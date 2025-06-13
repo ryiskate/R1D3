@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}R1D3 Game Development System{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 text-center">
+            <h1 class="display-4 mb-4">R1D3 Game Development System</h1>
+            <p class="lead mb-5">A comprehensive platform for managing your game development projects from concept to release.</p>
+            
+            <div class="d-grid gap-3 d-sm-flex justify-content-sm-center mb-5">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'games:dashboard' %}" class="btn btn-primary btn-lg px-4 gap-3">
+                        <i class="fas fa-gamepad me-2"></i> Game Dashboard
+                    </a>
+                    <a href="{% url 'games:game_list' %}" class="btn btn-outline-secondary btn-lg px-4">
+                        <i class="fas fa-list me-2"></i> View All Games
+                    </a>
+                {% else %}
+                    <a href="{% url 'account_login' %}" class="btn btn-primary btn-lg px-4 gap-3">
+                        <i class="fas fa-sign-in-alt me-2"></i> Sign In
+                    </a>
+                    <a href="{% url 'account_signup' %}" class="btn btn-outline-secondary btn-lg px-4">
+                        <i class="fas fa-user-plus me-2"></i> Register
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="row row-cols-1 row-cols-md-3 g-4 mb-5">
+        <div class="col">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center p-4">
+                    <div class="feature-icon bg-primary bg-gradient text-white rounded-3 mb-3">
+                        <i class="fas fa-file-alt fa-2x p-3"></i>
+                    </div>
+                    <h3 class="fs-4 fw-bold">Game Design Documents</h3>
+                    <p class="mb-0">Create and manage comprehensive GDDs with structured sections for all aspects of your game design.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center p-4">
+                    <div class="feature-icon bg-primary bg-gradient text-white rounded-3 mb-3">
+                        <i class="fas fa-tasks fa-2x p-3"></i>
+                    </div>
+                    <h3 class="fs-4 fw-bold">Task Management</h3>
+                    <p class="mb-0">Track development progress with task assignments, priorities, and milestone tracking.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center p-4">
+                    <div class="feature-icon bg-primary bg-gradient text-white rounded-3 mb-3">
+                        <i class="fas fa-cubes fa-2x p-3"></i>
+                    </div>
+                    <h3 class="fs-4 fw-bold">Asset Management</h3>
+                    <p class="mb-0">Organize all your game assets including art, audio, and code components in one central location.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg">
+                <div class="card-body p-5">
+                    <h2 class="card-title mb-4">About R1D3</h2>
+                    <p>R1D3 is a comprehensive game development company with a vision to create an ecosystem that spans:</p>
+                    <ul class="mb-4">
+                        <li>Game development studio creating innovative titles</li>
+                        <li>Educational platform for aspiring game developers</li>
+                        <li>Social media community for game creators</li>
+                        <li>Entertainment centers featuring our games</li>
+                        <li>Theme parks with immersive game-based attractions</li>
+                    </ul>
+                    <p>This management system is the backbone of our unified game development branch, helping us track and organize all aspects of our creative process.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

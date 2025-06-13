@@ -1,0 +1,59 @@
+/* Game Detail Page Styles */
+
+/* Progress Bar Styles */
+.progress {
+    height: 25px;
+    margin-bottom: 1rem;
+}
+
+.progress-bar {
+    color: white;
+    text-align: center;
+    line-height: 25px;
+    font-weight: 500;
+}
+
+/* Specific progress bar colors */
+.progress-done {
+    background-color: #28a745;
+}
+
+.progress-review {
+    background-color: #17a2b8;
+}
+
+.progress-in-progress {
+    background-color: #007bff;
+}
+
+.progress-todo {
+    background-color: #6c757d;
+}
+
+.progress-blocked {
+    background-color: #dc3545;
+}
+
+/* Asset Statistics */
+.asset-stats .card-body {
+    padding: 1.25rem;
+}
+
+/* Chart container */
+.chart-container {
+    position: relative;
+    height: 200px;
+    width: 100%;
+}
+
+/* Asset list styling */
+.asset-list-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #eee;
+}
+
+.asset-list-item:last-child {
+    border-bottom: none;
+}

@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Game Development Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <h1 class="mb-4">Game Development Dashboard</h1>
+    
+    <!-- Stats Overview -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Games</h5>
+                    <h2 class="display-4">{{ total_games }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Active Games</h5>
+                    <h2 class="display-4">{{ active_games }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Released Games</h5>
+                    <h2 class="display-4">{{ released_games }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning">
+                <div class="card-body">
+                    <h5 class="card-title">My Tasks</h5>
+                    <h2 class="display-4">{{ my_tasks.count }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Active Games -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Active Game Projects</h5>
+                    <a href="{% url 'games:game_create' %}" class="btn btn-primary btn-sm">New Game</a>
+                </div>
+                <div class="card-body">
+                    {% if games %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Status</th>
+                                        <th>Genre</th>
+                                        <th>Platform</th>
+                                        <th>Lead Developer</th>
+                                        <th>Target Release</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for game in games %}
+                                    <tr>
+                                        <td>
+                                            <a href="{% url 'games:game_detail' game.id %}">{{ game.title }}</a>
+                                            {% if game.tagline %}<br><small class="text-muted">{{ game.tagline }}</small>{% endif %}
+                                        </td>
+                                        <td><span class="badge bg-{{ game.status|yesno:'success,secondary' }}">{{ game.get_status_display }}</span></td>
+                                        <td>{{ game.get_genre_display }}</td>
+                                        <td>{{ game.get_platforms_display }}</td>
+                                        <td>{{ game.lead_developer|default:"Not assigned" }}</td>
+                                        <td>{{ game.target_release_date|default:"TBD" }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-center">No active game projects. <a href="{% url 'games:game_create' %}">Create your first game</a>.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- My Tasks -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">My Tasks</h5>
+                </div>
+                <div class="card-body">
+                    {% if my_tasks %}
+                        <div class="list-group">
+                            {% for task in my_tasks %}
+                                <a href="#" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">{{ task.title }}</h6>
+                                        <small class="text-{{ task.priority|yesno:'danger,warning,info,secondary' }}">{{ task.get_priority_display }}</small>
+                                    </div>
+                                    <p class="mb-1">{{ task.game.title }}</p>
+                                    <small>Due: {{ task.due_date|default:"No due date" }}</small>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-center">No tasks assigned to you.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recent Builds -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Recent Builds</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_builds %}
+                        <div class="list-group">
+                            {% for build in recent_builds %}
+                                <div class="list-group-item">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">{{ build.game.title }} v{{ build.version_number }}</h6>
+                                        <small>{{ build.build_date|date:"M d, Y" }}</small>
+                                    </div>
+                                    <p class="mb-1">{{ build.get_version_type_display }}</p>
+                                    {% if build.download_url %}
+                                        <a href="{{ build.download_url }}" class="btn btn-sm btn-outline-primary">Download</a>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-center">No recent builds.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

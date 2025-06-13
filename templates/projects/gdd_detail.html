@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ gdd.game.title }} - Game Design Document{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- GDD Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Game Design Document</h1>
+            <h2 class="text-primary">{{ gdd.game.title }}</h2>
+            {% if gdd.game.tagline %}<p class="lead">{{ gdd.game.tagline }}</p>{% endif %}
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'games:game_detail' gdd.game.id %}" class="btn btn-outline-secondary me-2">Back to Game</a>
+            <a href="#" class="btn btn-primary">Edit GDD</a>
+        </div>
+    </div>
+    
+    <!-- GDD Content -->
+    <div class="row">
+        <div class="col-lg-9">
+            <!-- High Concept -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">High Concept</h5>
+                </div>
+                <div class="card-body">
+                    {{ gdd.high_concept|linebreaks }}
+                </div>
+            </div>
+            
+            <!-- Player Experience -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Player Experience</h5>
+                </div>
+                <div class="card-body">
+                    {{ gdd.player_experience|linebreaks }}
+                </div>
+            </div>
+            
+            <!-- Core Mechanics -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Core Mechanics</h5>
+                </div>
+                <div class="card-body">
+                    {{ gdd.core_mechanics|linebreaks }}
+                </div>
+            </div>
+            
+            <!-- Game Rules -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Game Rules</h5>
+                </div>
+                <div class="card-body">
+                    {{ gdd.game_rules|linebreaks }}
+                </div>
+            </div>
+            
+            <!-- Controls -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Controls</h5>
+                </div>
+                <div class="card-body">
+                    {{ gdd.controls|linebreaks }}
+                </div>
+            </div>
+            
+            <!-- Story Synopsis -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Story Synopsis</h5>
+                </div>
+                <div class="card-body">
+                    {{ gdd.story_synopsis|linebreaks }}
+                </div>
+            </div>
+            
+            <!-- World Building -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">World Building</h5>
+                </div>
+                <div class="card-body">
+                    {{ gdd.world_building|linebreaks }}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3">
+            <!-- Game Info Sidebar -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Game Info</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6>Status</h6>
+                        <span class="badge bg-{{ gdd.game.status|yesno:'success,secondary' }}">{{ gdd.game.get_status_display }}</span>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h6>Genre</h6>
+                        <span class="badge bg-info">{{ gdd.game.get_genre_display }}</span>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h6>Platforms</h6>
+                        <span class="badge bg-dark">{{ gdd.game.get_platforms_display }}</span>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h6>Target Audience</h6>
+                        <p class="small">{{ gdd.game.target_audience|default:"Not specified" }}</p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h6>Target Release</h6>
+                        <p class="small">{{ gdd.game.target_release_date|date:"M d, Y"|default:"TBD" }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Art & Audio Style -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Art & Audio</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6>Art Style</h6>
+                        <p class="small">{{ gdd.art_style|linebreaks }}</p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h6>Audio Style</h6>
+                        <p class="small">{{ gdd.audio_style|linebreaks }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Technical & Business -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Technical & Business</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6>Technical Requirements</h6>
+                        <p class="small">{{ gdd.technical_requirements|linebreaks }}</p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h6>Monetization</h6>
+                        <p class="small">{{ gdd.monetization|linebreaks }}</p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h6>Marketing</h6>
+                        <p class="small">{{ gdd.marketing|linebreaks }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Document Info -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Document Info</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6>Created</h6>
+                        <p class="small">{{ gdd.created_at|date:"M d, Y H:i" }}</p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h6>Last Updated</h6>
+                        <p class="small">{{ gdd.updated_at|date:"M d, Y H:i" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

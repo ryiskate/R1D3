@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% if form.instance.id %}Edit{% else %}Create{% endif %} Game Project{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h5 class="mb-0">{% if form.instance.id %}Edit{% else %}Create{% endif %} Game Project</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-8">
+                                <h6 class="text-primary">Basic Information</h6>
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        {{ form.title|as_crispy_field }}
+                                    </div>
+                                    <div class="col-12">
+                                        {{ form.tagline|as_crispy_field }}
+                                    </div>
+                                    <div class="col-12">
+                                        {{ form.description|as_crispy_field }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <h6 class="text-primary">Classification</h6>
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        {{ form.status|as_crispy_field }}
+                                    </div>
+                                    <div class="col-12">
+                                        {{ form.genre|as_crispy_field }}
+                                    </div>
+                                    <div class="col-12">
+                                        {{ form.platforms|as_crispy_field }}
+                                    </div>
+                                    <div class="col-12">
+                                        {{ form.target_audience|as_crispy_field }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h6 class="text-primary">Timeline & Budget</h6>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        {{ form.start_date|as_crispy_field }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        {{ form.target_release_date|as_crispy_field }}
+                                    </div>
+                                    <div class="col-12">
+                                        {{ form.budget|as_crispy_field }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-primary">Team</h6>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        {{ form.lead_developer|as_crispy_field }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        {{ form.lead_designer|as_crispy_field }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        {{ form.lead_artist|as_crispy_field }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        {{ form.team_members|as_crispy_field }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h6 class="text-primary">GitHub Integration</h6>
+                                <div class="card bg-light mb-3">
+                                    <div class="card-body">
+                                        <p class="small text-muted mb-3">
+                                            <i class="fab fa-github me-1"></i> Connect your game project to GitHub for version control, issue tracking, and automated workflows.
+                                        </p>
+                                        <div class="row g-3">
+                                            <div class="col-12">
+                                                {{ form.github_repository|as_crispy_field }}
+                                            </div>
+                                            <div class="col-md-6">
+                                                {{ form.github_username|as_crispy_field }}
+                                            </div>
+                                            <div class="col-md-6">
+                                                {{ form.github_branch|as_crispy_field }}
+                                            </div>
+                                            <div class="col-md-6">
+                                                {{ form.github_token|as_crispy_field }}
+                                                <div class="form-text small text-muted">Stored securely. Used for API access.</div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                {{ form.github_webhook_secret|as_crispy_field }}
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="form-check form-switch">
+                                                    {{ form.auto_sync }}
+                                                    <label class="form-check-label" for="{{ form.auto_sync.id_for_label }}">Auto-sync with repository</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <h6 class="text-primary mt-4">External Links</h6>
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        {{ form.trello_board|as_crispy_field }}
+                                    </div>
+                                    <div class="col-12">
+                                        {{ form.discord_channel|as_crispy_field }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-primary">Media</h6>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        {{ form.logo|as_crispy_field }}
+                                        {% if form.instance.logo %}
+                                            <div class="mt-2">
+                                                <img src="{{ form.instance.logo.url }}" alt="Current Logo" class="img-thumbnail" style="max-height: 100px;">
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        {{ form.cover_image|as_crispy_field }}
+                                        {% if form.instance.cover_image %}
+                                            <div class="mt-2">
+                                                <img src="{{ form.instance.cover_image.url }}" alt="Current Cover" class="img-thumbnail" style="max-height: 100px;">
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'games:game_list' %}" class="btn btn-outline-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">
+                                {% if form.instance.id %}Save Changes{% else %}Create Game Project{% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Initialize Select2 for multi-select fields
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add Select2 if it's available
+        if (typeof $.fn.select2 !== 'undefined') {
+            $('.select2').select2({
+                theme: 'bootstrap4',
+                width: '100%'
+            });
+        }
+        
+        // Form validation
+        const forms = document.querySelectorAll('.needs-validation');
+        
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                
+                form.classList.add('was-validated');
+            }, false);
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Dashboard - R1D3{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <h1 class="mb-4">Dashboard</h1>
+    
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Game Development</h5>
+                    <a href="{% url 'games:dashboard' %}" class="btn btn-sm btn-primary">View All</a>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <div class="card bg-primary text-white">
+                                <div class="card-body text-center">
+                                    <h3 class="display-4">{{ game_count|default:"0" }}</h3>
+                                    <p class="mb-0">Active Games</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="card bg-success text-white">
+                                <div class="card-body text-center">
+                                    <h3 class="display-4">{{ task_count|default:"0" }}</h3>
+                                    <p class="mb-0">Open Tasks</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <p>Quick access to game development resources:</p>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'games:game_create' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-plus me-2"></i> New Game Project
+                        </a>
+                        <a href="{% url 'games:game_list' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-list me-2"></i> View All Games
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0">Company Strategy</h5>
+                </div>
+                <div class="card-body">
+                    <p>R1D3's multi-phase growth plan:</p>
+                    <ol>
+                        <li><strong>Game Development Studio</strong> - Our current focus</li>
+                        <li>Game Development Education Platform</li>
+                        <li>Social Media for Game Developers</li>
+                        <li>Arcade Entertainment Centers</li>
+                        <li>Theme Parks with Game-Based Attractions</li>
+                    </ol>
+                    
+                    <div class="d-grid gap-2 mt-3">
+                        <a href="#" class="btn btn-outline-primary">
+                            <i class="fas fa-bullseye me-2"></i> View Strategy Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Recent Activity</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item px-0">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">New game project created</h6>
+                                <small>3 days ago</small>
+                            </div>
+                            <p class="mb-1">Project: Space Explorer</p>
+                        </div>
+                        <div class="list-group-item px-0">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">GDD updated</h6>
+                                <small>5 days ago</small>
+                            </div>
+                            <p class="mb-1">Project: Dungeon Crawler</p>
+                        </div>
+                        <div class="list-group-item px-0">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">New build released</h6>
+                                <small>1 week ago</small>
+                            </div>
+                            <p class="mb-1">Project: Puzzle Quest v0.3.2</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">My Tasks</h5>
+                </div>
+                <div class="card-body">
+                    {% if user_tasks %}
+                        <div class="list-group list-group-flush">
+                            {% for task in user_tasks %}
+                                <div class="list-group-item px-0">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">{{ task.title }}</h6>
+                                        <span class="badge bg-{{ task.priority|yesno:'danger,warning,info,secondary' }}">{{ task.get_priority_display }}</span>
+                                    </div>
+                                    <p class="mb-1">{{ task.game.title }}</p>
+                                    <small>Due: {{ task.due_date|date:"M d"|default:"No due date" }}</small>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-center">No tasks assigned to you.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Quick Links</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        <a href="{% url 'games:dashboard' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-gamepad me-2"></i> Game Dashboard
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <i class="fas fa-file-alt me-2"></i> Game Design Documents
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <i class="fas fa-tasks me-2"></i> Task Management
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <i class="fas fa-cubes me-2"></i> Asset Management
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <i class="fas fa-bug me-2"></i> Bug Tracking
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <i class="fas fa-chart-line me-2"></i> Analytics
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

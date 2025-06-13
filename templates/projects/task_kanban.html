@@ -1,0 +1,297 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load project_extras %}
+
+{% block title %}Task Kanban - {{ game.title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .kanban-board {
+        display: flex;
+        overflow-x: auto;
+        padding-bottom: 1rem;
+        min-height: calc(100vh - 250px);
+    }
+    
+    .kanban-column {
+        min-width: 300px;
+        width: 300px;
+        margin-right: 1rem;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .kanban-column-header {
+        padding: 0.75rem;
+        border-radius: 0.25rem 0.25rem 0 0;
+        font-weight: bold;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .kanban-column-body {
+        flex: 1;
+        background-color: #f8f9fa;
+        border-radius: 0 0 0.25rem 0.25rem;
+        padding: 0.5rem;
+        overflow-y: auto;
+    }
+    
+    .kanban-card {
+        background-color: white;
+        border-radius: 0.25rem;
+        padding: 0.75rem;
+        margin-bottom: 0.5rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .kanban-card:hover {
+        box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+        transform: translateY(-2px);
+    }
+    
+    .kanban-card-title {
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+    
+    .kanban-card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 0.5rem;
+        font-size: 0.8rem;
+    }
+    
+    /* Status column colors */
+    .status-backlog .kanban-column-header {
+        background-color: #6c757d;
+        color: white;
+    }
+    
+    .status-to_do .kanban-column-header {
+        background-color: #0d6efd;
+        color: white;
+    }
+    
+    .status-in_progress .kanban-column-header {
+        background-color: #ffc107;
+        color: black;
+    }
+    
+    .status-in_review .kanban-column-header {
+        background-color: #0dcaf0;
+        color: black;
+    }
+    
+    .status-done .kanban-column-header {
+        background-color: #198754;
+        color: white;
+    }
+    
+    .status-blocked .kanban-column-header {
+        background-color: #dc3545;
+        color: white;
+    }
+    
+    /* Task type badges */
+    .badge-design {
+        background-color: #6f42c1;
+    }
+    
+    .badge-art {
+        background-color: #e83e8c;
+    }
+    
+    .badge-programming {
+        background-color: #20c997;
+    }
+    
+    .badge-audio {
+        background-color: #6610f2;
+    }
+    
+    .badge-testing {
+        background-color: #fd7e14;
+    }
+    
+    .badge-writing {
+        background-color: #0dcaf0;
+    }
+    
+    /* Priority indicators */
+    .priority-critical {
+        border-left: 4px solid #000;
+    }
+    
+    .priority-high {
+        border-left: 4px solid #dc3545;
+    }
+    
+    .priority-medium {
+        border-left: 4px solid #ffc107;
+    }
+    
+    .priority-low {
+        border-left: 4px solid #198754;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'games:dashboard' %}">Dashboard</a></li>
+                    {% if game %}
+                    <li class="breadcrumb-item"><a href="{% url 'games:game_detail' game.id %}">{{ game.title }}</a></li>
+                    {% endif %}
+                    <li class="breadcrumb-item"><a href="{% url 'games:task_list' game.id %}">Tasks</a></li>
+                    <li class="breadcrumb-item active">Kanban Board</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>
+                {% if game %}
+                Task Board for {{ game.title }}
+                {% else %}
+                Task Board
+                {% endif %}
+            </h1>
+        </div>
+        <div class="col-md-4 text-end">
+            {% if game %}
+            <a href="{% url 'games:task_create' game.id %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> New Task
+            </a>
+            <a href="{% url 'games:task_list' game.id %}" class="btn btn-outline-secondary ms-2">
+                <i class="bi bi-list"></i> List View
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="myTasksCheck" name="my_tasks" value="true" {% if request.GET.my_tasks %}checked{% endif %} onchange="this.form.submit()">
+                                <label class="form-check-label" for="myTasksCheck">
+                                    Show only my tasks
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-8 text-end">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" id="collapseAllBtn">
+                                Collapse All
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary ms-2" id="expandAllBtn">
+                                Expand All
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="kanban-board">
+                {% for status_code, status_name in status_choices %}
+                <div class="kanban-column status-{{ status_code }}">
+                    <div class="kanban-column-header">
+                        <span>{{ status_name }}</span>
+                        <span class="badge bg-light text-dark">{{ tasks_by_status|get_item:status_code|length }}</span>
+                    </div>
+                    <div class="kanban-column-body" id="column-{{ status_code }}" data-status="{{ status_code }}">
+                        {% for task in tasks_by_status|get_item:status_code %}
+                        <div class="kanban-card priority-{{ task.priority }}" data-task-id="{{ task.id }}" data-url="{% url 'games:task_detail' task.id %}">
+                            <div class="kanban-card-title">{{ task.title }}</div>
+                            
+                            {% if task.description %}
+                            <div class="kanban-card-description small text-muted text-truncate">
+                                {{ task.description|truncatechars:60 }}
+                            </div>
+                            {% endif %}
+                            
+                            <div class="kanban-card-footer">
+                                <div>
+                                    <span class="badge badge-{{ task.task_type }} bg-{{ task.task_type }}">{{ task.get_task_type_display }}</span>
+                                    {% if task.milestone %}
+                                    <span class="badge bg-info">{{ task.milestone.title|truncatechars:15 }}</span>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    {% if task.assigned_to %}
+                                    <span class="badge bg-secondary" title="{{ task.assigned_to.get_full_name|default:task.assigned_to.username }}">
+                                        {{ task.assigned_to.get_initials }}
+                                    </span>
+                                    {% endif %}
+                                    
+                                    {% if task.due_date %}
+                                    <span class="badge {% if task.due_date < today %}bg-danger{% elif task.due_date == today %}bg-warning{% else %}bg-light text-dark{% endif %}" title="Due date">
+                                        {{ task.due_date|date:"M d" }}
+                                    </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="text-center text-muted p-3">
+                            <em>No tasks</em>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Collapse/Expand functionality
+        document.getElementById('collapseAllBtn').addEventListener('click', function() {
+            document.querySelectorAll('.kanban-card-description').forEach(function(el) {
+                el.classList.add('d-none');
+            });
+        });
+        
+        document.getElementById('expandAllBtn').addEventListener('click', function() {
+            document.querySelectorAll('.kanban-card-description').forEach(function(el) {
+                el.classList.remove('d-none');
+            });
+        });
+        
+        // Handle kanban card clicks using event delegation
+        document.querySelectorAll('.kanban-column-body').forEach(function(column) {
+            column.addEventListener('click', function(event) {
+                // Find the closest kanban-card parent element
+                const card = event.target.closest('.kanban-card');
+                if (card && card.dataset.url) {
+                    window.location.href = card.dataset.url;
+                }
+            });
+        });
+        
+        // Initialize drag and drop functionality if needed
+        // This would require additional JavaScript libraries like SortableJS
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,295 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load project_extras %}
+
+{% block title %}{{ task.title }} - Task Details{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'games:dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'games:game_detail' task.game.id %}">{{ task.game.title }}</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'games:task_list' task.game.id %}">Tasks</a></li>
+                    <li class="breadcrumb-item active">{{ task.title }}</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>{{ task.title }}</h1>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'games:task_update' task.id %}" class="btn btn-primary">
+                <i class="bi bi-pencil"></i> Edit Task
+            </a>
+            <a href="{% url 'games:task_delete' task.id %}" class="btn btn-danger ms-2">
+                <i class="bi bi-trash"></i> Delete
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Task Details -->
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Task Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h6 class="fw-bold">Description</h6>
+                        <div class="p-3 bg-light rounded">
+                            {% if task.description %}
+                            {{ task.description|linebreaks }}
+                            {% else %}
+                            <em>No description provided</em>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="fw-bold">Status</h6>
+                            <div class="mb-3">
+                                {% if task.status == 'backlog' %}
+                                <span class="badge bg-secondary">Backlog</span>
+                                {% elif task.status == 'to_do' %}
+                                <span class="badge bg-primary">To Do</span>
+                                {% elif task.status == 'in_progress' %}
+                                <span class="badge bg-warning">In Progress</span>
+                                {% elif task.status == 'in_review' %}
+                                <span class="badge bg-info">In Review</span>
+                                {% elif task.status == 'done' %}
+                                <span class="badge bg-success">Done</span>
+                                {% elif task.status == 'blocked' %}
+                                <span class="badge bg-danger">Blocked</span>
+                                {% endif %}
+                            </div>
+
+                            <h6 class="fw-bold">Priority</h6>
+                            <div class="mb-3">
+                                {% if task.priority == 'low' %}
+                                <span class="badge bg-success">Low</span>
+                                {% elif task.priority == 'medium' %}
+                                <span class="badge bg-warning">Medium</span>
+                                {% elif task.priority == 'high' %}
+                                <span class="badge bg-danger">High</span>
+                                {% elif task.priority == 'critical' %}
+                                <span class="badge bg-dark">Critical</span>
+                                {% endif %}
+                            </div>
+
+                            <h6 class="fw-bold">Task Type</h6>
+                            <div class="mb-3">
+                                {% if task.task_type == 'design' %}
+                                <span class="badge bg-purple">Design</span>
+                                {% elif task.task_type == 'art' %}
+                                <span class="badge bg-pink">Art</span>
+                                {% elif task.task_type == 'programming' %}
+                                <span class="badge bg-teal">Programming</span>
+                                {% elif task.task_type == 'audio' %}
+                                <span class="badge bg-indigo">Audio</span>
+                                {% elif task.task_type == 'testing' %}
+                                <span class="badge bg-orange">Testing</span>
+                                {% elif task.task_type == 'writing' %}
+                                <span class="badge bg-cyan">Writing</span>
+                                {% else %}
+                                <span class="badge bg-secondary">Other</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <h6 class="fw-bold">Assigned To</h6>
+                            <div class="mb-3">
+                                {% if task.assigned_to %}
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar avatar-sm me-2">
+                                        {% if task.assigned_to.profile.avatar %}
+                                        <img src="{{ task.assigned_to.profile.avatar.url }}" alt="Avatar" class="rounded-circle">
+                                        {% else %}
+                                        <div class="avatar-initials rounded-circle bg-primary text-white">
+                                            {{ task.assigned_to.get_initials }}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    <span>{{ task.assigned_to.get_full_name|default:task.assigned_to.username }}</span>
+                                </div>
+                                {% else %}
+                                <span class="text-muted">Unassigned</span>
+                                {% endif %}
+                            </div>
+
+                            <h6 class="fw-bold">Due Date</h6>
+                            <div class="mb-3">
+                                {% if task.due_date %}
+                                {{ task.due_date }}
+                                {% if task.due_date < today %}
+                                <span class="badge bg-danger ms-2">Overdue</span>
+                                {% elif task.due_date == today %}
+                                <span class="badge bg-warning ms-2">Today</span>
+                                {% endif %}
+                                {% else %}
+                                <span class="text-muted">No due date</span>
+                                {% endif %}
+                            </div>
+
+                            <h6 class="fw-bold">Milestone</h6>
+                            <div class="mb-3">
+                                {% if task.milestone %}
+                                <a href="#" class="badge bg-info text-decoration-none">{{ task.milestone.title }}</a>
+                                {% else %}
+                                <span class="text-muted">Not assigned to a milestone</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <h6 class="fw-bold">Time Tracking</h6>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Estimated Hours:</span>
+                                    <span>{{ task.estimated_hours|default:"--" }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span>Actual Hours:</span>
+                                    <span>{{ task.actual_hours|default:"--" }}</span>
+                                </div>
+                                {% if task.estimated_hours and task.actual_hours %}
+                                <div class="progress mt-2" style="height: 10px;">
+                                    {% if task.actual_hours <= task.estimated_hours %}
+                                     <div class="progress-bar bg-success" role="progressbar"
+                                          style="width: 0%"
+                                          data-percentage="{{ task.actual_hours|div:task.estimated_hours|mul:100|floatformat:0 }}"
+                                          aria-valuenow="{{ task.actual_hours }}">
+                                    </div>
+                                    {% else %}
+                                     <div class="progress-bar bg-success" role="progressbar"
+                                          style="width: 100%"
+                                          aria-valuenow="{{ task.estimated_hours }}">
+                                     </div>
+                                     {% with overage=task.actual_hours|sub:task.estimated_hours %}
+                                    {% with percentage=overage|div:task.estimated_hours|mul:100 %}
+                                    <div class="progress-bar bg-danger" role="progressbar" 
+                                         style="width: 0%" 
+                                         data-percentage="{{ percentage|floatformat:0 }}"
+                                         aria-valuenow="{{ overage }}">
+                                    </div>
+
+                                    {% endwith %}
+                                    {% endwith %}
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="fw-bold">Created</h6>
+                            <div class="mb-3">
+                                {{ task.created|date:"F j, Y, g:i a" }}
+                            </div>
+                            <h6 class="fw-bold">Last Updated</h6>
+                            <div class="mb-3">
+                                {{ task.modified|date:"F j, Y, g:i a" }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'games:task_update' task.id %}" class="mb-3">
+                        {% csrf_token %}
+                        <input type="hidden" name="quick_update" value="true">
+                        <div class="mb-3">
+                            <label class="form-label">Update Status</label>
+                            <select name="status" class="form-select" onchange="this.form.submit()">
+                                {% for status_code, status_name in task.STATUS_CHOICES %}
+                                <option value="{{ status_code }}" {% if task.status == status_code %}selected{% endif %}>
+                                    {{ status_name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </form>
+
+                    <form method="post" action="{% url 'games:task_update' task.id %}" class="mb-3">
+                        {% csrf_token %}
+                        <input type="hidden" name="quick_update" value="true">
+                        <div class="mb-3">
+                            <label class="form-label">Log Hours</label>
+                            <div class="input-group">
+                                <input type="number" name="actual_hours" class="form-control" step="0.25" min="0" value="{{ task.actual_hours|default:0 }}">
+                                <button type="submit" class="btn btn-primary">Update</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Related Tasks</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for related_task in task.game.tasks.all|slice:":5" %}
+                            {% if related_task != task %}
+                            <a href="{% url 'games:task_detail' related_task.id %}" class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">{{ related_task.title }}</h6>
+                                    <small>
+                                        {% if related_task.status == 'backlog' %}
+                                        <span class="badge bg-secondary">Backlog</span>
+                                        {% elif related_task.status == 'to_do' %}
+                                        <span class="badge bg-primary">To Do</span>
+                                        {% elif related_task.status == 'in_progress' %}
+                                        <span class="badge bg-warning">In Progress</span>
+                                        {% elif related_task.status == 'in_review' %}
+                                        <span class="badge bg-info">In Review</span>
+                                        {% elif related_task.status == 'done' %}
+                                        <span class="badge bg-success">Done</span>
+                                        {% elif related_task.status == 'blocked' %}
+                                        <span class="badge bg-danger">Blocked</span>
+                                        {% endif %}
+                                    </small>
+                                </div>
+                                <small>{{ related_task.task_type|title }}</small>
+                            </a>
+                            {% endif %}
+                        {% empty %}
+                            <div class="list-group-item">No related tasks found</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Set the width of progress bars after page load to avoid CSS lint errors
+    document.addEventListener('DOMContentLoaded', function() {
+        const progressBars = document.querySelectorAll('.progress-bar[data-percentage]');
+        progressBars.forEach(bar => {
+            bar.style.width = bar.dataset.percentage + '%';
+        });
+    });
+</script>
+{% endblock %}

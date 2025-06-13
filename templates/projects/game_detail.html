@@ -1,0 +1,368 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ game.title }} - Game Details{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/game_detail.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Game Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>{{ game.title }}</h1>
+            {% if game.tagline %}<p class="lead">{{ game.tagline }}</p>{% endif %}
+            <div class="mb-3">
+                <span class="badge bg-{{ game.status|yesno:'success,secondary' }} me-2">{{ game.get_status_display }}</span>
+                <span class="badge bg-info me-2">{{ game.get_genre_display }}</span>
+                <span class="badge bg-dark">{{ game.get_platforms_display }}</span>
+            </div>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'games:game_list' %}" class="btn btn-outline-secondary me-2">Back to Games</a>
+            <div class="btn-group">
+                <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    Actions
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="#">Edit Game</a></li>
+                    {% if not gdd %}
+                        <li><a class="dropdown-item" href="{% url 'games:gdd_create' game.id %}">Create GDD</a></li>
+                    {% endif %}
+                    <li><a class="dropdown-item" href="{% url 'games:asset_create' game.id %}">Add Asset</a></li>
+                    <li><a class="dropdown-item" href="{% url 'games:task_create' game.id %}">Create Task</a></li>
+                    <li><a class="dropdown-item" href="{% url 'games:task_kanban' game.id %}">Kanban Board</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="#">Archive Game</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Game Info -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Game Overview</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            {% if game.logo %}
+                                <img src="{{ game.logo.url }}" alt="{{ game.title }} Logo" class="img-fluid mb-3">
+                            {% else %}
+                                <div class="bg-light text-center p-4 mb-3">
+                                    <i class="fas fa-gamepad fa-3x text-muted"></i>
+                                    <p class="mt-2 mb-0 small">No Logo</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-9">
+                            <p>{{ game.description|linebreaks }}</p>
+                            
+                            <h6>Target Audience</h6>
+                            <p>{{ game.target_audience|default:"Not specified" }}</p>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6>Start Date</h6>
+                                    <p>{{ game.start_date|date:"M d, Y"|default:"Not set" }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6>Target Release Date</h6>
+                                    <p>{{ game.target_release_date|date:"M d, Y"|default:"TBD" }}</p>
+                                </div>
+                            </div>
+                            
+                            {% if game.budget %}
+                                <h6>Budget</h6>
+                                <p>${{ game.budget }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- GDD Section -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Game Design Document</h5>
+                    {% if gdd %}
+                        <a href="{% url 'games:gdd_detail' gdd.id %}" class="btn btn-sm btn-outline-primary">View Full GDD</a>
+                    {% else %}
+                        <a href="{% url 'games:gdd_create' game.id %}" class="btn btn-sm btn-primary">Create GDD</a>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if gdd %}
+                        <h6>High Concept</h6>
+                        <p>{{ gdd.high_concept|truncatewords:50 }}</p>
+                        
+                        <h6>Core Mechanics</h6>
+                        <p>{{ gdd.core_mechanics|truncatewords:50 }}</p>
+                        
+                        <h6>Art Style</h6>
+                        <p>{{ gdd.art_style|truncatewords:30 }}</p>
+                    {% else %}
+                        <p class="text-center">No Game Design Document has been created yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Task Progress -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Task Progress</h5>
+                    <div>
+                        <a href="{% url 'games:task_kanban' game.id %}" class="btn btn-sm btn-outline-secondary me-2">
+                            <i class="bi bi-kanban"></i> Kanban Board
+                        </a>
+                        <a href="{% url 'games:task_list' game.id %}" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-list-task"></i> View All Tasks
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-end mb-3">
+                        <a href="{% url 'games:task_create' game.id %}" class="btn btn-primary btn-sm">
+                            <i class="bi bi-plus-circle"></i> Create Task
+                        </a>
+                    </div>
+                    <!-- Task progress bars - each in its own row for better visibility -->
+                    <div class="task-progress-container">
+                        <!-- Done tasks -->
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Done</span>
+                            <span>{{ tasks_by_status.done|default:0 }}%</span>
+                        </div>
+                        <div class="progress mb-3">
+                            <div class="progress-bar progress-done" role="progressbar" 
+                                 aria-valuenow="{{ tasks_by_status.done|default:0 }}" aria-valuemin="0" aria-valuemax="100">
+                            </div>
+                        </div>
+                        
+                        <!-- In Review tasks -->
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>In Review</span>
+                            <span>{{ tasks_by_status.in_review|default:0 }}%</span>
+                        </div>
+                        <div class="progress mb-3">
+                            <div class="progress-bar progress-review" role="progressbar"
+                                 aria-valuenow="{{ tasks_by_status.in_review|default:0 }}" aria-valuemin="0" aria-valuemax="100">
+                            </div>
+                        </div>
+                        
+                        <!-- In Progress tasks -->
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>In Progress</span>
+                            <span>{{ tasks_by_status.in_progress|default:0 }}%</span>
+                        </div>
+                        <div class="progress mb-3">
+                            <div class="progress-bar progress-in-progress" role="progressbar"
+                                 aria-valuenow="{{ tasks_by_status.in_progress|default:0 }}" aria-valuemin="0" aria-valuemax="100">
+                            </div>
+                        </div>
+                        
+                        <!-- To Do tasks -->
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>To Do</span>
+                            <span>{{ tasks_by_status.to_do|default:0 }}%</span>
+                        </div>
+                        <div class="progress mb-3">
+                            <div class="progress-bar progress-todo" role="progressbar"
+                                 aria-valuenow="{{ tasks_by_status.to_do|default:0 }}" aria-valuemin="0" aria-valuemax="100">
+                            </div>
+                        </div>
+                        
+                        <!-- Blocked tasks -->
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Blocked</span>
+                            <span>{{ tasks_by_status.blocked|default:0 }}%</span>
+                        </div>
+                        <div class="progress mb-3">
+                            <div class="progress-bar progress-blocked" role="progressbar"
+                                 aria-valuenow="{{ tasks_by_status.blocked|default:0 }}" aria-valuemin="0" aria-valuemax="100">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if tasks %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Task</th>
+                                        <th>Status</th>
+                                        <th>Assigned To</th>
+                                        <th>Due Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for task in tasks|slice:":5" %}
+                                    <tr>
+                                        <td>{{ task.title }}</td>
+                                        <td><span class="badge bg-{{ task.status|yesno:'success,warning,secondary' }}">{{ task.get_status_display }}</span></td>
+                                        <td>{{ task.assigned_to|default:"Unassigned" }}</td>
+                                        <td>{{ task.due_date|date:"M d"|default:"No date" }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-center">No tasks created for this game yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <!-- Team Information -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Team</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6>Lead Developer</h6>
+                        <p>{{ game.lead_developer|default:"Not assigned" }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <h6>Lead Designer</h6>
+                        <p>{{ game.lead_designer|default:"Not assigned" }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <h6>Lead Artist</h6>
+                        <p>{{ game.lead_artist|default:"Not assigned" }}</p>
+                    </div>
+                    
+                    <h6>Team Members</h6>
+                    {% if game.team_members.all %}
+                        <ul class="list-unstyled">
+                            {% for member in game.team_members.all %}
+                                <li>{{ member.get_full_name|default:member.username }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>No team members assigned</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- External Links -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Links</h5>
+                </div>
+                <div class="card-body">
+                    {% if game.github_repository %}
+                        <div class="mb-2">
+                            <i class="fab fa-github me-2"></i>
+                            <a href="{{ game.github_repository }}" target="_blank">GitHub Repository</a>
+                        </div>
+                    {% endif %}
+                    
+                    {% if game.trello_board %}
+                        <div class="mb-2">
+                            <i class="fab fa-trello me-2"></i>
+                            <a href="{{ game.trello_board }}" target="_blank">Trello Board</a>
+                        </div>
+                    {% endif %}
+                    
+                    {% if game.discord_channel %}
+                        <div class="mb-2">
+                            <i class="fab fa-discord me-2"></i>
+                            <a href="{{ game.discord_channel }}" target="_blank">Discord Channel</a>
+                        </div>
+                    {% endif %}
+                    
+                    {% if not game.github_repository and not game.trello_board and not game.discord_channel %}
+                        <p>No external links added</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Asset Stats -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Assets</h5>
+                    <a href="{% url 'games:asset_list' game.id %}" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="card-body asset-stats">
+                    <div class="chart-container">
+                        <canvas id="assetChart" width="100%" height="200"></canvas>
+                    </div>
+                    
+                    <div class="mt-4 asset-list">
+                        <div class="asset-list-item">
+                            <span>2D Art</span>
+                            <span class="badge bg-primary">{{ assets_by_type.art_2d|default:0 }}</span>
+                        </div>
+                        <div class="asset-list-item">
+                            <span>3D Models</span>
+                            <span class="badge bg-success">{{ assets_by_type.model_3d|default:0 }}</span>
+                        </div>
+                        <div class="asset-list-item">
+                            <span>Animation</span>
+                            <span class="badge bg-info">{{ assets_by_type.animation|default:0 }}</span>
+                        </div>
+                        <div class="asset-list-item">
+                            <span>Sound</span>
+                            <span class="badge bg-warning">{{ assets_by_type.sound|default:0 }}</span>
+                        </div>
+                        <div class="asset-list-item">
+                            <span>Music</span>
+                            <span class="badge bg-danger">{{ assets_by_type.music|default:0 }}</span>
+                        </div>
+                        <div class="asset-list-item">
+                            <span>Code</span>
+                            <span class="badge bg-secondary">{{ assets_by_type.code|default:0 }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Bugs Summary -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Bugs</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0">Open Bugs</h6>
+                        <span class="badge bg-danger">{{ open_bugs }}</span>
+                    </div>
+                    
+                    {% if bugs %}
+                        <div class="list-group list-group-flush">
+                            {% for bug in bugs|slice:":5" %}
+                                <div class="list-group-item px-0">
+                                    <div class="d-flex justify-content-between">
+                                        <span>{{ bug.title }}</span>
+                                        <span class="badge bg-{{ bug.severity|yesno:'danger,warning,info' }}">{{ bug.get_severity_display }}</span>
+                                    </div>
+                                    <small class="text-muted">{{ bug.get_status_display }}</small>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-center">No bugs reported</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block extra_js %}
+<!-- Pass Django data to JavaScript using json_script template tag -->
+{{ assets_by_type|json_script:"asset-data" }}
+{{ tasks_by_status|json_script:"task-data" }}
+
+<!-- Include external JavaScript file -->
+<script src="{% static 'js/game_detail.js' %}"></script>
+{% endblock extra_js %}

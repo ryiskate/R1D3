@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ title }} - {{ game.title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'games:dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'games:game_detail' game.id %}">{{ game.title }}</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'games:task_list' game.id %}">Tasks</a></li>
+                    <li class="breadcrumb-item active">{{ title }}</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1>{{ title }}</h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-8">
+                                {{ form.title|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form.status|as_crispy_field }}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-12">
+                                {{ form.description|as_crispy_field }}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-4">
+                                {{ form.task_type|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form.priority|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form.milestone|as_crispy_field }}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-4">
+                                {{ form.assigned_to|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form.due_date|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        {{ form.estimated_hours|as_crispy_field }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        {{ form.actual_hours|as_crispy_field }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a href="{% url 'games:task_list' game.id %}" class="btn btn-secondary me-md-2">Cancel</a>
+                            <button type="submit" class="btn btn-primary">{{ submit_text }}</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Task Tips</h5>
+                </div>
+                <div class="card-body">
+                    <h6>Creating Effective Tasks</h6>
+                    <ul>
+                        <li>Use clear, descriptive titles</li>
+                        <li>Break down large tasks into smaller ones</li>
+                        <li>Set realistic due dates</li>
+                        <li>Assign appropriate priorities</li>
+                        <li>Include detailed descriptions</li>
+                    </ul>
+                    
+                    <h6>Task Status Guide</h6>
+                    <ul>
+                        <li><strong>Backlog</strong>: Tasks planned for future sprints</li>
+                        <li><strong>To Do</strong>: Tasks ready to be worked on</li>
+                        <li><strong>In Progress</strong>: Tasks currently being worked on</li>
+                        <li><strong>In Review</strong>: Tasks completed and awaiting review</li>
+                        <li><strong>Done</strong>: Tasks completed and approved</li>
+                        <li><strong>Blocked</strong>: Tasks that cannot proceed due to dependencies</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Add datepicker initialization if needed
+    $(document).ready(function() {
+        // Any form-specific JavaScript can go here
+    });
+</script>
+{% endblock %}

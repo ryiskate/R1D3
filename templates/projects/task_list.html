@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load project_extras %}
+
+{% block title %}Tasks - {{ game.title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'games:dashboard' %}">Dashboard</a></li>
+                    {% if game %}
+                    <li class="breadcrumb-item"><a href="{% url 'games:game_detail' game.id %}">{{ game.title }}</a></li>
+                    {% endif %}
+                    <li class="breadcrumb-item active">Tasks</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>
+                {% if game %}
+                Tasks for {{ game.title }}
+                {% else %}
+                All Tasks
+                {% endif %}
+            </h1>
+        </div>
+        <div class="col-md-4 text-end">
+            {% if game %}
+            <a href="{% url 'games:task_create' game.id %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> New Task
+            </a>
+            <a href="{% url 'games:task_kanban' game.id %}" class="btn btn-outline-secondary ms-2">
+                <i class="bi bi-kanban"></i> Kanban View
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Filters -->
+        <div class="col-md-3">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Filters</h5>
+                </div>
+                <div class="card-body">
+                    <form method="get">
+                        <div class="mb-3">
+                            <label class="form-label">Status</label>
+                            <div class="list-group">
+                                <a href="?{% if request.GET.my_tasks %}my_tasks=true{% endif %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center {% if not request.GET.status %}active{% endif %}">
+                                    All
+                                    <span class="badge bg-primary rounded-pill">{{ tasks|length }}</span>
+                                </a>
+                                {% for status_code, status_name in task.STATUS_CHOICES %}
+                                <a href="?status={{ status_code }}{% if request.GET.my_tasks %}&my_tasks=true{% endif %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center {% if request.GET.status == status_code %}active{% endif %}">
+                                    {{ status_name }}
+                                    <span class="badge bg-primary rounded-pill">{{ status_counts|get_item:status_code }}</span>
+                                </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Type</label>
+                            <div class="list-group">
+                                <a href="?{% if request.GET.status %}status={{ request.GET.status }}{% endif %}{% if request.GET.my_tasks %}&my_tasks=true{% endif %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center {% if not request.GET.type %}active{% endif %}">
+                                    All Types
+                                    <span class="badge bg-secondary rounded-pill">{{ tasks|length }}</span>
+                                </a>
+                                {% for type_code, type_name in task.TASK_TYPE_CHOICES %}
+                                <a href="?type={{ type_code }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.my_tasks %}&my_tasks=true{% endif %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center {% if request.GET.type == type_code %}active{% endif %}">
+                                    {{ type_name }}
+                                    <span class="badge bg-secondary rounded-pill">{{ type_counts|get_item:type_code }}</span>
+                                </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="myTasksCheck" name="my_tasks" value="true" {% if request.GET.my_tasks %}checked{% endif %} onchange="this.form.submit()">
+                            <label class="form-check-label" for="myTasksCheck">
+                                My Tasks Only
+                            </label>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Task List -->
+        <div class="col-md-9">
+            {% if tasks %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Status</th>
+                            <th>Type</th>
+                            <th>Priority</th>
+                            <th>Assigned To</th>
+                            <th>Due Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for task in tasks %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'games:task_detail' task.id %}">{{ task.title }}</a>
+                                {% if task.milestone %}
+                                <span class="badge bg-info">{{ task.milestone.title }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if task.status == 'backlog' %}
+                                <span class="badge bg-secondary">Backlog</span>
+                                {% elif task.status == 'to_do' %}
+                                <span class="badge bg-primary">To Do</span>
+                                {% elif task.status == 'in_progress' %}
+                                <span class="badge bg-warning">In Progress</span>
+                                {% elif task.status == 'in_review' %}
+                                <span class="badge bg-info">In Review</span>
+                                {% elif task.status == 'done' %}
+                                <span class="badge bg-success">Done</span>
+                                {% elif task.status == 'blocked' %}
+                                <span class="badge bg-danger">Blocked</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if task.task_type == 'design' %}
+                                <span class="badge bg-purple">Design</span>
+                                {% elif task.task_type == 'art' %}
+                                <span class="badge bg-pink">Art</span>
+                                {% elif task.task_type == 'programming' %}
+                                <span class="badge bg-teal">Programming</span>
+                                {% elif task.task_type == 'audio' %}
+                                <span class="badge bg-indigo">Audio</span>
+                                {% elif task.task_type == 'testing' %}
+                                <span class="badge bg-orange">Testing</span>
+                                {% elif task.task_type == 'writing' %}
+                                <span class="badge bg-cyan">Writing</span>
+                                {% else %}
+                                <span class="badge bg-secondary">Other</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if task.priority == 'low' %}
+                                <span class="badge bg-success">Low</span>
+                                {% elif task.priority == 'medium' %}
+                                <span class="badge bg-warning">Medium</span>
+                                {% elif task.priority == 'high' %}
+                                <span class="badge bg-danger">High</span>
+                                {% elif task.priority == 'critical' %}
+                                <span class="badge bg-dark">Critical</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if task.assigned_to %}
+                                {{ task.assigned_to.get_full_name|default:task.assigned_to.username }}
+                                {% else %}
+                                <span class="text-muted">Unassigned</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if task.due_date %}
+                                {{ task.due_date }}
+                                {% if task.due_date < today %}
+                                <span class="badge bg-danger">Overdue</span>
+                                {% elif task.due_date == today %}
+                                <span class="badge bg-warning">Today</span>
+                                {% endif %}
+                                {% else %}
+                                <span class="text-muted">No due date</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{% url 'games:task_update' task.id %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="{% url 'games:task_delete' task.id %}" class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                <h4 class="alert-heading">No tasks found!</h4>
+                <p>There are no tasks matching your filter criteria.</p>
+                {% if game %}
+                <hr>
+                <p class="mb-0">
+                    <a href="{% url 'games:task_create' game.id %}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Create First Task
+                    </a>
+                </p>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Add any task-specific JavaScript here
+</script>
+{% endblock %}
