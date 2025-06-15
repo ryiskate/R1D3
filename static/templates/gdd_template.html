@@ -1,290 +1,1574 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game Design Document - [GAME NAME]</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Arial, sans-serif;
             margin: 20px;
+            color: #333;
+            line-height: 1.6;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
         }
         h1 {
             text-align: center;
+            color: #2c3e50;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+        }
+        h2 {
+            color: #2c3e50;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+            margin-top: 30px;
+        }
+        h3 {
+            color: #3498db;
+            margin-top: 20px;
         }
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         th, td {
-            padding: 10px;
+            padding: 12px 15px;
             text-align: left;
             border: 1px solid #ddd;
         }
         th {
-            background-color: #f4f4f4;
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
         }
         .feature-table {
             margin-top: 20px;
+        }
+        .section-intro {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-left: 4px solid #3498db;
+            margin-bottom: 20px;
+        }
+        /* Removing duplicate styles as they are defined below */
+        
+        .toc {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+        }
+        .toc h2 {
+            margin-top: 0;
+            border-bottom: none;
+        }
+        .toc ul {
+            list-style-type: none;
+            padding-left: 20px;
+        }
+        .toc a {
+            text-decoration: none;
+            color: #3498db;
+        }
+        .toc a:hover {
+            text-decoration: underline;
+        }
+        .metadata {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .metadata-item {
+            flex: 1;
+            min-width: 200px;
+        }
+        .metadata-label {
+            font-weight: bold;
+            color: #555;
+        }
+        /* Priority badges */
+        .priority-critical, .priority-high, .priority-medium, .priority-low {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            font-weight: bold;
+            text-align: center;
+        }
+        .priority-critical {
+            background-color: #e74c3c;
+            color: white;
+        }
+        .priority-high {
+            background-color: #f39c12;
+            color: white;
+        }
+        .priority-medium {
+            background-color: #3498db;
+            color: white;
+        }
+        .priority-low {
+            background-color: #2ecc71;
+            color: white;
+        }
+        /* Status badges */
+        .status-to_do, .status-backlog, .status-in_progress, .status-in_review, .status-done {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            font-weight: bold;
+            text-align: center;
+        }
+        .status-to_do {
+            background-color: #e74c3c;
+            color: white;
+        }
+        .status-backlog {
+            background-color: #95a5a6;
+            color: white;
+        }
+        .status-in_progress {
+            background-color: #f39c12;
+            color: white;
+        }
+        .status-in_review {
+            background-color: #3498db;
+            color: white;
+        }
+        .status-done {
+            background-color: #2ecc71;
+            color: white;
         }
     </style>
 </head>
 <body>
 
     <h1>Game Design Document - [GAME NAME]</h1>
+    
+    <div class="metadata">
+        <div class="metadata-item">
+            <div class="metadata-label">Version:</div>
+            <div>1.0</div>
+        </div>
+        <div class="metadata-item">
+            <div class="metadata-label">Last Updated:</div>
+            <div>June 15, 2025</div>
+        </div>
+        <div class="metadata-item">
+            <div class="metadata-label">Author:</div>
+            <div>[AUTHOR NAME]</div>
+        </div>
+        <div class="metadata-item">
+            <div class="metadata-label">Status:</div>
+            <div><span class="status-in_progress">In Progress</span></div>
+        </div>
+    </div>
+    
+    <div class="toc">
+        <h2>Table of Contents</h2>
+        <ul>
+            <li><a href="#game-overview">1. Game Overview</a>
+                <ul>
+                    <li><a href="#high-concept">1.1 High Concept</a></li>
+                    <li><a href="#target-audience">1.2 Target Audience</a></li>
+                    <li><a href="#unique-selling-points">1.3 Unique Selling Points</a></li>
+                    <li><a href="#platforms">1.4 Platforms & Requirements</a></li>
+                </ul>
+            </li>
+            <li><a href="#gameplay">2. Gameplay</a>
+                <ul>
+                    <li><a href="#core-mechanics">2.1 Core Mechanics</a></li>
+                    <li><a href="#controls">2.2 Controls & Input</a></li>
+                    <li><a href="#progression">2.3 Progression Systems</a></li>
+                    <li><a href="#game-economy">2.4 Game Economy</a></li>
+                </ul>
+            </li>
+            <li><a href="#game-world">3. Game World</a>
+                <ul>
+                    <li><a href="#world-overview">3.1 World Overview</a></li>
+                    <li><a href="#environments">3.2 Environments & Locations</a></li>
+                    <li><a href="#level-design">3.3 Level Design</a></li>
+                    <li><a href="#world-interaction">3.4 World Interaction</a></li>
+                </ul>
+            </li>
+            <li><a href="#characters">4. Characters</a>
+                <ul>
+                    <li><a href="#player-character">4.1 Player Character(s)</a></li>
+                    <li><a href="#non-player-characters">4.2 Non-Player Characters</a></li>
+                    <li><a href="#enemies">4.3 Enemies & Opponents</a></li>
+                    <li><a href="#character-relationships">4.4 Character Relationships</a></li>
+                </ul>
+            </li>
+            <li><a href="#narrative">5. Narrative</a>
+                <ul>
+                    <li><a href="#story-overview">5.1 Story Overview</a></li>
+                    <li><a href="#narrative-structure">5.2 Narrative Structure</a></li>
+                    <li><a href="#storytelling-methods">5.3 Storytelling Methods</a></li>
+                    <li><a href="#player-choice">5.4 Player Choice & Consequences</a></li>
+                </ul>
+            </li>
+            <li><a href="#technical-requirements">6. Technical Requirements</a></li>
+            <li><a href="#audio-design">7. Audio Design</a>
+                <ul>
+                    <li><a href="#music">7.1 Music</a></li>
+                    <li><a href="#sound-effects">7.2 Sound Effects</a></li>
+                    <li><a href="#voice-acting">7.3 Voice Acting</a></li>
+                    <li><a href="#audio-implementation">7.4 Audio Implementation</a></li>
+                </ul>
+            </li>
+            <li><a href="#user-interface">8. User Interface & UX</a>
+                <ul>
+                    <li><a href="#ui-design">8.1 UI Design</a></li>
+                    <li><a href="#hud">8.2 Heads-Up Display</a></li>
+                    <li><a href="#menus">8.3 Menu Systems</a></li>
+                    <li><a href="#accessibility">8.4 Accessibility</a></li>
+                </ul>
+            </li>
+            <li><a href="#art-direction">9. Art Direction</a>
+                <ul>
+                    <li><a href="#visual-style">9.1 Visual Style</a></li>
+                    <li><a href="#character-art">9.2 Character Art</a></li>
+                    <li><a href="#environment-art">9.3 Environment Art</a></li>
+                    <li><a href="#visual-effects">9.4 Visual Effects</a></li>
+                </ul>
+            </li>
+            <li><a href="#monetization">10. Monetization</a>
+                <ul>
+                    <li><a href="#revenue-model">10.1 Revenue Model</a></li>
+                    <li><a href="#in-game-purchases">10.2 In-Game Purchases</a></li>
+                    <li><a href="#monetization-balance">10.3 Monetization Balance</a></li>
+                    <li><a href="#additional-revenue">10.4 Additional Revenue Streams</a></li>
+                </ul>
+            </li>
+            <li><a href="#development">11. Development & Production</a>
+                <ul>
+                    <li><a href="#development-roadmap">11.1 Development Roadmap</a></li>
+                    <li><a href="#team-structure">11.2 Team Structure</a></li>
+                    <li><a href="#budget-resources">11.3 Budget & Resources</a></li>
+                    <li><a href="#post-launch">11.4 Post-Launch Support</a></li>
+                </ul>
+            </li>
+            <li><a href="#marketing">12. Marketing & Distribution</a>
+                <ul>
+                    <li><a href="#marketing-strategy">12.1 Marketing Strategy</a></li>
+                    <li><a href="#promotional-channels">12.2 Promotional Channels</a></li>
+                    <li><a href="#distribution-platforms">12.3 Distribution Platforms</a></li>
+                    <li><a href="#community-engagement">12.4 Community Engagement</a></li>
+                </ul>
+            </li>
+            <li><a href="#appendices">13. Appendices</a>
+                <ul>
+                    <li><a href="#reference-materials">13.1 Reference Materials</a></li>
+                    <li><a href="#technical-specifications">13.2 Technical Specifications</a></li>
+                    <li><a href="#change-log">13.3 Change Log</a></li>
+                    <li><a href="#glossary">13.4 Glossary</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
 
-    <h2 id="game-overview">Game Overview</h2>
+    <h2 id="game-overview">1. Game Overview</h2>
+    
+    <div class="section-intro">
+        This section provides a high-level overview of the game, including its core concept, target audience, and unique selling points.
+    </div>
+    
+    <h3 id="high-concept">1.1 High Concept</h3>
     <table class="feature-table">
         <tr>
             <th>Feature</th>
             <th>Description</th>
             <th>Priority</th>
             <th>Status</th>
+            <th>Task ID</th>
+            <th>Assigned To</th>
+            <th>Due Date</th>
         </tr>
         <tr>
-            <td>High Concept</td>
-            <td>Descrição breve e envolvente do jogo, incluindo o tipo de jogo e a experiência que ele oferece.</td>
-            <td>high</td>
-            <td>backlog</td>
+            <td>High Concept Statement</td>
+            <td>A one or two-sentence description that captures the essence of the game and its primary appeal.</td>
+            <td><span class="priority-critical">critical</span></td>
+            <td><span class="status-to_do">to_do</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
         </tr>
         <tr>
-            <td>Target Audience</td>
-            <td>Público-alvo do jogo, incluindo faixa etária, interesses e preferências.</td>
-            <td>medium</td>
-            <td>backlog</td>
+            <td>Game Genre</td>
+            <td>The primary and secondary genres that define the game (e.g., Action RPG, Tactical Strategy, etc.).</td>
+            <td><span class="priority-high">high</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
         </tr>
         <tr>
-            <td>Platforms</td>
-            <td>Plataformas nas quais o jogo será lançado, como PC, consoles e dispositivos móveis.</td>
-            <td>high</td>
-            <td>to_do</td>
+            <td>Core Experience</td>
+            <td>The primary emotional and gameplay experience the player should have.</td>
+            <td><span class="priority-high">high</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </table>
+    
+    <h3 id="target-audience">1.2 Target Audience</h3>
+    <table class="feature-table">
+        <tr>
+            <th>Feature</th>
+            <th>Description</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Task ID</th>
+            <th>Assigned To</th>
+            <th>Due Date</th>
+        </tr>
+        <tr>
+            <td>Demographics</td>
+            <td>Age range, interests, and gaming preferences of the target audience.</td>
+            <td><span class="priority-medium">medium</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Player Types</td>
+            <td>The types of players the game is designed for (e.g., casual, hardcore, social, etc.).</td>
+            <td><span class="priority-medium">medium</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Market Analysis</td>
+            <td>Brief analysis of similar games and how this game will appeal to the target audience.</td>
+            <td><span class="priority-medium">medium</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </table>
+    
+    <h3 id="unique-selling-points">1.3 Unique Selling Points</h3>
+    <table class="feature-table">
+        <tr>
+            <th>Feature</th>
+            <th>Description</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Task ID</th>
+            <th>Assigned To</th>
+            <th>Due Date</th>
+        </tr>
+        <tr>
+            <td>Key Differentiators</td>
+            <td>What makes this game unique compared to others in the same genre.</td>
+            <td><span class="priority-high">high</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Innovation Points</td>
+            <td>Novel gameplay mechanics, technology, or narrative approaches that set the game apart.</td>
+            <td><span class="priority-high">high</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </table>
+    
+    <h3 id="platforms">1.4 Platforms & Requirements</h3>
+    <table class="feature-table">
+        <tr>
+            <th>Feature</th>
+            <th>Description</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Task ID</th>
+            <th>Assigned To</th>
+            <th>Due Date</th>
+        </tr>
+        <tr>
+            <td>Target Platforms</td>
+            <td>Primary platforms for release (PC, consoles, mobile devices, etc.).</td>
+            <td><span class="priority-high">high</span></td>
+            <td><span class="status-to_do">to_do</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Minimum Requirements</td>
+            <td>Minimum hardware/software requirements for each platform.</td>
+            <td><span class="priority-medium">medium</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Platform-Specific Features</td>
+            <td>Features that will be exclusive to or optimized for specific platforms.</td>
+            <td><span class="priority-low">low</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
         </tr>
     </table>
 
-    <h2 id="gameplay-features">Gameplay Features</h2>
+    <h2 id="gameplay">2. Gameplay</h2>
+    
+    <div class="section-intro">
+        This section details the core gameplay mechanics, systems, and player interactions that define the game experience.
+    </div>
+    
+    <h3 id="core-mechanics">2.1 Core Mechanics</h3>
     <table class="feature-table">
         <tr>
             <th>Feature</th>
             <th>Description</th>
             <th>Priority</th>
             <th>Status</th>
+            <th>Task ID</th>
+            <th>Assigned To</th>
+            <th>Due Date</th>
         </tr>
         <tr>
-            <td>Core Mechanics</td>
-            <td>Definição das mecânicas principais do jogo, como movimento, combate, habilidades especiais, etc.</td>
-            <td>critical</td>
-            <td>in_progress</td>
+            <td>Primary Gameplay Loop</td>
+            <td>Description of the main gameplay loop that players will experience repeatedly.</td>
+            <td><span class="priority-critical">critical</span></td>
+            <td><span class="status-in_progress">in_progress</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
         </tr>
         <tr>
-            <td>Controls</td>
-            <td>Configuração dos controles do jogo, como teclas ou botões de consoles.</td>
-            <td>high</td>
-            <td>backlog</td>
+            <td>Movement System</td>
+            <td>How the player character moves through the game world, including special movement abilities.</td>
+            <td><span class="priority-critical">critical</span></td>
+            <td><span class="status-to_do">to_do</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
         </tr>
         <tr>
-            <td>Player Progression</td>
-            <td>Sistema de progressão do jogador, incluindo níveis, habilidades e desbloqueios.</td>
-            <td>medium</td>
-            <td>backlog</td>
+            <td>Combat System</td>
+            <td>Details of the combat mechanics, including attack types, defensive options, and special abilities.</td>
+            <td><span class="priority-critical">critical</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Interaction System</td>
+            <td>How players interact with objects, NPCs, and the environment.</td>
+            <td><span class="priority-high">high</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </table>
+    
+    <h3 id="controls">2.2 Controls & Input</h3>
+    <table class="feature-table">
+        <tr>
+            <th>Feature</th>
+            <th>Description</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Task ID</th>
+            <th>Assigned To</th>
+            <th>Due Date</th>
+        </tr>
+        <tr>
+            <td>Control Scheme</td>
+            <td>Detailed mapping of controls for each supported input device (keyboard/mouse, gamepad, etc.).</td>
+            <td><span class="priority-high">high</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Input Customization</td>
+            <td>Options for players to customize their control schemes.</td>
+            <td><span class="priority-medium">medium</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Accessibility Options</td>
+            <td>Alternative control schemes and input methods for players with different abilities.</td>
+            <td><span class="priority-medium">medium</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </table>
+    
+    <h3 id="progression">2.3 Progression Systems</h3>
+    <table class="feature-table">
+        <tr>
+            <th>Feature</th>
+            <th>Description</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Task ID</th>
+            <th>Assigned To</th>
+            <th>Due Date</th>
+        </tr>
+        <tr>
+            <td>Character Progression</td>
+            <td>How players advance their character(s), including experience, levels, and skill trees.</td>
+            <td><span class="priority-high">high</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Unlockable Content</td>
+            <td>Content that becomes available as players progress, such as new areas, abilities, or items.</td>
+            <td><span class="priority-medium">medium</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Achievement System</td>
+            <td>In-game achievements, challenges, and rewards for completing specific objectives.</td>
+            <td><span class="priority-low">low</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </table>
+    
+    <h3 id="game-economy">2.4 Game Economy</h3>
+    <table class="feature-table">
+        <tr>
+            <th>Feature</th>
+            <th>Description</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Task ID</th>
+            <th>Assigned To</th>
+            <th>Due Date</th>
+        </tr>
+        <tr>
+            <td>Resources & Currency</td>
+            <td>The various resources and currencies players can collect and spend.</td>
+            <td><span class="priority-medium">medium</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Crafting System</td>
+            <td>How players can create or upgrade items using collected resources.</td>
+            <td><span class="priority-medium">medium</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Trading System</td>
+            <td>How players can exchange items with NPCs or other players.</td>
+            <td><span class="priority-low">low</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
         </tr>
     </table>
 
-    <h2 id="level-design">Level Design</h2>
+    <h2 id="game-world">3. Game World</h2>
+    
+    <div class="section-intro">
+        This section describes the game world, its environments, levels, and how players navigate and interact with them.
+    </div>
+    
+    <h3 id="world-overview">3.1 World Overview</h3>
     <table class="feature-table">
         <tr>
             <th>Feature</th>
             <th>Description</th>
             <th>Priority</th>
             <th>Status</th>
+            <th>Task ID</th>
+            <th>Assigned To</th>
+            <th>Due Date</th>
         </tr>
         <tr>
             <td>World Structure</td>
-            <td>Estrutura do mundo, incluindo o número de níveis, mapas e áreas de exploração.</td>
-            <td>high</td>
-            <td>to_do</td>
+            <td>Overview of the game world, including its scale, organization, and key locations.</td>
+            <td><span class="priority-high">high</span></td>
+            <td><span class="status-to_do">to_do</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
         </tr>
         <tr>
-            <td>Environments</td>
-            <td>Design de ambientes interativos e como eles afetam o gameplay.</td>
-            <td>medium</td>
-            <td>backlog</td>
+            <td>World Map</td>
+            <td>Visual representation of the game world showing major areas and how they connect.</td>
+            <td><span class="priority-medium">medium</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
         </tr>
         <tr>
-            <td>Challenges</td>
-            <td>Desafios que os jogadores devem superar em cada nível, como inimigos e obstáculos.</td>
-            <td>critical</td>
-            <td>in_progress</td>
+            <td>World Lore</td>
+            <td>Background information on the world's history, cultures, and significant events.</td>
+            <td><span class="priority-medium">medium</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
         </tr>
     </table>
-
-    <h2 id="character-system">Character System</h2>
+    
+    <h3 id="environments">3.2 Environments & Locations</h3>
     <table class="feature-table">
         <tr>
             <th>Feature</th>
             <th>Description</th>
             <th>Priority</th>
             <th>Status</th>
+            <th>Task ID</th>
+            <th>Assigned To</th>
+            <th>Due Date</th>
         </tr>
         <tr>
-            <td>Player Character</td>
-            <td>Descrição e habilidades do personagem principal, como aparência e poderes especiais.</td>
-            <td>high</td>
-            <td>to_do</td>
+            <td>Key Locations</td>
+            <td>Detailed descriptions of important locations in the game world.</td>
+            <td><span class="priority-high">high</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
         </tr>
         <tr>
-            <td>NPCs</td>
-            <td>Criação de NPCs interativos, com diálogos e missões.</td>
-            <td>medium</td>
-            <td>backlog</td>
+            <td>Environment Types</td>
+            <td>Different types of environments players will encounter (forests, cities, dungeons, etc.).</td>
+            <td><span class="priority-medium">medium</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
         </tr>
         <tr>
-            <td>Enemies</td>
-            <td>Design e mecânicas dos inimigos, incluindo IA e comportamento em combate.</td>
-            <td>critical</td>
-            <td>in_review</td>
+            <td>Environmental Storytelling</td>
+            <td>How the environments themselves convey narrative and world-building elements.</td>
+            <td><span class="priority-medium">medium</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
         </tr>
     </table>
-
-    <h2 id="technical-requirements">Technical Requirements</h2>
+    
+    <h3 id="level-design">3.3 Level Design</h3>
     <table class="feature-table">
         <tr>
             <th>Feature</th>
             <th>Description</th>
             <th>Priority</th>
             <th>Status</th>
+            <th>Task ID</th>
+            <th>Assigned To</th>
+            <th>Due Date</th>
         </tr>
         <tr>
-            <td>Game Engine</td>
-            <td>Definição da engine do jogo, como Unity, Unreal Engine, etc.</td>
-            <td>high</td>
-            <td>to_do</td>
+            <td>Level Structure</td>
+            <td>How individual levels or areas are structured, including pacing and flow.</td>
+            <td><span class="priority-high">high</span></td>
+            <td><span class="status-to_do">to_do</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
         </tr>
         <tr>
-            <td>Networking</td>
-            <td>Sistemas de rede para multiplayer online, se aplicável.</td>
-            <td>medium</td>
-            <td>backlog</td>
+            <td>Level Progression</td>
+            <td>How players progress from one level to the next and how difficulty scales.</td>
+            <td><span class="priority-high">high</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
         </tr>
         <tr>
-            <td>Performance</td>
-            <td>Otimização de desempenho para garantir boa performance em várias plataformas.</td>
-            <td>critical</td>
-            <td>in_progress</td>
+            <td>Challenges & Obstacles</td>
+            <td>Specific challenges players will face in different levels, including enemies, puzzles, and environmental hazards.</td>
+            <td><span class="priority-critical">critical</span></td>
+            <td><span class="status-in_progress">in_progress</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
         </tr>
     </table>
-
-    <h2 id="art-direction">Art Direction</h2>
+    
+    <h3 id="world-interaction">3.4 World Interaction</h3>
     <table class="feature-table">
         <tr>
             <th>Feature</th>
             <th>Description</th>
             <th>Priority</th>
             <th>Status</th>
+            <th>Task ID</th>
+            <th>Assigned To</th>
+            <th>Due Date</th>
         </tr>
         <tr>
-            <td>Visual Style</td>
-            <td>Estilo visual do jogo, como gráficos 2D ou 3D, paleta de cores e estética geral.</td>
-            <td>high</td>
-            <td>to_do</td>
+            <td>Interactive Elements</td>
+            <td>Objects and elements in the world that players can interact with.</td>
+            <td><span class="priority-high">high</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Destructible Environment</td>
+            <td>Elements of the environment that can be destroyed or altered by player actions.</td>
+            <td><span class="priority-medium">medium</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Dynamic Systems</td>
+            <td>Weather, time of day, or other dynamic systems that affect the game world.</td>
+            <td><span class="priority-low">low</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </table>
+
+    <h2 id="characters">4. Characters</h2>
+    
+    <div class="section-intro">
+        This section details all characters in the game, including the player character(s), NPCs, and enemies.
+    </div>
+    
+    <h3 id="player-character">4.1 Player Character(s)</h3>
+    <table class="feature-table">
+        <tr>
+            <th>Feature</th>
+            <th>Description</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Task ID</th>
+            <th>Assigned To</th>
+            <th>Due Date</th>
         </tr>
         <tr>
             <td>Character Design</td>
-            <td>Design dos personagens, incluindo aparência, roupas e animações.</td>
-            <td>medium</td>
-            <td>backlog</td>
+            <td>Visual design and appearance of the player character(s), including concept art and references.</td>
+            <td><span class="priority-high">high</span></td>
+            <td><span class="status-to_do">to_do</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
         </tr>
         <tr>
-            <td>Environment Design</td>
-            <td>Criação dos ambientes de jogo, incluindo cenários, objetos e iluminação.</td>
-            <td>critical</td>
-            <td>in_progress</td>
+            <td>Character Abilities</td>
+            <td>Special abilities, powers, and skills the player character(s) can use.</td>
+            <td><span class="priority-critical">critical</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Character Backstory</td>
+            <td>Background and personal history of the player character(s).</td>
+            <td><span class="priority-medium">medium</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Character Customization</td>
+            <td>Options for players to customize their character's appearance and abilities.</td>
+            <td><span class="priority-medium">medium</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
         </tr>
     </table>
-
-    <h2 id="audio-design">Audio Design</h2>
+    
+    <h3 id="non-player-characters">4.2 Non-Player Characters (NPCs)</h3>
     <table class="feature-table">
         <tr>
             <th>Feature</th>
             <th>Description</th>
             <th>Priority</th>
             <th>Status</th>
+            <th>Task ID</th>
+            <th>Assigned To</th>
+            <th>Due Date</th>
         </tr>
         <tr>
-            <td>Music</td>
-            <td>Trilha sonora original que acompanha a atmosfera do jogo.</td>
-            <td>medium</td>
-            <td>backlog</td>
+            <td>Key NPCs</td>
+            <td>Important characters that drive the story or provide significant gameplay functions.</td>
+            <td><span class="priority-high">high</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
         </tr>
         <tr>
-            <td>Sound Effects</td>
-            <td>Efeitos sonoros para ações do jogador, como passos, tiros, e interações com o ambiente.</td>
-            <td>high</td>
-            <td>in_progress</td>
+            <td>NPC Interactions</td>
+            <td>How players can interact with NPCs, including dialogue systems and relationship mechanics.</td>
+            <td><span class="priority-medium">medium</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
         </tr>
         <tr>
-            <td>Voice Acting</td>
-            <td>Diálogos falados pelos personagens do jogo, se aplicável.</td>
-            <td>low</td>
-            <td>backlog</td>
+            <td>NPC AI & Behavior</td>
+            <td>How NPCs behave in the game world, including daily routines and reactions to player actions.</td>
+            <td><span class="priority-medium">medium</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
         </tr>
     </table>
-
-    <h2 id="narrative-elements">Narrative Elements</h2>
+    
+    <h3 id="enemies">4.3 Enemies & Opponents</h3>
     <table class="feature-table">
         <tr>
             <th>Feature</th>
             <th>Description</th>
             <th>Priority</th>
             <th>Status</th>
+            <th>Task ID</th>
+            <th>Assigned To</th>
+            <th>Due Date</th>
         </tr>
         <tr>
-            <td>Story</td>
-            <td>Enredo do jogo, incluindo a introdução, o conflito e o desfecho.</td>
-            <td>high</td>
-            <td>to_do</td>
+            <td>Enemy Types</td>
+            <td>Different categories of enemies and their characteristics.</td>
+            <td><span class="priority-high">high</span></td>
+            <td><span class="status-in_review">in_review</span></td>
         </tr>
         <tr>
-            <td>Characters</td>
-            <td>Desenvolvimento de personagens principais, vilões e aliados, com suas motivações e histórias.</td>
-            <td>medium</td>
-            <td>backlog</td>
+            <td>Enemy Behavior</td>
+            <td>AI patterns and behaviors for different enemy types.</td>
+            <td><span class="priority-critical">critical</span></td>
+            <td><span class="status-in_progress">in_progress</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
         </tr>
         <tr>
-            <td>World Building</td>
-            <td>Criação do mundo do jogo, incluindo história, geografia, culturas e mitologia.</td>
-            <td>high</td>
-            <td>in_progress</td>
+            <td>Boss Encounters</td>
+            <td>Design of major boss battles, including mechanics and phases.</td>
+            <td><span class="priority-high">high</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
         </tr>
     </table>
-
-    <h2 id="user-interface">User Interface</h2>
+    
+    <h3 id="character-relationships">4.4 Character Relationships</h3>
     <table class="feature-table">
         <tr>
             <th>Feature</th>
             <th>Description</th>
             <th>Priority</th>
             <th>Status</th>
+            <th>Task ID</th>
+            <th>Assigned To</th>
+            <th>Due Date</th>
         </tr>
         <tr>
-            <td>Menus</td>
-            <td>Design dos menus do jogo, incluindo menu principal, opções e inventário.</td>
-            <td>high</td>
-            <td>to_do</td>
+            <td>Relationship System</td>
+            <td>How relationships between characters are tracked and evolve throughout the game.</td>
+            <td><span class="priority-medium">medium</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
         </tr>
         <tr>
-            <td>HUD</td>
-            <td>Interface durante o jogo, mostrando informações como vida, munição e objetivos.</td>
-            <td>critical</td>
-            <td>in_progress</td>
+            <td>Faction System</td>
+            <td>Different factions in the game world and how the player can interact with them.</td>
+            <td><span class="priority-medium">medium</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
         </tr>
         <tr>
-            <td>Accessibility</td>
-            <td>Recursos de acessibilidade, como legendas, contraste ajustável e controles personalizáveis.</td>
-            <td>medium</td>
-            <td>backlog</td>
+            <td>Companion System</td>
+            <td>How companion characters function and interact with the player.</td>
+            <td><span class="priority-low">low</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
         </tr>
     </table>
 
+    <h2 id="narrative">5. Narrative</h2>
+    
+    <div class="section-intro">
+        This section outlines the story, narrative structure, and storytelling elements of the game.
+    </div>
+    
+    <h3 id="story-overview">5.1 Story Overview</h3>
+    <table class="feature-table">
+        <tr>
+            <th>Feature</th>
+            <th>Description</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Task ID</th>
+            <th>Assigned To</th>
+            <th>Due Date</th>
+        </tr>
+        <tr>
+            <td>Premise</td>
+            <td>The central concept of the story in a few sentences.</td>
+            <td><span class="priority-high">high</span></td>
+            <td><span class="status-to_do">to_do</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Setting</td>
+            <td>The time period, cultural context, and overall atmosphere of the game world.</td>
+            <td><span class="priority-high">high</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Themes</td>
+            <td>The central themes and messages the game explores through its narrative.</td>
+            <td><span class="priority-medium">medium</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </table>
+    
+    <h3 id="narrative-structure">5.2 Narrative Structure</h3>
+    <table class="feature-table">
+        <tr>
+            <th>Feature</th>
+            <th>Description</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Task ID</th>
+            <th>Assigned To</th>
+            <th>Due Date</th>
+        </tr>
+        <tr>
+            <td>Story Arc</td>
+            <td>The overall structure of the narrative, including major plot points and acts.</td>
+            <td><span class="priority-high">high</span></td>
+            <td><span class="status-to_do">to_do</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Main Storyline</td>
+            <td>The primary narrative path that players will experience.</td>
+            <td><span class="priority-high">high</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Side Quests</td>
+            <td>Optional storylines and missions that expand the world and characters.</td>
+            <td><span class="priority-medium">medium</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </table>
+    
+    <h3 id="storytelling-methods">5.3 Storytelling Methods</h3>
+    <table class="feature-table">
+        <tr>
+            <th>Feature</th>
+            <th>Description</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Task ID</th>
+            <th>Assigned To</th>
+            <th>Due Date</th>
+        </tr>
+        <tr>
+            <td>Dialogue System</td>
+            <td>How dialogue is presented, including choice systems and branching conversations.</td>
+            <td><span class="priority-medium">medium</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Cutscenes</td>
+            <td>Cinematic sequences that advance the story at key moments.</td>
+            <td><span class="priority-low">low</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Environmental Storytelling</td>
+            <td>How the game environment itself conveys narrative elements.</td>
+            <td><span class="priority-medium">medium</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </table>
+    
+    <h3 id="player-choice">5.4 Player Choice & Consequences</h3>
+    <table class="feature-table">
+        <tr>
+            <th>Feature</th>
+            <th>Description</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Task ID</th>
+            <th>Assigned To</th>
+            <th>Due Date</th>
+        </tr>
+        <tr>
+            <td>Decision Points</td>
+            <td>Key moments where players make choices that affect the narrative.</td>
+            <td><span class="priority-medium">medium</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Branching Paths</td>
+            <td>How the story branches based on player decisions.</td>
+            <td><span class="priority-medium">medium</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Endings</td>
+            <td>Different possible conclusions to the game based on player choices and actions.</td>
+            <td><span class="priority-medium">medium</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </table>
+    
+    <h2 id="technical-requirements">6. Technical Requirements</h2>
+    <table class="feature-table">
+        <tr>
+            <th>Feature</th>
+            <th>Description</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Task ID</th>
+            <th>Assigned To</th>
+            <th>Due Date</th>
+        </tr>
+        <tr>
+            <td>Game Engine</td>
+            <td>Game engine selection and implementation details (Unity, Unreal, custom, etc.).</td>
+            <td><span class="priority-high">high</span></td>
+            <td><span class="status-to_do">to_do</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Networking</td>
+            <td>Network architecture and requirements for multiplayer functionality, if applicable.</td>
+            <td><span class="priority-medium">medium</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Performance</td>
+            <td>Performance targets and optimization strategies for different platforms.</td>
+            <td><span class="priority-critical">critical</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </table>
+
+    <h2 id="audio-design">7. Audio Design</h2>
+    
+    <div class="section-intro">
+        This section details the audio elements of the game, including music, sound effects, and voice acting.
+    </div>
+    
+    <h3 id="music">7.1 Music</h3>
+    <table class="feature-table">
+        <tr>
+            <th>Feature</th>
+            <th>Description</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Task ID</th>
+            <th>Assigned To</th>
+            <th>Due Date</th>
+        </tr>
+        <tr>
+            <td>Main Soundtrack</td>
+            <td>Overview of the game's musical style, themes, and emotional goals.</td>
+            <td><span class="priority-medium">medium</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Adaptive Music System</td>
+            <td>How music changes dynamically based on gameplay situations and player actions.</td>
+            <td><span class="priority-medium">medium</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Key Musical Themes</td>
+            <td>Specific themes for characters, locations, or situations in the game.</td>
+            <td><span class="priority-low">low</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </table>
+    
+    <h3 id="sound-effects">7.2 Sound Effects</h3>
+    <table class="feature-table">
+        <tr>
+            <th>Feature</th>
+            <th>Description</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Task ID</th>
+            <th>Assigned To</th>
+            <th>Due Date</th>
+        </tr>
+        <tr>
+            <td>Player Feedback</td>
+            <td>Sound effects for player actions, abilities, and interactions with the environment.</td>
+            <td><span class="priority-high">high</span></td>
+            <td><span class="status-in_progress">in_progress</span></td>
+        </tr>
+        <tr>
+            <td>Environmental Audio</td>
+            <td>Ambient sounds for different environments and weather conditions.</td>
+            <td><span class="priority-medium">medium</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>UI Sounds</td>
+            <td>Audio feedback for menu navigation and interface interactions.</td>
+            <td><span class="priority-medium">medium</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </table>
+    
+    <h3 id="voice-acting">7.3 Voice Acting</h3>
+    <table class="feature-table">
+        <tr>
+            <th>Feature</th>
+            <th>Description</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Task ID</th>
+            <th>Assigned To</th>
+            <th>Due Date</th>
+        </tr>
+        <tr>
+            <td>Character Voices</td>
+            <td>Voice acting requirements for main characters and important NPCs.</td>
+            <td><span class="priority-low">low</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Dialogue Recording</td>
+            <td>Process and standards for recording, editing, and implementing voiced dialogue.</td>
+            <td><span class="priority-low">low</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Localization</td>
+            <td>Plans for translating and recording dialogue in multiple languages.</td>
+            <td><span class="priority-low">low</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </table>
+    
+    <h3 id="audio-implementation">7.4 Audio Implementation</h3>
+    <table class="feature-table">
+        <tr>
+            <th>Feature</th>
+            <th>Description</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Task ID</th>
+            <th>Assigned To</th>
+            <th>Due Date</th>
+        </tr>
+        <tr>
+            <td>Audio Engine</td>
+            <td>The audio middleware or system used for implementing game audio.</td>
+            <td><span class="priority-medium">medium</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>3D Audio</td>
+            <td>Implementation of spatial audio for immersive sound positioning.</td>
+            <td><span class="priority-medium">medium</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Audio Mixing</td>
+            <td>Dynamic mixing system to balance different audio elements during gameplay.</td>
+            <td><span class="priority-medium">medium</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </table>
+
+    <h2 id="art-direction">9. Art Direction</h2>
+    
+    <div class="section-intro">
+        This section outlines the visual style, art assets, and overall aesthetic direction of the game.
+    </div>
+    
+    <h3 id="visual-style">9.1 Visual Style</h3>
+    <table class="feature-table">
+        <tr>
+            <th>Feature</th>
+            <th>Description</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Task ID</th>
+            <th>Assigned To</th>
+            <th>Due Date</th>
+        </tr>
+        <tr>
+            <td>Art Style</td>
+            <td>Overall visual aesthetic (realistic, stylized, cartoon, pixel art, etc.) and artistic influences.</td>
+            <td><span class="priority-high">high</span></td>
+            <td><span class="status-to_do">to_do</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Color Palette</td>
+            <td>Primary and secondary color schemes used throughout the game.</td>
+            <td><span class="priority-high">high</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Mood Board</td>
+            <td>Collection of reference images that capture the desired look and feel of the game.</td>
+            <td><span class="priority-medium">medium</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </table>
+    
+    <h3 id="character-art">9.2 Character Art</h3>
+    <table class="feature-table">
+        <tr>
+            <th>Feature</th>
+            <th>Description</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Task ID</th>
+            <th>Assigned To</th>
+            <th>Due Date</th>
+        </tr>
+        <tr>
+            <td>Character Concepts</td>
+            <td>Concept art and design specifications for player characters and key NPCs.</td>
+            <td><span class="priority-high">high</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Character Models</td>
+            <td>3D models or 2D sprites for all characters, including variations and customization options.</td>
+            <td><span class="priority-high">high</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Character Animation</td>
+            <td>Animation requirements and style for character movements and actions.</td>
+            <td><span class="priority-critical">critical</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </table>
+    
+    <h3 id="environment-art">9.3 Environment Art</h3>
+    <table class="feature-table">
+        <tr>
+            <th>Feature</th>
+            <th>Description</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Task ID</th>
+            <th>Assigned To</th>
+            <th>Due Date</th>
+        </tr>
+        <tr>
+            <td>Environment Concepts</td>
+            <td>Concept art and design specifications for key locations and environments.</td>
+            <td><span class="priority-high">high</span></td>
+            <td><span class="status-in_progress">in_progress</span></td>
+        </tr>
+        <tr>
+            <td>Environment Assets</td>
+            <td>3D models or 2D assets for terrain, structures, vegetation, and props.</td>
+            <td><span class="priority-high">high</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Lighting Design</td>
+            <td>Approach to lighting different environments to create mood and atmosphere.</td>
+            <td><span class="priority-medium">medium</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </table>
+    
+    <h3 id="visual-effects">9.4 Visual Effects</h3>
+    <table class="feature-table">
+        <tr>
+            <th>Feature</th>
+            <th>Description</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Task ID</th>
+            <th>Assigned To</th>
+            <th>Due Date</th>
+        </tr>
+        <tr>
+            <td>Particle Effects</td>
+            <td>Particle systems for elements like fire, water, magic, explosions, etc.</td>
+            <td><span class="priority-medium">medium</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Combat Effects</td>
+            <td>Visual feedback for combat actions, hits, misses, and special abilities.</td>
+            <td><span class="priority-high">high</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Environmental Effects</td>
+            <td>Weather effects, time of day changes, and other dynamic visual elements.</td>
+            <td><span class="priority-medium">medium</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </table>
+
+    <h2 id="user-interface">8. User Interface & UX</h2>
+    
+    <div class="section-intro">
+        This section details the user interface design, user experience flow, and accessibility features.
+    </div>
+    
+    <h3 id="ui-design">8.1 UI Design</h3>
+    <table class="feature-table">
+        <tr>
+            <th>Feature</th>
+            <th>Description</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Task ID</th>
+            <th>Assigned To</th>
+            <th>Due Date</th>
+        </tr>
+        <tr>
+            <td>Visual Style</td>
+            <td>Overall visual style and theme of the UI, including color palette, typography, and iconography.</td>
+            <td><span class="priority-high">high</span></td>
+            <td><span class="status-to_do">to_do</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>UI Components</td>
+            <td>Design of buttons, panels, windows, and other UI elements that make up the interface.</td>
+            <td><span class="priority-high">high</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Animation & Transitions</td>
+            <td>How UI elements animate and transition between states and screens.</td>
+            <td><span class="priority-medium">medium</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </table>
+    
+    <h3 id="hud">8.2 Heads-Up Display (HUD)</h3>
+    <table class="feature-table">
+        <tr>
+            <th>Feature</th>
+            <th>Description</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Task ID</th>
+            <th>Assigned To</th>
+            <th>Due Date</th>
+        </tr>
+        <tr>
+            <td>Core HUD Elements</td>
+            <td>Essential information displayed during gameplay (health, ammo, objectives, etc.).</td>
+            <td><span class="priority-critical">critical</span></td>
+            <td><span class="status-in_progress">in_progress</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Contextual HUD</td>
+            <td>Information that appears only in specific contexts or situations.</td>
+            <td><span class="priority-high">high</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+                    <td>HUD Customization</td>
+            <td>Options for players to customize or toggle HUD elements.</td>
+            <td><span class="priority-medium">medium</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </table>
 </body>
 </html>
+

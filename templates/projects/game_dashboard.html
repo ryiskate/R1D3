@@ -101,13 +101,28 @@
                     {% if my_tasks %}
                         <div class="list-group">
                             {% for task in my_tasks %}
-                                <a href="#" class="list-group-item list-group-item-action">
+                                <a href="{% url 'games:task_detail' task.id %}" class="list-group-item list-group-item-action">
                                     <div class="d-flex w-100 justify-content-between">
                                         <h6 class="mb-1">{{ task.title }}</h6>
-                                        <small class="text-{{ task.priority|yesno:'danger,warning,info,secondary' }}">{{ task.get_priority_display }}</small>
+                                        <span class="badge {% if task.status == 'to_do' %}bg-secondary
+                                            {% elif task.status == 'in_progress' %}bg-primary
+                                            {% elif task.status == 'in_review' %}bg-info
+                                            {% elif task.status == 'done' %}bg-success
+                                            {% elif task.status == 'blocked' %}bg-danger
+                                            {% elif task.status == 'backlog' %}bg-dark text-white
+                                            {% else %}bg-light{% endif %}">
+                                            {{ task.get_status_display }}
+                                        </span>
                                     </div>
-                                    <p class="mb-1">{{ task.game.title }}</p>
-                                    <small>Due: {{ task.due_date|default:"No due date" }}</small>
+                                    <p class="mb-1">Game: {{ task.game.title }}</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small>Due: {{ task.due_date|default:"No due date" }}</small>
+                                        <span class="badge {% if task.priority == 'high' %}bg-danger
+                                            {% elif task.priority == 'medium' %}bg-warning text-dark
+                                            {% else %}bg-info{% endif %}">
+                                            {{ task.get_priority_display }}
+                                        </span>
+                                    </div>
                                 </a>
                             {% endfor %}
                         </div>

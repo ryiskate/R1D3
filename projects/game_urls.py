@@ -4,6 +4,8 @@ from .task_status_update_view import TaskStatusUpdateView
 from .gdd_views import GameDesignDocumentEditView, TaskGDDSectionLinkView
 from .gdd_feature_views import ExtractFeaturesView, GDDFeaturesListView, ConvertFeatureToTaskView, ConvertAllFeaturesToTasksView, UpdateGDDWithTaskStatusView, task_status_update_callback
 from .gdd_upload_view import GDDUploadView
+from .debug_views import debug_tasks_view
+from .game_status_view import GameStatusUpdateView
 
 app_name = 'games'
 
@@ -13,6 +15,8 @@ urlpatterns = [
     path('list/', game_views.GameProjectListView.as_view(), name='game_list'),
     path('<int:pk>/', game_views.GameProjectDetailView.as_view(), name='game_detail'),
     path('create/', game_views.GameProjectCreateView.as_view(), name='game_create'),
+    path('<int:pk>/update/', game_views.GameProjectUpdateView.as_view(), name='game_update'),
+    path('<int:pk>/update-status/', GameStatusUpdateView.as_view(), name='game_update_status'),
     
     # Game Design Document URLs
     path('<int:pk>/gdd/', game_views.GameDesignDocumentView.as_view(), name='gdd_detail'),
@@ -43,4 +47,5 @@ urlpatterns = [
     path('tasks/<int:pk>/delete/', game_views.GameTaskDeleteView.as_view(), name='task_delete'),
     path('tasks/<int:pk>/status-update/', TaskStatusUpdateView.as_view(), name='task_status_update'),
     path('<int:game_id>/tasks/kanban/', game_views.GameTaskKanbanView.as_view(), name='task_kanban'),
+    path('debug/tasks/', debug_tasks_view, name='debug_tasks'),
 ]

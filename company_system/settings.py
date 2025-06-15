@@ -152,10 +152,11 @@ SITE_ID = 1
 
 # django-allauth settings
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
-
-# Updated settings format for django-allauth
-ACCOUNT_LOGIN_METHODS = {'username', 'email'}
-ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
+ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = True
 
 # Login/Logout URLs
 LOGIN_REDIRECT_URL = 'dashboard'

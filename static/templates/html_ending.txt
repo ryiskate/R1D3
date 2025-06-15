@@ -1,0 +1,11 @@
+            <td>HUD Customization</td>
+            <td>Options for players to customize or toggle HUD elements.</td>
+            <td><span class="priority-medium">medium</span></td>
+            <td><span class="status-backlog">backlog</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </table>
+</body>
+</html>

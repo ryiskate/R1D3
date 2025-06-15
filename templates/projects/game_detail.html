@@ -15,8 +15,42 @@
         <div class="col-md-8">
             <h1>{{ game.title }}</h1>
             {% if game.tagline %}<p class="lead">{{ game.tagline }}</p>{% endif %}
-            <div class="mb-3">
-                <span class="badge bg-{{ game.status|yesno:'success,secondary' }} me-2">{{ game.get_status_display }}</span>
+            <div class="mb-3 d-flex align-items-center">
+                <!-- Status Badge -->
+                <span class="badge {% if game.status == 'concept' %}bg-secondary
+                      {% elif game.status == 'pre_production' %}bg-info
+                      {% elif game.status == 'production' %}bg-primary
+                      {% elif game.status == 'alpha' %}bg-warning
+                      {% elif game.status == 'beta' %}bg-info
+                      {% elif game.status == 'release' %}bg-success
+                      {% elif game.status == 'post_release' %}bg-success
+                      {% elif game.status == 'completed' %}bg-dark
+                      {% elif game.status == 'cancelled' %}bg-danger
+                      {% else %}bg-secondary{% endif %} me-2">{{ game.get_status_display }}</span>
+                
+                <!-- Status Change Dropdown (Staff Only) -->
+                {% if user.is_staff %}
+                <div class="dropdown d-inline-block me-3">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="statusDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        Change Status
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="statusDropdown">
+                        {% for status_code, status_name in status_choices %}
+                        <li>
+                            <form method="post" action="{% url 'games:game_update_status' game.id %}" class="d-inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="status" value="{{ status_code }}">
+                                <button type="submit" class="dropdown-item {% if game.status == status_code %}active{% endif %}">
+                                    {{ status_name }}
+                                </button>
+                            </form>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+                
+                <!-- Other badges -->
                 <span class="badge bg-info me-2">{{ game.get_genre_display }}</span>
                 <span class="badge bg-dark">{{ game.get_platforms_display }}</span>
             </div>
@@ -28,7 +62,7 @@
                     Actions
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="#">Edit Game</a></li>
+                    <li><a class="dropdown-item" href="{% url 'games:game_update' game.id %}">Edit Game</a></li>
                     {% if not gdd %}
                         <li><a class="dropdown-item" href="{% url 'games:gdd_create' game.id %}">Create GDD</a></li>
                     {% else %}

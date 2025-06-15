@@ -41,7 +41,7 @@ class GameDashboardView(LoginRequiredMixin, ListView):
         ).count()
         context['my_tasks'] = GameTask.objects.filter(
             assigned_to=self.request.user, 
-            status__in=['to_do', 'in_progress']
+            status__in=['backlog', 'to_do', 'in_progress', 'in_review', 'blocked']
         )
         context['overdue_tasks'] = GameTask.objects.filter(
             due_date__lt=timezone.now().date(),
@@ -235,6 +235,30 @@ class GameProjectListView(LoginRequiredMixin, ListView):
             )
             
         return queryset
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Add user's tasks to the context - simplified approach
+        if self.request.user.is_authenticated:
+            # Get all tasks assigned to the user
+            user_tasks = GameTask.objects.filter(assigned_to=self.request.user)
+            
+            # Add to context
+            context['my_tasks'] = user_tasks
+            context['task_count'] = user_tasks.count()
+            
+            # Also add task counts by status for debugging
+            context['task_counts_by_status'] = {
+                'backlog': user_tasks.filter(status='backlog').count(),
+                'to_do': user_tasks.filter(status='to_do').count(),
+                'in_progress': user_tasks.filter(status='in_progress').count(),
+                'in_review': user_tasks.filter(status='in_review').count(),
+                'done': user_tasks.filter(status='done').count(),
+                'blocked': user_tasks.filter(status='blocked').count(),
+            }
+        
+        return context
 
 
 class GameProjectDetailView(LoginRequiredMixin, DetailView):
@@ -286,6 +310,9 @@ class GameProjectDetailView(LoginRequiredMixin, DetailView):
         # Get bugs
         context['bugs'] = game.bugs.all().order_by('-severity')
         context['open_bugs'] = game.bugs.filter(status__in=['open', 'confirmed', 'in_progress']).count()
+        
+        # Add status choices for the status change dropdown
+        context['status_choices'] = GameProject.STATUS_CHOICES
         
         return context
 
@@ -457,6 +484,39 @@ class GameProjectCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView)
         context['submit_text'] = 'Create Project'
         context['show_github_section'] = True
         return context
+
+
+class GameProjectUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    """
+    Update an existing game project
+    """
+    model = GameProject
+    form_class = GameProjectForm
+    template_name = 'projects/game_form.html'
+    
+    def test_func(self):
+        # Only staff members can edit projects
+        return self.request.user.is_staff
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = f'Edit Game Project: {self.object.title}'
+        context['submit_text'] = 'Update Project'
+        context['show_github_section'] = True
+        return context
+    
+    def form_valid(self, form):
+        # Handle GitHub integration updates if needed
+        if form.cleaned_data.get('github_repository'):
+            # Update GitHub token securely if changed
+            pass
+            
+        messages.success(self.request, f"Game project '{form.instance.title}' updated successfully!")
+        return super().form_valid(form)
+    
+    def get_success_url(self):
+        # Redirect to the updated game's detail page
+        return reverse_lazy('games:game_detail', kwargs={'pk': self.object.pk})
 
 
 class GameTaskDetailView(LoginRequiredMixin, DetailView):
