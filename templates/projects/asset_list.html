@@ -1,0 +1,268 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/asset_list.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 sidebar">
+            <div class="sidebar-sticky">
+                <h5 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1">
+                    <span>Asset Types</span>
+                </h5>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link {% if not type_filter %}active{% endif %}" href="{% url 'games:asset_list' game.id %}">
+                            <i class="bi bi-grid-3x3-gap"></i> All Assets
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if type_filter == '3d_model' %}active{% endif %}" href="{% url 'games:asset_list' game.id %}?type=3d_model">
+                            <i class="bi bi-box"></i> 3D Models
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if type_filter == '2d_image' %}active{% endif %}" href="{% url 'games:asset_list' game.id %}?type=2d_image">
+                            <i class="bi bi-image"></i> 2D Images
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if type_filter == 'music' %}active{% endif %}" href="{% url 'games:asset_list' game.id %}?type=music">
+                            <i class="bi bi-music-note-beamed"></i> Music
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if type_filter == 'video' %}active{% endif %}" href="{% url 'games:asset_list' game.id %}?type=video">
+                            <i class="bi bi-film"></i> Videos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if type_filter == 'reference' %}active{% endif %}" href="{% url 'games:asset_list' game.id %}?type=reference">
+                            <i class="bi bi-bookmark"></i> References
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if type_filter == 'other' %}active{% endif %}" href="{% url 'games:asset_list' game.id %}?type=other">
+                            <i class="bi bi-three-dots"></i> Other
+                        </a>
+                    </li>
+                </ul>
+
+                <h5 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1">
+                    <span>Status</span>
+                </h5>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link {% if status_filter == 'planned' %}active{% endif %}" href="{% url 'games:asset_list' game.id %}?status=planned">
+                            <i class="bi bi-clipboard"></i> Planned
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if status_filter == 'in_progress' %}active{% endif %}" href="{% url 'games:asset_list' game.id %}?status=in_progress">
+                            <i class="bi bi-hourglass-split"></i> In Progress
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if status_filter == 'review' %}active{% endif %}" href="{% url 'games:asset_list' game.id %}?status=review">
+                            <i class="bi bi-eye"></i> In Review
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if status_filter == 'approved' %}active{% endif %}" href="{% url 'games:asset_list' game.id %}?status=approved">
+                            <i class="bi bi-check-circle"></i> Approved
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if status_filter == 'implemented' %}active{% endif %}" href="{% url 'games:asset_list' game.id %}?status=implemented">
+                            <i class="bi bi-check2-all"></i> Implemented
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">{{ game.title }} - Assets</h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <div class="btn-group me-2">
+                        <a href="{% url 'games:asset_create' game.id %}" class="btn btn-primary">
+                            <i class="bi bi-plus-lg"></i> Add Asset
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search and filters -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <form class="d-flex" method="get">
+                        <input class="form-control me-2" type="search" placeholder="Search assets..." name="search" value="{{ search_query }}">
+                        <button class="btn btn-outline-primary" type="submit">Search</button>
+                    </form>
+                </div>
+                <div class="col-md-6 text-end">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-sort-down"></i> Sort
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="?sort=name">Name</a></li>
+                            <li><a class="dropdown-item" href="?sort=type">Type</a></li>
+                            <li><a class="dropdown-item" href="?sort=status">Status</a></li>
+                            <li><a class="dropdown-item" href="?sort=date">Date Added</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Assets grid view -->
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-4">
+                {% for asset in assets %}
+                <div class="col">
+                    <div class="card h-100 asset-card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <span class="badge bg-primary asset-type-badge">{{ asset.get_asset_type_display }}</span>
+                        </div>
+                        
+                        <div class="asset-thumbnail-container">
+                            {% if asset.thumbnail %}
+                                <!-- Use custom thumbnail if available -->
+                                <img src="{{ asset.thumbnail.url }}" class="card-img-top asset-preview" alt="{{ asset.name }}">
+                                <div class="overlay-icon">
+                                    <i class="bi bi-image"></i>
+                                </div>
+                            {% elif asset.file %}
+                                {% if asset.asset_type == '2d_image' %}
+                                    <img src="{{ asset.file.url }}" class="card-img-top asset-preview" alt="{{ asset.name }}">
+                                    <div class="overlay-icon">
+                                        <i class="bi bi-image"></i>
+                                    </div>
+                                {% elif asset.asset_type == 'video' %}
+                                    <div class="video-preview">
+                                        <i class="bi bi-play-circle-fill"></i>
+                                        <span>{{ asset.name|truncatechars:20 }}</span>
+                                    </div>
+                                {% elif asset.asset_type == '3d_model' %}
+                                    <div class="model-preview">
+                                        <i class="bi bi-cube-fill"></i>
+                                        <span>{{ asset.name|truncatechars:20 }}</span>
+                                    </div>
+                                {% elif asset.asset_type == 'music' %}
+                                    <div class="music-preview">
+                                        <i class="bi bi-music-note-beamed"></i>
+                                        <span>{{ asset.name|truncatechars:20 }}</span>
+                                        <div class="audio-wave">
+                                            <span></span><span></span><span></span><span></span><span></span>
+                                        </div>
+                                    </div>
+                                {% elif asset.asset_type == 'reference' %}
+                                    <div class="reference-preview">
+                                        <i class="bi bi-bookmark-fill"></i>
+                                        <span>{{ asset.name|truncatechars:20 }}</span>
+                                    </div>
+                                {% else %}
+                                    <div class="generic-preview">
+                                        <i class="bi bi-file-earmark"></i>
+                                        <span>{{ asset.name|truncatechars:20 }}</span>
+                                    </div>
+                                {% endif %}
+                            {% else %}
+                                {% if asset.external_url %}
+                                    <div class="external-preview">
+                                        <i class="bi bi-link-45deg"></i>
+                                        <span>External Resource</span>
+                                    </div>
+                                {% else %}
+                                    <div class="no-preview">
+                                        <i class="bi bi-image"></i>
+                                        <span>No Preview</span>
+                                    </div>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="card-body">
+                            <h5 class="card-title">{{ asset.name }}</h5>
+                            {% if asset.subtype %}
+                                <h6 class="card-subtitle mb-2 text-muted">Subtype: {{ asset.subtype }}</h6>
+                            {% endif %}
+                            <p class="card-text">{{ asset.description|truncatechars:100 }}</p>
+                        </div>
+                        <div class="card-footer">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">Added {{ asset.created_at|date:"M d, Y" }}</small>
+                                <div class="btn-group">
+                                    <a href="{% url 'games:asset_detail' game.id asset.id %}" class="btn btn-sm btn-outline-secondary">View</a>
+                                    <a href="{% url 'games:asset_update' game.id asset.id %}" class="btn btn-sm btn-outline-primary">Edit</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-info text-center">
+                        <i class="bi bi-info-circle me-2"></i> No assets found. <a href="{% url 'games:asset_create' game.id %}" class="alert-link">Add your first asset</a>.
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if is_paginated %}
+            <nav aria-label="Asset pagination">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1" aria-label="First">
+                                <span aria-hidden="true">&laquo;&laquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                    
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <li class="page-item active"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Last">
+                                <span aria-hidden="true">&raquo;&raquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </main>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add any JavaScript functionality for the asset list page here
+    });
+</script>
+{% endblock %}

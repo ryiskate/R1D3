@@ -1,0 +1,161 @@
+/* Game Design Document Styles */
+
+.gdd-upload-btn {
+    background-color: #4a6fdc;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.gdd-upload-btn:hover {
+    background-color: #3a5cbe;
+    color: white;
+    text-decoration: none;
+}
+
+.gdd-upload-btn i {
+    font-size: 1.1rem;
+}
+
+.gdd-format-btn {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.gdd-format-btn:hover {
+    background-color: #218838;
+    color: white;
+    text-decoration: none;
+}
+
+.gdd-format-btn i {
+    font-size: 1.1rem;
+}
+
+.gdd-feature-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1.5rem;
+}
+
+.gdd-feature-table th {
+    background-color: #f0f4ff;
+    border-bottom: 2px solid #4a6fdc;
+    padding: 8px 12px;
+    text-align: left;
+}
+
+.gdd-feature-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.gdd-section-header {
+    background-color: #f8f9fa;
+    padding: 12px 16px;
+    margin-bottom: 1rem;
+    border-left: 4px solid #4a6fdc;
+    font-weight: 600;
+}
+
+.gdd-priority-high {
+    background-color: #ffecec;
+    color: #dc3545;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.gdd-priority-medium {
+    background-color: #fff4e0;
+    color: #fd7e14;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.gdd-priority-low {
+    background-color: #e8f5e9;
+    color: #198754;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.gdd-status-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.gdd-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Upload form styles */
+.gdd-upload-form {
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 24px;
+}
+
+.gdd-upload-form .form-label {
+    font-weight: 500;
+}
+
+.gdd-upload-instructions {
+    background-color: #e9f2ff;
+    border-left: 4px solid #4a6fdc;
+    padding: 16px;
+    border-radius: 4px;
+}
+
+.gdd-upload-instructions ol {
+    margin-bottom: 0;
+    padding-left: 20px;
+}
+
+/* Feature management styles */
+.gdd-feature-card {
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.gdd-feature-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.gdd-feature-card .card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    padding: 12px 16px;
+}
+
+.gdd-feature-actions {
+    display: flex;
+    gap: 8px;
+}

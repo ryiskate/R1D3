@@ -25,7 +25,7 @@ class HomeView(TemplateView):
 class DashboardView(LoginRequiredMixin, TemplateView):
     """Main dashboard view"""
     template_name = 'core/dashboard.html'
-    login_url = '/accounts/login/'
+    login_url = '/'  # Temporarily changed from '/accounts/login/' while allauth is disabled
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

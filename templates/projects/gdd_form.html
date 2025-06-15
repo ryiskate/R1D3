@@ -1,0 +1,404 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Edit Game Design Document - {{ gdd.game.title }}{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<style>
+    .ql-editor {
+        min-height: 400px;
+    }
+    .section-card {
+        margin-bottom: 1.5rem;
+    }
+    .section-card .card-header {
+        cursor: pointer;
+    }
+    .section-card .card-body {
+        display: none;
+    }
+    .section-card.expanded .card-body {
+        display: block;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>{% if gdd %}Edit{% else %}Create{% endif %} Game Design Document</h1>
+            <h2 class="text-primary">{% if gdd %}{{ gdd.game.title }}{% else %}{{ game.title }}{% endif %}</h2>
+        </div>
+        <div class="col-md-4 text-end">
+            {% if gdd %}
+                <a href="{% url 'games:gdd_detail' gdd.game.id %}" class="btn btn-outline-secondary me-2">Cancel</a>
+            {% else %}
+                <a href="{% url 'games:game_detail' game_id %}" class="btn btn-outline-secondary me-2">Cancel</a>
+            {% endif %}
+            <button type="submit" form="gdd-form" class="btn btn-primary">Save GDD</button>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-lg-9">
+            <!-- GDD Form -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">GDD Content</h5>
+                </div>
+                <div class="card-body">
+                    <form id="gdd-form" method="post">
+                        {% csrf_token %}
+                        
+                        <!-- Toggle between HTML and structured content -->
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="use_html_content" name="use_html_content" {% if gdd.use_html_content %}checked{% endif %}>
+                            <label class="form-check-label" for="use_html_content">Use HTML Editor</label>
+                        </div>
+                        
+                        <div id="html-editor-container" {% if not gdd.use_html_content %}style="display: none;"{% endif %}>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <label class="form-label">HTML Content</label>
+                                    <div>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary me-2" id="paste-html-btn">Paste from Clipboard</button>
+                                        <button type="button" class="btn btn-sm btn-primary" id="extract-sections-btn">Extract Sections</button>
+                                    </div>
+                                </div>
+                                <div class="alert alert-info small mb-2">
+                                    <i class="bi bi-info-circle"></i> Paste HTML content from Windsurf or another source, then click "Extract Sections" to automatically create sections from headings.
+                                </div>
+                                <div id="html-editor"></div>
+                                <input type="hidden" name="html_content" id="html_content_input" value="{{ gdd.html_content|default:'' }}">
+                            </div>
+                        </div>
+                        
+                        <div id="structured-fields-container" {% if gdd.use_html_content %}style="display: none;"{% endif %}>
+                            {{ form|crispy }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- GDD Sections -->
+            <div id="gdd-sections-container" {% if not gdd.use_html_content %}style="display: none;"{% endif %}>
+                <h4 class="mb-3">GDD Sections</h4>
+                <p class="text-muted mb-4">Create sections that can be linked to tasks. Each section will be a separate part of your GDD.</p>
+                
+                <div id="sections-list">
+                    {% for section in gdd.sections.all %}
+                    <div class="card section-card" data-section-id="{{ section.id }}">
+                        <div class="card-header d-flex justify-content-between align-items-center" onclick="toggleSection(this)">
+                            <h5 class="mb-0">{{ section.title }}</h5>
+                            <div>
+                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeSection('{{ section.id }}')">Remove</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label">Section Title</label>
+                                <input type="text" class="form-control section-title" value="{{ section.title }}">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Section ID</label>
+                                <input type="text" class="form-control section-id" value="{{ section.section_id }}">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Content</label>
+                                <div class="section-editor" data-section-id="{{ section.id }}"></div>
+                                <input type="hidden" class="section-content" value="{{ section.html_content|default:'' }}">
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <button type="button" class="btn btn-success mt-3" id="add-section-btn">Add Section</button>
+            </div>
+        </div>
+        
+        <div class="col-lg-3">
+            <!-- Tips & Help -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">GDD Tips</h5>
+                </div>
+                <div class="card-body">
+                    <h6>HTML Editor Mode</h6>
+                    <p class="small">Use the HTML editor for complete control over your GDD's layout and formatting. Create sections that can be linked to tasks.</p>
+                    
+                    <h6>Structured Mode</h6>
+                    <p class="small">Use the structured fields for a more guided GDD creation experience with predefined sections.</p>
+                    
+                    <h6>Linking Tasks</h6>
+                    <p class="small">You can create tasks directly from GDD sections to track implementation progress.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+<script>
+    // Initialize Quill editor for main HTML content
+    var quill = new Quill('#html-editor', {
+        theme: 'snow',
+        modules: {
+            toolbar: [
+                [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                ['bold', 'italic', 'underline', 'strike'],
+                [{ 'color': [] }, { 'background': [] }],
+                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                [{ 'indent': '-1' }, { 'indent': '+1' }],
+                ['link', 'image'],
+                ['clean']
+            ]
+        }
+    });
+    
+    // Set initial content
+    quill.root.innerHTML = document.getElementById('html_content_input').value;
+    
+    // Section editors
+    var sectionEditors = {};
+    document.querySelectorAll('.section-editor').forEach(function(editorElement) {
+        var sectionId = editorElement.getAttribute('data-section-id');
+        var editor = new Quill(editorElement, {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    ['bold', 'italic', 'underline'],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    ['link'],
+                    ['clean']
+                ]
+            }
+        });
+        
+        // Set initial content
+        var contentInput = editorElement.parentElement.querySelector('.section-content');
+        editor.root.innerHTML = contentInput.value;
+        
+        sectionEditors[sectionId] = editor;
+    });
+    
+    // Toggle between HTML and structured fields
+    document.getElementById('use_html_content').addEventListener('change', function() {
+        if (this.checked) {
+            document.getElementById('html-editor-container').style.display = 'block';
+            document.getElementById('structured-fields-container').style.display = 'none';
+            document.getElementById('gdd-sections-container').style.display = 'block';
+        } else {
+            document.getElementById('html-editor-container').style.display = 'none';
+            document.getElementById('structured-fields-container').style.display = 'block';
+            document.getElementById('gdd-sections-container').style.display = 'none';
+        }
+    });
+    
+    // Save form data
+    document.getElementById('gdd-form').addEventListener('submit', function() {
+        // Save main HTML content
+        document.getElementById('html_content_input').value = quill.root.innerHTML;
+        
+        // Save section data
+        var sectionsData = [];
+        document.querySelectorAll('.section-card').forEach(function(sectionCard) {
+            var sectionId = sectionCard.getAttribute('data-section-id');
+            var title = sectionCard.querySelector('.section-title').value;
+            var sectionIdValue = sectionCard.querySelector('.section-id').value;
+            var content = '';
+            
+            if (sectionEditors[sectionId]) {
+                content = sectionEditors[sectionId].root.innerHTML;
+            }
+            
+            sectionsData.push({
+                id: sectionId,
+                title: title,
+                section_id: sectionIdValue,
+                html_content: content
+            });
+        });
+        
+        // Add hidden input with sections data
+        var sectionsInput = document.createElement('input');
+        sectionsInput.type = 'hidden';
+        sectionsInput.name = 'sections_data';
+        sectionsInput.value = JSON.stringify(sectionsData);
+        this.appendChild(sectionsInput);
+    });
+    
+    // Toggle section expansion
+    function toggleSection(header) {
+        var card = header.closest('.section-card');
+        card.classList.toggle('expanded');
+    }
+    
+    // Remove section
+    function removeSection(sectionId) {
+        if (confirm('Are you sure you want to remove this section?')) {
+            var sectionCard = document.querySelector(`.section-card[data-section-id="${sectionId}"]`);
+            if (sectionCard) {
+                sectionCard.remove();
+            }
+        }
+    }
+    
+    // Add new section
+    document.getElementById('add-section-btn').addEventListener('click', function() {
+        var sectionId = 'new_' + Date.now();
+        var sectionTitle = 'New Section';
+        var sectionIdValue = 'section_' + Date.now();
+        
+        var sectionHtml = `
+            <div class="card section-card expanded" data-section-id="${sectionId}">
+                <div class="card-header d-flex justify-content-between align-items-center" onclick="toggleSection(this)">
+                    <h5 class="mb-0">${sectionTitle}</h5>
+                    <div>
+                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeSection('${sectionId}')">Remove</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Section Title</label>
+                        <input type="text" class="form-control section-title" value="${sectionTitle}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Section ID</label>
+                        <input type="text" class="form-control section-id" value="${sectionIdValue}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Content</label>
+                        <div class="section-editor" data-section-id="${sectionId}"></div>
+                        <input type="hidden" class="section-content" value="">
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        var sectionsContainer = document.getElementById('sections-list');
+        sectionsContainer.insertAdjacentHTML('beforeend', sectionHtml);
+        
+        // Initialize the new editor
+        var editorElement = document.querySelector(`.section-editor[data-section-id="${sectionId}"]`);
+        var editor = new Quill(editorElement, {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    ['bold', 'italic', 'underline'],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    ['link'],
+                    ['clean']
+                ]
+            }
+        });
+        
+        sectionEditors[sectionId] = editor;
+    });
+    // Paste HTML from clipboard
+    document.getElementById('paste-html-btn').addEventListener('click', function() {
+        navigator.clipboard.readText().then(function(clipText) {
+            quill.root.innerHTML = clipText;
+        }).catch(function(err) {
+            alert('Failed to read from clipboard: ' + err);
+        });
+    });
+    
+    // Extract sections from HTML content
+    document.getElementById('extract-sections-btn').addEventListener('click', function() {
+        // Clear existing sections
+        if (confirm('This will replace all existing sections. Continue?')) {
+            var htmlContent = quill.root.innerHTML;
+            var tempDiv = document.createElement('div');
+            tempDiv.innerHTML = htmlContent;
+            
+            // Find all headings
+            var headings = tempDiv.querySelectorAll('h1, h2, h3');
+            var sections = [];
+            
+            // Clear existing sections
+            document.getElementById('sections-list').innerHTML = '';
+            
+            // Process each heading as a section
+            headings.forEach(function(heading, index) {
+                var sectionId = 'extracted_' + Date.now() + '_' + index;
+                var sectionTitle = heading.textContent;
+                var sectionIdValue = 'section_' + sectionTitle.toLowerCase().replace(/[^a-z0-9]/g, '_');
+                var content = '';
+                
+                // Get content between this heading and the next
+                var currentNode = heading.nextSibling;
+                while (currentNode && !['H1', 'H2', 'H3'].includes(currentNode.nodeName)) {
+                    if (currentNode.outerHTML) {
+                        content += currentNode.outerHTML;
+                    } else if (currentNode.textContent) {
+                        content += currentNode.textContent;
+                    }
+                    currentNode = currentNode.nextSibling;
+                    if (!currentNode) break;
+                }
+                
+                // Create the section
+                createSection(sectionId, sectionTitle, sectionIdValue, content);
+            });
+            
+            alert('Extracted ' + headings.length + ' sections from the HTML content.');
+        }
+    });
+    
+    // Helper function to create a section
+    function createSection(sectionId, sectionTitle, sectionIdValue, content) {
+        var sectionHtml = `
+            <div class="card section-card expanded" data-section-id="${sectionId}">
+                <div class="card-header d-flex justify-content-between align-items-center" onclick="toggleSection(this)">
+                    <h5 class="mb-0">${sectionTitle}</h5>
+                    <div>
+                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeSection('${sectionId}')">Remove</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Section Title</label>
+                        <input type="text" class="form-control section-title" value="${sectionTitle}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Section ID</label>
+                        <input type="text" class="form-control section-id" value="${sectionIdValue}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Content</label>
+                        <div class="section-editor" data-section-id="${sectionId}"></div>
+                        <input type="hidden" class="section-content" value="${content.replace(/"/g, '&quot;')}">
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        var sectionsContainer = document.getElementById('sections-list');
+        sectionsContainer.insertAdjacentHTML('beforeend', sectionHtml);
+        
+        // Initialize the new editor
+        var editorElement = document.querySelector(`.section-editor[data-section-id="${sectionId}"]`);
+        var editor = new Quill(editorElement, {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    ['bold', 'italic', 'underline'],
+                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                    ['link'],
+                    ['clean']
+                ]
+            }
+        });
+        
+        editor.root.innerHTML = content;
+        sectionEditors[sectionId] = editor;
+    }
+</script>
+{% endblock %}

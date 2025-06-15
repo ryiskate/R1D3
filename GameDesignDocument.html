@@ -1,0 +1,1495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PeacefulFarm - Game Design Document</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+        
+        h2 {
+            color: #4CAF50;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+            margin-top: 40px;
+        }
+        
+        h3 {
+            color: #2E7D32;
+            margin-top: 25px;
+        }
+        
+        .toc {
+            background-color: #f1f1f1;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+        }
+        
+        .toc h2 {
+            margin-top: 0;
+        }
+        
+        .toc ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        .toc li {
+            margin-bottom: 10px;
+        }
+        
+        .toc a {
+            text-decoration: none;
+            color: #2E7D32;
+        }
+        
+        .toc a:hover {
+            text-decoration: underline;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .feature-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        .feature-table th, .feature-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        .feature-table th {
+            background-color: #f2f2f2;
+        }
+        
+        .feature-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .status {
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 3px;
+            display: inline-block;
+        }
+        
+        .complete {
+            background-color: #DFF2BF;
+            color: #4F8A10;
+        }
+        
+        .in-progress {
+            background-color: #FEEFB3;
+            color: #9F6000;
+        }
+        
+        .planned {
+            background-color: #BDE5F8;
+            color: #00529B;
+        }
+        
+        .not-started {
+            background-color: #FFBABA;
+            color: #D8000C;
+        }
+        
+        .priority {
+            font-weight: bold;
+        }
+        
+        .high {
+            color: #D8000C;
+        }
+        
+        .medium {
+            color: #9F6000;
+        }
+        
+        .low {
+            color: #00529B;
+        }
+
+        .notes {
+            font-style: italic;
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .system-diagram {
+            max-width: 100%;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        code {
+            font-family: Consolas, Monaco, 'Andale Mono', monospace;
+            background-color: #f5f5f5;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+
+        .code-block {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: Consolas, Monaco, 'Andale Mono', monospace;
+            font-size: 0.9em;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>PeacefulFarm</h1>
+        <p>Game Design Document</p>
+        <p><em>Last Updated: May 29, 2025</em></p>
+    </header>
+    
+    <div class="toc">
+        <h2>Table of Contents</h2>
+        <ul>
+            <li><a href="#game-overview">1. Game Overview</a></li>
+            <li><a href="#core-mechanics">2. Core Mechanics</a></li>
+            <li><a href="#animal-systems">3. Animal Systems</a></li>
+            <li><a href="#merchant-economy">4. Merchant and Economy</a></li>
+            <li><a href="#habitat-systems">5. Habitat Systems</a></li>
+            <li><a href="#audio-system">6. Audio System</a></li>
+            <li><a href="#ui-systems">7. UI Systems</a></li>
+            <li><a href="#player-progression">8. Player Progression</a></li>
+            <li><a href="#technical-implementation">9. Technical Implementation</a></li>
+            <li><a href="#art-assets">10. Art Assets</a></li>
+            <li><a href="#unity-configuration">11. Unity Configuration Guide</a></li>
+            <li><a href="#roadmap">12. Development Roadmap</a></li>
+        </ul>
+    </div>
+    
+    <div id="game-overview" class="section">
+        <h2>1. Game Overview</h2>
+        <p>PeacefulFarm is a relaxing animal collection and care simulation game where players capture wild animals, raise them on their farm, and build relationships with them. Players use food as bait to capture animals, care for them in specialized habitats, and collect gifts that animals provide once bonded.</p>
+        
+        <h3>Game Pillars</h3>
+        <ul>
+            <li><strong>Animal Collection:</strong> Capture different animal species using appropriate food baits</li>
+            <li><strong>Animal Care:</strong> Deep systems for caring for animals and building bonds with them</li>
+            <li><strong>Economy Loop:</strong> Animals provide gifts that can be sold for money to buy food and habitats</li>
+            <li><strong>Breeding System:</strong> Animals with high happiness and bond can produce eggs that hatch into color variants</li>
+            <li><strong>Farm Development:</strong> Gradual expansion by adding new habitats and animal types</li>
+            <li><strong>Atmosphere:</strong> Soothing audio and visuals that create a calming experience with day/night cycles</li>
+        </ul>
+        
+        <h3>Core Gameplay Loop</h3>
+        <ol>
+            <li>Collect food (from trees or by purchasing)</li>
+            <li>Use food to capture animals in the wild through mini-games</li>
+            <li>Build and place habitats for captured animals</li>
+            <li>Feed and care for animals to increase happiness and bond</li>
+            <li>Collect gifts from bonded animals</li>
+            <li>Sell gifts to merchants for money</li>
+            <li>Use money to buy more food and habitats</li>
+            <li>Breed animals to get color variants</li>
+        </ol>
+    </div>
+    
+    <div id="core-mechanics" class="section">
+        <h2>2. Core Mechanics</h2>
+        
+        <table class="feature-table">
+            <tr>
+                <th>Feature</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Priority</th>
+            </tr>
+            <tr>
+                <td>Animal Capture System</td>
+                <td>Mechanics for capturing wild animals using food baits</td>
+                <td><span class="status planned">Planned</span></td>
+                <td><span class="priority high">High</span></td>
+            </tr>
+            <tr>
+                <td>Capture Mini-games</td>
+                <td>Interactive challenges to capture animals</td>
+                <td><span class="status planned">Planned</span></td>
+                <td><span class="priority high">High</span></td>
+            </tr>
+            <tr>
+                <td>Animal Care System</td>
+                <td>Feeding and caring for animals to increase happiness</td>
+                <td><span class="status complete">Complete</span></td>
+                <td><span class="priority high">High</span></td>
+            </tr>
+            <tr>
+                <td>Gift Collection</td>
+                <td>System for animals to provide gifts based on bond level</td>
+                <td><span class="status planned">Planned</span></td>
+                <td><span class="priority high">High</span></td>
+            </tr>
+            <tr>
+                <td>Breeding System</td>
+                <td>Mechanics for animals to produce eggs and offspring</td>
+                <td><span class="status planned">Planned</span></td>
+                <td><span class="priority medium">Medium</span></td>
+            </tr>
+            <tr>
+                <td>Economy System</td>
+                <td>Buying/selling with merchants to sustain farm</td>
+                <td><span class="status planned">Planned</span></td>
+                <td><span class="priority high">High</span></td>
+            </tr>
+            <tr>
+                <td>Day/Night Cycle</td>
+                <td>Time progression with visual changes</td>
+                <td><span class="status in-progress">In Progress</span></td>
+                <td><span class="priority medium">Medium</span></td>
+            </tr>
+        </table>
+        
+        <h3>Animal Capture System</h3>
+        <p>The animal capture system works as follows:</p>
+        <ul>
+            <li><strong>Food Baits:</strong> Each animal type is attracted to a specific food</li>
+            <li>Turtle → Apple</li>
+            <li>Parrot → Corn</li>
+            <li>Jaguar → Meat</li>
+            <li>Rabbit → Carrot</li>
+            <li>Capybara → Lettuce</li>
+            <li>Armadillo → Grubs</li>
+            <li>Tapir → Fruit Mix</li>
+            <li><strong>Capture Areas:</strong> Special locations where wild animals can be found</li>
+            <li><strong>Mini-games:</strong> Skill-based challenges to successfully capture animals</li>
+            <li><strong>Inventory:</strong> Captured animals are added to player inventory</li>
+        </ul>
+        
+        <h3>Animal Care and Gifts</h3>
+        <p>The animal care and gift system includes:</p>
+        <ul>
+            <li>Regular feeding to maintain and increase happiness</li>
+            <li>After 3 feedings, animals begin to provide gifts</li>
+            <li>Each animal can provide 3 different gifts based on bond level</li>
+            <li>Gifts can be sold to merchants for money</li>
+            <li>Higher bond levels unlock better, more valuable gifts</li>
+        </ul>
+        
+        <h3>Breeding System</h3>
+        <p>The breeding system works as follows:</p>
+        <ul>
+            <li>Two animals in the same habitat with full bond (level 3) and high happiness (3+)</li>
+            <li>Chance to produce an egg after meeting conditions</li>
+            <li>After parent animals provide 3 more gifts, the egg hatches</li>
+            <li>Offspring have color variations from parents</li>
+        </ul>
+    </div>
+    
+    <div id="animal-systems" class="section">
+        <h2>3. Animal Systems</h2>
+        
+        <table class="feature-table">
+            <tr>
+                <th>Feature</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Priority</th>
+            </tr>
+            <tr>
+                <td>Animal Types</td>
+                <td>Different animal species with unique behaviors and gifts</td>
+                <td><span class="status in-progress">In Progress</span></td>
+                <td><span class="priority high">High</span></td>
+            </tr>
+            <tr>
+                <td>Animal Happiness System</td>
+                <td>System tracking animal happiness based on care</td>
+                <td><span class="status complete">Complete</span></td>
+                <td><span class="priority high">High</span></td>
+            </tr>
+            <tr>
+                <td>Bond Level System</td>
+                <td>Relationship building with animals through interaction</td>
+                <td><span class="status complete">Complete</span></td>
+                <td><span class="priority high">High</span></td>
+            </tr>
+            <tr>
+                <td>Gift System</td>
+                <td>Animals providing gifts based on bond level</td>
+                <td><span class="status planned">Planned</span></td>
+                <td><span class="priority high">High</span></td>
+            </tr>
+            <tr>
+                <td>Breeding System</td>
+                <td>Animals producing eggs that hatch into variants</td>
+                <td><span class="status planned">Planned</span></td>
+                <td><span class="priority medium">Medium</span></td>
+            </tr>
+            <tr>
+                <td>Animal Sounds</td>
+                <td>Sound effects for different animal states</td>
+                <td><span class="status in-progress">In Progress</span></td>
+                <td><span class="priority medium">Medium</span></td>
+            </tr>
+            <tr>
+                <td>Color Variations</td>
+                <td>Visual differences in offspring from breeding</td>
+                <td><span class="status planned">Planned</span></td>
+                <td><span class="priority low">Low</span></td>
+            </tr>
+        </table>
+        
+        <h3>Animal Types</h3>
+        <p>The game features the following animal types:</p>
+        <ul>
+            <li><strong>Turtle:</strong> Captured with Apples, starter animal</li>
+            <li><strong>Parrot:</strong> Captured with Corn</li>
+            <li><strong>Jaguar:</strong> Captured with Meat</li>
+            <li><strong>Rabbit:</strong> Captured with Carrots</li>
+            <li><strong>Capybara:</strong> Captured with Lettuce</li>
+            <li><strong>Armadillo:</strong> Captured with Grubs</li>
+            <li><strong>Tapir:</strong> Captured with Fruit Mix</li>
+        </ul>
+        
+        <h3>Animal Happiness System</h3>
+        <p>The animal happiness system has the following components:</p>
+        <ul>
+            <li>Happiness scale (0-5)</li>
+            <li>Feeding timer that decreases over time</li>
+            <li>Habitat cleanliness affecting happiness</li>
+            <li>Happiness rules based on feeding timing and habitat cleanliness</li>
+        </ul>
+        
+        <h3>Bond Level System</h3>
+        <p>The bond level system works as follows:</p>
+        <ul>
+            <li>Bond levels range from 0-3</li>
+            <li>Bond increases when happiness reaches certain thresholds</li>
+            <li>Higher bond levels require more happiness points</li>
+            <li>Bond decreases if happiness would go below -1</li>
+            <li>Higher bond levels unlock better gifts</li>
+        </ul>
+        
+        <h3>Gift System</h3>
+        <p>The gift system works as follows:</p>
+        <ul>
+            <li>After 3 feedings, animals begin to provide gifts</li>
+            <li>Each animal type can provide 3 different gifts based on bond level</li>
+            <li>Bond Level 1: Basic gift</li>
+            <li>Bond Level 2: Improved gift</li>
+            <li>Bond Level 3: Rare gift</li>
+            <li>Gifts can be sold to merchants for money</li>
+        </ul>
+        
+        <h4>Animal Gifts by Type</h4>
+        <table class="feature-table">
+            <tr>
+                <th>Animal</th>
+                <th>Level 1 Gift</th>
+                <th>Level 2 Gift</th>
+                <th>Level 3 Gift</th>
+            </tr>
+            <tr>
+                <td>Turtle</td>
+                <td>Rock</td>
+                <td>Pearl</td>
+                <td>Gold Nugget</td>
+            </tr>
+            <tr>
+                <td>Parrot</td>
+                <td>Tropical Seed</td>
+                <td>Rainbow Berry</td>
+                <td>Singing Flower</td>
+            </tr>
+            <tr>
+                <td>Jaguar</td>
+                <td>Jungle Gem</td>
+                <td>Spotted Orchid</td>
+                <td>Golden Eye Crystal</td>
+            </tr>
+            <tr>
+                <td>Rabbit</td>
+                <td>Clover Leaf</td>
+                <td>Carrot Seeds</td>
+                <td>Golden Clover</td>
+            </tr>
+            <tr>
+                <td>Capybara</td>
+                <td>Herb Bundle</td>
+                <td>Medicinal Root</td>
+                <td>Healing Flower</td>
+            </tr>
+            <tr>
+                <td>Armadillo</td>
+                <td>Clay Marble</td>
+                <td>Buried Coin</td>
+                <td>Ancient Artifact</td>
+            </tr>
+            <tr>
+                <td>Tapir</td>
+                <td>Exotic Seed</td>
+                <td>Rare Fruit</td>
+                <td>Magic Bean</td>
+            </tr>
+        </table>
+        
+        <h3>Breeding System</h3>
+        <p>The breeding system allows for animal variants:</p>
+        <ul>
+            <li>Two animals in the same habitat with full bond (level 3) and high happiness (3+)</li>
+            <li>Chance to produce an egg</li>
+            <li>After parent animals provide 3 more gifts, the egg hatches</li>
+            <li>Offspring have color variations from parents</li>
+        </ul>
+    </div>
+    
+    <div id="merchant-economy" class="section">
+        <h2>4. Merchant and Economy</h2>
+        
+        <table class="feature-table">
+            <tr>
+                <th>Feature</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Priority</th>
+            </tr>
+            <tr>
+                <td>Merchant Interface</td>
+                <td>UI for buying and selling items with merchants</td>
+                <td><span class="status planned">Planned</span></td>
+                <td><span class="priority high">High</span></td>
+            </tr>
+            <tr>
+                <td>Gift Selling</td>
+                <td>System for selling animal gifts for money</td>
+                <td><span class="status implemented">Implemented</span></td>
+                <td><span class="priority high">High</span></td>
+            </tr>
+            <tr>
+                <td>Gift Catalog</td>
+                <td>UI for tracking discovered and undiscovered gifts</td>
+                <td><span class="status implemented">Implemented</span></td>
+                <td><span class="priority medium">Medium</span></td>
+            </tr>
+            <tr>
+                <td>Food Purchasing</td>
+                <td>Buying food for feeding and capturing animals</td>
+                <td><span class="status planned">Planned</span></td>
+                <td><span class="priority high">High</span></td>
+            </tr>
+            <tr>
+                <td>Habitat Shop</td>
+                <td>Interface for purchasing new habitat types</td>
+                <td><span class="status planned">Planned</span></td>
+                <td><span class="priority high">High</span></td>
+            </tr>
+            <tr>
+                <td>Animal Trading</td>
+                <td>System for selling animals to merchants</td>
+                <td><span class="status planned">Planned</span></td>
+                <td><span class="priority medium">Medium</span></td>
+            </tr>
+            <tr>
+                <td>Economy Balance</td>
+                <td>Tuning of prices and rewards for game progression</td>
+                <td><span class="status planned">Planned</span></td>
+                <td><span class="priority high">High</span></td>
+            </tr>
+        </table>
+        
+        <h3>Economy Loop</h3>
+        <p>The game's economy follows a sustainable loop:</p>
+        <ol>
+            <li>Start with a turtle habitat and apple tree</li>
+            <li>Collect apples to capture turtles</li>
+            <li>Feed turtles to increase happiness and bond</li>
+            <li>Collect gifts from bonded turtles</li>
+            <li>Sell gifts to merchants for money</li>
+            <li>Use money to buy food for existing animals</li>
+            <li>Use money to buy new habitats and food for capturing new animals</li>
+            <li>Expand collection with new animal types</li>
+            <li>Breed animals to get color variants</li>
+        </ol>
+        
+        <h3>Merchant System</h3>
+        <p>The merchant provides the following services:</p>
+        <ul>
+            <li>Buying animal gifts at different prices based on rarity</li>
+            <li>Selling food items needed for animal care and capture</li>
+            <li>Selling new habitat types as player progresses</li>
+            <li>Potentially buying animals from the player</li>
+        </ul>
+        
+        <h3>Gift Values and Economy Progression</h3>
+        <p>The economy is designed to encourage players to invest in raising animals' bond levels:</p>
+        <ul>
+            <li><strong>Bond Level 0:</strong> No gifts yet, player must invest in feeding</li>
+            <li><strong>Bond Level 1:</strong> Gifts roughly equal feeding costs (break-even)</li>
+            <li><strong>Bond Level 2:</strong> Gifts exceed feeding costs (modest profit)</li>
+            <li><strong>Bond Level 3:</strong> Gifts significantly exceed feeding costs (substantial profit)</li>
+        </ul>
+        
+        <table class="feature-table">
+            <tr>
+                <th>Gift Tier</th>
+                <th>Value Range</th>
+                <th>Examples</th>
+                <th>Feeding Investment</th>
+            </tr>
+            <tr>
+                <td>No Bond (Level 0)</td>
+                <td>0 coins</td>
+                <td>No gifts yet</td>
+                <td>3-5 feedings (15-75 coins)</td>
+            </tr>
+            <tr>
+                <td>Level 1 (Basic)</td>
+                <td>5-15 coins</td>
+                <td>Rock, Feather, Fur, Cotton Fluff, Herb Bundle, Shell Fragment, Exotic Seed</td>
+                <td>≈ 5-15 coins per feeding</td>
+            </tr>
+            <tr>
+                <td>Level 2 (Improved)</td>
+                <td>20-40 coins</td>
+                <td>Pearl, Rainbow Feather, Whiskers, Soft Pelt, Medicinal Root, Buried Coin, Rare Fruit</td>
+                <td>≈ 5-15 coins per feeding</td>
+            </tr>
+            <tr>
+                <td>Level 3 (Rare)</td>
+                <td>50-150 coins</td>
+                <td>Gold Nugget, Gold Feather, Tooth, Lucky Foot, Healing Flower, Ancient Artifact, Magic Bean</td>
+                <td>≈ 5-15 coins per feeding</td>
+            </tr>
+        </table>
+        
+        <h3>Habitat Costs</h3>
+        <table class="feature-table">
+            <tr>
+                <th>Habitat Type</th>
+                <th>Cost</th>
+                <th>Unlock Requirement</th>
+            </tr>
+            <tr>
+                <td>Pond Habitat (Turtle)</td>
+                <td>Starting habitat</td>
+                <td>Available at start</td>
+            </tr>
+            <tr>
+                <td>Aviary Habitat (Parrot)</td>
+                <td>150 coins</td>
+                <td>Reach bond level 1 with a turtle</td>
+            </tr>
+            <tr>
+                <td>Jungle Habitat (Jaguar)</td>
+                <td>300 coins</td>
+                <td>Reach bond level 2 with a parrot</td>
+            </tr>
+            <tr>
+                <td>Meadow Habitat (Rabbit)</td>
+                <td>200 coins</td>
+                <td>Reach bond level 1 with a parrot</td>
+            </tr>
+            <tr>
+                <td>Wetland Habitat (Capybara)</td>
+                <td>250 coins</td>
+                <td>Reach bond level 2 with a turtle</td>
+            </tr>
+            <tr>
+                <td>Burrow Habitat (Armadillo)</td>
+                <td>275 coins</td>
+                <td>Reach bond level 1 with a rabbit</td>
+            </tr>
+            <tr>
+                <td>Rainforest Habitat (Tapir)</td>
+                <td>350 coins</td>
+                <td>Reach bond level 2 with a jaguar</td>
+            </tr>
+        </table>
+        
+        <h3>Food Costs</h3>
+        <p>Food costs are balanced to ensure players must invest in animals before seeing returns:</p>
+        <table class="feature-table">
+            <tr>
+                <th>Food Type</th>
+                <th>Cost</th>
+                <th>Used For</th>
+                <th>Feedings to Bond Level 1</th>
+                <th>Total Investment</th>
+            </tr>
+            <tr>
+                <td>Apple</td>
+                <td>5 coins</td>
+                <td>Turtle bait and food</td>
+                <td>3 feedings</td>
+                <td>15 coins</td>
+            </tr>
+            <tr>
+                <td>Corn</td>
+                <td>8 coins</td>
+                <td>Parrot bait and food</td>
+                <td>3 feedings</td>
+                <td>24 coins</td>
+            </tr>
+            <tr>
+                <td>Meat</td>
+                <td>15 coins</td>
+                <td>Jaguar bait and food</td>
+                <td>3 feedings</td>
+                <td>45 coins</td>
+            </tr>
+            <tr>
+                <td>Carrot</td>
+                <td>7 coins</td>
+                <td>Rabbit bait and food</td>
+                <td>3 feedings</td>
+                <td>21 coins</td>
+            </tr>
+            <tr>
+                <td>Lettuce</td>
+                <td>6 coins</td>
+                <td>Capybara bait and food</td>
+                <td>3 feedings</td>
+                <td>18 coins</td>
+            </tr>
+            <tr>
+                <td>Grubs</td>
+                <td>10 coins</td>
+                <td>Armadillo bait and food</td>
+                <td>3 feedings</td>
+                <td>30 coins</td>
+            </tr>
+            <tr>
+                <td>Fruit Mix</td>
+                <td>12 coins</td>
+                <td>Tapir bait and food</td>
+                <td>3 feedings</td>
+                <td>36 coins</td>
+            </tr>
+        </table>
+        
+        <h3>Economy Balance Examples</h3>
+        <table class="feature-table">
+            <tr>
+                <th>Animal</th>
+                <th>Initial Investment</th>
+                <th>Bond Level 1 Return</th>
+                <th>Bond Level 2 Return</th>
+                <th>Bond Level 3 Return</th>
+            </tr>
+            <tr>
+                <td>Turtle</td>
+                <td>15 coins</td>
+                <td>5-10 coins (loss)</td>
+                <td>20-30 coins (profit)</td>
+                <td>50-75 coins (significant profit)</td>
+            </tr>
+            <tr>
+                <td>Jaguar</td>
+                <td>45 coins</td>
+                <td>10-15 coins (loss)</td>
+                <td>30-40 coins (small profit)</td>
+                <td>100-150 coins (major profit)</td>
+            </tr>
+        </table>
+        
+        <h3>Gift System</h3>
+        <p>The gift system uses physical objects that appear in the world:</p>
+        <ul>
+            <li><strong>Gift Generation:</strong> Animals produce gifts after being fed a certain number of times (default: 3 feeds)</li>
+            <li><strong>Physical Representation:</strong> Gifts appear as interactive objects in the animal's habitat</li>
+            <li><strong>Animations:</strong> Gifts bob up and down and rotate slowly to attract attention</li>
+            <li><strong>Interaction:</strong> Players must click on gifts to collect them</li>
+            <li><strong>Value Decay:</strong> Gift value decreases over time (5% per hour, up to 70% maximum)</li>
+            <li><strong>Persistence:</strong> Gifts remain in the world across scene changes and game sessions</li>
+            <li><strong>Visual Indicators:</strong> UI elements show when gifts are ready and when they're collected</li>
+            <li><strong>Gift Catalog:</strong> Players can view all discovered and undiscovered gifts in a catalog UI</li>
+        </ul>
+        
+        <h3>Gift Catalog UI</h3>
+        <p>The Gift Catalog provides players with information about all gifts in the game:</p>
+        <ul>
+            <li><strong>Discovery System:</strong> Gifts are initially shown as silhouettes until collected for the first time</li>
+            <li><strong>Filtering:</strong> Players can filter gifts by animal type or bond level</li>
+            <li><strong>Gift Details:</strong> Each entry shows the gift's name, description, value range, and source animal</li>
+            <li><strong>Collection Tracking:</strong> The catalog tracks how many of each gift type the player has collected</li>
+            <li><strong>Completion Rewards:</strong> Bonuses are awarded for completing animal gift sets</li>
+        </ul>
+        
+        <h3>Complete Gift Catalog</h3>
+        <p>This table provides details on all gifts that animals can provide:</p>
+        <table class="feature-table">
+            <tr>
+                <th>Gift Name</th>
+                <th>Animal Source</th>
+                <th>Bond Level</th>
+                <th>Value</th>
+                <th>Description</th>
+            </tr>
+            <!-- Turtle Gifts -->
+            <tr>
+                <td>Rock</td>
+                <td>Turtle</td>
+                <td>1</td>
+                <td>5-10 coins</td>
+                <td>A smooth river rock polished by the turtle's shell. Common but useful for crafting.</td>
+            </tr>
+            <tr>
+                <td>Pearl</td>
+                <td>Turtle</td>
+                <td>2</td>
+                <td>20-30 coins</td>
+                <td>A small freshwater pearl found by the turtle. Has a subtle luster and moderate value.</td>
+            </tr>
+            <tr>
+                <td>Gold Nugget</td>
+                <td>Turtle</td>
+                <td>3</td>
+                <td>50-75 coins</td>
+                <td>A small gold nugget discovered in the riverbed. Highly valuable and sought after.</td>
+            </tr>
+            <!-- Parrot Gifts -->
+            <tr>
+                <td>Tropical Seed</td>
+                <td>Parrot</td>
+                <td>1</td>
+                <td>8-12 coins</td>
+                <td>A colorful seed from an exotic fruit. Can be planted to grow decorative flowers.</td>
+            </tr>
+            <tr>
+                <td>Rainbow Berry</td>
+                <td>Parrot</td>
+                <td>2</td>
+                <td>25-35 coins</td>
+                <td>A rare berry with a spectrum of colors. Makes vibrant dyes and has a unique sweet flavor.</td>
+            </tr>
+            <tr>
+                <td>Singing Flower</td>
+                <td>Parrot</td>
+                <td>3</td>
+                <td>60-90 coins</td>
+                <td>An extraordinary flower that mimics bird songs when the wind blows. Extremely rare and magical.</td>
+            </tr>
+            <!-- Jaguar Gifts -->
+            <tr>
+                <td>Jungle Gem</td>
+                <td>Jaguar</td>
+                <td>1</td>
+                <td>10-15 coins</td>
+                <td>A small colorful stone found in the jungle. Has a natural spotted pattern reminiscent of a jaguar.</td>
+            </tr>
+            <tr>
+                <td>Spotted Orchid</td>
+                <td>Jaguar</td>
+                <td>2</td>
+                <td>30-40 coins</td>
+                <td>A rare orchid with jaguar-like spots. Prized by botanists for its unique pattern and scent.</td>
+            </tr>
+            <tr>
+                <td>Golden Eye Crystal</td>
+                <td>Jaguar</td>
+                <td>3</td>
+                <td>100-150 coins</td>
+                <td>A mesmerizing amber crystal that resembles a jaguar's eye. Said to grant night vision and courage.</td>
+            </tr>
+            <!-- Rabbit Gifts -->
+            <tr>
+                <td>Clover Leaf</td>
+                <td>Rabbit</td>
+                <td>1</td>
+                <td>5-10 coins</td>
+                <td>A perfect four-leaf clover found by the rabbit. Brings a small amount of luck to its owner.</td>
+            </tr>
+            <tr>
+                <td>Carrot Seeds</td>
+                <td>Rabbit</td>
+                <td>2</td>
+                <td>20-30 coins</td>
+                <td>Rare heirloom carrot seeds gathered by the rabbit. Grows into exceptionally sweet carrots.</td>
+            </tr>
+            <tr>
+                <td>Golden Clover</td>
+                <td>Rabbit</td>
+                <td>3</td>
+                <td>50-70 coins</td>
+                <td>An extremely rare golden clover with five leaves. Said to bring extraordinary luck and prosperity.</td>
+            </tr>
+            <!-- Capybara Gifts -->
+            <tr>
+                <td>Herb Bundle</td>
+                <td>Capybara</td>
+                <td>1</td>
+                <td>6-10 coins</td>
+                <td>A small bundle of herbs collected by the capybara. Has mild medicinal properties.</td>
+            </tr>
+            <tr>
+                <td>Medicinal Root</td>
+                <td>Capybara</td>
+                <td>2</td>
+                <td>25-35 coins</td>
+                <td>A rare root with healing properties. Used in making remedies and potions.</td>
+            </tr>
+            <tr>
+                <td>Healing Flower</td>
+                <td>Capybara</td>
+                <td>3</td>
+                <td>60-80 coins</td>
+                <td>An extremely rare flower with powerful medicinal properties. Highly sought after by healers.</td>
+            </tr>
+            <!-- Armadillo Gifts -->
+            <tr>
+                <td>Clay Marble</td>
+                <td>Armadillo</td>
+                <td>1</td>
+                <td>8-12 coins</td>
+                <td>A perfectly round clay marble uncovered while digging. Smooth and pleasing to hold.</td>
+            </tr>
+            <tr>
+                <td>Buried Coin</td>
+                <td>Armadillo</td>
+                <td>2</td>
+                <td>25-40 coins</td>
+                <td>An old coin dug up by the armadillo. Has historical value beyond its metal worth.</td>
+            </tr>
+            <tr>
+                <td>Ancient Artifact</td>
+                <td>Armadillo</td>
+                <td>3</td>
+                <td>70-120 coins</td>
+                <td>A mysterious ancient artifact discovered underground. Extremely valuable to collectors and scholars.</td>
+            </tr>
+            <!-- Tapir Gifts -->
+            <tr>
+                <td>Exotic Seed</td>
+                <td>Tapir</td>
+                <td>1</td>
+                <td>10-15 coins</td>
+                <td>An unusual seed from a rare plant. Can be planted or used in exotic cooking.</td>
+            </tr>
+            <tr>
+                <td>Rare Fruit</td>
+                <td>Tapir</td>
+                <td>2</td>
+                <td>30-40 coins</td>
+                <td>A delicious and rare fruit from deep in the rainforest. Has unique flavor and properties.</td>
+            </tr>
+            <tr>
+                <td>Magic Bean</td>
+                <td>Tapir</td>
+                <td>3</td>
+                <td>80-120 coins</td>
+                <td>A legendary bean said to have magical growing properties. Extremely rare and valuable.</td>
+            </tr>
+        </table>
+        
+        <h3>Food Sources</h3>
+        <p>Food can be obtained through:</p>
+        <ul>
+            <li>Natural sources (e.g., apple tree on the farm)</li>
+            <li>Purchasing from merchants</li>
+            <li>Potentially as gifts from certain animals</li>
+        </ul>
+    </div>
+    
+    <div id="habitat-systems" class="section">
+        <h2>5. Habitat Systems</h2>
+        
+        <table class="feature-table">
+            <tr>
+                <th>Feature</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Priority</th>
+            </tr>
+            <tr>
+                <td>Habitat Types</td>
+                <td>Different enclosures for various animal types</td>
+                <td><span class="status in-progress">In Progress</span></td>
+                <td><span class="priority high">High</span></td>
+            </tr>
+            <tr>
+                <td>Habitat Placement</td>
+                <td>System for placing and arranging habitats on the farm</td>
+                <td><span class="status planned">Planned</span></td>
+                <td><span class="priority high">High</span></td>
+            </tr>
+            <tr>
+                <td>Habitat Cleanliness</td>
+                <td>System for tracking and managing habitat cleanliness</td>
+                <td><span class="status complete">Complete</span></td>
+                <td><span class="priority high">High</span></td>
+            </tr>
+            <tr>
+                <td>Habitat Management</td>
+                <td>System for removing and replacing habitats</td>
+                <td><span class="status planned">Planned</span></td>
+                <td><span class="priority medium">Medium</span></td>
+            </tr>
+            <tr>
+                <td>Breeding Support</td>
+                <td>Habitat features that enable animal breeding</td>
+                <td><span class="status planned">Planned</span></td>
+                <td><span class="priority medium">Medium</span></td>
+            </tr>
+        </table>
+        
+        <h3>Habitat Progression</h3>
+        <p>The habitat system follows a progression path:</p>
+        <ul>
+            <li>Player starts with a turtle habitat and apple tree</li>
+            <li>As players earn money from selling gifts, they can purchase new habitats</li>
+            <li>Each habitat type houses a specific animal species</li>
+            <li>Players can choose where to place new habitats on their farm</li>
+            <li>Existing habitats can be removed and replaced with different types</li>
+        </ul>
+        
+        <h3>Habitat Cleanliness System</h3>
+        <p>The habitat cleanliness system includes:</p>
+        <ul>
+            <li>Dirt objects that appear over time</li>
+            <li>Cleaning interaction to remove dirt</li>
+            <li>Dirt count affecting animal happiness</li>
+            <li>Dirt respawn timer</li>
+        </ul>
+        
+        <h3>Habitat Capacity</h3>
+        <p>Each habitat has specific characteristics:</p>
+        <ul>
+            <li>Can house multiple animals of the same type</li>
+            <li>Animals in the same habitat can breed if conditions are met</li>
+            <li>Cleanliness affects all animals in the habitat</li>
+        </ul>
+        
+        <h3>Habitat Management</h3>
+        <p>Players can manage their habitats by:</p>
+        <ul>
+            <li>Purchasing new habitats from the merchant</li>
+            <li>Selecting a free spot on the farm to place habitats</li>
+            <li>Removing existing habitats to make room for new ones</li>
+            <li>Maintaining cleanliness to keep animals happy</li>
+        </ul>
+    </div>
+    
+    <div id="audio-system" class="section">
+        <h2>6. Audio System</h2>
+        
+        <table class="feature-table">
+            <tr>
+                <th>Feature</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Priority</th>
+            </tr>
+            <tr>
+                <td>Audio Manager</td>
+                <td>Core system for playing and managing audio</td>
+                <td><span class="status complete">Complete</span></td>
+                <td><span class="priority high">High</span></td>
+            </tr>
+            <tr>
+                <td>Background Music</td>
+                <td>Ambient music that changes with time of day</td>
+                <td><span class="status complete">Complete</span></td>
+                <td><span class="priority high">High</span></td>
+            </tr>
+            <tr>
+                <td>Sound Effects</td>
+                <td>Interactive sounds for actions and events</td>
+                <td><span class="status in-progress">In Progress</span></td>
+                <td><span class="priority high">High</span></td>
+            </tr>
+            <tr>
+                <td>Animal Sounds</td>
+                <td>Unique sounds for different animals and states</td>
+                <td><span class="status in-progress">In Progress</span></td>
+                <td><span class="priority medium">Medium</span></td>
+            </tr>
+            <tr>
+                <td>Environmental Sounds</td>
+                <td>Ambient sounds based on location and weather</td>
+                <td><span class="status in-progress">In Progress</span></td>
+                <td><span class="priority medium">Medium</span></td>
+            </tr>
+            <tr>
+                <td>Audio Settings</td>
+                <td>UI for adjusting volume levels</td>
+                <td><span class="status planned">Planned</span></td>
+                <td><span class="priority medium">Medium</span></td>
+            </tr>
+        </table>
+        
+        <h3>Audio System Architecture</h3>
+        <p>The audio system consists of:</p>
+        <ul>
+            <li><strong>AudioManager:</strong> Singleton that handles all audio playback</li>
+            <li><strong>AmbienceManager:</strong> Controls background music and environmental sounds</li>
+            <li><strong>SoundCollection:</strong> ScriptableObjects for organizing related sounds</li>
+            <li><strong>AnimalSoundController:</strong> Component for animal-specific sounds</li>
+        </ul>
+        
+        <h3>Audio Mixer Structure</h3>
+        <p>The audio mixer has the following groups:</p>
+        <ul>
+            <li>Master (parent group)</li>
+            <li>Music (for background music)</li>
+            <li>SFX (for sound effects)</li>
+            <li>Ambience (for environmental sounds)</li>
+        </ul>
+    </div>
+    
+    <div id="ui-systems" class="section">
+        <h2>7. UI Systems</h2>
+        
+        <table class="feature-table">
+            <tr>
+                <th>Feature</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Priority</th>
+            </tr>
+            <tr>
+                <td>Main Menu</td>
+                <td>Game start screen with options</td>
+                <td><span class="status in-progress">In Progress</span></td>
+                <td><span class="priority high">High</span></td>
+            </tr>
+            <tr>
+                <td>HUD</td>
+                <td>In-game heads-up display showing essential info</td>
+                <td><span class="status in-progress">In Progress</span></td>
+                <td><span class="priority high">High</span></td>
+            </tr>
+            <tr>
+                <td>Inventory UI</td>
+                <td>Interface for managing player inventory</td>
+                <td><span class="status planned">Planned</span></td>
+                <td><span class="priority high">High</span></td>
+            </tr>
+            <tr>
+                <td>Animal Info UI</td>
+                <td>Display for animal stats and information</td>
+                <td><span class="status planned">Planned</span></td>
+                <td><span class="priority medium">Medium</span></td>
+            </tr>
+            <tr>
+                <td>Settings Menu</td>
+                <td>Options for adjusting game settings</td>
+                <td><span class="status planned">Planned</span></td>
+                <td><span class="priority medium">Medium</span></td>
+            </tr>
+            <tr>
+                <td>Tutorial UI</td>
+                <td>Guidance for new players</td>
+                <td><span class="status not-started">Not Started</span></td>
+                <td><span class="priority low">Low</span></td>
+            </tr>
+        </table>
+    </div>
+    
+    <div id="player-progression" class="section">
+        <h2>8. Player Progression</h2>
+        
+        <table class="feature-table">
+            <tr>
+                <th>Feature</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Priority</th>
+            </tr>
+            <tr>
+                <td>Farm Expansion</td>
+                <td>Unlocking new areas of the farm</td>
+                <td><span class="status planned">Planned</span></td>
+                <td><span class="priority high">High</span></td>
+            </tr>
+            <tr>
+                <td>Animal Collection</td>
+                <td>Acquiring different animal species</td>
+                <td><span class="status in-progress">In Progress</span></td>
+                <td><span class="priority high">High</span></td>
+            </tr>
+            <tr>
+                <td>Building Upgrades</td>
+                <td>Improving farm structures</td>
+                <td><span class="status planned">Planned</span></td>
+                <td><span class="priority medium">Medium</span></td>
+            </tr>
+            <tr>
+                <td>Tool Upgrades</td>
+                <td>Enhancing player tools for better efficiency</td>
+                <td><span class="status not-started">Not Started</span></td>
+                <td><span class="priority medium">Medium</span></td>
+            </tr>
+            <tr>
+                <td>Achievement System</td>
+                <td>Goals and rewards for player accomplishments</td>
+                <td><span class="status not-started">Not Started</span></td>
+                <td><span class="priority low">Low</span></td>
+            </tr>
+        </table>
+    </div>
+    
+    <div id="technical-implementation" class="section">
+        <h2>9. Technical Implementation</h2>
+        
+        <table class="feature-table">
+            <tr>
+                <th>System</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Priority</th>
+            </tr>
+            <tr>
+                <td>Save/Load System</td>
+                <td>Persistence of game state between sessions</td>
+                <td><span class="status planned">Planned</span></td>
+                <td><span class="priority high">High</span></td>
+            </tr>
+            <tr>
+                <td>ScriptableObject Architecture</td>
+                <td>Data-driven design using ScriptableObjects</td>
+                <td><span class="status complete">Complete</span></td>
+                <td><span class="priority high">High</span></td>
+            </tr>
+            <tr>
+                <td>Object Pooling</td>
+                <td>Efficient reuse of game objects</td>
+                <td><span class="status in-progress">In Progress</span></td>
+                <td><span class="priority medium">Medium</span></td>
+            </tr>
+            <tr>
+                <td>Event System</td>
+                <td>Decoupled communication between systems</td>
+                <td><span class="status in-progress">In Progress</span></td>
+                <td><span class="priority medium">Medium</span></td>
+            </tr>
+            <tr>
+                <td>Performance Optimization</td>
+                <td>Ensuring smooth gameplay on target platforms</td>
+                <td><span class="status planned">Planned</span></td>
+                <td><span class="priority medium">Medium</span></td>
+            </tr>
+        </table>
+        
+        <h3>ScriptableObject Architecture</h3>
+        <p>The game uses ScriptableObjects for:</p>
+        <ul>
+            <li>Animal data storage (PlayerAnimalInventory)</li>
+            <li>Sound collections</li>
+            <li>Item definitions</li>
+            <li>Game settings</li>
+        </ul>
+    </div>
+    
+    <div id="art-assets" class="section">
+        <h2>10. Art Assets</h2>
+        
+        <table class="feature-table">
+            <tr>
+                <th>Asset Type</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Priority</th>
+            </tr>
+            <tr>
+                <td>Character Models</td>
+                <td>Player character and NPCs</td>
+                <td><span class="status in-progress">In Progress</span></td>
+                <td><span class="priority high">High</span></td>
+            </tr>
+            <tr>
+                <td>Animal Models</td>
+                <td>3D models for various farm animals</td>
+                <td><span class="status in-progress">In Progress</span></td>
+                <td><span class="priority high">High</span></td>
+            </tr>
+            <tr>
+                <td>Environment Assets</td>
+                <td>Terrain, vegetation, buildings</td>
+                <td><span class="status in-progress">In Progress</span></td>
+                <td><span class="priority high">High</span></td>
+            </tr>
+            <tr>
+                <td>UI Elements</td>
+                <td>Interface graphics and icons</td>
+                <td><span class="status planned">Planned</span></td>
+                <td><span class="priority medium">Medium</span></td>
+            </tr>
+            <tr>
+                <td>VFX</td>
+                <td>Visual effects for actions and events</td>
+                <td><span class="status not-started">Not Started</span></td>
+                <td><span class="priority low">Low</span></td>
+            </tr>
+        </table>
+    </div>
+    
+    <div id="unity-configuration" class="section">
+        <h2>11. Unity Configuration Guide</h2>
+        
+        <p>This section provides detailed instructions for configuring the various systems in the Unity Editor for PeacefulFarm.</p>
+        
+        <h3>Gift System Configuration</h3>
+        <ol>
+            <li><strong>Create Gift Prefab:</strong>
+                <ul>
+                    <li>Create an empty GameObject in your scene</li>
+                    <li>Add components: SpriteRenderer, Box Collider 2D, and GiftObject script</li>
+                    <li>Add a child GameObject named "SelectionIndicator" with a SpriteRenderer</li>
+                    <li>Save as a prefab in your Prefabs folder</li>
+                </ul>
+            </li>
+            <li><strong>Configure GiftManager:</strong>
+                <ul>
+                    <li>Create a GiftManager GameObject in your scene</li>
+                    <li>Assign the Gift Prefab reference</li>
+                    <li>Set Gift Decay Rate Per Hour to 0.05 (5% per hour)</li>
+                    <li>Set Max Decay Percent to 0.7 (70% maximum)</li>
+                    <li>Assign references to PlayerAnimalInventory, PlayerGiftInventory, and MarketSystem</li>
+                </ul>
+            </li>
+            <li><strong>Create Gift Data:</strong>
+                <ul>
+                    <li>Right-click in Project window > Create > PeacefulFarm > Economy > Gift</li>
+                    <li>Configure each gift with name, animal type, bond level, value range, and sprites</li>
+                    <li>Add all created Gift Data ScriptableObjects to the GiftManager's "All Gifts" array</li>
+                </ul>
+            </li>
+            <li><strong>Configure AnimalGiftProvider:</strong>
+                <ul>
+                    <li>Ensure each animal prefab has the AnimalGiftProvider component</li>
+                    <li>Set Feeds Required For Gift to 3 (or preferred number)</li>
+                    <li>Assign references to GiftManager and PlayerAnimalInventory</li>
+                </ul>
+            </li>
+            <li><strong>Set Up GiftSaveSystem:</strong>
+                <ul>
+                    <li>Create a GiftSaveSystem GameObject in your scene</li>
+                    <li>Set Save File Name to "gifts.json"</li>
+                    <li>Assign the GiftManager reference</li>
+                </ul>
+            </li>
+        </ol>
+        
+        <h3>Habitat System Configuration</h3>
+        <ol>
+            <li><strong>Habitat Prefab Setup:</strong>
+                <ul>
+                    <li>Create a base habitat prefab with required components: HabitatManager, HabitatDirtController</li>
+                    <li>Add 9 dirt GameObjects as children (can be named anything)</li>
+                    <li>Create variants for each animal type (Turtle, Jaguar, etc.) and save in Resources/Prefabs/Habitats</li>
+                </ul>
+            </li>
+            <li><strong>Configure HabitatManager:</strong>
+                <ul>
+                    <li>Assign habitat prefab references for each animal type</li>
+                    <li>Set up habitat slot transforms in the scene</li>
+                    <li>Configure habitat costs in the inspector</li>
+                </ul>
+            </li>
+            <li><strong>Set Up HabitatSaveSystem:</strong>
+                <ul>
+                    <li>Create a HabitatSaveSystem GameObject</li>
+                    <li>Set Save File Name to "habitats.json"</li>
+                    <li>Assign the HabitatManager reference</li>
+                </ul>
+            </li>
+        </ol>
+        
+        <h3>Animal System Configuration</h3>
+        <ol>
+            <li><strong>Animal Prefab Setup:</strong>
+                <ul>
+                    <li>Create a base animal prefab with required components: AnimalIdentifier, AnimalHappinessManager, AnimalGiftProvider, NavMeshAgent</li>
+                    <li>Configure NavMeshAgent for proper movement (speed, stopping distance, etc.)</li>
+                    <li>Create variants for each animal type and save in Resources/Prefabs/Animals</li>
+                </ul>
+            </li>
+            <li><strong>Configure AnimalHappinessManager:</strong>
+                <ul>
+                    <li>Set Time To Eat parameters (min/max hours)</li>
+                    <li>Configure happiness thresholds and bond level requirements</li>
+                </ul>
+            </li>
+            <li><strong>Set Up AnimalSaveSystem:</strong>
+                <ul>
+                    <li>Create an AnimalSaveSystem GameObject</li>
+                    <li>Set Save File Name to "animals.json"</li>
+                    <li>Assign the AnimalManager reference</li>
+                </ul>
+            </li>
+        </ol>
+        
+        <h3>Audio System Configuration</h3>
+        <ol>
+            <li><strong>Audio Mixer Setup:</strong>
+                <ul>
+                    <li>Create an Audio Mixer (Window > Audio > Audio Mixer)</li>
+                    <li>Create groups: Master, Music, SFX, and Ambience</li>
+                    <li>Set up volume parameters for each group</li>
+                </ul>
+            </li>
+            <li><strong>Configure AudioManager:</strong>
+                <ul>
+                    <li>Create an AudioManager GameObject with AudioManager script</li>
+                    <li>Assign the Audio Mixer reference</li>
+                    <li>Create and assign SoundCollection ScriptableObjects for different sound categories</li>
+                </ul>
+            </li>
+            <li><strong>Set Up AmbienceManager:</strong>
+                <ul>
+                    <li>Create an AmbienceManager GameObject</li>
+                    <li>Assign day/night music clips</li>
+                    <li>Configure transition times and fade durations</li>
+                </ul>
+            </li>
+        </ol>
+        
+        <h3>UI System Configuration</h3>
+        <ol>
+            <li><strong>Canvas Setup:</strong>
+                <ul>
+                    <li>Create a main Canvas with CanvasScaler (set to Scale With Screen Size)</li>
+                    <li>Create separate canvases for different UI layers (HUD, Menus, Notifications)</li>
+                </ul>
+            </li>
+            <li><strong>Configure GiftNotificationUI:</strong>
+                <ul>
+                    <li>Create a notification panel prefab with Text and Image components</li>
+                    <li>Add the GiftNotificationUI script</li>
+                    <li>Configure animation parameters (duration, scale curve)</li>
+                </ul>
+            </li>
+            <li><strong>Set Up MarketUI:</strong>
+                <ul>
+                    <li>Create market panel prefabs with necessary UI elements</li>
+                    <li>Configure item slots and button callbacks</li>
+                    <li>Assign references to MarketSystem and PlayerInventory</li>
+                </ul>
+            </li>
+        </ol>
+        
+        <h3>Scene Setup</h3>
+        <ol>
+            <li><strong>Main Farm Scene:</strong>
+                <ul>
+                    <li>Place habitat slots in a circular arrangement</li>
+                    <li>Add NavMesh surface and bake for animal movement</li>
+                    <li>Place food sources (apple trees, etc.)</li>
+                    <li>Add all manager GameObjects (GiftManager, HabitatManager, etc.)</li>
+                </ul>
+            </li>
+            <li><strong>Persistent Managers:</strong>
+                <ul>
+                    <li>Create a PersistentManagers prefab with DontDestroyOnLoad</li>
+                    <li>Include SaveManager, AudioManager, and other cross-scene managers</li>
+                    <li>Use a bootstrap scene to initialize these managers</li>
+                </ul>
+            </li>
+        </ol>
+        
+        <h3>Testing Configuration</h3>
+        <ol>
+            <li><strong>Debug Mode:</strong>
+                <ul>
+                    <li>Enable debug flags on key managers for detailed logging</li>
+                    <li>Create test buttons for spawning animals, gifts, etc.</li>
+                    <li>Use the Debug build configuration for development testing</li>
+                </ul>
+            </li>
+            <li><strong>Save Data Management:</strong>
+                <ul>
+                    <li>Use PlayerPrefs to store configuration options</li>
+                    <li>Create a debug menu for clearing save data</li>
+                    <li>Implement save data versioning for compatibility</li>
+                </ul>
+            </li>
+        </ol>
+    </div>
+    
+    <div id="roadmap" class="section">
+        <h2>12. Development Roadmap</h2>
+        
+        <h3>Phase 1: Core Systems (Current)</h3>
+        <ul>
+            <li><span class="status complete">Complete</span> Basic player movement and interaction</li>
+            <li><span class="status complete">Complete</span> Animal happiness and bond systems</li>
+            <li><span class="status complete">Complete</span> Habitat cleanliness system</li>
+            <li><span class="status complete">Complete</span> Audio system foundation</li>
+            <li><span class="status in-progress">In Progress</span> Animal movement and behavior</li>
+            <li><span class="status in-progress">In Progress</span> Sound effects implementation</li>
+        </ul>
+        
+        <h3>Phase 2: Farming Mechanics</h3>
+        <ul>
+            <li><span class="status planned">Planned</span> Crop planting system</li>
+            <li><span class="status planned">Planned</span> Watering mechanics</li>
+            <li><span class="status planned">Planned</span> Growth stages</li>
+            <li><span class="status planned">Planned</span> Harvesting system</li>
+            <li><span class="status planned">Planned</span> Basic inventory management</li>
+        </ul>
+        
+        <h3>Phase 3: Progression and Polish</h3>
+        <ul>
+            <li><span class="status planned">Planned</span> Farm expansion mechanics</li>
+            <li><span class="status planned">Planned</span> Building system</li>
+            <li><span class="status planned">Planned</span> Save/load system</li>
+            <li><span class="status planned">Planned</span> UI improvements</li>
+            <li><span class="status planned">Planned</span> Tutorial system</li>
+        </ul>
+        
+        <h3>Phase 4: Content Expansion</h3>
+        <ul>
+            <li><span class="status not-started">Not Started</span> Additional animal types</li>
+            <li><span class="status not-started">Not Started</span> More crop varieties</li>
+            <li><span class="status not-started">Not Started</span> Seasonal events</li>
+            <li><span class="status not-started">Not Started</span> Weather system</li>
+            <li><span class="status not-started">Not Started</span> Achievement system</li>
+        </ul>
+    </div>
+    
+    <footer>
+        <p>PeacefulFarm Game Design Document - Created May 13, 2025</p>
+        <p>This document is a living resource and will be updated as development progresses.</p>
+    </footer>
+</body>
+</html>

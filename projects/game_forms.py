@@ -70,14 +70,21 @@ class GameAssetForm(forms.ModelForm):
     class Meta:
         model = GameAsset
         fields = [
-            'name', 'description', 'asset_type', 'status',
-            'file', 'external_url', 'category', 'tags', 'assigned_to'
+            'name', 'description', 'asset_type', 'subtype', 'status',
+            'file', 'thumbnail', 'external_url', 'category', 'tags', 'assigned_to'
         ]
         widgets = {
-            'description': forms.Textarea(attrs={'rows': 3}),
-            'external_url': forms.URLInput(attrs={'placeholder': 'https://...'}),
-            'category': forms.TextInput(attrs={'placeholder': 'e.g., Characters, Environment, UI'}),
-            'tags': forms.TextInput(attrs={'placeholder': 'e.g., player, enemy, level1'}),
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
+            'asset_type': forms.Select(attrs={'class': 'form-select'}),
+            'subtype': forms.TextInput(attrs={'placeholder': 'e.g., character, environment, concept art', 'class': 'form-control'}),
+            'status': forms.Select(attrs={'class': 'form-select'}),
+            'file': forms.FileInput(attrs={'class': 'form-control'}),
+            'thumbnail': forms.FileInput(attrs={'class': 'form-control', 'accept': 'image/*'}),
+            'external_url': forms.URLInput(attrs={'placeholder': 'https://...', 'class': 'form-control'}),
+            'category': forms.TextInput(attrs={'placeholder': 'e.g., Characters, Environment, UI', 'class': 'form-control'}),
+            'tags': forms.TextInput(attrs={'placeholder': 'e.g., player, enemy, level1', 'class': 'form-control'}),
+            'assigned_to': forms.Select(attrs={'class': 'form-select'}),
         }
 
 
@@ -97,11 +104,13 @@ class GameTaskForm(forms.ModelForm):
         model = GameTask
         fields = [
             'title', 'description', 'task_type', 'status', 'priority',
-            'milestone', 'assigned_to', 'due_date', 'estimated_hours', 'actual_hours'
+            'milestone', 'assigned_to', 'due_date', 'estimated_hours', 'actual_hours',
+            'gdd_section'
         ]
         widgets = {
             'description': forms.Textarea(attrs={'rows': 3}),
             'due_date': forms.DateInput(attrs={'type': 'date'}),
+            'gdd_section': forms.Select(attrs={'class': 'form-select'}),
         }
 
 

@@ -1,7 +1,8 @@
+import json
 from django.shortcuts import render, redirect, get_object_or_404
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, View
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.contrib import messages
 from django.db.models import Q, Sum, Count
 from django.utils import timezone
@@ -271,12 +272,12 @@ class GameProjectDetailView(LoginRequiredMixin, DetailView):
         # Get game assets
         context['assets'] = game.assets.all()
         context['assets_by_type'] = {
-            '2d_art': game.assets.filter(asset_type='2d_art').count(),
             '3d_model': game.assets.filter(asset_type='3d_model').count(),
-            'animation': game.assets.filter(asset_type='animation').count(),
-            'sound': game.assets.filter(asset_type='sound').count(),
+            '2d_image': game.assets.filter(asset_type='2d_image').count(),
             'music': game.assets.filter(asset_type='music').count(),
-            'code': game.assets.filter(asset_type='code').count(),
+            'video': game.assets.filter(asset_type='video').count(),
+            'reference': game.assets.filter(asset_type='reference').count(),
+            'other': game.assets.filter(asset_type='other').count(),
         }
         
         # Get game builds
@@ -626,16 +627,57 @@ class GameTaskKanbanView(LoginRequiredMixin, ListView):
 
 class GameDesignDocumentView(LoginRequiredMixin, DetailView):
     """
-    View a game design document
+    View a game design document with support for HTML content and task integration
     """
     model = GameDesignDocument
-    template_name = 'projects/gdd_detail.html'
+    template_name = 'projects/gdd_detail_simple.html'
     context_object_name = 'gdd'
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['game'] = self.object.game
-        context['today'] = date.today()
+        
+        # Check permissions
+        user = self.request.user
+        game = self.object.game
+        context['can_edit'] = user.is_staff or user == game.lead_developer or user == game.lead_designer
+        context['can_create_task'] = user.is_staff or user == game.lead_developer or user == game.lead_designer
+        context['can_link_tasks'] = user.is_staff or user == game.lead_developer or user == game.lead_designer
+        
+        # Get sections and their tasks
+        sections_with_tasks = {}
+        for section in self.object.sections.all():
+            sections_with_tasks[section.id] = list(section.tasks.all())
+        
+        context['sections_with_tasks'] = sections_with_tasks
+        
+        # Get unlinked tasks
+        all_game_tasks = GameTask.objects.filter(game=game)
+        linked_task_ids = []
+        for tasks in sections_with_tasks.values():
+            linked_task_ids.extend([task.id for task in tasks])
+        
+        context['unlinked_tasks'] = all_game_tasks.exclude(id__in=linked_task_ids)
+        
+        # Prepare JSON data for JavaScript
+        sections_json = [{
+            'id': section.id,
+            'title': section.title,
+            'section_id': section.section_id
+        } for section in self.object.sections.all()]
+        context['sections_json'] = json.dumps(sections_json)
+        
+        sections_with_tasks_json = {}
+        for section_id, tasks in sections_with_tasks.items():
+            sections_with_tasks_json[section_id] = [{
+                'id': task.id,
+                'title': task.title,
+                'status_display': task.get_status_display()
+            } for task in tasks]
+        
+        context['sections_with_tasks_json'] = json.dumps(sections_with_tasks_json)
+        
+        # Return the context
         return context
 
 
@@ -787,46 +829,179 @@ class GameTaskKanbanView(LoginRequiredMixin, ListView):
         
         return context
 
-class GameDesignDocumentCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+class GameDesignDocumentCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
     """
-    Create a game design document
+    Create a game design document or redirect to edit if one already exists
     """
-    model = GameDesignDocument
-    form_class = GameDesignDocumentForm
-    template_name = 'projects/gdd_form.html'
-    
     def test_func(self):
         # Only allow staff or game leads to create GDDs
         game_id = self.kwargs.get('game_id')
         game = get_object_or_404(GameProject, id=game_id)
         return self.request.user.is_staff or self.request.user == game.lead_developer or self.request.user == game.lead_designer
     
-    def form_valid(self, form):
+    def get(self, request, *args, **kwargs):
         game_id = self.kwargs.get('game_id')
-        form.instance.game = get_object_or_404(GameProject, id=game_id)
-        messages.success(self.request, "Game Design Document created successfully!")
-        return super().form_valid(form)
+        game = get_object_or_404(GameProject, id=game_id)
+        
+        # Check if a GDD already exists for this game
+        try:
+            existing_gdd = GameDesignDocument.objects.get(game=game)
+            messages.info(request, "A Game Design Document already exists for this game. You can edit it below.")
+            return redirect('games:gdd_edit', pk=existing_gdd.id)
+        except GameDesignDocument.DoesNotExist:
+            # No GDD exists, proceed to create form
+            form = GameDesignDocumentForm()
+            return render(request, 'projects/gdd_form.html', {
+                'form': form,
+                'game': game,
+                'game_id': game_id
+            })
     
-    def get_success_url(self):
-        return reverse_lazy('projects:game_detail', kwargs={'pk': self.object.game.id})
+    def post(self, request, *args, **kwargs):
+        game_id = self.kwargs.get('game_id')
+        game = get_object_or_404(GameProject, id=game_id)
+        
+        # Check if a GDD already exists for this game
+        try:
+            existing_gdd = GameDesignDocument.objects.get(game=game)
+            messages.error(request, "A Game Design Document already exists for this game. You cannot create another one.")
+            return redirect('games:gdd_edit', pk=existing_gdd.id)
+        except GameDesignDocument.DoesNotExist:
+            # No GDD exists, proceed to create
+            form = GameDesignDocumentForm(request.POST)
+            if form.is_valid():
+                gdd = form.save(commit=False)
+                gdd.game = game
+                gdd.save()
+                messages.success(request, "Game Design Document created successfully!")
+                return redirect('games:game_detail', pk=game.id)
+            else:
+                return render(request, 'projects/gdd_form.html', {
+                    'form': form,
+                    'game': game,
+                    'game_id': game_id
+                })
 
 
 class GameAssetListView(LoginRequiredMixin, ListView):
     """
-    List assets for a game
+    List assets for a game with filtering and sorting options
     """
     model = GameAsset
     template_name = 'projects/asset_list.html'
     context_object_name = 'assets'
+    paginate_by = 12
     
     def get_queryset(self):
         game_id = self.kwargs.get('game_id')
-        return GameAsset.objects.filter(game_id=game_id)
+        queryset = GameAsset.objects.filter(game_id=game_id)
+        
+        # Apply filters
+        type_filter = self.request.GET.get('type')
+        status_filter = self.request.GET.get('status')
+        search_query = self.request.GET.get('search')
+        sort_by = self.request.GET.get('sort')
+        
+        if type_filter:
+            queryset = queryset.filter(asset_type=type_filter)
+        
+        if status_filter:
+            queryset = queryset.filter(status=status_filter)
+        
+        if search_query:
+            queryset = queryset.filter(
+                models.Q(name__icontains=search_query) |
+                models.Q(description__icontains=search_query) |
+                models.Q(subtype__icontains=search_query) |
+                models.Q(tags__icontains=search_query)
+            )
+        
+        # Apply sorting
+        if sort_by == 'name':
+            queryset = queryset.order_by('name')
+        elif sort_by == 'type':
+            queryset = queryset.order_by('asset_type', 'name')
+        elif sort_by == 'status':
+            queryset = queryset.order_by('status', 'name')
+        elif sort_by == 'date':
+            queryset = queryset.order_by('-created_at')
+        else:
+            queryset = queryset.order_by('-created_at')  # Default sort
+            
+        return queryset
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         game_id = self.kwargs.get('game_id')
         context['game'] = get_object_or_404(GameProject, id=game_id)
+        
+        # Pass filter parameters to context
+        context['type_filter'] = self.request.GET.get('type')
+        context['status_filter'] = self.request.GET.get('status')
+        context['search_query'] = self.request.GET.get('search')
+        context['sort_by'] = self.request.GET.get('sort', 'date')
+        
+        return context
+
+
+class GameAssetCreateView(LoginRequiredMixin, CreateView):
+    """
+    Create a new asset for a game
+    """
+    model = GameAsset
+    form_class = GameAssetForm
+    template_name = 'projects/asset_form.html'
+    
+    def get_success_url(self):
+        return reverse('games:asset_list', kwargs={'game_id': self.object.game.id})
+    
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        # If you need to customize the form, do it here
+        return kwargs
+    
+    def form_valid(self, form):
+        form.instance.game_id = self.kwargs.get('game_id')
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        game_id = self.kwargs.get('game_id')
+        context['game'] = get_object_or_404(GameProject, id=game_id)
+        return context
+
+
+class GameAssetUpdateView(LoginRequiredMixin, UpdateView):
+    """
+    Update an existing game asset
+    """
+    model = GameAsset
+    form_class = GameAssetForm
+    template_name = 'projects/asset_form.html'
+    pk_url_kwarg = 'asset_id'
+    
+    def get_success_url(self):
+        return reverse('games:asset_list', kwargs={'game_id': self.object.game.id})
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['game'] = self.object.game
+        return context
+
+
+class GameAssetDetailView(LoginRequiredMixin, DetailView):
+    """
+    View details of a specific asset
+    """
+    model = GameAsset
+    template_name = 'projects/asset_detail.html'
+    context_object_name = 'asset'
+    pk_url_kwarg = 'asset_id'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['game'] = self.object.game
         return context
 
 
@@ -994,7 +1169,7 @@ class GameAssetCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
     
     def get_success_url(self):
-        return reverse_lazy('projects:asset_list', kwargs={'game_id': self.object.game.id})
+        return reverse_lazy('games:asset_list', kwargs={'game_id': self.object.game.id})
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

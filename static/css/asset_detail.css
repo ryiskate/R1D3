@@ -1,0 +1,305 @@
+/* Asset Detail Page Styling */
+
+/* Sidebar styling */
+.sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 100;
+    padding: 48px 0 0;
+    box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+    background-color: #f8f9fa;
+}
+
+.sidebar-sticky {
+    position: relative;
+    top: 0;
+    height: calc(100vh - 48px);
+    padding-top: .5rem;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.sidebar .nav-link {
+    font-weight: 500;
+    color: #333;
+    padding: .5rem 1rem;
+}
+
+.sidebar .nav-link:hover {
+    color: #4a6fdc;
+    background-color: rgba(74, 111, 220, 0.1);
+}
+
+.sidebar .nav-link i {
+    margin-right: .5rem;
+}
+
+.sidebar-heading {
+    font-size: .75rem;
+    text-transform: uppercase;
+    color: #6c757d;
+}
+
+/* Main content area */
+main {
+    padding-top: 48px;
+}
+
+/* Asset preview styling */
+.asset-preview-container {
+    min-height: 300px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Image preview styling */
+.image-preview-wrapper {
+    position: relative;
+    width: 100%;
+    text-align: center;
+    overflow: hidden;
+    border-radius: 5px;
+}
+
+.image-preview-wrapper img {
+    max-height: 400px;
+    object-fit: contain;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.image-preview-wrapper:hover .image-overlay {
+    opacity: 1;
+}
+
+/* Video preview styling */
+.video-preview-wrapper {
+    width: 100%;
+    text-align: center;
+}
+
+.video-preview-wrapper video {
+    max-height: 400px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Audio preview styling */
+.music-preview-wrapper {
+    width: 100%;
+    text-align: center;
+}
+
+.audio-thumbnail {
+    height: 200px;
+    background-color: #6f42c1;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.audio-thumbnail i {
+    font-size: 4rem;
+    margin-bottom: 15px;
+}
+
+.detail-wave {
+    height: 40px;
+}
+
+.detail-wave span {
+    width: 4px;
+    margin: 0 3px;
+    height: 15px;
+}
+
+/* Model preview styling */
+.model-preview-wrapper, .reference-preview-wrapper, .file-preview-wrapper, .external-url-preview-wrapper, .no-preview-wrapper {
+    width: 100%;
+    text-align: center;
+}
+
+.model-thumbnail, .reference-thumbnail, .file-thumbnail, .external-thumbnail, .no-preview-thumbnail {
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    padding: 20px;
+    color: white;
+}
+
+.model-thumbnail {
+    background-color: #3d4852;
+}
+
+.reference-thumbnail {
+    background-color: #fd7e14;
+}
+
+.file-thumbnail {
+    background-color: #20c997;
+}
+
+.external-thumbnail {
+    background-color: #17a2b8;
+}
+
+.no-preview-thumbnail {
+    background-color: #6c757d;
+}
+
+.model-thumbnail i, .reference-thumbnail i, .file-thumbnail i, .external-thumbnail i, .no-preview-thumbnail i {
+    font-size: 4rem;
+    margin-bottom: 15px;
+}
+
+.model-thumbnail p, .reference-thumbnail p, .file-thumbnail p, .external-thumbnail p, .no-preview-thumbnail p {
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+.external-thumbnail small {
+    max-width: 80%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Card styling */
+.card {
+    margin-bottom: 1.5rem;
+    border: 1px solid rgba(0,0,0,.125);
+    box-shadow: 0 1px 3px rgba(0,0,0,.05);
+}
+
+.card-header {
+    background-color: rgba(0, 0, 0, 0.03);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+    padding: 0.75rem 1.25rem;
+}
+
+/* Asset preview styling */
+.asset-preview-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+    background-color: #f8f9fa;
+    border-radius: 0.25rem;
+    overflow: hidden;
+}
+
+.asset-preview {
+    max-height: 500px;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+.model-preview-placeholder, .file-preview, .external-link-preview, .no-preview {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 300px;
+    color: #6c757d;
+    text-align: center;
+    padding: 2rem;
+}
+
+.model-preview-placeholder i, .file-preview i, .external-link-preview i, .no-preview i {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.model-preview-placeholder {
+    background-color: #3d4852;
+    color: #fff;
+}
+
+.external-link-preview {
+    background-color: #4a6fdc;
+    color: #fff;
+}
+
+/* Badge styling */
+.badge {
+    font-weight: 500;
+    padding: 0.4em 0.6em;
+}
+
+.badge-planned {
+    background-color: #6c757d;
+}
+
+.badge-in-progress {
+    background-color: #4a6fdc;
+}
+
+.badge-review {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.badge-approved {
+    background-color: #28a745;
+}
+
+.badge-implemented {
+    background-color: #198754;
+}
+
+.badge-rejected {
+    background-color: #dc3545;
+}
+
+/* Table styling */
+.table th {
+    width: 30%;
+    font-weight: 500;
+}
+
+/* Responsive adjustments */
+@media (max-width: 767.98px) {
+    .sidebar {
+        position: static;
+        height: auto;
+        padding-top: 0;
+    }
+    
+    .sidebar-sticky {
+        height: auto;
+    }
+    
+    main {
+        padding-top: 0;
+    }
+    
+    .asset-preview-container {
+        min-height: 200px;
+    }
+}

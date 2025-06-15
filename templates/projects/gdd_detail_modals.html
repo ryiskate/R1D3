@@ -1,0 +1,136 @@
+{% load crispy_forms_tags %}
+
+<!-- Create Task Modal -->
+<div class="modal fade" id="createTaskModal" tabindex="-1" aria-labelledby="createTaskModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createTaskModalLabel">Create Task from GDD Section</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="{% url 'games:task_create' game.id %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" id="task-section-id" name="gdd_section" value="">
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Section</label>
+                        <div class="form-control-static" id="section-title-display"></div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="task-title" class="form-label">Task Title</label>
+                        <input type="text" class="form-control" id="task-title" name="title" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="task-description" class="form-label">Description</label>
+                        <textarea class="form-control" id="task-description" name="description" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="task-type" class="form-label">Type</label>
+                                <select class="form-select" id="task-type" name="task_type">
+                                    <option value="FEATURE">Feature</option>
+                                    <option value="BUG">Bug Fix</option>
+                                    <option value="IMPROVEMENT">Improvement</option>
+                                    <option value="DOCUMENTATION">Documentation</option>
+                                    <option value="RESEARCH">Research</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="task-priority" class="form-label">Priority</label>
+                                <select class="form-select" id="task-priority" name="priority">
+                                    <option value="LOW">Low</option>
+                                    <option value="MEDIUM" selected>Medium</option>
+                                    <option value="HIGH">High</option>
+                                    <option value="URGENT">Urgent</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="task-assigned-to" class="form-label">Assigned To</label>
+                        <select class="form-select" id="task-assigned-to" name="assigned_to">
+                            <option value="">Unassigned</option>
+                            {% if game.lead_developer %}
+                                <option value="{{ game.lead_developer.id }}">{{ game.lead_developer.get_full_name|default:game.lead_developer.username }} (Lead Developer)</option>
+                            {% endif %}
+                            {% if game.lead_designer %}
+                                <option value="{{ game.lead_designer.id }}">{{ game.lead_designer.get_full_name|default:game.lead_designer.username }} (Lead Designer)</option>
+                            {% endif %}
+                            {% if game.lead_artist %}
+                                <option value="{{ game.lead_artist.id }}">{{ game.lead_artist.get_full_name|default:game.lead_artist.username }} (Lead Artist)</option>
+                            {% endif %}
+                            {% for member in game.team_members.all %}
+                                <option value="{{ member.id }}">{{ member.get_full_name|default:member.username }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Link Task to Section Modal -->
+<div class="modal fade" id="linkTaskModal" tabindex="-1" aria-labelledby="linkTaskModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="linkTaskModalLabel">Link Task to GDD Section</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="link-task-form">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="alert alert-danger" id="link-task-error" style="display: none;"></div>
+                    
+                    <input type="hidden" id="link-task-id" name="task_id" value="">
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Task</label>
+                        <div class="form-control-static" id="link-task-title"></div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="link-section-select" class="form-label">GDD Section</label>
+                        <select class="form-select" id="link-section-select" name="section_id" required>
+                            <option value="">-- Select a section --</option>
+                            <option value="">None (unlink from section)</option>
+                            {% for section in sections %}
+                                <option value="{{ section.id }}">{{ section.title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Link Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Success Toast -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div id="successToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header bg-success text-white">
+            <strong class="me-auto">Success</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body" id="toastMessage">
+            Task linked successfully!
+        </div>
+    </div>
+</div>

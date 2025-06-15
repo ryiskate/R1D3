@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}GDD Features - {{ gdd.game.title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>GDD Features</h1>
+            <h2 class="text-primary">{{ gdd.game.title }}</h2>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'games:gdd_detail' gdd.game.id %}" class="btn btn-outline-secondary me-2">Back to GDD</a>
+            <form method="post" action="{% url 'games:convert_all_features' gdd.id %}" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary">Convert All to Tasks</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h3 class="card-title mb-0">Features by Section</h3>
+                </div>
+                <div class="card-body">
+                    <div class="accordion" id="sectionsAccordion">
+                        {% for section in sections %}
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="heading{{ section.id }}">
+                                <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ section.id }}" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}" aria-controls="collapse{{ section.id }}">
+                                    {{ section.title }} ({{ section.features.count }} features)
+                                </button>
+                            </h2>
+                            <div id="collapse{{ section.id }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" aria-labelledby="heading{{ section.id }}" data-bs-parent="#sectionsAccordion">
+                                <div class="accordion-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Feature</th>
+                                                    <th>Description</th>
+                                                    <th>Priority</th>
+                                                    <th>Status</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for feature in features %}
+                                                {% if feature.section.id == section.id %}
+                                                <tr>
+                                                    <td>{{ feature.feature_name }}</td>
+                                                    <td>{{ feature.description }}</td>
+                                                    <td>
+                                                        {% if feature.priority == 'critical' %}
+                                                        <span class="badge bg-danger">Critical</span>
+                                                        {% elif feature.priority == 'high' %}
+                                                        <span class="badge bg-warning text-dark">High</span>
+                                                        {% elif feature.priority == 'medium' %}
+                                                        <span class="badge bg-info text-dark">Medium</span>
+                                                        {% else %}
+                                                        <span class="badge bg-secondary">Low</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        {% if feature.task %}
+                                                        <span class="badge 
+                                                            {% if feature.task.status == 'completed' %}bg-success
+                                                            {% elif feature.task.status == 'in_progress' %}bg-primary
+                                                            {% elif feature.task.status == 'blocked' %}bg-danger
+                                                            {% else %}bg-secondary{% endif %}">
+                                                            {{ feature.status }}
+                                                        </span>
+                                                        {% else %}
+                                                        <span class="badge bg-secondary">Planned</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        {% if feature.task %}
+                                                        <a href="{% url 'games:task_detail' feature.task.id %}" class="btn btn-sm btn-outline-primary">View Task</a>
+                                                        {% else %}
+                                                        <form method="post" action="{% url 'games:convert_feature' feature.id %}" class="d-inline">
+                                                            {% csrf_token %}
+                                                            <button type="submit" class="btn btn-sm btn-outline-success">Convert to Task</button>
+                                                        </form>
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                                {% endif %}
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="alert alert-info">
+                            No sections found in this GDD. Please extract features first.
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h3 class="card-title mb-0">Update GDD with Task Status</h3>
+                </div>
+                <div class="card-body">
+                    <p>Update the GDD HTML content with the current status of all linked tasks.</p>
+                    <form method="post" action="{% url 'games:update_gdd_with_task_status' gdd.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary">Update GDD</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

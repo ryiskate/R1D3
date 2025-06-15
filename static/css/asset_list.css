@@ -1,0 +1,257 @@
+/* Asset List Page Styling */
+
+/* Sidebar styling */
+.sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 100;
+    padding: 48px 0 0;
+    box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+    background-color: #f8f9fa;
+}
+
+.sidebar-sticky {
+    position: relative;
+    top: 0;
+    height: calc(100vh - 48px);
+    padding-top: .5rem;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.sidebar .nav-link {
+    font-weight: 500;
+    color: #333;
+    padding: .5rem 1rem;
+}
+
+.sidebar .nav-link.active {
+    color: #4a6fdc;
+}
+
+.sidebar .nav-link:hover {
+    color: #4a6fdc;
+    background-color: rgba(74, 111, 220, 0.1);
+}
+
+.sidebar .nav-link i {
+    margin-right: .5rem;
+}
+
+.sidebar-heading {
+    font-size: .75rem;
+    text-transform: uppercase;
+    color: #6c757d;
+}
+
+/* Main content area */
+main {
+    padding-top: 48px;
+}
+
+/* Asset card styling */
+.asset-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 1px solid rgba(0,0,0,.125);
+}
+
+.asset-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0,0,0,.1);
+}
+
+.asset-type-badge {
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+/* Asset thumbnail styling */
+.asset-thumbnail-container {
+    position: relative;
+    overflow: hidden;
+    height: 180px;
+}
+
+.asset-preview {
+    height: 180px;
+    object-fit: cover;
+    width: 100%;
+    transition: transform 0.3s;
+}
+
+.asset-thumbnail-container:hover .asset-preview {
+    transform: scale(1.05);
+}
+
+.overlay-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.no-preview, .video-preview, .model-preview, .music-preview, .generic-preview, .reference-preview, .external-preview {
+    height: 180px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #f8f9fa;
+    color: #6c757d;
+    text-align: center;
+    padding: 15px;
+    transition: all 0.3s;
+}
+
+.no-preview i, .video-preview i, .model-preview i, .music-preview i, .generic-preview i, .reference-preview i, .external-preview i {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+}
+
+.no-preview span, .video-preview span, .model-preview span, .music-preview span, .generic-preview span, .reference-preview span, .external-preview span {
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-top: 10px;
+}
+
+.video-preview {
+    background-color: #212529;
+    color: #fff;
+}
+
+.video-preview:hover {
+    background-color: #343a40;
+}
+
+.video-preview i {
+    font-size: 4rem;
+}
+
+.model-preview {
+    background-color: #3d4852;
+    color: #fff;
+}
+
+.model-preview:hover {
+    background-color: #4d5d6c;
+}
+
+.music-preview {
+    background-color: #6f42c1;
+    color: #fff;
+}
+
+.music-preview:hover {
+    background-color: #7e57c2;
+}
+
+.reference-preview {
+    background-color: #fd7e14;
+    color: #fff;
+}
+
+.reference-preview:hover {
+    background-color: #ff8c00;
+}
+
+.external-preview {
+    background-color: #20c997;
+    color: #fff;
+}
+
+.external-preview:hover {
+    background-color: #2bd9a3;
+}
+
+/* Audio wave animation for music assets */
+.audio-wave {
+    display: flex;
+    align-items: center;
+    height: 30px;
+    margin-top: 10px;
+}
+
+.audio-wave span {
+    display: block;
+    width: 3px;
+    margin: 0 2px;
+    background: rgba(255, 255, 255, 0.8);
+    height: 8px;
+    border-radius: 1px;
+    animation: wave 1.2s infinite ease-in-out;
+}
+
+.audio-wave span:nth-child(2) {
+    animation-delay: 0.2s;
+    height: 10px;
+}
+
+.audio-wave span:nth-child(3) {
+    animation-delay: 0.4s;
+    height: 16px;
+}
+
+.audio-wave span:nth-child(4) {
+    animation-delay: 0.6s;
+    height: 10px;
+}
+
+.audio-wave span:nth-child(5) {
+    animation-delay: 0.8s;
+    height: 8px;
+}
+
+@keyframes wave {
+    0%, 100% {
+        height: 8px;
+    }
+    50% {
+        height: 16px;
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 767.98px) {
+    .sidebar {
+        position: static;
+        height: auto;
+        padding-top: 0;
+    }
+    
+    .sidebar-sticky {
+        height: auto;
+    }
+    
+    main {
+        padding-top: 0;
+    }
+}
+
+/* Card footer styling */
+.card-footer {
+    background-color: rgba(0, 0, 0, 0.03);
+    border-top: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+/* Pagination styling */
+.pagination {
+    margin-top: 2rem;
+}
+
+.page-link {
+    color: #4a6fdc;
+}
+
+.page-item.active .page-link {
+    background-color: #4a6fdc;
+    border-color: #4a6fdc;
+}

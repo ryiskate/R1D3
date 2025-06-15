@@ -57,3 +57,106 @@
 .asset-list-item:last-child {
     border-bottom: none;
 }
+
+/* Game Design Document Styling */
+.card-gdd {
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    margin-bottom: 2rem;
+}
+
+.card-gdd .card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 1rem;
+}
+
+.card-gdd .card-body {
+    padding: 1.5rem;
+}
+
+/* GDD Content Preview */
+.card-gdd h6 {
+    color: #4a6fdc;
+    font-weight: 600;
+    margin-top: 1.25rem;
+    margin-bottom: 0.75rem;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 0.5rem;
+}
+
+.card-gdd h6:first-child {
+    margin-top: 0;
+}
+
+.card-gdd p {
+    color: #333;
+    line-height: 1.6;
+    margin-bottom: 1.25rem;
+}
+
+/* GDD Action Buttons */
+.gdd-action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* Make sure GDD content uses full width */
+.gdd-preview-content {
+    width: 100%;
+    max-width: none;
+}
+
+/* GDD HTML Preview Styling */
+#gdd-html-preview {
+    overflow: auto;
+    max-height: 600px;
+}
+
+#gdd-html-preview * {
+    max-width: none !important;
+    box-sizing: border-box;
+}
+
+#gdd-html-preview h1,
+#gdd-html-preview h2,
+#gdd-html-preview h3,
+#gdd-html-preview h4,
+#gdd-html-preview h5,
+#gdd-html-preview h6 {
+    margin-top: 1rem;
+    margin-bottom: 0.75rem;
+}
+
+#gdd-html-preview table {
+    width: 100% !important;
+    margin-bottom: 1rem;
+    border-collapse: collapse;
+}
+
+#gdd-html-preview table th,
+#gdd-html-preview table td {
+    padding: 0.5rem;
+    border: 1px solid #dee2e6;
+}
+
+/* Add a 'View Full GDD' button at the bottom of the preview */
+.view-full-gdd-btn {
+    display: block;
+    text-align: center;
+    margin-top: 1rem;
+    padding: 0.5rem;
+    background-color: #4a6fdc;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.view-full-gdd-btn:hover {
+    background-color: #3a5cbe;
+    color: white;
+    text-decoration: none;
+}

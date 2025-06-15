@@ -222,7 +222,7 @@
                             <div class="kanban-card-title">{{ task.title }}</div>
                             
                             {% if task.description %}
-                            <div class="kanban-card-description small text-muted text-truncate">
+                            <div class="kanban-card-description small text-muted">
                                 {{ task.description|truncatechars:60 }}
                             </div>
                             {% endif %}
@@ -271,12 +271,23 @@
             document.querySelectorAll('.kanban-card-description').forEach(function(el) {
                 el.classList.add('d-none');
             });
+            // Visual feedback
+            this.classList.add('active');
+            document.getElementById('expandAllBtn').classList.remove('active');
         });
         
         document.getElementById('expandAllBtn').addEventListener('click', function() {
             document.querySelectorAll('.kanban-card-description').forEach(function(el) {
                 el.classList.remove('d-none');
             });
+            // Visual feedback
+            this.classList.add('active');
+            document.getElementById('collapseAllBtn').classList.remove('active');
+        });
+        
+        // Initialize - expand all descriptions by default
+        document.querySelectorAll('.kanban-card-description').forEach(function(el) {
+            el.classList.remove('d-none');
         });
         
         // Handle kanban card clicks using event delegation

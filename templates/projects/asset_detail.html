@@ -1,0 +1,318 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/asset_detail.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 sidebar">
+            <div class="sidebar-sticky">
+                <h5 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1">
+                    <span>Navigation</span>
+                </h5>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'games:game_detail' game.id %}">
+                            <i class="bi bi-arrow-left"></i> Back to Game
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'games:asset_list' game.id %}">
+                            <i class="bi bi-grid-3x3-gap"></i> All Assets
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'games:asset_update' game.id asset.id %}">
+                            <i class="bi bi-pencil"></i> Edit Asset
+                        </a>
+                    </li>
+                </ul>
+                
+                <h5 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1">
+                    <span>Related Assets</span>
+                </h5>
+                <div class="px-3">
+                    <a href="{% url 'games:asset_list' game.id %}?type={{ asset.asset_type }}" class="btn btn-sm btn-outline-primary mb-2 d-block">
+                        <i class="bi bi-tag"></i> Same Type
+                    </a>
+                    {% if asset.subtype %}
+                    <a href="{% url 'games:asset_list' game.id %}?search={{ asset.subtype }}" class="btn btn-sm btn-outline-secondary mb-2 d-block">
+                        <i class="bi bi-tags"></i> Same Subtype
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">{{ asset.name }}</h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <div class="btn-group me-2">
+                        <a href="{% url 'games:asset_update' game.id asset.id %}" class="btn btn-primary">
+                            <i class="bi bi-pencil"></i> Edit
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <!-- Asset preview -->
+                    <div class="card mb-4">
+                        <div class="card-header d-flex justify-content-between">
+                            <span>
+                                <i class="bi bi-eye"></i> Asset Preview
+                            </span>
+                            <div>
+                                <span class="badge bg-primary">{{ asset.get_asset_type_display }}</span>
+                                {% if asset.subtype %}
+                                <span class="badge bg-secondary">{{ asset.subtype }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="asset-preview-container">
+                                {% if asset.thumbnail %}
+                                    <!-- Display custom thumbnail if available -->
+                                    <div class="image-preview-wrapper">
+                                        <img src="{{ asset.thumbnail.url }}" class="img-fluid asset-preview" alt="{{ asset.name }} thumbnail">
+                                        <div class="image-overlay">
+                                            <a href="{{ asset.thumbnail.url }}" target="_blank" class="btn btn-light btn-sm">
+                                                <i class="bi bi-arrows-fullscreen"></i> View Full Size
+                                            </a>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Display download button for the actual file if it exists -->
+                                    {% if asset.file %}
+                                        <div class="mt-3 text-center">
+                                            <a href="{{ asset.file.url }}" class="btn btn-primary" download>
+                                                <i class="bi bi-download"></i> Download {{ asset.get_asset_type_display }}
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                                {% elif asset.file %}
+                                    {% if asset.asset_type == '2d_image' %}
+                                        <div class="image-preview-wrapper">
+                                            <img src="{{ asset.file.url }}" class="img-fluid asset-preview" alt="{{ asset.name }}">
+                                            <div class="image-overlay">
+                                                <a href="{{ asset.file.url }}" target="_blank" class="btn btn-light btn-sm">
+                                                    <i class="bi bi-arrows-fullscreen"></i> View Full Size
+                                                </a>
+                                            </div>
+                                        </div>
+                                    {% elif asset.asset_type == 'video' %}
+                                        <div class="video-preview-wrapper">
+                                            <video controls class="w-100 rounded">
+                                                <source src="{{ asset.file.url }}" type="video/mp4">
+                                                Your browser does not support the video tag.
+                                            </video>
+                                        </div>
+                                    {% elif asset.asset_type == 'music' %}
+                                        <div class="music-preview-wrapper">
+                                            <div class="audio-thumbnail">
+                                                <i class="bi bi-music-note-beamed"></i>
+                                                <div class="audio-wave detail-wave">
+                                                    <span></span><span></span><span></span><span></span><span></span>
+                                                    <span></span><span></span><span></span><span></span><span></span>
+                                                </div>
+                                            </div>
+                                            <audio controls class="w-100 mt-3">
+                                                <source src="{{ asset.file.url }}" type="audio/mpeg">
+                                                Your browser does not support the audio element.
+                                            </audio>
+                                        </div>
+                                    {% elif asset.asset_type == '3d_model' %}
+                                        <div class="model-preview-wrapper">
+                                            <div class="model-thumbnail">
+                                                <i class="bi bi-cube-fill"></i>
+                                                <p>3D Model Preview</p>
+                                            </div>
+                                            <div class="mt-3 text-center">
+                                                <a href="{{ asset.file.url }}" class="btn btn-primary" download>
+                                                    <i class="bi bi-download"></i> Download Model
+                                                </a>
+                                        </div>
+                                    {% elif asset.asset_type == 'reference' %}
+                                        <div class="reference-preview-wrapper">
+                                            <div class="reference-thumbnail">
+                                                <i class="bi bi-bookmark-fill"></i>
+                                                <p>Reference Material</p>
+                                            </div>
+                                            <div class="mt-3 text-center">
+                                                <a href="{{ asset.file.url }}" class="btn btn-primary" download>
+                                                    <i class="bi bi-download"></i> Download Reference
+                                                </a>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <div class="file-preview-wrapper">
+                                            <div class="file-thumbnail">
+                                                <i class="bi bi-file-earmark"></i>
+                                                <p>{{ asset.name }}</p>
+                                            </div>
+                                            <div class="mt-3 text-center">
+                                                <a href="{{ asset.file.url }}" class="btn btn-primary" download>
+                                                    <i class="bi bi-download"></i> Download File
+                                                </a>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% elif asset.external_url %}
+                                    <div class="external-url-preview-wrapper">
+                                        <div class="external-thumbnail">
+                                            <i class="bi bi-link-45deg"></i>
+                                            <p>External Resource</p>
+                                            <small class="text-truncate d-block">{{ asset.external_url }}</small>
+                                        </div>
+                                        <div class="mt-3 text-center">
+                                            <a href="{{ asset.external_url }}" class="btn btn-success" target="_blank">
+                                                <i class="bi bi-box-arrow-up-right"></i> Visit URL
+                                            </a>
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <div class="no-preview-wrapper">
+                                        <div class="no-preview-thumbnail">
+                                            <i class="bi bi-file-earmark-x"></i>
+                                            <p>No Preview Available</p>
+                                            <small class="text-muted">This asset has no file or external URL attached</small>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Asset description -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <i class="bi bi-info-circle"></i> Description
+                        </div>
+                        <div class="card-body">
+                            {% if asset.description %}
+                                <p>{{ asset.description|linebreaks }}</p>
+                            {% else %}
+                                <p class="text-muted">No description provided.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <!-- Asset details -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <i class="bi bi-list-ul"></i> Asset Details
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-sm">
+                                <tbody>
+                                    <tr>
+                                        <th>Status</th>
+                                        <td>
+                                            <span class="badge bg-{{ asset.status|slugify }}">
+                                                {{ asset.get_status_display }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Type</th>
+                                        <td>{{ asset.get_asset_type_display }}</td>
+                                    </tr>
+                                    {% if asset.subtype %}
+                                    <tr>
+                                        <th>Subtype</th>
+                                        <td>{{ asset.subtype }}</td>
+                                    </tr>
+                                    {% endif %}
+                                    {% if asset.category %}
+                                    <tr>
+                                        <th>Category</th>
+                                        <td>{{ asset.category }}</td>
+                                    </tr>
+                                    {% endif %}
+                                    {% if asset.tags %}
+                                    <tr>
+                                        <th>Tags</th>
+                                        <td>
+                                            {% for tag in asset.tags.split|dictsort:0 %}
+                                                <span class="badge bg-light text-dark">{{ tag }}</span>
+                                            {% endfor %}
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                    <tr>
+                                        <th>Created By</th>
+                                        <td>{{ asset.created_by.get_full_name|default:asset.created_by.username }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Created</th>
+                                        <td>{{ asset.created_at|date:"M d, Y" }}</td>
+                                    </tr>
+                                    {% if asset.assigned_to %}
+                                    <tr>
+                                        <th>Assigned To</th>
+                                        <td>{{ asset.assigned_to.get_full_name|default:asset.assigned_to.username }}</td>
+                                    </tr>
+                                    {% endif %}
+                                    {% if asset.file %}
+                                    <tr>
+                                        <th>File</th>
+                                        <td>
+                                            <a href="{{ asset.file.url }}" download>
+                                                <i class="bi bi-download"></i> Download
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                    {% if asset.external_url %}
+                                    <tr>
+                                        <th>External URL</th>
+                                        <td>
+                                            <a href="{{ asset.external_url }}" target="_blank">
+                                                <i class="bi bi-link-45deg"></i> Open Link
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Related tasks -->
+                    <div class="card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <span><i class="bi bi-check2-square"></i> Related Tasks</span>
+                            <a href="#" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-plus-lg"></i> Add Task
+                            </a>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group list-group-flush">
+                                <!-- This would be populated with actual related tasks -->
+                                <p class="text-muted">No related tasks found.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add any JavaScript functionality for the asset detail page here
+    });
+</script>
+{% endblock %}

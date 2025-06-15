@@ -69,15 +69,15 @@ function setupAssetChart() {
         new Chart(ctx.getContext('2d'), {
             type: 'doughnut',
             data: {
-                labels: ['2D Art', '3D Models', 'Animation', 'Sound', 'Music', 'Code'],
+                labels: ['3D Models', '2D Images', 'Music', 'Videos', 'References', 'Other'],
                 datasets: [{
                     data: [
-                        assetData.art_2d || 0,
-                        assetData.model_3d || 0,
-                        assetData.animation || 0,
-                        assetData.sound || 0,
+                        assetData['3d_model'] || 0,
+                        assetData['2d_image'] || 0,
                         assetData.music || 0,
-                        assetData.code || 0
+                        assetData.video || 0,
+                        assetData.reference || 0,
+                        assetData.other || 0
                     ],
                     backgroundColor: [
                         '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b', '#858796'

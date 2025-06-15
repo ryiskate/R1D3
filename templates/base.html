@@ -286,7 +286,7 @@
                 </li>
                 
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'account_logout' %}">
+                    <a class="nav-link" href="#"><!-- Temporarily disabled: {% url 'account_logout' %} -->
                         <i class="fas fa-fw fa-sign-out-alt"></i>
                         <span>Logout</span>
                     </a>
@@ -341,16 +341,16 @@
                                     Settings
                                 </a>
                                 <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="{% url 'account_logout' %}">
+                                <a class="dropdown-item" href="#"><!-- Temporarily disabled: {% url 'account_logout' %} -->
                                     <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Logout
                                 </a>
                             {% else %}
-                                <a class="dropdown-item" href="{% url 'account_login' %}">
+                                <a class="dropdown-item" href="#"><!-- Temporarily disabled: {% url 'account_login' %} -->
                                     <i class="fas fa-sign-in-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Login
                                 </a>
-                                <a class="dropdown-item" href="{% url 'account_signup' %}">
+                                <a class="dropdown-item" href="#"><!-- Temporarily disabled: {% url 'account_signup' %} -->
                                     <i class="fas fa-user-plus fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Register
                                 </a>

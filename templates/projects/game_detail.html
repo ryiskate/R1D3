@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load project_extras %}
 
 {% block title %}{{ game.title }} - Game Details{% endblock %}
 
@@ -30,7 +31,13 @@
                     <li><a class="dropdown-item" href="#">Edit Game</a></li>
                     {% if not gdd %}
                         <li><a class="dropdown-item" href="{% url 'games:gdd_create' game.id %}">Create GDD</a></li>
+                    {% else %}
+                        <li><a class="dropdown-item" href="{% url 'games:gdd_detail' gdd.id %}">View GDD</a></li>
                     {% endif %}
+                    <li><a class="dropdown-item" href="{% url 'games:gdd_upload' game.id %}">
+                        <i class="bi bi-upload"></i> Upload GDD
+                    </a></li>
+                    <li><hr class="dropdown-divider"></li>
                     <li><a class="dropdown-item" href="{% url 'games:asset_create' game.id %}">Add Asset</a></li>
                     <li><a class="dropdown-item" href="{% url 'games:task_create' game.id %}">Create Task</a></li>
                     <li><a class="dropdown-item" href="{% url 'games:task_kanban' game.id %}">Kanban Board</a></li>
@@ -86,26 +93,126 @@
                 </div>
             </div>
             
-            <!-- GDD Section -->
-            <div class="card mb-4">
+            <!-- Game Design Document -->
+            <div class="card card-gdd mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Game Design Document</h5>
-                    {% if gdd %}
-                        <a href="{% url 'games:gdd_detail' gdd.id %}" class="btn btn-sm btn-outline-primary">View Full GDD</a>
-                    {% else %}
-                        <a href="{% url 'games:gdd_create' game.id %}" class="btn btn-sm btn-primary">Create GDD</a>
-                    {% endif %}
+                    <div class="gdd-action-buttons">
+                        <button type="button" class="gdd-format-btn btn-sm" data-bs-toggle="modal" data-bs-target="#gddFormatModal">
+                            <i class="bi bi-file-text"></i> GDD Format Guide
+                        </button>
+                        <a href="{% url 'games:gdd_upload' game.id %}" class="gdd-upload-btn btn-sm">
+                            <i class="bi bi-upload"></i> Upload GDD
+                        </a>
+                        {% if gdd %}
+                            <a href="{% url 'games:gdd_detail' gdd.id %}" class="btn btn-sm btn-outline-primary">View Full GDD</a>
+                        {% else %}
+                            <a href="{% url 'games:gdd_create' game.id %}" class="btn btn-sm btn-primary">Create GDD</a>
+                        {% endif %}
+                    </div>
                 </div>
                 <div class="card-body">
                     {% if gdd %}
-                        <h6>High Concept</h6>
-                        <p>{{ gdd.high_concept|truncatewords:50 }}</p>
-                        
-                        <h6>Core Mechanics</h6>
-                        <p>{{ gdd.core_mechanics|truncatewords:50 }}</p>
-                        
-                        <h6>Art Style</h6>
-                        <p>{{ gdd.art_style|truncatewords:30 }}</p>
+                        {% if gdd.use_html_content %}
+                            <!-- Display only the game overview section from the HTML content -->
+                            <div class="gdd-preview-content" id="gdd-html-preview">
+                                <script>
+                                    document.addEventListener('DOMContentLoaded', function() {
+                                        // Function to extract game overview section
+                                        function extractGameOverview() {
+                                            // Create a temporary div to parse the HTML content
+                                            var tempDiv = document.createElement('div');
+                                            tempDiv.innerHTML = `{{ gdd.html_content|escapejs }}`;
+                                            
+                                            // Look for game overview section (usually after an h2 with 'overview', 'about', etc.)
+                                            var overviewSection = null;
+                                            var headings = tempDiv.querySelectorAll('h1, h2, h3');
+                                            
+                                            for (var i = 0; i < headings.length; i++) {
+                                                var heading = headings[i];
+                                                var headingText = heading.textContent.toLowerCase();
+                                                
+                                                if (headingText.includes('overview') || 
+                                                    headingText.includes('about') || 
+                                                    headingText.includes('concept') || 
+                                                    headingText.includes('introduction')) {
+                                                    
+                                                    // Found the overview heading, extract this section
+                                                    overviewSection = document.createElement('div');
+                                                    overviewSection.appendChild(heading.cloneNode(true));
+                                                    
+                                                    // Get all content until the next heading of same or higher level
+                                                    var currentNode = heading.nextSibling;
+                                                    var headingLevel = parseInt(heading.tagName.substring(1));
+                                                    
+                                                    while (currentNode) {
+                                                        if (currentNode.nodeType === 1 && // Element node
+                                                            currentNode.tagName.startsWith('H') && 
+                                                            parseInt(currentNode.tagName.substring(1)) <= headingLevel) {
+                                                            break; // Stop at next heading of same or higher level
+                                                        }
+                                                        
+                                                        overviewSection.appendChild(currentNode.cloneNode(true));
+                                                        currentNode = currentNode.nextSibling;
+                                                    }
+                                                    
+                                                    break;
+                                                }
+                                            }
+                                            
+                                            // If no specific overview section found, just take the first part
+                                            if (!overviewSection && tempDiv.firstChild) {
+                                                overviewSection = document.createElement('div');
+                                                
+                                                // Take first heading and paragraph
+                                                var firstHeading = tempDiv.querySelector('h1, h2, h3');
+                                                if (firstHeading) {
+                                                    overviewSection.appendChild(firstHeading.cloneNode(true));
+                                                }
+                                                
+                                                // Take first few paragraphs (up to 3)
+                                                var paragraphs = tempDiv.querySelectorAll('p');
+                                                var count = 0;
+                                                for (var i = 0; i < paragraphs.length && count < 3; i++) {
+                                                    overviewSection.appendChild(paragraphs[i].cloneNode(true));
+                                                    count++;
+                                                }
+                                            }
+                                            
+                                            return overviewSection ? overviewSection.innerHTML : '<p>No overview section found in the GDD.</p>';
+                                        }
+                                        
+                                        // Insert the extracted overview into the preview div
+                                        var previewDiv = document.getElementById('gdd-html-preview');
+                                        if (previewDiv) {
+                                            previewDiv.innerHTML = extractGameOverview();
+                                            
+                                            // Apply styling fixes
+                                            var containers = previewDiv.querySelectorAll('div, table, section, article, main');
+                                            containers.forEach(function(container) {
+                                                container.style.maxWidth = 'none';
+                                                container.style.width = '100%';
+                                            });
+                                        }
+                                    });
+                                </script>
+                            </div>
+                            <a href="{% url 'games:gdd_detail' gdd.id %}" class="view-full-gdd-btn">
+                                <i class="bi bi-arrows-fullscreen"></i> View Full Game Design Document
+                            </a>
+                        {% else %}
+                            <!-- Display structured fields for non-HTML GDDs -->
+                            <div class="gdd-preview-content">
+                                <h6>High Concept</h6>
+                                <p>{{ gdd.high_concept|truncatewords:50 }}</p>
+                                
+                                <h6>Core Mechanics</h6>
+                                <p>{{ gdd.core_mechanics|truncatewords:50 }}</p>
+                                
+                                <h6>Art Style</h6>
+                                <p>{{ gdd.art_style|truncatewords:30 }}</p>
+                            </div>
+                        {% endif %}
                     {% else %}
                         <p class="text-center">No Game Design Document has been created yet.</p>
                     {% endif %}
@@ -204,7 +311,7 @@
                                     {% for task in tasks|slice:":5" %}
                                     <tr>
                                         <td>{{ task.title }}</td>
-                                        <td><span class="badge bg-{{ task.status|yesno:'success,warning,secondary' }}">{{ task.get_status_display }}</span></td>
+                                        <td><span class="badge bg-{{ task.status|task_status_color }}">{{ task.get_status_display }}</span></td>
                                         <td>{{ task.assigned_to|default:"Unassigned" }}</td>
                                         <td>{{ task.due_date|date:"M d"|default:"No date" }}</td>
                                     </tr>
@@ -298,28 +405,28 @@
                     
                     <div class="mt-4 asset-list">
                         <div class="asset-list-item">
-                            <span>2D Art</span>
-                            <span class="badge bg-primary">{{ assets_by_type.art_2d|default:0 }}</span>
-                        </div>
-                        <div class="asset-list-item">
                             <span>3D Models</span>
-                            <span class="badge bg-success">{{ assets_by_type.model_3d|default:0 }}</span>
+                            <span class="badge bg-primary">{{ assets_by_type.3d_model|default:0 }}</span>
                         </div>
                         <div class="asset-list-item">
-                            <span>Animation</span>
-                            <span class="badge bg-info">{{ assets_by_type.animation|default:0 }}</span>
-                        </div>
-                        <div class="asset-list-item">
-                            <span>Sound</span>
-                            <span class="badge bg-warning">{{ assets_by_type.sound|default:0 }}</span>
+                            <span>2D Images</span>
+                            <span class="badge bg-success">{{ assets_by_type.2d_image|default:0 }}</span>
                         </div>
                         <div class="asset-list-item">
                             <span>Music</span>
-                            <span class="badge bg-danger">{{ assets_by_type.music|default:0 }}</span>
+                            <span class="badge bg-info">{{ assets_by_type.music|default:0 }}</span>
                         </div>
                         <div class="asset-list-item">
-                            <span>Code</span>
-                            <span class="badge bg-secondary">{{ assets_by_type.code|default:0 }}</span>
+                            <span>Videos</span>
+                            <span class="badge bg-warning">{{ assets_by_type.video|default:0 }}</span>
+                        </div>
+                        <div class="asset-list-item">
+                            <span>References</span>
+                            <span class="badge bg-danger">{{ assets_by_type.reference|default:0 }}</span>
+                        </div>
+                        <div class="asset-list-item">
+                            <span>Other</span>
+                            <span class="badge bg-secondary">{{ assets_by_type.other|default:0 }}</span>
                         </div>
                     </div>
                 </div>
@@ -365,4 +472,103 @@
 
 <!-- Include external JavaScript file -->
 <script src="{% static 'js/game_detail.js' %}"></script>
+
+<!-- GDD Format Guide Modal -->
+<div class="modal fade" id="gddFormatModal" tabindex="-1" aria-labelledby="gddFormatModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="gddFormatModalLabel">GDD Format Guide for Windsurf</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h4>Copy and paste this prompt into Windsurf to generate a properly formatted GDD</h4>
+                <p>Below is a prompt you can copy and paste into Windsurf to generate a Game Design Document that will work perfectly with the R1D3 system's automatic task creation:</p>
+                
+                <div class="bg-light p-3 mb-3" style="border-left: 4px solid #4a6fdc;">
+                    <p class="mb-2">Click the button below to copy the prompt:</p>
+                    <button id="copyPromptBtn" class="btn btn-primary btn-sm" onclick="copyPromptToClipboard()">Copy Prompt</button>
+                </div>
+                
+                <div class="border p-3" style="max-height: 400px; overflow-y: auto;">
+                    <pre id="windsurf-prompt" style="white-space: pre-wrap; word-break: break-word;">Create a comprehensive Game Design Document (GDD) in HTML format for my game [GAME NAME]. The document should follow this structure and formatting exactly:
+
+1. Use h1 for the title, h2 for main sections, and h3 for subsections.
+2. Each feature should be in a table with the class "feature-table" containing these exact columns: Feature, Description, Priority, Status.
+3. Valid priority values are: low, medium, high, critical
+4. Valid status values must be exactly one of these: backlog, to_do, in_progress, in_review, done, blocked
+5. IMPORTANT: The section title (h2 or h3) above each feature table will be used as the task type in the task management system.
+
+Here's an example of how a feature table should be formatted:
+
+&lt;h2 id="combat-system"&gt;Combat System&lt;/h2&gt;
+&lt;table class="feature-table"&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Feature&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Priority&lt;/th&gt;
+        &lt;th&gt;Status&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;Melee Attacks&lt;/td&gt;
+        &lt;td&gt;Implement basic melee combat with combos and blocking&lt;/td&gt;
+        &lt;td&gt;high&lt;/td&gt;
+        &lt;td&gt;backlog&lt;/td&gt;
+    &lt;/tr&gt;
+&lt;/table&gt;
+
+IMPORTANT: Your GDD should follow this structure with Game Overview as the first section:
+
+1. Game Overview (high concept, target audience, platforms) - MUST BE FIRST SECTION
+   * This section will be displayed as a preview on the game detail page
+   * Use an h2 heading with the exact text "Game Overview" for best results
+   * Include a concise summary of your game's concept in this section
+
+2. Gameplay Features (core mechanics, controls, player progression)
+3. Level Design (world structure, environments, challenges)
+4. Character System (player character, NPCs, enemies)
+5. Technical Requirements (architecture, networking, performance)
+6. Art Direction (visual style, character design, environment design)
+7. Audio Design (music, sound effects, voice acting)
+8. Narrative Elements (story, characters, world-building)
+9. User Interface (menus, HUD, accessibility)
+
+For each section, create appropriate feature tables with features relevant to that section. Make sure each feature has a clear name, detailed description, appropriate priority, and initial status (usually "backlog").</pre>
+                </div>
+                
+                <h5 class="mt-4">How the R1D3 System Uses This Format</h5>
+                <p>When you upload a GDD HTML file formatted according to this guide:</p>
+                <ul>
+                    <li>The system will automatically extract features from tables with the class "feature-table"</li>
+                    <li>Each feature will be converted to a task with the section title as its task type</li>
+                    <li>The system recognizes standard task types (design, art, programming, audio, testing, writing)</li>
+                    <li>For any other section titles, the exact section name will be used as the task type</li>
+                    <li>The system will avoid creating duplicate tasks if they already exist</li>
+                    <li>Task status will be synchronized bidirectionally between the GDD and task management system</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a href="{% url 'games:gdd_upload' game.id %}" class="btn btn-primary">Upload GDD</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function copyPromptToClipboard() {
+    const promptText = document.getElementById('windsurf-prompt').innerText;
+    navigator.clipboard.writeText(promptText).then(function() {
+        const copyBtn = document.getElementById('copyPromptBtn');
+        copyBtn.innerHTML = 'Copied!';
+        copyBtn.classList.remove('btn-primary');
+        copyBtn.classList.add('btn-success');
+        setTimeout(function() {
+            copyBtn.innerHTML = 'Copy Prompt';
+            copyBtn.classList.remove('btn-success');
+            copyBtn.classList.add('btn-primary');
+        }, 2000);
+    });
+}
+</script>
 {% endblock extra_js %}

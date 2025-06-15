@@ -147,6 +147,8 @@
                                 <span class="badge bg-orange">Testing</span>
                                 {% elif task.task_type == 'writing' %}
                                 <span class="badge bg-cyan">Writing</span>
+                                {% elif task.task_type == 'other' and task.custom_type %}
+                                <span class="badge bg-secondary">{{ task.custom_type }}</span>
                                 {% else %}
                                 <span class="badge bg-secondary">Other</span>
                                 {% endif %}

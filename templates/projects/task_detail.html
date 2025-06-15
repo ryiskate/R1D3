@@ -98,6 +98,8 @@
                                 <span class="badge bg-orange">Testing</span>
                                 {% elif task.task_type == 'writing' %}
                                 <span class="badge bg-cyan">Writing</span>
+                                {% elif task.task_type == 'other' and task.custom_type %}
+                                <span class="badge bg-secondary">{{ task.custom_type }}</span>
                                 {% else %}
                                 <span class="badge bg-secondary">Other</span>
                                 {% endif %}
@@ -212,9 +214,8 @@
                     <h5 class="card-title mb-0">Quick Actions</h5>
                 </div>
                 <div class="card-body">
-                    <form method="post" action="{% url 'games:task_update' task.id %}" class="mb-3">
+                    <form method="post" action="{% url 'games:task_status_update' task.id %}" class="mb-3">
                         {% csrf_token %}
-                        <input type="hidden" name="quick_update" value="true">
                         <div class="mb-3">
                             <label class="form-label">Update Status</label>
                             <select name="status" class="form-select" onchange="this.form.submit()">
@@ -227,9 +228,8 @@
                         </div>
                     </form>
 
-                    <form method="post" action="{% url 'games:task_update' task.id %}" class="mb-3">
+                    <form method="post" action="{% url 'games:task_status_update' task.id %}" class="mb-3">
                         {% csrf_token %}
-                        <input type="hidden" name="quick_update" value="true">
                         <div class="mb-3">
                             <label class="form-label">Log Hours</label>
                             <div class="input-group">

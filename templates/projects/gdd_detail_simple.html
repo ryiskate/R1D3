@@ -1,0 +1,499 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load gdd_extras %}
+
+{% block title %}{{ gdd.game.title }} - Game Design Document{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/gdd_styles.css' %}">
+<style>
+    /* Override any width constraints */
+    .gdd-container, .gdd-html-content, #gdd-html-content {
+        max-width: none !important;
+        width: 100% !important;
+    }
+    
+    /* Target all elements inside the GDD content */
+    #gdd-html-content * {
+        max-width: none !important;
+        box-sizing: border-box;
+    }
+    
+    /* Override the body styles in the GDD HTML content */
+    #gdd-html-content body {
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 20px !important;
+        width: 100% !important;
+    }
+    
+    /* Ensure tables use full width */
+    #gdd-html-content table {
+        width: 100% !important;
+    }
+    
+    .gdd-container {
+        display: flex;
+        gap: 2rem;
+    }
+    
+    .gdd-content {
+        flex: 1;
+    }
+    
+    .gdd-sidebar {
+        width: 300px;
+        position: sticky;
+        top: 20px;
+        max-height: calc(100vh - 40px);
+        overflow-y: auto;
+    }
+    
+    .toc-link {
+        display: block;
+        padding: 5px 0;
+        color: #495057;
+        text-decoration: none;
+    }
+    
+    .toc-link:hover, .toc-link.active {
+        color: #0d6efd;
+    }
+    
+    .toc-h2 {
+        padding-left: 15px;
+    }
+    
+    .toc-h3 {
+        padding-left: 30px;
+    }
+    
+    .section-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+    }
+    
+    .task-badge {
+        cursor: pointer;
+        margin-left: 10px;
+    }
+    
+    .task-badge-container {
+        display: inline-flex;
+        gap: 5px;
+    }
+    
+    .task-create-btn {
+        font-size: 0.8rem;
+        padding: 0.2rem 0.4rem;
+    }
+    
+    /* Add smooth scrolling behavior */
+    html {
+        scroll-behavior: smooth;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-3 px-0">
+    <div class="d-flex justify-content-between align-items-center mb-3 px-3">
+        <h2 class="mb-0">{{ gdd.game.title }} - GDD</h2>
+        <div class="d-flex gap-2">
+            {% if can_edit %}
+            <div class="dropdown">
+                <button class="btn btn-sm btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-gear"></i> Actions
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li>
+                        <a class="dropdown-item" href="{% url 'games:gdd_edit' gdd.id %}">
+                            <i class="bi bi-pencil"></i> Edit GDD
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="{% url 'games:extract_features' gdd.id %}">
+                            <i class="bi bi-table"></i> Extract Features
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="{% url 'games:gdd_features' gdd.id %}">
+                            <i class="bi bi-kanban"></i> Manage Features
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <form method="post" action="{% url 'games:update_gdd_with_task_status' gdd.id %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="dropdown-item">
+                                <i class="bi bi-arrow-clockwise"></i> Update with Task Status
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+            {% endif %}
+            <button type="button" class="gdd-format-btn btn-sm" data-bs-toggle="modal" data-bs-target="#gddFormatModal">
+                <i class="bi bi-file-text"></i> Format Guide
+            </button>
+            <a href="{% url 'games:gdd_upload' gdd.game.id %}" class="gdd-upload-btn btn-sm">
+                <i class="bi bi-upload"></i> Upload
+            </a>
+            <a href="{% url 'games:game_detail' gdd.game.id %}" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Back
+            </a>
+        </div>
+    </div>
+
+    <!-- Main content area with sidebar -->
+    <div class="d-flex flex-wrap">
+        <!-- Main GDD Content -->
+        <div class="flex-grow-1" style="min-width: 0; width: calc(100% - 300px);">
+            <div class="card mx-3 h-100">
+                <div class="card-body p-3">
+                    {% if gdd.use_html_content %}
+                        <!-- HTML Content Mode -->
+                        <div id="gdd-html-content" class="gdd-html-content w-100" style="max-width: none !important;">
+                            {{ gdd.html_content|safe }}
+                        </div>
+                        <script>
+                            // Direct DOM manipulation to remove width constraints
+                            document.addEventListener('DOMContentLoaded', function() {
+                                // Get the first element inside gdd-html-content (usually the HTML content)
+                                var gddContent = document.getElementById('gdd-html-content');
+                                if (gddContent && gddContent.firstElementChild) {
+                                    // Look for any style tags
+                                    var styleTags = gddContent.getElementsByTagName('style');
+                                    for (var i = 0; i < styleTags.length; i++) {
+                                        // Replace max-width and margin in style tags
+                                        styleTags[i].innerHTML = styleTags[i].innerHTML
+                                            .replace(/max-width:\s*\d+px/g, 'max-width: 100%')
+                                            .replace(/margin:\s*0\s+auto/g, 'margin: 0');
+                                    }
+                                    
+                                    // Apply inline styles to override any remaining constraints
+                                    var bodyElements = gddContent.getElementsByTagName('body');
+                                    if (bodyElements.length > 0) {
+                                        bodyElements[0].style.maxWidth = '100%';
+                                        bodyElements[0].style.margin = '0';
+                                        bodyElements[0].style.width = '100%';
+                                    }
+                                }
+                            });
+                        </script>
+                    {% else %}
+                        <!-- Structured Fields Mode -->
+                        <h3>Core Concept</h3>
+                        <div class="mb-4">
+                            <h5>High Concept</h5>
+                            <p>{{ gdd.high_concept|linebreaks }}</p>
+                            
+                            <h5>Player Experience</h5>
+                            <p>{{ gdd.player_experience|linebreaks }}</p>
+                        </div>
+                        
+                        <h3>Gameplay</h3>
+                        <div class="mb-4">
+                            <h5>Core Mechanics</h5>
+                            <p>{{ gdd.core_mechanics|linebreaks }}</p>
+                            
+                            {% if gdd.game_rules %}
+                            <h5>Game Rules</h5>
+                            <p>{{ gdd.game_rules|linebreaks }}</p>
+                            {% endif %}
+                            
+                            {% if gdd.controls %}
+                            <h5>Controls</h5>
+                            <p>{{ gdd.controls|linebreaks }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        {% if gdd.story_synopsis or gdd.world_building %}
+                        <h3>Narrative</h3>
+                        <div class="mb-4">
+                            {% if gdd.story_synopsis %}
+                            <h5>Story Synopsis</h5>
+                            <p>{{ gdd.story_synopsis|linebreaks }}</p>
+                            {% endif %}
+                            
+                            {% if gdd.world_building %}
+                            <h5>World Building</h5>
+                            <p>{{ gdd.world_building|linebreaks }}</p>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                        
+                        {% if gdd.art_style or gdd.audio_style %}
+                        <h3>Art and Audio</h3>
+                        <div class="mb-4">
+                            {% if gdd.art_style %}
+                            <h5>Art Style</h5>
+                            <p>{{ gdd.art_style|linebreaks }}</p>
+                            {% endif %}
+                            
+                            {% if gdd.audio_style %}
+                            <h5>Audio Style</h5>
+                            <p>{{ gdd.audio_style|linebreaks }}</p>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                        
+                        {% if gdd.technical_requirements %}
+                        <h3>Technical</h3>
+                        <div class="mb-4">
+                            <h5>Technical Requirements</h5>
+                            <p>{{ gdd.technical_requirements|linebreaks }}</p>
+                        </div>
+                        {% endif %}
+                        
+                        {% if gdd.monetization or gdd.marketing %}
+                        <h3>Business</h3>
+                        <div class="mb-4">
+                            {% if gdd.monetization %}
+                            <h5>Monetization</h5>
+                            <p>{{ gdd.monetization|linebreaks }}</p>
+                            {% endif %}
+                            
+                            {% if gdd.marketing %}
+                            <h5>Marketing</h5>
+                            <p>{{ gdd.marketing|linebreaks }}</p>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sidebar -->
+        <div style="width: 300px;">
+            {% if gdd.use_html_content %}
+                <!-- Table of Contents -->
+                <div class="card mb-3">
+                    <div class="card-header py-2">
+                        <h6 class="mb-0">Table of Contents</h6>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="list-group list-group-flush" id="toc-container" style="max-height: 250px; overflow-y: auto;">
+                            <!-- Dynamically generated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            
+            <!-- Sections with Tasks -->
+            <div class="card mb-3">
+                <div class="card-header py-2 d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">Sections & Tasks</h6>
+                    <span class="badge bg-primary">{{ gdd.sections.count }}</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush" style="max-height: 500px; overflow-y: auto;">
+                        {% for section in gdd.sections.all %}
+                            <div class="list-group-item py-2 px-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-truncate" title="{{ section.title }}">{{ section.title }}</span>
+                                    <div class="task-badge-container">
+                                        {% with section_tasks=sections_with_tasks|get_item:section.id %}
+                                        {% if section_tasks %}
+                                            <span class="badge bg-primary">{{ section_tasks|length }}</span>
+                                        {% endif %}
+                                        {% endwith %}
+                                        
+                                        {% if can_create_task %}
+                                        <button type="button" class="btn btn-sm btn-outline-primary btn-sm p-0 px-1" 
+                                                data-bs-toggle="modal" data-bs-target="#createTaskModal"
+                                                data-section-id="{{ section.id }}"
+                                                data-section-title="{{ section.title }}">
+                                            <i class="bi bi-plus-circle"></i>
+                                        </button>
+                                        {% endif %}
+                                        
+                                        {% if can_link_tasks %}
+                                        <button type="button" class="btn btn-sm btn-outline-secondary btn-sm p-0 px-1"
+                                                data-bs-toggle="modal" data-bs-target="#linkTaskModal"
+                                                data-section-id="{{ section.id }}"
+                                                data-section-title="{{ section.title }}">
+                                            <i class="bi bi-link"></i>
+                                        </button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                {% with section_tasks=sections_with_tasks|get_item:section.id %}
+                                {% if section_tasks %}
+                                <div class="mt-1" style="font-size: 0.85rem;">
+                                    {% for task in section_tasks %}
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <a href="{% url 'games:task_detail' task.id %}" class="text-decoration-none text-truncate" style="max-width: 70%;" title="{{ task.title }}">
+                                            {{ task.title }}
+                                        </a>
+                                        <span class="badge {% if task.status == 'done' %}bg-success{% elif task.status == 'in_progress' %}bg-warning{% elif task.status == 'blocked' %}bg-danger{% else %}bg-secondary{% endif %}">
+                                            {{ task.get_status_display }}
+                                        </span>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                                {% endwith %}
+                            </div>
+                        {% empty %}
+                            <div class="list-group-item text-center text-muted py-2">
+                                No sections found
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Include modals for task creation and linking -->
+{% include "projects/gdd_detail_modals.html" %}
+
+<!-- GDD Format Guide Modal -->
+<div class="modal fade" id="gddFormatModal" tabindex="-1" aria-labelledby="gddFormatModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="gddFormatModalLabel">GDD Format Guide for Windsurf</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <button id="copyPromptBtn" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-clipboard"></i> Copy Prompt
+                    </button>
+                </div>
+                
+                <div id="promptText" class="bg-light p-3 mb-3" style="white-space: pre-wrap;">
+Create an HTML document for a Game Design Document (GDD) with the following structure:
+
+1. Use h1 for the game title
+2. Use h2 or h3 for main sections
+3. For features that should be tracked as tasks, create tables with class="feature-table"
+4. Each feature table must have these exact column headers: Feature, Description, Priority, Status
+
+IMPORTANT FORMATTING RULES:
+- The section title (h2 or h3) above each feature table will be used as the task type
+- Priority values should be: low, medium, high, or critical
+- Status values must be exactly one of these: backlog, to_do, in_progress, in_review, done, blocked
+
+Suggested main sections (you can customize these):
+- Game Overview
+- Gameplay
+- Combat System
+- Level Design
+- User Interface
+- Art Style
+- Audio Design
+- Technical Requirements
+
+Example feature table:
+
+&lt;h2&gt;Combat System&lt;/h2&gt;
+&lt;table class="feature-table"&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Feature&lt;/th&gt;
+    &lt;th&gt;Description&lt;/th&gt;
+    &lt;th&gt;Priority&lt;/th&gt;
+    &lt;th&gt;Status&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Melee Attacks&lt;/td&gt;
+    &lt;td&gt;Basic sword combat with light and heavy attacks&lt;/td&gt;
+    &lt;td&gt;high&lt;/td&gt;
+    &lt;td&gt;in_progress&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;
+                </div>
+                
+                <h5 class="mt-4">How the R1D3 System Uses This Format</h5>
+                <p>When you upload a GDD HTML file formatted according to this guide:</p>
+                <ul>
+                    <li>The system will automatically extract features from tables with the class "feature-table"</li>
+                    <li>Each feature will be converted to a task with the section title as its task type</li>
+                    <li>The system recognizes standard task types (design, art, programming, audio, testing, writing)</li>
+                    <li>For any other section titles, the exact section name will be used as the task type</li>
+                    <li>The system will avoid creating duplicate tasks if they already exist</li>
+                    <li>Task status will be synchronized bidirectionally between the GDD and task management system</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a href="{% url 'games:gdd_upload' gdd.game.id %}" class="btn btn-primary">Upload GDD</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<!-- Store Django template variables as data attributes to avoid JavaScript lint errors -->
+<div id="gdd-data" 
+     data-sections="{% if sections_json %}{{ sections_json|safe }}{% else %}[]{% endif %}"
+     data-sections-with-tasks="{% if sections_with_tasks_json %}{{ sections_with_tasks_json|safe }}{% else %}{}{% endif %}"
+     data-can-create-task="{% if can_create_task %}true{% else %}false{% endif %}"
+     data-can-link-tasks="{% if can_link_tasks %}true{% else %}false{% endif %}"
+     style="display: none;">
+</div>
+
+<script src="{% static 'js/gdd-task-integration.js' %}"></script>
+<script src="{% static 'js/gdd-detail.js' %}"></script>
+<!-- Test script for debugging -->
+<script src="{% static 'js/test-gdd-integration.js' %}"></script>
+<script>
+    $(document).ready(function() {
+        // Fix GDD content width issues
+        const gddContent = document.getElementById('gdd-html-content');
+        if (gddContent) {
+            // Remove any width constraints on the content itself
+            gddContent.style.maxWidth = 'none';
+            gddContent.style.width = '100%';
+            
+            // Find all container elements in the GDD content and remove width constraints
+            const containers = gddContent.querySelectorAll('div, table, section, article, main');
+            containers.forEach(function(container) {
+                container.style.maxWidth = 'none';
+                container.style.width = '100%';
+            });
+        }
+        // Copy prompt button functionality
+        $('#copyPromptBtn').on('click', function() {
+            var promptText = document.getElementById('promptText').innerText;
+            navigator.clipboard.writeText(promptText).then(function() {
+                // Change button text temporarily to indicate success
+                var $btn = $('#copyPromptBtn');
+                var originalText = $btn.html();
+                $btn.html('<i class="bi bi-check"></i> Copied!');
+                setTimeout(function() {
+                    $btn.html(originalText);
+                }, 2000);
+            }, function(err) {
+                console.error('Could not copy text: ', err);
+                alert('Failed to copy prompt. Please try again.');
+            });
+        });
+        
+        // Get data from HTML data attributes to avoid template tag parsing issues
+        var gddData = document.getElementById('gdd-data');
+        var sectionsJson = JSON.parse(gddData.getAttribute('data-sections'));
+        var sectionsWithTasksJson = JSON.parse(gddData.getAttribute('data-sections-with-tasks'));
+        var canCreateTask = gddData.getAttribute('data-can-create-task') === 'true';
+        var canLinkTasks = gddData.getAttribute('data-can-link-tasks') === 'true';
+        
+        // Initialize the GDD detail page with parsed data
+        initGddDetailPage({
+            sectionsJson: sectionsJson,
+            sectionsWithTasksJson: sectionsWithTasksJson,
+            canCreateTask: canCreateTask,
+            canLinkTasks: canLinkTasks
+        });
+    });
+</script>
+{% endblock %}

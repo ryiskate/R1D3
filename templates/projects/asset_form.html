@@ -1,0 +1,242 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/asset_form.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 sidebar">
+            <div class="sidebar-sticky">
+                <h5 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1">
+                    <span>Navigation</span>
+                </h5>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'games:game_detail' game.id %}">
+                            <i class="bi bi-arrow-left"></i> Back to Game
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'games:asset_list' game.id %}">
+                            <i class="bi bi-grid-3x3-gap"></i> All Assets
+                        </a>
+                    </li>
+                </ul>
+                
+                <h5 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1">
+                    <span>Help</span>
+                </h5>
+                <div class="px-3 py-2">
+                    <div class="small text-muted">
+                        <p><strong>Asset Types:</strong></p>
+                        <ul class="ps-3">
+                            <li><strong>3D Model</strong> - 3D models, characters, environments</li>
+                            <li><strong>2D Image</strong> - Concept art, sprites, textures</li>
+                            <li><strong>Music</strong> - Background music, themes</li>
+                            <li><strong>Video</strong> - Cutscenes, animations, trailers</li>
+                            <li><strong>Reference</strong> - Inspiration, mood boards</li>
+                        </ul>
+                        <p><strong>Subtypes:</strong> Use this field to further categorize your assets (e.g., character, environment, UI, etc.)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">{% if form.instance.pk %}Edit Asset{% else %}Add New Asset{% endif %}</h1>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-body">
+                            <form method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                
+                                {% if form.errors %}
+                                <div class="alert alert-danger">
+                                    <h4 class="alert-heading">Please correct the errors below:</h4>
+                                    {{ form.errors }}
+                                </div>
+                                {% endif %}
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-12">
+                                        <label for="{{ form.name.id_for_label }}" class="form-label">Asset Name*</label>
+                                        {{ form.name }}
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-12">
+                                        <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                                        {{ form.description }}
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="{{ form.asset_type.id_for_label }}" class="form-label">Asset Type*</label>
+                                        {{ form.asset_type }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="{{ form.subtype.id_for_label }}" class="form-label">Subtype</label>
+                                        {{ form.subtype }}
+                                        <div class="form-text">E.g., character, environment, UI, etc.</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="{{ form.status.id_for_label }}" class="form-label">Status*</label>
+                                        {{ form.status }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="{{ form.assigned_to.id_for_label }}" class="form-label">Assigned To</label>
+                                        {{ form.assigned_to }}
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-12">
+                                        <label for="{{ form.file.id_for_label }}" class="form-label">Upload File</label>
+                                        {% if form.instance.file %}
+                                            <div class="mb-2">
+                                                <strong>Current file:</strong> 
+                                                <a href="{{ form.instance.file.url }}" target="_blank">{{ form.instance.file.name }}</a>
+                                            </div>
+                                        {% endif %}
+                                        {{ form.file }}
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-12">
+                                        <label for="{{ form.thumbnail.id_for_label }}" class="form-label">Thumbnail Image</label>
+                                        {% if form.instance.thumbnail %}
+                                            <div class="mb-2">
+                                                <strong>Current thumbnail:</strong>
+                                                <div class="thumbnail-preview">
+                                                    <img src="{{ form.instance.thumbnail.url }}" alt="Thumbnail" class="img-thumbnail" style="max-height: 100px;">
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                        {{ form.thumbnail }}
+                                        <div class="form-text">Upload a custom thumbnail image for this asset</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-12">
+                                        <label for="{{ form.external_url.id_for_label }}" class="form-label">External URL</label>
+                                        {{ form.external_url }}
+                                        <div class="form-text">If the asset is hosted elsewhere, provide the URL</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="{{ form.category.id_for_label }}" class="form-label">Category</label>
+                                        {{ form.category }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="{{ form.tags.id_for_label }}" class="form-label">Tags</label>
+                                        {{ form.tags }}
+                                        <div class="form-text">Comma-separated tags</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                    <a href="{% url 'games:asset_list' game.id %}" class="btn btn-secondary me-md-2">Cancel</a>
+                                    <button type="submit" class="btn btn-primary">{% if form.instance.pk %}Update Asset{% else %}Create Asset{% endif %}</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Asset Guidelines</h5>
+                        </div>
+                        <div class="card-body">
+                            <h6>Recommended File Types</h6>
+                            <ul>
+                                <li><strong>3D Models:</strong> .fbx, .obj, .blend</li>
+                                <li><strong>2D Images:</strong> .png, .jpg, .psd</li>
+                                <li><strong>Music:</strong> .mp3, .wav, .ogg</li>
+                                <li><strong>Video:</strong> .mp4, .webm</li>
+                                <li><strong>Reference:</strong> Any supported format</li>
+                            </ul>
+                            
+                            <h6>Naming Convention</h6>
+                            <p>Use descriptive names with the following format:</p>
+                            <code>[type]_[name]_[version]</code>
+                            <p class="small text-muted">Example: character_hero_v01</p>
+                            
+                            <h6>File Size Limits</h6>
+                            <ul>
+                                <li>Images: Max 10MB</li>
+                                <li>Audio: Max 20MB</li>
+                                <li>Video: Max 50MB</li>
+                                <li>3D Models: Max 30MB</li>
+                            </ul>
+                            
+                            <div class="alert alert-info mt-3">
+                                <i class="bi bi-info-circle me-2"></i> For larger files, consider using an external hosting service and providing the URL.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Dynamic subtype suggestions based on asset type
+        const assetTypeSelect = document.getElementById('{{ form.asset_type.id_for_label }}');
+        const subtypeInput = document.getElementById('{{ form.subtype.id_for_label }}');
+        
+        assetTypeSelect.addEventListener('change', function() {
+            const assetType = this.value;
+            let placeholder = '';
+            
+            switch(assetType) {
+                case '3d_model':
+                    placeholder = 'e.g., character, environment, prop, vehicle';
+                    break;
+                case '2d_image':
+                    placeholder = 'e.g., concept art, sprite, texture, UI element';
+                    break;
+                case 'music':
+                    placeholder = 'e.g., theme, background, battle, menu';
+                    break;
+                case 'video':
+                    placeholder = 'e.g., cutscene, trailer, animation';
+                    break;
+                case 'reference':
+                    placeholder = 'e.g., mood board, inspiration, competitor';
+                    break;
+                default:
+                    placeholder = 'e.g., character, environment, concept art';
+            }
+            
+            subtypeInput.placeholder = placeholder;
+        });
+        
+        // Trigger the change event to set the initial placeholder
+        assetTypeSelect.dispatchEvent(new Event('change'));
+    });
+</script>
+{% endblock %}

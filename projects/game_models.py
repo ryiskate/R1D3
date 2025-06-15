@@ -130,8 +130,61 @@ class GameDesignDocument(TimeStampedModel):
     monetization = models.TextField(blank=True, help_text="Monetization strategy")
     marketing = models.TextField(blank=True, help_text="Marketing strategy")
     
+    # HTML Content
+    html_content = models.TextField(blank=True, help_text="Full HTML content of the GDD")
+    use_html_content = models.BooleanField(default=False, help_text="Use HTML content instead of structured fields")
+    
     def __str__(self):
         return f"GDD for {self.game.title}"
+
+
+class GDDSection(TimeStampedModel):
+    """
+    A section of the Game Design Document that can be linked to tasks
+    """
+    gdd = models.ForeignKey(GameDesignDocument, on_delete=models.CASCADE, related_name='sections')
+    title = models.CharField(max_length=100)
+    content = models.TextField(blank=True)
+    html_content = models.TextField(blank=True)
+    section_id = models.CharField(max_length=50, help_text="Unique identifier for this section in the HTML document")
+    order = models.PositiveIntegerField(default=0, help_text="Order of this section in the document")
+    
+    def __str__(self):
+        return f"{self.title} - {self.gdd.game.title}"
+    
+    class Meta:
+        ordering = ['order']
+
+
+class GDDFeature(TimeStampedModel):
+    """
+    A feature from a GDD section's feature table that can be linked to tasks
+    """
+    PRIORITY_CHOICES = (
+        ('low', 'Low'),
+        ('medium', 'Medium'),
+        ('high', 'High'),
+        ('critical', 'Critical'),
+    )
+    
+    section = models.ForeignKey(GDDSection, on_delete=models.CASCADE, related_name='features')
+    feature_name = models.CharField(max_length=100)
+    description = models.TextField()
+    priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='medium')
+    task = models.OneToOneField('GameTask', on_delete=models.SET_NULL, null=True, blank=True, related_name='gdd_feature')
+    
+    def __str__(self):
+        return f"{self.feature_name} - {self.section.title}"
+    
+    @property
+    def status(self):
+        """Return the status of the linked task, or 'Planned' if no task is linked"""
+        if self.task:
+            return self.task.get_status_display()
+        return "Planned"
+    
+    class Meta:
+        ordering = ['priority', 'feature_name']
 
 
 class GameAsset(TimeStampedModel):
@@ -139,15 +192,11 @@ class GameAsset(TimeStampedModel):
     Game asset (art, audio, code, etc.)
     """
     ASSET_TYPE_CHOICES = [
-        ('2d_art', '2D Art'),
         ('3d_model', '3D Model'),
-        ('animation', 'Animation'),
-        ('texture', 'Texture'),
-        ('sound', 'Sound Effect'),
+        ('2d_image', '2D Image'),
         ('music', 'Music'),
-        ('voice', 'Voice Acting'),
-        ('code', 'Code'),
-        ('document', 'Document'),
+        ('video', 'Video'),
+        ('reference', 'Reference'),
         ('other', 'Other'),
     ]
     
@@ -168,9 +217,11 @@ class GameAsset(TimeStampedModel):
     
     # File management
     file = models.FileField(upload_to='game_assets/', null=True, blank=True)
+    thumbnail = models.ImageField(upload_to='game_assets/thumbnails/', null=True, blank=True, help_text="Custom thumbnail image for this asset")
     external_url = models.URLField(blank=True, help_text="URL to external storage if not uploaded directly")
     
     # Organization
+    subtype = models.CharField(max_length=100, blank=True, help_text="Subtype of the asset (e.g., character, environment, concept art)")
     category = models.CharField(max_length=100, blank=True, help_text="Custom category for organization")
     tags = models.CharField(max_length=200, blank=True, help_text="Comma-separated tags")
     
@@ -232,12 +283,14 @@ class GameTask(TimeStampedModel):
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     task_type = models.CharField(max_length=20, choices=TASK_TYPE_CHOICES, default='other')
+    custom_type = models.CharField(max_length=100, blank=True, null=True, help_text="Custom task type when task_type is 'other'")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='backlog')
     priority = models.CharField(max_length=20, choices=PRIORITY_CHOICES, default='medium')
     assigned_to = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='game_tasks')
     due_date = models.DateField(null=True, blank=True)
     estimated_hours = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
     actual_hours = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
+    gdd_section = models.ForeignKey(GDDSection, on_delete=models.SET_NULL, null=True, blank=True, related_name='tasks', help_text="GDD section this task is related to")
     
     def __str__(self):
         return self.title

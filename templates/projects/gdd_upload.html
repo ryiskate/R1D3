@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/gdd_styles.css' %}">
+{% endblock %}
+
+{% block title %}Upload GDD - {{ game.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Upload Game Design Document</h1>
+            <h2 class="text-primary">{{ game.title }}</h2>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'games:game_detail' game.id %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Back to Game
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h3 class="card-title mb-0">Upload GDD HTML File</h3>
+                </div>
+                <div class="card-body">
+                    {% if has_gdd %}
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle-fill"></i> A Game Design Document already exists for this game. Uploading a new one will replace the existing content if "Update existing" is checked.
+                    </div>
+                    {% endif %}
+                    
+                    <form method="post" enctype="multipart/form-data" class="gdd-upload-form">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <div class="mt-4">
+                            <button type="submit" class="gdd-upload-btn">
+                                <i class="bi bi-upload"></i> Upload GDD
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h3 class="card-title mb-0">Instructions</h3>
+                </div>
+                <div class="card-body">
+                    <div class="gdd-upload-instructions">
+                        <p>Upload an HTML file containing your Game Design Document. The system will:</p>
+                        <ol>
+                            <li>Extract sections and features from the HTML content</li>
+                            <li>Create tasks for features that don't already exist (if selected)</li>
+                            <li>Link features to existing tasks with matching names</li>
+                        </ol>
+                    </div>
+                    <p class="text-muted mt-3">For best results, ensure your GDD HTML contains feature tables with columns for Feature, Description, Status, and Priority.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
