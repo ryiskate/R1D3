@@ -159,10 +159,27 @@ class GameDesignDocumentDeleteView(LoginRequiredMixin, UserPassesTestMixin, View
         game = get_object_or_404(GameProject, id=game_id)
         
         try:
-            gdd = GameDesignDocument.objects.get(game=game)
-            gdd.delete()
-            messages.success(request, "Game Design Document has been deleted. You can now create a new one.")
+            from django.db import transaction
+            with transaction.atomic():
+                # Get the GDD and all its related objects
+                gdd = GameDesignDocument.objects.get(game=game)
+                
+                # Get all sections
+                sections = gdd.sections.all()
+                
+                # Delete all features first to avoid integrity errors
+                from projects.game_models import GDDFeature
+                for section in sections:
+                    GDDFeature.objects.filter(section=section).delete()
+                
+                # Delete all sections
+                sections.delete()
+                
+                # Finally delete the GDD
+                gdd.delete()
+                
+                messages.success(request, "Game Design Document has been deleted. You can now create a new one.")
         except GameDesignDocument.DoesNotExist:
             messages.info(request, "No Game Design Document exists for this game.")
         
-        return redirect('games:gdd_create', game_id=game_id)
+        return redirect('games:gdd_simple_create', game_id=game_id)

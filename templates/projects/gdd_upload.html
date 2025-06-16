@@ -63,6 +63,29 @@
                         </ol>
                     </div>
                     <p class="text-muted mt-3">For best results, ensure your GDD HTML contains feature tables with columns for Feature, Description, Status, and Priority.</p>
+                    
+                    <div class="alert alert-info mt-4">
+                        <h5><i class="bi bi-lightbulb"></i> Need a template?</h5>
+                        <p>Use our industry-standard GDD template with 13 well-structured sections:</p>
+                        <ol class="small">
+                            <li>Game Overview</li>
+                            <li>Gameplay</li>
+                            <li>Game World</li>
+                            <li>Characters</li>
+                            <li>Narrative</li>
+                            <li>Technical Requirements</li>
+                            <li>Audio Design</li>
+                            <li>User Interface & UX</li>
+                            <li>Art Direction</li>
+                            <li>Monetization</li>
+                            <li>Development & Production</li>
+                            <li>Marketing & Distribution</li>
+                            <li>Appendices</li>
+                        </ol>
+                        <a href="{% url 'games:gdd_create' game.id %}" class="btn btn-sm btn-outline-primary mt-2">
+                            <i class="bi bi-file-earmark-plus"></i> Create GDD with Template
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

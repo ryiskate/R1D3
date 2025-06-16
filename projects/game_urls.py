@@ -5,7 +5,7 @@ from .gdd_views import (GameDesignDocumentEditView, TaskGDDSectionLinkView, Game
 from .gdd_feature_views import (ExtractFeaturesView, GDDFeaturesListView, ConvertFeatureToTaskView, 
                               ConvertAllFeaturesToTasksView, UpdateGDDWithTaskStatusView, task_status_update_callback)
 from .gdd_upload_view import GDDUploadView
-from .gdd_structured_views import GDDStructuredCreateView, GDDStructuredEditView, GDDSectionFeatureView, UpdateFeatureOrderView
+from .gdd_structured_views import GDDStructuredCreateView, GDDStructuredEditView, GDDSectionFeatureView, UpdateFeatureOrderView, GDDSimpleCreateView
 from .debug_views import debug_tasks_view
 from .game_status_view import GameStatusUpdateView
 
@@ -14,6 +14,7 @@ app_name = 'games'
 urlpatterns = [
     # Game Project URLs
     path('', game_views.GameDashboardView.as_view(), name='dashboard'),
+    path('dashboard/', game_views.GameDashboardView.as_view(), name='dashboard_alt'),
     path('list/', game_views.GameProjectListView.as_view(), name='game_list'),
     path('<int:pk>/', game_views.GameProjectDetailView.as_view(), name='game_detail'),
     path('create/', game_views.GameProjectCreateView.as_view(), name='game_create'),
@@ -28,8 +29,8 @@ urlpatterns = [
     path('tasks/<int:task_id>/link-gdd-section/', TaskGDDSectionLinkView.as_view(), name='task_link_gdd_section'),
     path('<int:pk>/gdd/upload/', GDDUploadView.as_view(), name='gdd_upload'),
     
-    # Structured GDD URLs (New user-friendly interface)
-    path('<int:game_id>/gdd/structured/create/', GDDStructuredCreateView.as_view(), name='gdd_structured_create'),
+    # GDD Simple Create URL (User-friendly interface)
+    path('<int:game_id>/gdd/simple/create/', GDDSimpleCreateView.as_view(), name='gdd_simple_create'),
     path('gdd/<int:pk>/structured/edit/', GDDStructuredEditView.as_view(), name='gdd_structured_edit'),
     path('<int:game_id>/gdd/section/<str:section_id>/features/', GDDSectionFeatureView.as_view(), name='gdd_section_features'),
     path('<int:game_id>/gdd/section/<int:section_id>/update-order/', UpdateFeatureOrderView.as_view(), name='update_feature_order'),
@@ -49,6 +50,7 @@ urlpatterns = [
     path('<int:game_id>/assets/<int:asset_id>/update/', game_views.GameAssetUpdateView.as_view(), name='asset_update'),
     
     # Game Task URLs
+    path('tasks/', game_views.GameTaskListView.as_view(), name='all_tasks'),  # All tasks across all games
     path('<int:game_id>/tasks/', game_views.GameTaskListView.as_view(), name='task_list'),
     path('<int:game_id>/tasks/create/', game_views.GameTaskCreateView.as_view(), name='task_create'),
     path('tasks/<int:pk>/', game_views.GameTaskDetailView.as_view(), name='task_detail'),

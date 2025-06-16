@@ -1,0 +1,461 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ game.title }} - Create Game Design Document{% endblock %}
+
+{% block extra_css %}
+<style>
+    .feature-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 2rem;
+    }
+    
+    .feature-table th, .feature-table td {
+        padding: 12px 15px;
+        border: 1px solid #ddd;
+    }
+    
+    .feature-table th {
+        background-color: #f8f9fa;
+        font-weight: bold;
+        text-align: left;
+    }
+    
+    .feature-table tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+    
+    .feature-table tr:hover {
+        background-color: #e9ecef;
+    }
+    
+    .priority-badge {
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        display: inline-block;
+        min-width: 60px;
+        text-align: center;
+    }
+    
+    .priority-critical {
+        background-color: #dc3545;
+        color: white;
+    }
+    
+    .priority-high {
+        background-color: #fd7e14;
+        color: white;
+    }
+    
+    .priority-medium {
+        background-color: #ffc107;
+        color: #212529;
+    }
+    
+    .priority-low {
+        background-color: #6c757d;
+        color: white;
+    }
+    
+    .status-badge {
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        display: inline-block;
+        min-width: 80px;
+        text-align: center;
+    }
+    
+    .status-backlog {
+        background-color: #6c757d;
+        color: white;
+    }
+    
+    .status-to_do {
+        background-color: #17a2b8;
+        color: white;
+    }
+    
+    .status-in_progress {
+        background-color: #007bff;
+        color: white;
+    }
+    
+    .status-in_review {
+        background-color: #6f42c1;
+        color: white;
+    }
+    
+    .status-done {
+        background-color: #28a745;
+        color: white;
+    }
+    
+    .section-header {
+        border-bottom: 2px solid #e9ecef;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0">Create Game Design Document</h3>
+                    <a href="{% url 'games:game_detail' game.id %}" class="btn btn-outline-secondary">Back to Game</a>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="section-header">
+                            <h4>Game Information</h4>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label for="gdd-title" class="form-label">GDD Title</label>
+                                    <input type="text" class="form-control" id="gdd-title" name="title" value="{{ game.title }} - Game Design Document">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="game-description" class="form-label">Game Description</label>
+                                    <textarea class="form-control" id="game-description" name="description" rows="3" placeholder="A brief description of your game concept">{{ game.description }}</textarea>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card h-100">
+                                    <div class="card-body text-center d-flex flex-column justify-content-center">
+                                        <h5 class="card-title">{{ game.title }}</h5>
+                                        <p class="card-text text-muted">{{ game.genre }}</p>
+                                        <p class="card-text"><small class="text-muted">Created by: {{ game.lead_developer }}</small></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="section-header">
+                            <h4>Game Overview</h4>
+                        </div>
+                        
+                        <table class="feature-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 20%">Feature</th>
+                                    <th style="width: 40%">Description</th>
+                                    <th style="width: 10%">Priority</th>
+                                    <th style="width: 10%">Status</th>
+                                    <th style="width: 20%">Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm" name="high_concept_name" value="High Concept" placeholder="Feature name">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm" name="high_concept" placeholder="A brief, one or two sentence description of the game">
+                                    </td>
+                                    <td>
+                                        <select class="form-select form-select-sm" name="high_concept_priority">
+                                            <option value="critical" selected>Critical</option>
+                                            <option value="high">High</option>
+                                            <option value="medium">Medium</option>
+                                            <option value="low">Low</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select class="form-select form-select-sm" name="high_concept_status">
+                                            <option value="backlog" selected>Backlog</option>
+                                            <option value="to_do">To Do</option>
+                                            <option value="in_progress">In Progress</option>
+                                            <option value="in_review">In Review</option>
+                                            <option value="done">Done</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm" name="high_concept_notes" placeholder="Additional notes">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm" name="target_audience_name" value="Target Audience" placeholder="Feature name">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm" name="target_audience" placeholder="The types of players the game is designed for">
+                                    </td>
+                                    <td>
+                                        <select class="form-select form-select-sm" name="target_audience_priority">
+                                            <option value="critical">Critical</option>
+                                            <option value="high">High</option>
+                                            <option value="medium" selected>Medium</option>
+                                            <option value="low">Low</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select class="form-select form-select-sm" name="target_audience_status">
+                                            <option value="backlog">Backlog</option>
+                                            <option value="to_do" selected>To Do</option>
+                                            <option value="in_progress">In Progress</option>
+                                            <option value="in_review">In Review</option>
+                                            <option value="done">Done</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm" name="target_audience_notes" placeholder="Additional notes">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm" name="unique_selling_points_name" value="Unique Selling Points" placeholder="Feature name">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm" name="unique_selling_points" placeholder="What makes this game unique compared to others">
+                                    </td>
+                                    <td>
+                                        <select class="form-select form-select-sm" name="unique_selling_points_priority">
+                                            <option value="critical">Critical</option>
+                                            <option value="high" selected>High</option>
+                                            <option value="medium">Medium</option>
+                                            <option value="low">Low</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select class="form-select form-select-sm" name="unique_selling_points_status">
+                                            <option value="backlog">Backlog</option>
+                                            <option value="to_do">To Do</option>
+                                            <option value="in_progress" selected>In Progress</option>
+                                            <option value="in_review">In Review</option>
+                                            <option value="done">Done</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm" name="unique_selling_points_notes" placeholder="Additional notes">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="d-flex justify-content-start mt-1 mb-2">
+                            <button type="button" class="btn btn-outline-primary btn-sm" id="add-feature-btn">
+                                <i class="bi bi-plus-circle"></i> Add Feature
+                            </button>
+                        </div>
+                        
+                        <div class="mb-2">
+                            <input type="text" class="form-control" id="section-title" name="section_title" placeholder="Section Title (e.g., Game Mechanics, Art Style, etc.)">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <textarea class="form-control" id="additional-notes" name="additional_notes" rows="3" placeholder="Additional notes about the Game Design Document..."></textarea>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <div class="bullet-points">
+                                <div class="d-flex align-items-center mb-2">
+                                    <span class="me-2">•</span>
+                                    <input type="text" class="form-control form-control-sm" name="bullet_point_1" placeholder="Key point 1">
+                                </div>
+                                <div class="d-flex align-items-center mb-2">
+                                    <span class="me-2">•</span>
+                                    <input type="text" class="form-control form-control-sm" name="bullet_point_2" placeholder="Key point 2">
+                                </div>
+                                <div class="d-flex align-items-center mb-2">
+                                    <span class="me-2">•</span>
+                                    <input type="text" class="form-control form-control-sm" name="bullet_point_3" placeholder="Key point 3">
+                                </div>
+                                <div class="d-flex justify-content-start mt-1">
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" id="add-bullet-btn">
+                                        <i class="bi bi-plus-circle"></i> Add Bullet
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 d-flex justify-content-between">
+                            <a href="{% url 'games:game_detail' game.id %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> Create GDD
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    // Wait for the DOM to be fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get references to the buttons and containers
+        const addFeatureBtn = document.getElementById('add-feature-btn');
+        const addBulletBtn = document.getElementById('add-bullet-btn');
+        const featuresTable = document.querySelector('.feature-table tbody');
+        const bulletPointsContainer = document.querySelector('.bullet-points');
+        let featureCounter = 1;
+        let bulletCounter = 4; // Start from 4 since we already have 3 bullet points
+        
+        // Remove any existing event listeners to prevent duplicates
+        const newAddFeatureBtn = addFeatureBtn.cloneNode(true);
+        addFeatureBtn.parentNode.replaceChild(newAddFeatureBtn, addFeatureBtn);
+        
+        const newAddBulletBtn = addBulletBtn.cloneNode(true);
+        addBulletBtn.parentNode.replaceChild(newAddBulletBtn, addBulletBtn);
+        
+        // Add the event listener to the new bullet button
+        newAddBulletBtn.addEventListener('click', function(event) {
+            // Prevent any default actions or event bubbling
+            event.preventDefault();
+            event.stopPropagation();
+            
+            // Get the last bullet point container (the one with the add button)
+            const lastBulletContainer = bulletPointsContainer.lastElementChild;
+            
+            // Create a new bullet point
+            const newBulletContainer = document.createElement('div');
+            newBulletContainer.className = 'd-flex align-items-center mb-2';
+            
+            // Create the bullet symbol
+            const bulletSymbol = document.createElement('span');
+            bulletSymbol.className = 'me-2';
+            bulletSymbol.textContent = '•';
+            
+            // Create the input field
+            const bulletInput = document.createElement('input');
+            bulletInput.type = 'text';
+            bulletInput.className = 'form-control form-control-sm';
+            bulletInput.name = `bullet_point_${bulletCounter}`;
+            bulletInput.placeholder = `Key point ${bulletCounter}`;
+            
+            // Increment the counter for the next bullet
+            bulletCounter++;
+            
+            // Add the elements to the container
+            newBulletContainer.appendChild(bulletSymbol);
+            newBulletContainer.appendChild(bulletInput);
+            
+            // Insert the new bullet point before the button container
+            bulletPointsContainer.insertBefore(newBulletContainer, lastBulletContainer);
+            
+            // Focus on the new input
+            bulletInput.focus();
+        });
+        
+        // Add the event listener to the new feature button
+        newAddFeatureBtn.addEventListener('click', function(event) {
+            // Prevent any default actions or event bubbling
+            event.preventDefault();
+            event.stopPropagation();
+            // Create a new row
+            const newRow = document.createElement('tr');
+            
+            // Generate a unique ID for the new feature
+            const featureId = `custom_feature_${featureCounter}`;
+            featureCounter++;
+            
+            // Create the feature name cell
+            const nameCell = document.createElement('td');
+            const nameInput = document.createElement('input');
+            nameInput.type = 'text';
+            nameInput.className = 'form-control form-control-sm';
+            nameInput.name = `${featureId}_name`;
+            nameInput.placeholder = 'Feature name';
+            nameInput.value = 'New Feature';
+            nameCell.appendChild(nameInput);
+            
+            // Create the description cell
+            const descCell = document.createElement('td');
+            const descInput = document.createElement('input');
+            descInput.type = 'text';
+            descInput.className = 'form-control form-control-sm';
+            descInput.name = featureId;
+            descInput.placeholder = 'Feature description';
+            descCell.appendChild(descInput);
+            
+            // Create the priority cell
+            const priorityCell = document.createElement('td');
+            const prioritySelect = document.createElement('select');
+            prioritySelect.className = 'form-select form-select-sm';
+            prioritySelect.name = `${featureId}_priority`;
+            
+            const priorities = [
+                { value: 'critical', text: 'Critical' },
+                { value: 'high', text: 'High' },
+                { value: 'medium', text: 'Medium', selected: true },
+                { value: 'low', text: 'Low' }
+            ];
+            
+            priorities.forEach(priority => {
+                const option = document.createElement('option');
+                option.value = priority.value;
+                option.textContent = priority.text;
+                if (priority.selected) {
+                    option.selected = true;
+                }
+                prioritySelect.appendChild(option);
+            });
+            
+            priorityCell.appendChild(prioritySelect);
+            
+            // Create the status cell
+            const statusCell = document.createElement('td');
+            const statusSelect = document.createElement('select');
+            statusSelect.className = 'form-select form-select-sm';
+            statusSelect.name = `${featureId}_status`;
+            
+            const statuses = [
+                { value: 'backlog', text: 'Backlog', selected: true },
+                { value: 'to_do', text: 'To Do' },
+                { value: 'in_progress', text: 'In Progress' },
+                { value: 'in_review', text: 'In Review' },
+                { value: 'done', text: 'Done' }
+            ];
+            
+            statuses.forEach(status => {
+                const option = document.createElement('option');
+                option.value = status.value;
+                option.textContent = status.text;
+                if (status.selected) {
+                    option.selected = true;
+                }
+                statusSelect.appendChild(option);
+            });
+            
+            statusCell.appendChild(statusSelect);
+            
+            // Create the notes cell
+            const notesCell = document.createElement('td');
+            const notesInput = document.createElement('input');
+            notesInput.type = 'text';
+            notesInput.className = 'form-control form-control-sm';
+            notesInput.name = `${featureId}_notes`;
+            notesInput.placeholder = 'Additional notes';
+            notesCell.appendChild(notesInput);
+            
+            // Add all cells to the row
+            newRow.appendChild(nameCell);
+            newRow.appendChild(descCell);
+            newRow.appendChild(priorityCell);
+            newRow.appendChild(statusCell);
+            newRow.appendChild(notesCell);
+            
+            // Add the row to the table
+            featuresTable.appendChild(newRow);
+            
+            // Focus on the new feature name input
+            nameInput.focus();
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}

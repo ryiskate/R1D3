@@ -32,8 +32,33 @@ document.addEventListener('DOMContentLoaded', function() {
     try {
         const gddData = document.getElementById('gdd-data');
         if (gddData) {
-            const sectionsJson = JSON.parse(gddData.getAttribute('data-sections') || '[]');
-            const sectionsWithTasksJson = JSON.parse(gddData.getAttribute('data-sections-with-tasks') || '{}');
+            // Debug raw data attributes before parsing
+            const rawSectionsData = gddData.getAttribute('data-sections');
+            const rawSectionsWithTasksData = gddData.getAttribute('data-sections-with-tasks');
+            
+            console.log('Raw sections data:', rawSectionsData);
+            console.log('Raw sections with tasks data:', rawSectionsWithTasksData);
+            
+            // Safely parse JSON with better error handling
+            let sectionsJson = [];
+            try {
+                sectionsJson = JSON.parse(rawSectionsData || '[]');
+            } catch (parseError) {
+                console.error('Error parsing sections JSON:', parseError);
+                console.log('Invalid JSON content:', rawSectionsData);
+                // Provide a fallback
+                sectionsJson = [];
+            }
+            
+            let sectionsWithTasksJson = {};
+            try {
+                sectionsWithTasksJson = JSON.parse(rawSectionsWithTasksData || '{}');
+            } catch (parseError) {
+                console.error('Error parsing sections with tasks JSON:', parseError);
+                console.log('Invalid JSON content:', rawSectionsWithTasksData);
+                // Provide a fallback
+                sectionsWithTasksJson = {};
+            }
             
             console.log(`Sections JSON: ${sectionsJson.length} sections found`);
             console.log(`Sections with tasks JSON: ${Object.keys(sectionsWithTasksJson).length} sections with tasks found`);
@@ -46,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('GDD data container not found');
         }
     } catch (error) {
-        console.error('Error parsing JSON data:', error);
+        console.error('Error in GDD data processing:', error);
     }
     
     // Check if Bootstrap is properly loaded

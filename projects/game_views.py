@@ -725,17 +725,20 @@ class GameDesignDocumentView(LoginRequiredMixin, DetailView):
             'title': section.title,
             'section_id': section.section_id
         } for section in self.object.sections.all()]
-        context['sections_json'] = json.dumps(sections_json)
+        context['sections_json'] = json.dumps(sections_json, ensure_ascii=False)
         
         sections_with_tasks_json = {}
         for section_id, tasks in sections_with_tasks.items():
-            sections_with_tasks_json[section_id] = [{
+            # Convert section_id to string to ensure it's a valid JSON key
+            str_section_id = str(section_id)
+            sections_with_tasks_json[str_section_id] = [{
                 'id': task.id,
                 'title': task.title,
                 'status_display': task.get_status_display()
             } for task in tasks]
         
-        context['sections_with_tasks_json'] = json.dumps(sections_with_tasks_json)
+        # Use ensure_ascii=False to handle non-ASCII characters properly
+        context['sections_with_tasks_json'] = json.dumps(sections_with_tasks_json, ensure_ascii=False)
         
         # Return the context
         return context

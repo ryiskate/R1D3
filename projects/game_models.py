@@ -172,6 +172,15 @@ class GDDFeature(TimeStampedModel):
     feature_name = models.CharField(max_length=100)
     description = models.TextField()
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='medium')
+    status = models.CharField(max_length=20, default='backlog', 
+                           choices=(
+                               ('backlog', 'Backlog'),
+                               ('to_do', 'To Do'),
+                               ('in_progress', 'In Progress'),
+                               ('in_review', 'In Review'),
+                               ('done', 'Done'),
+                           ))
+    notes = models.TextField(blank=True, null=True, help_text="Additional notes about this feature")
     task = models.OneToOneField('GameTask', on_delete=models.SET_NULL, null=True, blank=True, related_name='gdd_feature')
     order = models.PositiveIntegerField(default=0, help_text="Order of this feature within its section/subsection")
     

@@ -12,7 +12,7 @@ urlpatterns = [
     path('', include('core.urls')),
     path('strategy/', include('strategy.urls')),
     path('projects/', include('projects.urls')),
-    path('games/', include('projects.game_urls', namespace='games')),
+    path('games/', include('projects.game_urls')),
     # Department URLs
     path('education/', include('education.urls', namespace='education')),
     path('social-media/', include('social_media.urls', namespace='social_media')),

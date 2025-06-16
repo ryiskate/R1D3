@@ -1,0 +1,463 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ game.title }} - Create Structured GDD{% endblock %}
+
+{% block extra_css %}
+<style>
+    .feature-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 2rem;
+    }
+    
+    .feature-table th, .feature-table td {
+        padding: 12px 15px;
+        border: 1px solid #ddd;
+    }
+    
+    .feature-table th {
+        background-color: #f8f9fa;
+        font-weight: bold;
+        text-align: left;
+    }
+    
+    .feature-table tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+    
+    .feature-table tr:hover {
+        background-color: #e9ecef;
+    }
+    
+    .section-card {
+        margin-bottom: 2rem;
+        border: 1px solid #ddd;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    
+    .section-card .card-header {
+        background-color: #f8f9fa;
+        padding: 15px 20px;
+        border-bottom: 1px solid #ddd;
+    }
+    
+    .section-number {
+        display: inline-block;
+        width: 32px;
+        height: 32px;
+        line-height: 32px;
+        text-align: center;
+        color: white;
+        border-radius: 50%;
+        margin-right: 10px;
+        font-weight: bold;
+        background-color: #3498db;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0">Create Structured GDD for {{ game.title }}</h3>
+                    <a href="{% url 'games:game_detail' game.id %}" class="btn btn-outline-secondary">Back to Game</a>
+                </div>
+                <div class="card-body">
+
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-4">
+                            <label for="gdd-title" class="form-label">GDD Title</label>
+                            <input type="text" class="form-control" id="gdd-title" name="high_concept" value="{{ game.title }} - Game Design Document">
+                        </div>
+                        
+                        <div class="section-card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">
+                                    <span class="section-number">1</span> Game Overview
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <p>Provide a high-level overview of your game concept, target audience, and unique selling points.</p>
+                                
+                                <table class="feature-table">
+                                    <thead>
+                                        <tr>
+                                            <th width="20%">Feature</th>
+                                            <th width="50%">Description</th>
+                                            <th width="15%">Priority</th>
+                                            <th width="15%">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <input type="text" name="high_concept_name" class="form-control" value="High Concept">
+                                            </td>
+                                            <td>
+                                                <textarea name="high_concept" class="form-control" rows="2" placeholder="A brief, one or two sentence description of the game."></textarea>
+                                            </td>
+                                            <td>
+                                                <select name="high_concept_priority" class="form-select">
+                                                    <option value="critical" selected>Critical</option>
+                                                    <option value="high">High</option>
+                                                    <option value="medium">Medium</option>
+                                                    <option value="low">Low</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <select name="high_concept_status" class="form-select">
+                                                    <option value="backlog" selected>Backlog</option>
+                                                    <option value="to_do">To Do</option>
+                                                    <option value="in_progress">In Progress</option>
+                                                    <option value="in_review">In Review</option>
+                                                    <option value="done">Done</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="text" name="target_audience_name" class="form-control" value="Target Audience">
+                                            </td>
+                                            <td>
+                                                <textarea name="target_audience" class="form-control" rows="2" placeholder="The types of players the game is designed for."></textarea>
+                                            </td>
+                                            <td>
+                                                <select name="target_audience_priority" class="form-select">
+                                                    <option value="critical">Critical</option>
+                                                    <option value="high">High</option>
+                                                    <option value="medium" selected>Medium</option>
+                                                    <option value="low">Low</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <select name="target_audience_status" class="form-select">
+                                                    <option value="backlog" selected>Backlog</option>
+                                                    <option value="to_do">To Do</option>
+                                                    <option value="in_progress">In Progress</option>
+                                                    <option value="in_review">In Review</option>
+                                                    <option value="done">Done</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="text" name="unique_selling_points_name" class="form-control" value="Unique Selling Points">
+                                            </td>
+                                            <td>
+                                                <textarea name="unique_selling_points" class="form-control" rows="2" placeholder="What makes this game unique compared to others."></textarea>
+                                            </td>
+                                            <td>
+                                                <select name="unique_selling_points_priority" class="form-select">
+                                                    <option value="critical">Critical</option>
+                                                    <option value="high" selected>High</option>
+                                                    <option value="medium">Medium</option>
+                                                    <option value="low">Low</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <select name="unique_selling_points_status" class="form-select">
+                                                    <option value="backlog" selected>Backlog</option>
+                                                    <option value="to_do">To Do</option>
+                                                    <option value="in_progress">In Progress</option>
+                                                    <option value="in_review">In Review</option>
+                                                    <option value="done">Done</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <div class="section-card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">
+                                    <span class="section-number">2</span> Gameplay
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <p>Describe the core mechanics, controls, progression systems, and game economy.</p>
+                                
+                                <table class="feature-table">
+                                    <thead>
+                                        <tr>
+                                            <th width="20%">Feature</th>
+                                            <th width="50%">Description</th>
+                                            <th width="15%">Priority</th>
+                                            <th width="15%">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <input type="text" name="core_mechanics_name" class="form-control" value="Core Mechanics">
+                                            </td>
+                                            <td>
+                                                <textarea name="core_mechanics" class="form-control" rows="2" placeholder="The primary gameplay mechanics that define the experience."></textarea>
+                                            </td>
+                                            <td>
+                                                <select name="core_mechanics_priority" class="form-select">
+                                                    <option value="critical" selected>Critical</option>
+                                                    <option value="high">High</option>
+                                                    <option value="medium">Medium</option>
+                                                    <option value="low">Low</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <select name="core_mechanics_status" class="form-select">
+                                                    <option value="backlog" selected>Backlog</option>
+                                                    <option value="to_do">To Do</option>
+                                                    <option value="in_progress">In Progress</option>
+                                                    <option value="in_review">In Review</option>
+                                                    <option value="done">Done</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="text" name="controls_name" class="form-control" value="Controls">
+                                            </td>
+                                            <td>
+                                                <textarea name="controls" class="form-control" rows="2" placeholder="How the player interacts with the game."></textarea>
+                                            </td>
+                                            <td>
+                                                <select name="controls_priority" class="form-select">
+                                                    <option value="critical">Critical</option>
+                                                    <option value="high" selected>High</option>
+                                                    <option value="medium">Medium</option>
+                                                    <option value="low">Low</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <select name="controls_status" class="form-select">
+                                                    <option value="backlog" selected>Backlog</option>
+                                                    <option value="to_do">To Do</option>
+                                                    <option value="in_progress">In Progress</option>
+                                                    <option value="in_review">In Review</option>
+                                                    <option value="done">Done</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="text" name="progression_name" class="form-control" value="Progression Systems">
+                                            </td>
+                                            <td>
+                                                <textarea name="progression" class="form-control" rows="2" placeholder="How the player advances through the game."></textarea>
+                                            </td>
+                                            <td>
+                                                <select name="progression_priority" class="form-select">
+                                                    <option value="critical">Critical</option>
+                                                    <option value="high">High</option>
+                                                    <option value="medium" selected>Medium</option>
+                                                    <option value="low">Low</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <select name="progression_status" class="form-select">
+                                                    <option value="backlog" selected>Backlog</option>
+                                                    <option value="to_do">To Do</option>
+                                                    <option value="in_progress">In Progress</option>
+                                                    <option value="in_review">In Review</option>
+                                                    <option value="done">Done</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <div class="section-card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">
+                                    <span class="section-number">3</span> Game World
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <p>Describe the world overview, environments, level design, and world interaction.</p>
+                                
+                                <table class="feature-table">
+                                    <thead>
+                                        <tr>
+                                            <th width="20%">Feature</th>
+                                            <th width="50%">Description</th>
+                                            <th width="15%">Priority</th>
+                                            <th width="15%">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <input type="text" name="world_overview_name" class="form-control" value="World Overview">
+                                            </td>
+                                            <td>
+                                                <textarea name="world_overview" class="form-control" rows="2" placeholder="The setting and general atmosphere of the game world."></textarea>
+                                            </td>
+                                            <td>
+                                                <select name="world_overview_priority" class="form-select">
+                                                    <option value="critical">Critical</option>
+                                                    <option value="high" selected>High</option>
+                                                    <option value="medium">Medium</option>
+                                                    <option value="low">Low</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <select name="world_overview_status" class="form-select">
+                                                    <option value="backlog" selected>Backlog</option>
+                                                    <option value="to_do">To Do</option>
+                                                    <option value="in_progress">In Progress</option>
+                                                    <option value="in_review">In Review</option>
+                                                    <option value="done">Done</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="text" name="environments_name" class="form-control" value="Environments">
+                                            </td>
+                                            <td>
+                                                <textarea name="environments" class="form-control" rows="2" placeholder="The different locations and areas in the game."></textarea>
+                                            </td>
+                                            <td>
+                                                <select name="environments_priority" class="form-select">
+                                                    <option value="critical">Critical</option>
+                                                    <option value="high">High</option>
+                                                    <option value="medium" selected>Medium</option>
+                                                    <option value="low">Low</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <select name="environments_status" class="form-select">
+                                                    <option value="backlog" selected>Backlog</option>
+                                                    <option value="to_do">To Do</option>
+                                                    <option value="in_progress">In Progress</option>
+                                                    <option value="in_review">In Review</option>
+                                                    <option value="done">Done</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="text" name="level_design_name" class="form-control" value="Level Design">
+                                            </td>
+                                            <td>
+                                                <textarea name="level_design" class="form-control" rows="2" placeholder="How levels are structured and what they contain."></textarea>
+                                            </td>
+                                            <td>
+                                                <select name="level_design_priority" class="form-select">
+                                                    <option value="critical">Critical</option>
+                                                    <option value="high" selected>High</option>
+                                                    <option value="medium">Medium</option>
+                                                    <option value="low">Low</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <select name="level_design_status" class="form-select">
+                                                    <option value="backlog" selected>Backlog</option>
+                                                    <option value="to_do">To Do</option>
+                                                    <option value="in_progress">In Progress</option>
+                                                    <option value="in_review">In Review</option>
+                                                    <option value="done">Done</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <!-- Characters Section -->
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">Characters</h6>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Feature Name</th>
+                                            <th>Description</th>
+                                            <th>Priority</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <input type="text" name="player_characters_name" class="form-control" value="Player Characters">
+                                            </td>
+                                            <td>
+                                                <textarea name="player_characters" class="form-control" rows="2" placeholder="Description of playable characters, their abilities, and progression."></textarea>
+                                            </td>
+                                            <td>
+                                                <select name="player_characters_priority" class="form-select">
+                                                    <option value="critical">Critical</option>
+                                                    <option value="high" selected>High</option>
+                                                    <option value="medium">Medium</option>
+                                                    <option value="low">Low</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <select name="player_characters_status" class="form-select">
+                                                    <option value="backlog" selected>Backlog</option>
+                                                    <option value="to_do">To Do</option>
+                                                    <option value="in_progress">In Progress</option>
+                                                    <option value="in_review">In Review</option>
+                                                    <option value="done">Done</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="text" name="npcs_name" class="form-control" value="NPCs">
+                                            </td>
+                                            <td>
+                                                <textarea name="npcs" class="form-control" rows="2" placeholder="Non-player characters and their roles in the game."></textarea>
+                                            </td>
+                                            <td>
+                                                <select name="npcs_priority" class="form-select">
+                                                    <option value="critical">Critical</option>
+                                                    <option value="high">High</option>
+                                                    <option value="medium" selected>Medium</option>
+                                                    <option value="low">Low</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <select name="npcs_status" class="form-select">
+                                                    <option value="backlog" selected>Backlog</option>
+                                                    <option value="to_do">To Do</option>
+                                                    <option value="in_progress">In Progress</option>
+                                                    <option value="in_review">In Review</option>
+                                                    <option value="done">Done</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 d-flex justify-content-between">
+                            <a href="{% url 'games:game_detail' game.id %}" class="btn btn-outline-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> Create GDD
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
