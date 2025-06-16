@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Education Schedule | R1D3{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-4 text-gray-800">Education Schedule</h1>
+    
+    <!-- Schedule Calendar Section -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 font-weight-bold text-primary">Class Schedule</h6>
+            <div class="dropdown no-arrow">
+                <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                    <div class="dropdown-header">Schedule Actions:</div>
+                    <a class="dropdown-item" href="#"><i class="fas fa-plus fa-sm fa-fw mr-2 text-gray-400"></i>Add New Event</a>
+                    <a class="dropdown-item" href="#"><i class="fas fa-print fa-sm fa-fw mr-2 text-gray-400"></i>Print Schedule</a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div id="calendar"></div>
+        </div>
+    </div>
+    
+    <!-- Upcoming Classes Section -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Upcoming Classes</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="upcomingClassesTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Class</th>
+                            <th>Instructor</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Location</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Game Design Fundamentals</td>
+                            <td>John Smith</td>
+                            <td>June 17, 2025</td>
+                            <td>10:00 - 12:00</td>
+                            <td>Room 101</td>
+                            <td><span class="badge bg-success">Confirmed</span></td>
+                        </tr>
+                        <tr>
+                            <td>Unity Game Development</td>
+                            <td>Jane Doe</td>
+                            <td>June 17, 2025</td>
+                            <td>14:00 - 16:00</td>
+                            <td>Computer Lab 3</td>
+                            <td><span class="badge bg-success">Confirmed</span></td>
+                        </tr>
+                        <tr>
+                            <td>3D Modeling for Games</td>
+                            <td>Robert Johnson</td>
+                            <td>June 18, 2025</td>
+                            <td>13:00 - 15:00</td>
+                            <td>Design Studio</td>
+                            <td><span class="badge bg-success">Confirmed</span></td>
+                        </tr>
+                        <tr>
+                            <td>Game Art and Animation</td>
+                            <td>Sarah Williams</td>
+                            <td>June 18, 2025</td>
+                            <td>09:00 - 11:00</td>
+                            <td>Art Lab</td>
+                            <td><span class="badge bg-success">Confirmed</span></td>
+                        </tr>
+                        <tr>
+                            <td>Game Audio Design</td>
+                            <td>Michael Brown</td>
+                            <td>June 20, 2025</td>
+                            <td>10:00 - 12:00</td>
+                            <td>Sound Studio</td>
+                            <td><span class="badge bg-warning">Tentative</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        $('#upcomingClassesTable').DataTable();
+        
+        // Calendar initialization would go here
+        // This is a placeholder for actual calendar implementation
+        // which would require a calendar library like FullCalendar
+        $('#calendar').html('<div class="alert alert-info">Calendar view will be implemented here using a JavaScript calendar library.</div>');
+    });
+</script>
+{% endblock %}

@@ -41,6 +41,11 @@ INSTALLED_APPS = [
     'core.apps.CoreConfig',
     'strategy.apps.StrategyConfig',
     'projects.apps.ProjectsConfig',
+    # Department apps
+    'education.apps.EducationConfig',
+    'social_media.apps.SocialMediaConfig',
+    'arcade.apps.ArcadeConfig',
+    'theme_park.apps.ThemeParkConfig',
     # Apps to be implemented later
     # 'resources.apps.ResourcesConfig',
     # 'docs.apps.DocsConfig',

@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Education Classes | R1D3{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-4 text-gray-800">Education Classes</h1>
+    
+    <!-- Classes List Section -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 font-weight-bold text-primary">Current Classes</h6>
+            <div class="dropdown no-arrow">
+                <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                    <div class="dropdown-header">Class Actions:</div>
+                    <a class="dropdown-item" href="#"><i class="fas fa-plus fa-sm fa-fw mr-2 text-gray-400"></i>Add New Class</a>
+                    <a class="dropdown-item" href="#"><i class="fas fa-filter fa-sm fa-fw mr-2 text-gray-400"></i>Filter Classes</a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="classesTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Class ID</th>
+                            <th>Class Name</th>
+                            <th>Instructor</th>
+                            <th>Schedule</th>
+                            <th>Students</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>EDU-C001</td>
+                            <td>Game Design Fundamentals</td>
+                            <td>John Smith</td>
+                            <td>Mon/Wed 10:00-12:00</td>
+                            <td>24</td>
+                            <td><span class="badge bg-success">Active</span></td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>EDU-C002</td>
+                            <td>Unity Game Development</td>
+                            <td>Jane Doe</td>
+                            <td>Tue/Thu 14:00-16:00</td>
+                            <td>18</td>
+                            <td><span class="badge bg-success">Active</span></td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>EDU-C003</td>
+                            <td>3D Modeling for Games</td>
+                            <td>Robert Johnson</td>
+                            <td>Mon/Fri 13:00-15:00</td>
+                            <td>15</td>
+                            <td><span class="badge bg-success">Active</span></td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>EDU-C004</td>
+                            <td>Game Art and Animation</td>
+                            <td>Sarah Williams</td>
+                            <td>Wed/Fri 09:00-11:00</td>
+                            <td>20</td>
+                            <td><span class="badge bg-success">Active</span></td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>EDU-C005</td>
+                            <td>Game Audio Design</td>
+                            <td>Michael Brown</td>
+                            <td>Tue/Thu 10:00-12:00</td>
+                            <td>12</td>
+                            <td><span class="badge bg-warning">Upcoming</span></td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        $('#classesTable').DataTable();
+    });
+</script>
+{% endblock %}

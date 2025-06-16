@@ -1,0 +1,92 @@
+{% load gdd_extras %}
+
+{{ feature_formset.management_form }}
+
+{% if feature_formset %}
+    <table class="table table-sm table-hover feature-table mb-0">
+        <thead class="table-light">
+            <tr>
+                <th style="width: 30px;"><i class="bi bi-grip-vertical" data-toggle="tooltip" title="Drag to reorder"></i></th>
+                <th>Feature</th>
+                <th>Description</th>
+                <th>Priority</th>
+                <th>Status</th>
+                <th>Task ID</th>
+                <th>Assigned To</th>
+                <th>Due Date</th>
+                <th class="text-center">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for feature_form in feature_formset %}
+                <tr class="feature-row">
+                    <td class="feature-drag-handle text-center" style="cursor: move;" title="Drag to reorder">
+                        <i class="bi bi-grip-vertical"></i>
+                        {{ feature_form.id }}
+                        <input type="hidden" name="{{ feature_form.prefix }}-{{ forloop.counter0 }}-order" value="{{ forloop.counter0 }}">
+                        {% if feature_form.instance.subsection_id %}
+                            <input type="hidden" name="{{ feature_form.prefix }}-{{ forloop.counter0 }}-subsection_id" value="{{ feature_form.instance.subsection_id }}">
+                        {% elif subsection_id %}
+                            <input type="hidden" name="{{ feature_form.prefix }}-{{ forloop.counter0 }}-subsection_id" value="{{ subsection_id }}">
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ feature_form.feature_name }}
+                    </td>
+                    <td>{{ feature_form.description }}</td>
+                    <td>
+                        {{ feature_form.priority }}
+                        {% if feature_form.instance.priority %}
+                            <div class="mt-1">
+                                <span class="badge rounded-pill {% if feature_form.instance.priority == 'critical' %}bg-danger{% elif feature_form.instance.priority == 'high' %}bg-warning text-dark{% elif feature_form.instance.priority == 'medium' %}bg-info text-dark{% else %}bg-secondary{% endif %}">
+                                    {% if feature_form.instance.priority == 'critical' %}<i class="bi bi-exclamation-triangle-fill me-1"></i>{% endif %}
+                                    {{ feature_form.instance.priority|title }}
+                                </span>
+                            </div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ feature_form.status }}
+                        {% if feature_form.instance.status %}
+                            <div class="mt-1">
+                                <span class="badge rounded-pill {% if feature_form.instance.status == 'to_do' %}bg-secondary{% elif feature_form.instance.status == 'backlog' %}bg-light text-dark border{% elif feature_form.instance.status == 'in_progress' %}bg-primary{% elif feature_form.instance.status == 'in_review' %}bg-info text-dark{% elif feature_form.instance.status == 'done' %}bg-success{% else %}bg-light text-dark{% endif %}">
+                                    {% if feature_form.instance.status == 'in_progress' %}<i class="bi bi-hourglass-split me-1"></i>
+                                    {% elif feature_form.instance.status == 'done' %}<i class="bi bi-check-circle-fill me-1"></i>
+                                    {% elif feature_form.instance.status == 'in_review' %}<i class="bi bi-eye me-1"></i>
+                                    {% endif %}
+                                    {{ feature_form.instance.status|format_status }}
+                                </span>
+                            </div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ feature_form.task_id }}
+                        {% if feature_form.instance.task_id %}
+                            <a href="{% url 'games:task_detail' game_id feature_form.instance.task_id %}" class="ms-2" target="_blank" title="View Task">
+                                <i class="bi bi-link-45deg"></i>
+                            </a>
+                        {% endif %}
+                    </td>
+                    <td>{{ feature_form.assigned_to }}</td>
+                    <td>{{ feature_form.due_date }}</td>
+                    <td class="text-center">
+                        {{ feature_form.DELETE }}
+                        <button type="button" class="btn btn-sm btn-outline-danger delete-feature-btn" title="Delete Feature">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <div class="alert alert-light mb-0">
+        <i class="bi bi-info-circle"></i> No features added yet. Click the button below to add your first feature.
+    </div>
+{% endif %}
+
+<div class="mt-2">
+    <button type="button" class="btn btn-sm btn-outline-primary add-feature-btn" data-section-id="{{ section_id }}" {% if subsection_id %}data-subsection-id="{{ subsection_id }}"{% endif %}>
+        <i class="bi bi-plus"></i> Add Feature
+    </button>
+</div>

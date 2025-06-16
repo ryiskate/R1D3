@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Social Media Dashboard | R1D3{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-4 text-gray-800">Social Media Dashboard</h1>
+    
+    <div class="row">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Followers</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">125,430</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Engagement Rate</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">4.8%</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-heart fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Scheduled Posts
+                            </div>
+                            <div class="row no-gutters align-items-center">
+                                <div class="col-auto">
+                                    <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">12</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Pending Tasks</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">15</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-tasks fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Social Media Tasks Section -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 font-weight-bold text-primary">Social Media Tasks</h6>
+            <div class="dropdown no-arrow">
+                <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                    <div class="dropdown-header">Task Actions:</div>
+                    <a class="dropdown-item" href="#"><i class="fas fa-plus fa-sm fa-fw mr-2 text-gray-400"></i>Add New Task</a>
+                    <a class="dropdown-item" href="#"><i class="fas fa-filter fa-sm fa-fw mr-2 text-gray-400"></i>Filter Tasks</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="#"><i class="fas fa-file-export fa-sm fa-fw mr-2 text-gray-400"></i>Export Tasks</a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="socialMediaTasksTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Task ID</th>
+                            <th>Task Name</th>
+                            <th>Description</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>Assigned To</th>
+                            <th>Due Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>SM-001</td>
+                            <td>Create Game Launch Campaign</td>
+                            <td>Develop social media campaign for upcoming game launch</td>
+                            <td><span class="badge bg-danger">Critical</span></td>
+                            <td><span class="badge bg-warning">In Progress</span></td>
+                            <td>Emily Parker</td>
+                            <td>2025-06-25</td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>SM-002</td>
+                            <td>Influencer Outreach</td>
+                            <td>Contact gaming influencers for promotional partnerships</td>
+                            <td><span class="badge bg-primary">High</span></td>
+                            <td><span class="badge bg-secondary">To Do</span></td>
+                            <td>David Wilson</td>
+                            <td>2025-07-10</td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>SM-003</td>
+                            <td>Community Event Planning</td>
+                            <td>Plan online community event for game anniversary</td>
+                            <td><span class="badge bg-info">Medium</span></td>
+                            <td><span class="badge bg-success">Done</span></td>
+                            <td>Sophia Martinez</td>
+                            <td>2025-06-05</td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>SM-004</td>
+                            <td>Content Calendar Creation</td>
+                            <td>Develop Q3 content calendar for all social platforms</td>
+                            <td><span class="badge bg-primary">High</span></td>
+                            <td><span class="badge bg-warning">In Progress</span></td>
+                            <td>Alex Thompson</td>
+                            <td>2025-06-30</td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>SM-005</td>
+                            <td>Analytics Report</td>
+                            <td>Prepare monthly social media performance report</td>
+                            <td><span class="badge bg-info">Medium</span></td>
+                            <td><span class="badge bg-secondary">To Do</span></td>
+                            <td>Jessica Lee</td>
+                            <td>2025-07-05</td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        $('#socialMediaTasksTable').DataTable();
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,419 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Social Media Analytics | R1D3{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-4 text-gray-800">Social Media Analytics</h1>
+    
+    <!-- Date Range Selector -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Date Range</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">From</span>
+                        <input type="date" class="form-control" id="dateFrom" value="2025-05-16">
+                        <span class="input-group-text">To</span>
+                        <input type="date" class="form-control" id="dateTo" value="2025-06-16">
+                        <button class="btn btn-primary" type="button" id="updateDateRange">Update</button>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="btn-group float-end" role="group">
+                        <button type="button" class="btn btn-outline-secondary">Last 7 Days</button>
+                        <button type="button" class="btn btn-outline-secondary">Last 30 Days</button>
+                        <button type="button" class="btn btn-outline-secondary">This Quarter</button>
+                        <button type="button" class="btn btn-outline-secondary">Year to Date</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Analytics Overview Cards -->
+    <div class="row">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total Followers</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">125,430</div>
+                            <div class="text-xs text-success mt-1">
+                                <i class="fas fa-arrow-up"></i> 3.5% from last period
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Engagement Rate</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">4.8%</div>
+                            <div class="text-xs text-success mt-1">
+                                <i class="fas fa-arrow-up"></i> 0.3% from last period
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-heart fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Total Posts</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">87</div>
+                            <div class="text-xs text-info mt-1">
+                                <i class="fas fa-equals"></i> Same as last period
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Link Clicks</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">8,742</div>
+                            <div class="text-xs text-danger mt-1">
+                                <i class="fas fa-arrow-down"></i> 1.2% from last period
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-mouse-pointer fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audience Growth Chart -->
+    <div class="row">
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Audience Growth</h6>
+                    <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">Export Options:</div>
+                            <a class="dropdown-item" href="#"><i class="fas fa-file-csv fa-sm fa-fw mr-2 text-gray-400"></i>CSV</a>
+                            <a class="dropdown-item" href="#"><i class="fas fa-file-pdf fa-sm fa-fw mr-2 text-gray-400"></i>PDF</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#"><i class="fas fa-cog fa-sm fa-fw mr-2 text-gray-400"></i>Chart Settings</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-area">
+                        <canvas id="audienceGrowthChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-lg-5">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Platform Distribution</h6>
+                    <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">Export Options:</div>
+                            <a class="dropdown-item" href="#"><i class="fas fa-file-csv fa-sm fa-fw mr-2 text-gray-400"></i>CSV</a>
+                            <a class="dropdown-item" href="#"><i class="fas fa-file-pdf fa-sm fa-fw mr-2 text-gray-400"></i>PDF</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-pie pt-4 pb-2">
+                        <canvas id="platformDistributionChart"></canvas>
+                    </div>
+                    <div class="mt-4 text-center small">
+                        <span class="mr-2">
+                            <i class="fas fa-circle text-primary"></i> Instagram
+                        </span>
+                        <span class="mr-2">
+                            <i class="fas fa-circle text-success"></i> Twitter
+                        </span>
+                        <span class="mr-2">
+                            <i class="fas fa-circle text-info"></i> Facebook
+                        </span>
+                        <span class="mr-2">
+                            <i class="fas fa-circle text-warning"></i> YouTube
+                        </span>
+                        <span class="mr-2">
+                            <i class="fas fa-circle text-danger"></i> TikTok
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Performing Posts -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Top Performing Posts</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="topPostsTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Post</th>
+                            <th>Platform</th>
+                            <th>Date</th>
+                            <th>Likes</th>
+                            <th>Comments</th>
+                            <th>Shares</th>
+                            <th>Engagement Rate</th>
+                            <th>Link Clicks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Game Launch Announcement</td>
+                            <td><span class="badge bg-primary">Instagram</span></td>
+                            <td>June 1, 2025</td>
+                            <td>12,458</td>
+                            <td>843</td>
+                            <td>2,156</td>
+                            <td>8.7%</td>
+                            <td>1,245</td>
+                        </tr>
+                        <tr>
+                            <td>Developer Interview</td>
+                            <td><span class="badge bg-warning">YouTube</span></td>
+                            <td>May 25, 2025</td>
+                            <td>8,932</td>
+                            <td>567</td>
+                            <td>1,245</td>
+                            <td>7.2%</td>
+                            <td>987</td>
+                        </tr>
+                        <tr>
+                            <td>Game Feature Preview</td>
+                            <td><span class="badge bg-success">Twitter</span></td>
+                            <td>June 5, 2025</td>
+                            <td>7,845</td>
+                            <td>423</td>
+                            <td>3,245</td>
+                            <td>6.8%</td>
+                            <td>1,532</td>
+                        </tr>
+                        <tr>
+                            <td>Character Reveal</td>
+                            <td><span class="badge bg-danger">TikTok</span></td>
+                            <td>May 30, 2025</td>
+                            <td>15,678</td>
+                            <td>1,245</td>
+                            <td>4,567</td>
+                            <td>6.5%</td>
+                            <td>876</td>
+                        </tr>
+                        <tr>
+                            <td>Game Mechanics Showcase</td>
+                            <td><span class="badge bg-info">Facebook</span></td>
+                            <td>June 10, 2025</td>
+                            <td>5,432</td>
+                            <td>345</td>
+                            <td>987</td>
+                            <td>5.9%</td>
+                            <td>654</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#topPostsTable').DataTable();
+        
+        // Audience Growth Chart
+        var ctx = document.getElementById("audienceGrowthChart");
+        var myLineChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ["May 16", "May 21", "May 26", "May 31", "Jun 5", "Jun 10", "Jun 15"],
+                datasets: [{
+                    label: "Total Followers",
+                    lineTension: 0.3,
+                    backgroundColor: "rgba(78, 115, 223, 0.05)",
+                    borderColor: "rgba(78, 115, 223, 1)",
+                    pointRadius: 3,
+                    pointBackgroundColor: "rgba(78, 115, 223, 1)",
+                    pointBorderColor: "rgba(78, 115, 223, 1)",
+                    pointHoverRadius: 3,
+                    pointHoverBackgroundColor: "rgba(78, 115, 223, 1)",
+                    pointHoverBorderColor: "rgba(78, 115, 223, 1)",
+                    pointHitRadius: 10,
+                    pointBorderWidth: 2,
+                    data: [118500, 119800, 121200, 122400, 123500, 124600, 125430],
+                }],
+            },
+            options: {
+                maintainAspectRatio: false,
+                layout: {
+                    padding: {
+                        left: 10,
+                        right: 25,
+                        top: 25,
+                        bottom: 0
+                    }
+                },
+                scales: {
+                    xAxes: [{
+                        time: {
+                            unit: 'date'
+                        },
+                        gridLines: {
+                            display: false,
+                            drawBorder: false
+                        },
+                        ticks: {
+                            maxTicksLimit: 7
+                        }
+                    }],
+                    yAxes: [{
+                        ticks: {
+                            maxTicksLimit: 5,
+                            padding: 10,
+                            callback: function(value, index, values) {
+                                return number_format(value);
+                            }
+                        },
+                        gridLines: {
+                            color: "rgb(234, 236, 244)",
+                            zeroLineColor: "rgb(234, 236, 244)",
+                            drawBorder: false,
+                            borderDash: [2],
+                            zeroLineBorderDash: [2]
+                        }
+                    }],
+                },
+                legend: {
+                    display: false
+                },
+                tooltips: {
+                    backgroundColor: "rgb(255,255,255)",
+                    bodyFontColor: "#858796",
+                    titleMarginBottom: 10,
+                    titleFontColor: '#6e707e',
+                    titleFontSize: 14,
+                    borderColor: '#dddfeb',
+                    borderWidth: 1,
+                    xPadding: 15,
+                    yPadding: 15,
+                    displayColors: false,
+                    intersect: false,
+                    mode: 'index',
+                    caretPadding: 10,
+                    callbacks: {
+                        label: function(tooltipItem, chart) {
+                            var datasetLabel = chart.datasets[tooltipItem.datasetIndex].label || '';
+                            return datasetLabel + ': ' + number_format(tooltipItem.yLabel);
+                        }
+                    }
+                }
+            }
+        });
+
+        // Platform Distribution Chart
+        var ctx2 = document.getElementById("platformDistributionChart");
+        var myPieChart = new Chart(ctx2, {
+            type: 'doughnut',
+            data: {
+                labels: ["Instagram", "Twitter", "Facebook", "YouTube", "TikTok"],
+                datasets: [{
+                    data: [45, 25, 15, 10, 5],
+                    backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b'],
+                    hoverBackgroundColor: ['#2e59d9', '#17a673', '#2c9faf', '#dda20a', '#be2617'],
+                    hoverBorderColor: "rgba(234, 236, 244, 1)",
+                }],
+            },
+            options: {
+                maintainAspectRatio: false,
+                tooltips: {
+                    backgroundColor: "rgb(255,255,255)",
+                    bodyFontColor: "#858796",
+                    borderColor: '#dddfeb',
+                    borderWidth: 1,
+                    xPadding: 15,
+                    yPadding: 15,
+                    displayColors: false,
+                    caretPadding: 10,
+                },
+                legend: {
+                    display: false
+                },
+                cutoutPercentage: 80,
+            },
+        });
+        
+        // Helper function for formatting numbers
+        function number_format(number, decimals, dec_point, thousands_sep) {
+            number = (number + '').replace(',', '').replace(' ', '');
+            var n = !isFinite(+number) ? 0 : +number,
+                prec = !isFinite(+decimals) ? 0 : Math.abs(decimals),
+                sep = (typeof thousands_sep === 'undefined') ? ',' : thousands_sep,
+                dec = (typeof dec_point === 'undefined') ? '.' : dec_point,
+                s = '',
+                toFixedFix = function(n, prec) {
+                    var k = Math.pow(10, prec);
+                    return '' + Math.round(n * k) / k;
+                };
+            s = (prec ? toFixedFix(n, prec) : '' + Math.round(n)).split('.');
+            if (s[0].length > 3) {
+                s[0] = s[0].replace(/\B(?=(?:\d{3})+(?!\d))/g, sep);
+            }
+            if ((s[1] || '').length < prec) {
+                s[1] = s[1] || '';
+                s[1] += new Array(prec - s[1].length + 1).join('0');
+            }
+            return s.join(dec);
+        }
+    });
+</script>
+{% endblock %}

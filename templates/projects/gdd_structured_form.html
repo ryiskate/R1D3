@@ -1,0 +1,1070 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load gdd_extras %}
+
+{% block title %}{{ game.title }} - Game Design Document{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Section styling */
+    .section-card {
+        margin-bottom: 2rem;
+        border: 1px solid #ddd;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    .section-card .card-header {
+        background-color: #f8f9fa;
+        cursor: pointer;
+        padding: 15px 20px;
+        border-bottom: 1px solid #ddd;
+        transition: all 0.2s ease;
+    }
+    .section-card .card-header:hover {
+        background-color: #e9ecef;
+    }
+    .section-number {
+        display: inline-block;
+        width: 32px;
+        height: 32px;
+        line-height: 32px;
+        text-align: center;
+        color: white;
+        border-radius: 50%;
+        margin-right: 10px;
+        font-weight: bold;
+    }
+    .section-intro {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-left: 5px solid;
+        margin-bottom: 25px;
+        border-radius: 4px;
+    }
+    
+    /* Section-specific colors */
+    .section-game_overview .section-number { background-color: #3498db; }
+    .section-gameplay .section-number { background-color: #2ecc71; }
+    .section-game_world .section-number { background-color: #9b59b6; }
+    .section-characters .section-number { background-color: #e74c3c; }
+    .section-narrative .section-number { background-color: #f39c12; }
+    .section-technical_requirements .section-number { background-color: #1abc9c; }
+    .section-audio_design .section-number { background-color: #d35400; }
+    .section-user_interface .section-number { background-color: #27ae60; }
+    .section-art_direction .section-number { background-color: #8e44ad; }
+    .section-monetization .section-number { background-color: #16a085; }
+    .section-development .section-number { background-color: #c0392b; }
+    .section-marketing .section-number { background-color: #f1c40f; }
+    .section-appendices .section-number { background-color: #7f8c8d; }
+    
+    /* Section-specific border colors */
+    .section-game_overview .section-intro { border-left-color: #3498db; }
+    .section-gameplay .section-intro { border-left-color: #2ecc71; }
+    .section-game_world .section-intro { border-left-color: #9b59b6; }
+    .section-characters .section-intro { border-left-color: #e74c3c; }
+    .section-narrative .section-intro { border-left-color: #f39c12; }
+    .section-technical_requirements .section-intro { border-left-color: #1abc9c; }
+    .section-audio_design .section-intro { border-left-color: #d35400; }
+    .section-user_interface .section-intro { border-left-color: #27ae60; }
+    .section-art_direction .section-intro { border-left-color: #8e44ad; }
+    .section-monetization .section-intro { border-left-color: #16a085; }
+    .section-development .section-intro { border-left-color: #c0392b; }
+    .section-marketing .section-intro { border-left-color: #f1c40f; }
+    .section-appendices .section-intro { border-left-color: #7f8c8d; }
+    
+    /* Subsection styling */
+    .subsection {
+        margin-top: 30px;
+        margin-bottom: 35px;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+        background-color: #ffffff;
+        border-left: 3px solid #ddd;
+        transition: all 0.2s ease;
+    }
+    .subsection:hover {
+        box-shadow: 0 4px 8px rgba(0,0,0,0.12);
+    }
+    .subsection-title {
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #eee;
+    }
+    
+    /* Section-specific subsection styling */
+    .section-game_overview .subsection { border-left-color: #3498db; }
+    .section-gameplay .subsection { border-left-color: #2ecc71; }
+    .section-game_world .subsection { border-left-color: #9b59b6; }
+    .section-characters .subsection { border-left-color: #e74c3c; }
+    .section-narrative .subsection { border-left-color: #f39c12; }
+    .section-technical_requirements .subsection { border-left-color: #1abc9c; }
+    .section-audio_design .subsection { border-left-color: #d35400; }
+    .section-user_interface .subsection { border-left-color: #27ae60; }
+    .section-art_direction .subsection { border-left-color: #8e44ad; }
+    .section-monetization .subsection { border-left-color: #16a085; }
+    .section-development .subsection { border-left-color: #c0392b; }
+    .section-marketing .subsection { border-left-color: #f1c40f; }
+    .section-appendices .subsection { border-left-color: #7f8c8d; }
+    
+    .subsection-title {
+        font-size: 1.25rem;
+        margin-bottom: 15px;
+        color: #343a40;
+        font-weight: 600;
+        border-bottom: 1px solid #dee2e6;
+        padding-bottom: 10px;
+    }
+    
+    /* Feature table styling */
+    .feature-table {
+        margin-top: 20px;
+        margin-bottom: 20px;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    .feature-table th {
+        font-size: 0.9rem;
+        padding: 10px 12px;
+        text-align: left;
+        font-weight: 600;
+        color: #495057;
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+    }
+    .feature-table thead {
+        background-color: #f8f9fa;
+    }
+    .feature-table td {
+        padding: 8px 12px;
+        text-align: left;
+        border: 1px solid #dee2e6;
+        vertical-align: middle;
+    }
+    .feature-table tbody tr:hover {
+        background-color: rgba(0,0,0,0.02);
+    }
+    .feature-row td {
+        vertical-align: middle;
+    }
+    .feature-card {
+        border: none;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        margin-bottom: 1.5rem;
+    }
+    .feature-card .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+        padding: 0.75rem 1rem;
+        font-weight: 600;
+    }
+    
+    /* Priority and status badges */
+    .priority-badge, .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: middle;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+    .badge-icon {
+        margin-right: 0.25rem;
+        font-size: 0.7rem;
+    }
+    
+    /* Drag and drop styling */
+    .feature-drag-handle {
+        width: 30px;
+        color: #adb5bd;
+        transition: color 0.2s ease;
+    }
+    .feature-drag-handle:hover {
+        color: #6c757d;
+    }
+    .feature-drag-handle i {
+        cursor: grab;
+    }
+    .feature-row-ghost {
+        background-color: #f8f9fa !important;
+        opacity: 0.8;
+        border: 1px dashed #6c757d !important;
+    }
+    .feature-row-ghost td {
+        background-color: #f8f9fa !important;
+    }
+    .feature-row.sortable-drag {
+        background-color: #e9ecef;
+        box-shadow: 0 0 10px rgba(0,0,0,0.15);
+    }
+    
+    /* Priority badge colors */
+    .priority-critical {
+        background-color: #dc3545;
+        color: white;
+    }
+    .priority-high {
+        background-color: #fd7e14;
+        color: white;
+    }
+    .priority-medium {
+        background-color: #ffc107;
+        color: #212529;
+    }
+    .priority-low {
+        background-color: #6c757d;
+        color: white;
+    }
+    
+    /* Status colors */
+    .status-to_do {
+        background-color: #6c757d;
+        color: white;
+    }
+    .status-backlog {
+        background-color: #17a2b8;
+        color: white;
+    }
+    .status-in_progress {
+        background-color: #007bff;
+        color: white;
+    }
+    .status-in_review {
+        background-color: #fd7e14;
+        color: white;
+    }
+    .status-done {
+        background-color: #28a745;
+        color: white;
+    }
+    
+    /* Hide DELETE checkboxes but keep them functional */
+    input[type="checkbox"][id$="-DELETE"] {
+        display: none;
+    }
+    .feature-form {
+        background-color: #f9f9f9;
+        padding: 15px;
+        margin-bottom: 15px;
+        border-radius: 5px;
+        border: 1px solid #eee;
+    }
+    .priority-badge {
+        display: inline-block;
+        padding: 0.25em 0.6em;
+        font-size: 0.75em;
+        font-weight: 700;
+        line-height: 1;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: baseline;
+        border-radius: 0.25rem;
+        color: white;
+        margin-left: 5px;
+    }
+    .priority-critical { background-color: #dc3545; }
+    .priority-high { background-color: #fd7e14; }
+    .priority-medium { background-color: #ffc107; color: #212529; }
+    .priority-low { background-color: #6c757d; }
+    
+    .status-badge {
+        display: inline-block;
+        padding: 0.25em 0.6em;
+        font-size: 0.75em;
+        font-weight: 700;
+        line-height: 1;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: baseline;
+        border-radius: 0.25rem;
+        margin-left: 5px;
+    }
+    .status-to_do { background-color: #6c757d; color: white; }
+    .status-backlog { background-color: #17a2b8; color: white; }
+    .status-in_progress { background-color: #007bff; color: white; }
+    .status-in_review { background-color: #6f42c1; color: white; }
+    .status-done { background-color: #28a745; color: white; }
+    
+    /* Section specific styling */
+    #heading-game-overview { border-left: 5px solid #3498db; }
+    #heading-gameplay { border-left: 5px solid #2ecc71; }
+    #heading-game-world { border-left: 5px solid #9b59b6; }
+    #heading-characters { border-left: 5px solid #e74c3c; }
+    #heading-narrative { border-left: 5px solid #f39c12; }
+    #heading-technical { border-left: 5px solid #1abc9c; }
+    #heading-audio { border-left: 5px solid #34495e; }
+    #heading-ui { border-left: 5px solid #d35400; }
+    #heading-art { border-left: 5px solid #8e44ad; }
+    #heading-monetization { border-left: 5px solid #27ae60; }
+    #heading-development { border-left: 5px solid #c0392b; }
+    #heading-marketing { border-left: 5px solid #16a085; }
+    #heading-appendices { border-left: 5px solid #7f8c8d; }
+    
+    /* Hide DELETE checkboxes but keep them functional */
+    input[name$="-DELETE"] {
+        display: none;
+    }
+    
+    /* Task management styling */
+    .task-management-section {
+        margin-top: 20px;
+        padding: 10px;
+        background-color: #f8f9fa;
+        border-radius: 4px;
+    }
+    .subsection {
+        margin-top: 20px;
+        margin-bottom: 30px;
+    }
+    .subsection-title {
+        color: #3498db;
+        margin-top: 20px;
+        margin-bottom: 10px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 5px;
+    }
+    .add-feature-btn {
+        margin-top: 10px;
+    }
+    .task-management-columns {
+        background-color: #e9f7ef;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-3">
+    <div class="alert alert-warning mb-3">
+        <strong>IMPORTANT: JavaScript cache issue detected!</strong> The browser is using cached JavaScript which is causing 404 errors when loading features.
+        <button class="btn btn-danger ms-2" onclick="location.reload(true);">CLICK HERE FOR HARD REFRESH</button>
+        <p class="small mt-2 mb-0">This will clear your browser cache and fix the feature loading issues.</p>
+    </div>
+    
+    {% if show_auto_create %}
+    <div class="alert alert-info mb-3">
+        <strong>Quick Start:</strong> Create an empty GDD with all 13 standard sections automatically.
+        <a href="?auto_create=true" class="btn btn-primary ms-2">Create Empty GDD</a>
+        <p class="small mt-2 mb-0">This will create a GDD with all sections and subsections ready for you to fill in.</p>
+    </div>
+    {% endif %}
+    <!-- Hidden input for game ID -->
+    <input type="hidden" id="game-id-input" value="{{ game.id }}">
+    
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>{% if gdd %}Edit{% else %}Create{% endif %} Game Design Document</h1>
+            <p class="text-muted">Game: {{ game.title }}</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'games:game_detail' pk=game.id %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Back to Game
+            </a>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-lg-9">
+            <!-- GDD Form -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Game Design Document</h5>
+                </div>
+                <div class="card-body">
+                    <form id="gdd-form" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" id="game-id-input" value="{{ game.id }}">
+                        
+                        <div class="alert alert-info">
+                            <h5><i class="bi bi-info-circle"></i> Industry-Standard 13-Section GDD Template (Updated)</h5>
+                            <p>This structured form implements a comprehensive Game Design Document following professional industry standards:</p>
+                            <ul class="mb-0">
+                                <li>13 well-organized sections covering all aspects of game design</li>
+                                <li>Numbered sections and subsections for clear organization</li>
+                                <li>Feature tracking with priority, status, assignments, and due dates</li>
+                                <li>Styled badges for visual clarity of priorities and statuses</li>
+                                <li>Task management integration for converting features to trackable tasks</li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Main GDD fields -->
+                        {{ form|crispy }}
+                        
+                        <hr class="my-4">
+                        
+                        <!-- 13-Section GDD Structure -->
+                        <div id="gdd-sections">
+                            {% for section in standard_sections %}
+                                <div class="section-card mb-4">
+                                    <div class="card-header d-flex justify-content-between align-items-center" id="heading-{{ section.section_id }}">
+                                        <h5 class="mb-0">
+                                            <span class="section-number">{{ forloop.counter }}.</span> {{ section.title }}
+                                        </h5>
+                                        <button class="btn btn-link toggle-section" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ section.section_id }}" aria-expanded="true" aria-controls="collapse-{{ section.section_id }}">
+                                            <i class="bi bi-chevron-up"></i>
+                                        </button>
+                                    </div>
+                                    <div id="collapse-{{ section.section_id }}" class="collapse show" aria-labelledby="heading-{{ section.section_id }}">
+                                        <div class="card-body">
+                                            <!-- Section Content -->
+                                            <div class="section-intro">
+                                                <p><strong>{{ section.title }}</strong> - {{ section.description }}</p>
+                                                <textarea name="section_content_{{ section.section_id }}" class="form-control" rows="3" placeholder="Section introduction text">{% if section_formsets and section.section_id in section_formsets %}{{ section_formsets|get_item:section.section_id|get_item:'section'|get_item:'content' }}{% endif %}</textarea>
+                                            </div>
+                                            
+                                            {% for subsection in section.subsections %}
+                                                <div class="subsection" data-subsection-id="{{ subsection.subsection_id }}">
+                                                    <h4 class="subsection-title">{{ forloop.parentloop.counter }}.{{ forloop.counter }}. {{ subsection.title }}</h4>
+                                                    <div class="mb-3">
+                                                        <textarea name="subsection_content_{{ section.section_id }}_{{ subsection.subsection_id }}" class="form-control" rows="3" placeholder="{{ subsection.description }}">{% if section_formsets and section.section_id in section_formsets and subsection.subsection_id in section_formsets|get_item:section.section_id|get_item:'subsections' %}{{ section_formsets|get_item:section.section_id|get_item:'subsections'|get_item:subsection.subsection_id }}{% endif %}</textarea>
+                                                    </div>
+                                                    
+                                                    <div class="feature-section">
+                                                        <h5><i class="bi bi-list-check"></i> Features & Tasks</h5>
+                                                        <table class="feature-table">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th style="width: 30px;"><i class="bi bi-grip-vertical" data-toggle="tooltip" title="Drag to reorder"></i></th>
+                                                                    <th>Feature</th>
+                                                                    <th>Description</th>
+                                                                    <th>Priority</th>
+                                                                    <th>Status</th>
+                                                                    <th>Task ID</th>
+                                                                    <th>Assigned To</th>
+                                                                    <th>Due Date</th>
+                                                                    <th>Actions</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody id="features-{{ section.section_id }}-{{ subsection.subsection_id }}-container">
+                                                                <!-- Features will be loaded via AJAX -->
+                                                            </tbody>
+                                                        </table>
+                                                        
+                                                        <button type="button" class="btn btn-sm btn-outline-primary add-feature-btn mt-2" data-section-id="{{ section.section_id }}" data-subsection-id="{{ subsection.subsection_id }}">
+                                                            <i class="bi bi-plus"></i> Add Feature
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                            
+                                            <!-- Section-level features (if no subsections or additional features needed) -->
+                                            <div class="feature-section mt-4">
+                                                <h5><i class="bi bi-list-check"></i> Section Features</h5>
+                                                <table class="feature-table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th style="width: 30px;"><i class="bi bi-grip-vertical" data-toggle="tooltip" title="Drag to reorder"></i></th>
+                                                            <th>Feature</th>
+                                                            <th>Description</th>
+                                                            <th>Priority</th>
+                                                            <th>Status</th>
+                                                            <th>Task ID</th>
+                                                            <th>Assigned To</th>
+                                                            <th>Due Date</th>
+                                                            <th>Actions</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="features-{{ section.section_id }}-container">
+                                                        <!-- Features will be loaded via AJAX -->
+                                                    </tbody>
+                                                </table>
+                                                
+                                                <button type="button" class="btn btn-sm btn-outline-primary add-feature-btn mt-2" data-section-id="{{ section.section_id }}">
+                                                    <i class="bi bi-plus"></i> Add Section Feature
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> {% if gdd %}Update{% else %}Create{% endif %} GDD
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3">
+            <!-- Tips & Help -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Tips & Help</h5>
+                </div>
+                <div class="card-body">
+                    <h6>Creating a Good GDD</h6>
+                    <ul>
+                        <li>Be specific and detailed in your descriptions</li>
+                        <li>Use the priority field to indicate importance</li>
+                        <li>Use the status field to track progress</li>
+                        <li>Link features to tasks for better tracking</li>
+                    </ul>
+                    
+                    <h6>Priority Levels</h6>
+                    <ul>
+                        <li><span class="priority-badge priority-critical">Critical</span> - Must have for launch</li>
+                        <li><span class="priority-badge priority-high">High</span> - Important for core experience</li>
+                        <li><span class="priority-badge priority-medium">Medium</span> - Adds significant value</li>
+                        <li><span class="priority-badge priority-low">Low</span> - Nice to have</li>
+                    </ul>
+                    
+                    <h6>Status Levels</h6>
+                    <ul>
+                        <li><span class="status-badge status-to_do">To Do</span> - Not started</li>
+                        <li><span class="status-badge status-backlog">Backlog</span> - Planned for future</li>
+                        <li><span class="status-badge status-in_progress">In Progress</span> - Currently working on</li>
+                        <li><span class="status-badge status-in_review">In Review</span> - Ready for review</li>
+                        <li><span class="status-badge status-done">Done</span> - Completed</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+    <!-- Add jQuery first -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <script>
+    // Simple debug function
+    function debug(message, data) {
+        if (data) {
+            console.log(message + ':', data);
+        } else {
+            console.log(message);
+        }
+    }
+    
+    // Simple error logging function
+    function logError(message, data) {
+        console.error(message + ':', data);
+    }
+    
+    $(document).ready(function() {
+        debug('Document ready - GDD Structured Form loaded');
+        debug('Game ID from hidden input', $('#game-id-input').val());
+        
+        // Initialize tooltips
+        $('[data-toggle="tooltip"]').tooltip();
+        
+        // Toggle section visibility
+        $('.toggle-section').click(function() {
+            $(this).find('i').toggleClass('bi-chevron-down bi-chevron-up');
+            const target = $(this).data('bs-target');
+            $(target).collapse('toggle');
+        });
+        
+        // Load feature formset via AJAX - completely rewritten for clarity and reliability
+        function loadFeatureFormset(sectionId, subsectionId) {
+            // Add logging for debugging
+            console.log('FEATURE LOADING: Starting for section: ' + sectionId + ', subsection: ' + (subsectionId || 'none'));
+            
+            // Determine container ID
+            var containerId = subsectionId ? 
+                'features-' + sectionId + '-' + subsectionId + '-container' : 
+                'features-' + sectionId + '-container';
+                
+            var container = $('#' + containerId);
+            console.log('FEATURE LOADING: Container found:', container.length > 0);
+            
+            // Skip if already loaded
+            if (container.data('loaded')) {
+                console.log('FEATURE LOADING: Container already loaded, skipping');
+                return;
+            }
+            
+            // Show loading indicator
+            container.html('<div class="text-center py-3"><i class="bi bi-hourglass-split me-2"></i>Loading features...</div>');
+            
+            // Get game ID from hidden input field
+            var gameId = $('#game-id-input').val();
+            console.log('FEATURE LOADING: Game ID:', gameId);
+            
+            if (!gameId) {
+                container.html('<div class="alert alert-danger">Error: Game ID not found</div>');
+                return;
+            }
+            
+            // Prepare request parameters
+            var params = {
+                // Add a timestamp to prevent caching
+                '_': new Date().getTime()
+            };
+            
+            if (subsectionId) {
+                params.subsection_id = subsectionId;
+            }
+            
+            // IMPORTANT: Always use the correct URL pattern with /games/ prefix
+            var correctUrl = '/games/' + gameId + '/gdd/section/' + sectionId + '/features/';
+            console.log('FEATURE LOADING: Using URL:', correctUrl);
+            
+            $.ajax({
+                url: correctUrl,
+                data: params,
+                dataType: 'json',
+                cache: false, // Prevent caching
+                success: function(data) {
+                    if (data && data.html) {
+                        container.html(data.html);
+                        container.data('loaded', true);
+                        debug('Features loaded successfully');
+                        
+                        // Initialize sortable for the feature table
+                        setTimeout(function() {
+                            initSortableTables();
+                        }, 100);
+                    } else {
+                        container.html('<div class="alert alert-warning">No feature data returned</div>');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.log('FEATURE LOADING: Primary URL failed with status:', xhr.status);
+                    
+                    // If primary URL failed, try one more time with a different approach
+                    if (xhr.status === 404) {
+                        // Try a different URL pattern as fallback
+                        var fallbackUrl = '/' + gameId + '/gdd/section/' + sectionId + '/features/';
+                        console.log('FEATURE LOADING: Trying fallback URL:', fallbackUrl);
+                        
+                        $.ajax({
+                            url: fallbackUrl,
+                            data: params,
+                            cache: false,
+                            dataType: 'json',
+                            success: function(data) {
+                                if (data && data.html) {
+                                    container.html(data.html);
+                                    container.data('loaded', true);
+                                    console.log('FEATURE LOADING: Features loaded successfully with fallback URL');
+                                    
+                                    // Initialize sortable for the feature table
+                                    setTimeout(function() {
+                                        initSortableTables();
+                                    }, 100);
+                                } else {
+                                    container.html('<div class="alert alert-warning">No feature data returned</div>');
+                                }
+                            },
+                            error: function(xhr2, status2, error2) {
+                                console.log('FEATURE LOADING: Both URLs failed. Primary status:', xhr.status, 'Fallback status:', xhr2.status);
+                                container.html(
+                                    '<div class="alert alert-danger">' +
+                                    '<strong>Error loading features:</strong> ' + status2 + ' (' + xhr2.status + ')<br>' +
+                                    '<small>Primary URL: ' + correctUrl + '</small><br>' +
+                                    '<small>Fallback URL: ' + fallbackUrl + '</small><br>' +
+                                    '<button class="btn btn-sm btn-outline-danger mt-2" onclick="window.location.reload(true)">Hard Refresh</button>' +
+                                    '</div>'
+                                );
+                            }
+                        });
+                    } else {
+                        container.html(
+                            '<div class="alert alert-danger">' +
+                            '<strong>Error loading features:</strong> ' + status + ' (' + xhr.status + ')<br>' +
+                            '<small>URL: ' + correctUrl + '</small><br>' +
+                            '<button class="btn btn-sm btn-outline-danger mt-2" onclick="window.location.reload(true)">Hard Refresh</button>' +
+                            '</div>'
+                        );
+                    }
+                }
+            });
+        }
+        
+        // Load feature formsets when section is expanded
+        $('.section-card').on('shown.bs.collapse', function() {
+            const sectionId = $(this).find('.card-header').attr('id').replace('heading-', '');
+            loadFeatureFormset(sectionId);
+            
+            // Also load subsection feature formsets if any
+            $(this).find('.subsection').each(function() {
+                const subsectionId = $(this).data('subsection-id');
+                if (subsectionId) {
+                    loadFeatureFormset(sectionId, subsectionId);
+                }
+            });
+        });
+        
+        // Simple test script to verify jQuery functionality
+        $(document).ready(function() {
+            console.log('jQuery is working!');
+            
+            // Add a test button to the page
+            $('<button id="test-button" class="btn btn-warning mt-3">Test jQuery</button>')
+                .appendTo('.container-fluid')
+                .click(function() {
+                    alert('jQuery is working! Button clicked.');
+                });
+        });
+        
+        // Add new feature row - delegated binding for dynamically added buttons
+        $(document).on('click', '.add-feature-btn', function(e) {
+            e.preventDefault();
+            alert('Add Feature button clicked - starting to process');
+            console.log('Add feature button clicked - delegated handler');
+            console.log('Button that was clicked:', this);
+            
+            const sectionId = $(this).data('section-id');
+            const subsectionId = $(this).data('subsection-id') || '';
+            console.log('Data attributes on button:', $(this).data());
+            
+            // Get game ID from hidden input field
+            const featureGameId = $('#game-id-input').val();
+            debug('Game ID for feature', featureGameId);
+            
+            console.log('Section ID:', sectionId, 'Subsection ID:', subsectionId);
+            
+            var prefix = subsectionId ? 
+                'feature_' + sectionId + '_' + subsectionId : 
+                'feature_' + sectionId;
+                
+            console.log('Form prefix:', prefix);
+                
+            var containerId = subsectionId ? 
+                'features-' + sectionId + '-' + subsectionId + '-container' : 
+                'features-' + sectionId + '-container';
+                
+            var featureContainer = $('#' + containerId);
+            console.log('Feature container selector:', '#' + containerId);
+            console.log('Feature container found:', featureContainer.length);
+            
+            // If container doesn't exist, create it
+            if (featureContainer.length === 0) {
+                console.log('Container not found, creating it');
+                var parentContainer = subsectionId ? 
+                    $('#subsection-' + sectionId + '-' + subsectionId) : 
+                    $('#section-' + sectionId + '-content');
+                    
+                parentContainer.append('<div id="' + containerId + '" class="feature-container mt-3"></div>');
+                featureContainer = $('#' + containerId);
+            }
+            
+            let container = featureContainer.find('tbody');
+            console.log('Table body found:', container.length);
+                
+            // If no tbody exists yet (first feature), create the table structure
+            if (container.length === 0) {
+                console.log('No table found, creating new table structure');
+                alert('Creating new feature table structure');
+                
+                // Create table structure with ID on tbody
+                var tableHtml = 
+                    '<table class="table table-sm table-hover feature-table mb-0">' +
+                    '    <thead class="table-light">' +
+                    '        <tr>' +
+                    '            <th style="width: 30px;"></th>' +
+                    '            <th>Feature</th>' +
+                    '            <th>Description</th>' +
+                    '            <th>Priority</th>' +
+                    '            <th>Status</th>' +
+                    '            <th>Task ID</th>' +
+                    '            <th>Assigned To</th>' +
+                    '            <th>Due Date</th>' +
+                    '            <th class="text-center">Actions</th>' +
+                    '        </tr>' +
+                    '    </thead>' +
+                    '    <tbody id="' + containerId + '"></tbody>' +
+                    '</table>';
+                
+                console.log('Generated table HTML:', tableHtml);
+                featureContainer.html(tableHtml);
+                
+                // Update container to point to tbody
+                container = featureContainer.find('tbody');
+                console.log('New tbody created:', container.length);
+                console.log('New tbody ID:', container.attr('id'));
+            }
+            
+            let totalFormsInput = $(`input[name="${prefix}-TOTAL_FORMS"]`);
+            console.log('Total forms input:', totalFormsInput.length ? totalFormsInput.val() : 'not found');
+            
+            if (totalFormsInput.length === 0) {
+                // If the management form doesn't exist yet, we need to create it
+                // This happens when we're adding the first feature to a section
+                console.log('Creating management form for prefix:', prefix);
+                
+                var managementFormHtml = 
+                    '<div class="management-form" style="display:none;">' +
+                    '    <input type="hidden" name="' + prefix + '-TOTAL_FORMS" value="0" id="id_' + prefix + '-TOTAL_FORMS">' +
+                    '    <input type="hidden" name="' + prefix + '-INITIAL_FORMS" value="0" id="id_' + prefix + '-INITIAL_FORMS">' +
+                    '    <input type="hidden" name="' + prefix + '-MIN_NUM_FORMS" value="0" id="id_' + prefix + '-MIN_NUM_FORMS">' +
+                    '    <input type="hidden" name="' + prefix + '-MAX_NUM_FORMS" value="1000" id="id_' + prefix + '-MAX_NUM_FORMS">' +
+                    '</div>';
+                
+                // Add management form before the table
+                featureContainer.prepend(managementFormHtml);
+                
+                // Re-query to get the newly created input
+                totalFormsInput = $('input[name="' + prefix + '-TOTAL_FORMS"]');
+                console.log('Created management form, total forms value:', totalFormsInput.val());
+            }
+            
+            const formCount = parseInt(totalFormsInput.val() || '0');
+            console.log('Current form count:', formCount);
+            
+            // Calculate the next order value based on existing rows
+            let nextOrder = 0;
+            container.find('input[name$="-order"]').each(function() {
+                const orderVal = parseInt($(this).val()) || 0;
+                nextOrder = Math.max(nextOrder, orderVal + 1);
+            });
+            console.log('Next order value:', nextOrder);
+            
+            // Create the new feature row HTML
+            console.log('Creating new feature row with prefix:', prefix, 'formCount:', formCount);
+            
+            // Build the row HTML
+            // Prepare subsection ID input if needed
+            var subsectionIdInput = '';
+            if (subsectionId) {
+                subsectionIdInput = '<input type="hidden" name="' + prefix + '-' + formCount + '-subsection_id" id="id_' + prefix + '-' + formCount + '-subsection_id" value="' + subsectionId + '">';
+            }
+                
+            // Build the row HTML in parts to avoid syntax errors
+            var rowHtml = '<tr class="feature-row">';
+            
+            // First cell with drag handle and hidden inputs
+            rowHtml += '<td class="feature-drag-handle text-center" style="cursor: move;" title="Drag to reorder">';
+            rowHtml += '<i class="bi bi-grip-vertical"></i>';
+            rowHtml += '<input type="hidden" name="' + prefix + '-' + formCount + '-id" id="id_' + prefix + '-' + formCount + '-id">';
+            rowHtml += '<input type="hidden" name="' + prefix + '-' + formCount + '-order" id="id_' + prefix + '-' + formCount + '-order" value="' + nextOrder + '">';
+            rowHtml += subsectionIdInput;
+            rowHtml += '</td>';
+            
+            // Feature name cell
+            rowHtml += '<td><input type="text" name="' + prefix + '-' + formCount + '-feature_name" class="form-control form-control-sm" placeholder="Feature Name" id="id_' + prefix + '-' + formCount + '-feature_name" required></td>';
+            
+            // Description cell
+            rowHtml += '<td><textarea name="' + prefix + '-' + formCount + '-description" class="form-control form-control-sm" rows="2" placeholder="Description" id="id_' + prefix + '-' + formCount + '-description"></textarea></td>';
+            
+            // Priority cell
+            rowHtml += '<td><select name="' + prefix + '-' + formCount + '-priority" class="form-control form-control-sm" id="id_' + prefix + '-' + formCount + '-priority">';
+            rowHtml += '<option value="critical">Critical</option>';
+            rowHtml += '<option value="high">High</option>';
+            rowHtml += '<option value="medium" selected>Medium</option>';
+            rowHtml += '<option value="low">Low</option>';
+            rowHtml += '</select></td>';
+            
+            // Status cell
+            rowHtml += '<td><select name="' + prefix + '-' + formCount + '-status" class="form-control form-control-sm" id="id_' + prefix + '-' + formCount + '-status">';
+            rowHtml += '<option value="to_do" selected>To Do</option>';
+            rowHtml += '<option value="backlog">Backlog</option>';
+            rowHtml += '<option value="in_progress">In Progress</option>';
+            rowHtml += '<option value="in_review">In Review</option>';
+            rowHtml += '<option value="done">Done</option>';
+            rowHtml += '</select></td>';
+            
+            // Task ID cell
+            rowHtml += '<td><input type="text" name="' + prefix + '-' + formCount + '-task_id" class="form-control form-control-sm" placeholder="Task ID" id="id_' + prefix + '-' + formCount + '-task_id"></td>';
+            
+            // Assigned To cell
+            rowHtml += '<td><input type="text" name="' + prefix + '-' + formCount + '-assigned_to" class="form-control form-control-sm" placeholder="Assigned To" id="id_' + prefix + '-' + formCount + '-assigned_to"></td>';
+            
+            // Due Date cell
+            rowHtml += '<td><input type="date" name="' + prefix + '-' + formCount + '-due_date" class="form-control form-control-sm" id="id_' + prefix + '-' + formCount + '-due_date"></td>';
+            
+            // Actions cell
+            rowHtml += '<td class="text-center"><input type="checkbox" name="' + prefix + '-' + formCount + '-DELETE" id="id_' + prefix + '-' + formCount + '-DELETE" style="display:none;">';
+            rowHtml += '<button type="button" class="btn btn-sm btn-outline-danger delete-feature-btn" title="Delete Feature"><i class="bi bi-trash"></i></button></td>';
+            
+            // Close the row
+            rowHtml += '</tr>';
+            
+            console.log('Generated row HTML (first 100 chars):', rowHtml.substring(0, 100) + '...');
+            const newRow = $(rowHtml);
+            
+            // Add the new row to the container
+            container.append(newRow);
+            console.log('Added new feature row to container');
+            alert('New feature row added to container. Check if visible in the table.');
+            
+            // Verify the row was actually added to the DOM
+            setTimeout(function() {
+                const addedRows = container.find('tr.feature-row');
+                console.log('Feature rows in container after adding:', addedRows.length);
+                console.log('Container HTML after adding row:', container.html());
+            }, 100);
+            
+            // Initialize delete button for this new row
+            newRow.find('.delete-feature-btn').click(function() {
+                const row = $(this).closest('tr');
+                const deleteCheckbox = row.find('input[name$="-DELETE"]');
+                deleteCheckbox.prop('checked', true);
+                row.fadeOut(300);
+            });
+            
+            // Increment form count
+            totalFormsInput.val(formCount + 1);
+            console.log('Updated form count to:', formCount + 1);
+            
+            // Initialize sortable for the table if needed
+            setTimeout(function() {
+                initSortableTables();
+            }, 100);
+        });
+        
+        // Initialize existing delete buttons
+        $(document).on('click', '.delete-feature-btn', function() {
+            const row = $(this).closest('tr');
+            const deleteCheckbox = row.find('input[name$="-DELETE"]');
+            deleteCheckbox.prop('checked', true);
+            row.fadeOut(300);
+        });
+        
+        // Get game ID from the hidden input field
+        const gameIdForInitialLoad = $('#game-id-input').val();
+        debug('Game ID for initial load', gameIdForInitialLoad);
+        
+        // Load feature formsets for initially expanded sections
+        $('.collapse.show').each(function() {
+            const sectionId = $(this).attr('id').replace('collapse-', '');
+            loadFeatureFormset(sectionId);
+            
+            // Also load subsection feature formsets if any
+            $(this).find('.subsection').each(function() {
+                const subsectionId = $(this).data('subsection-id');
+                if (subsectionId) {
+                    loadFeatureFormset(sectionId, subsectionId);
+                }
+            });
+        });
+        
+        // Debug information when page loads
+        $(document).ready(function() {
+            console.log('Document ready - GDD Structured Form loaded');
+            console.log('Game ID from hidden input:', $('#game-id-input').val());
+            console.log('Add feature buttons found:', $('.add-feature-btn').length);
+            
+            // Check if Sortable is available
+            if (typeof Sortable !== 'undefined') {
+                console.log('Sortable.js is available');
+            } else {
+                console.error('Sortable.js is not loaded!');
+            }
+            
+            // Initialize any existing feature tables
+            initSortableTables();
+        });
+        
+        // Initialize Sortable.js for feature tables
+        function initSortableTables() {
+            console.log('Initializing sortable tables');
+            $('.feature-table tbody').each(function() {
+                console.log('Found feature table tbody:', this);
+                if (!$(this).data('sortable')) {
+                    try {
+                        new Sortable(this, {
+                            handle: '.feature-drag-handle',
+                            animation: 150,
+                            ghostClass: 'bg-light',
+                            onEnd: function(evt) {
+                                // Update order values after drag
+                                $(evt.to).find('tr').each(function(index) {
+                                    $(this).find('input[name$="-order"]').val(index);
+                                });
+                            }
+                        });
+                        $(this).data('sortable', true);
+                        console.log('Sortable initialized for table');
+                    } catch (error) {
+                        console.error('Error initializing Sortable:', error);
+                    }
+                }
+            });
+        }
+        
+        // Function to update feature order values
+        function updateFeatureOrder(container) {
+            // Get the prefix from the first input in the container
+            const firstInput = container.find('input[name*="-0-"]').first();
+            if (!firstInput.length) return;
+            
+            const nameAttr = firstInput.attr('name');
+            const prefix = nameAttr.substring(0, nameAttr.indexOf('-0-'));
+            
+            // Extract section_id and subsection_id from prefix
+            let sectionId = '';
+            let subsectionId = null;
+            
+            if (prefix.startsWith('feature_')) {
+                const parts = prefix.split('_');
+                if (parts.length >= 2) {
+                    sectionId = parts[1];
+                    if (parts.length >= 3) {
+                        subsectionId = parts[2];
+                    }
+                }
+            }
+            
+            // Update order field for each row
+            const featureIds = [];
+            container.find('tr.feature-row').each(function(index) {
+                const rowId = $(this).find('input[name$="-id"]').val();
+                if (rowId) {
+                    const orderInput = $(this).find('input[name$="-order"]');
+                    if (orderInput.length) {
+                        orderInput.val(index);
+                        featureIds.push(rowId);
+                    }
+                }
+            });
+            
+            // Send the updated order to the server
+            if (featureIds.length > 0 && sectionId) {
+                saveFeatureOrder(sectionId, featureIds, subsectionId);
+            }
+        }
+        
+        // Function to save feature order to the server
+        function saveFeatureOrder(sectionId, featureIds, subsectionId) {
+            // Get the game_id from the URL
+            const urlParts = window.location.pathname.split('/');
+            const gameId = urlParts[2]; // Assuming URL pattern: /games/{game_id}/gdd/structured/...
+            
+            $.ajax({
+                url: `/games/${gameId}/gdd/section/${sectionId}/update-order/`,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    feature_ids: featureIds,
+                    subsection_id: subsectionId
+                }),
+                headers: {
+                    'X-CSRFToken': $('input[name="csrfmiddlewaretoken"]').val()
+                },
+                success: function(response) {
+                    console.log('Feature order updated successfully');
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error updating feature order:', error);
+                    alert('There was an error saving the feature order. Please try again.');
+                }
+            });
+        }
+        
+        // Initialize sortable tables when features are loaded
+        $(document).ajaxComplete(function(event, xhr, settings) {
+            if (settings.url.includes('/features/')) {
+                setTimeout(function() {
+                    initSortableTables();
+                }, 100);
+            }
+        });
+    });
+</script>
+{% endblock %}

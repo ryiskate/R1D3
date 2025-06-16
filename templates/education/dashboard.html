@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Education Dashboard | R1D3{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-4 text-gray-800">Education Dashboard</h1>
+    
+    <div class="row">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Active Classes</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">4</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-chalkboard-teacher fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Students Enrolled</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">215</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-user-graduate fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Course Completion
+                            </div>
+                            <div class="row no-gutters align-items-center">
+                                <div class="col-auto">
+                                    <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">78%</div>
+                                </div>
+                                <div class="col">
+                                    <div class="progress progress-sm mr-2">
+                                        <div class="progress-bar bg-info" role="progressbar" style="width: 78%"
+                                            aria-valuenow="78" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Pending Tasks</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">18</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-tasks fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Education Tasks Section -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 font-weight-bold text-primary">Education Tasks</h6>
+            <div class="dropdown no-arrow">
+                <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                    <div class="dropdown-header">Task Actions:</div>
+                    <a class="dropdown-item" href="#"><i class="fas fa-plus fa-sm fa-fw mr-2 text-gray-400"></i>Add New Task</a>
+                    <a class="dropdown-item" href="#"><i class="fas fa-filter fa-sm fa-fw mr-2 text-gray-400"></i>Filter Tasks</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="#"><i class="fas fa-file-export fa-sm fa-fw mr-2 text-gray-400"></i>Export Tasks</a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="educationTasksTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Task ID</th>
+                            <th>Task Name</th>
+                            <th>Description</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>Assigned To</th>
+                            <th>Due Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>EDU-001</td>
+                            <td>Develop Game Design Curriculum</td>
+                            <td>Create a comprehensive curriculum for teaching game design principles</td>
+                            <td><span class="badge bg-danger">Critical</span></td>
+                            <td><span class="badge bg-warning">In Progress</span></td>
+                            <td>John Smith</td>
+                            <td>2025-06-30</td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>EDU-002</td>
+                            <td>Create Unity Tutorial Series</td>
+                            <td>Develop a series of video tutorials for Unity game development</td>
+                            <td><span class="badge bg-primary">High</span></td>
+                            <td><span class="badge bg-secondary">To Do</span></td>
+                            <td>Jane Doe</td>
+                            <td>2025-07-15</td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>EDU-003</td>
+                            <td>Schedule Guest Lecturer</td>
+                            <td>Coordinate with industry professionals for guest lectures</td>
+                            <td><span class="badge bg-info">Medium</span></td>
+                            <td><span class="badge bg-success">Done</span></td>
+                            <td>Robert Johnson</td>
+                            <td>2025-06-10</td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>EDU-004</td>
+                            <td>Update Learning Management System</td>
+                            <td>Implement new features in the LMS for better tracking</td>
+                            <td><span class="badge bg-primary">High</span></td>
+                            <td><span class="badge bg-warning">In Progress</span></td>
+                            <td>Sarah Williams</td>
+                            <td>2025-07-05</td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>EDU-005</td>
+                            <td>Prepare Student Showcase</td>
+                            <td>Organize end-of-term student project showcase event</td>
+                            <td><span class="badge bg-info">Medium</span></td>
+                            <td><span class="badge bg-secondary">To Do</span></td>
+                            <td>Michael Brown</td>
+                            <td>2025-08-20</td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        $('#educationTasksTable').DataTable();
+    });
+</script>
+{% endblock %}

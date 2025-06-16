@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Education Tasks | R1D3{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-4 text-gray-800">Education Department Tasks</h1>
+    
+    <!-- Task Management Controls -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Task Management</h6>
+                </div>
+                <div class="card-body">
+                    <button class="btn btn-primary mb-2" data-bs-toggle="modal" data-bs-target="#addTaskModal">
+                        <i class="fas fa-plus"></i> Add New Task
+                    </button>
+                    <div class="btn-group mb-2 ml-2">
+                        <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            Filter by Status
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">All Tasks</a></li>
+                            <li><a class="dropdown-item" href="#">To Do</a></li>
+                            <li><a class="dropdown-item" href="#">In Progress</a></li>
+                            <li><a class="dropdown-item" href="#">In Review</a></li>
+                            <li><a class="dropdown-item" href="#">Done</a></li>
+                        </ul>
+                    </div>
+                    <div class="btn-group mb-2 ml-2">
+                        <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            Filter by Priority
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">All Priorities</a></li>
+                            <li><a class="dropdown-item" href="#">Critical</a></li>
+                            <li><a class="dropdown-item" href="#">High</a></li>
+                            <li><a class="dropdown-item" href="#">Medium</a></li>
+                            <li><a class="dropdown-item" href="#">Low</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Task Summary</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 text-center">
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">18</div>
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Tasks</div>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">5</div>
+                            <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">To Do</div>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">8</div>
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">In Progress</div>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">5</div>
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Done</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Education Tasks Section -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Education Tasks</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="educationTasksTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Task ID</th>
+                            <th>Task Name</th>
+                            <th>Description</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>Assigned To</th>
+                            <th>Due Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>EDU-001</td>
+                            <td>Develop Game Design Curriculum</td>
+                            <td>Create a comprehensive curriculum for teaching game design principles</td>
+                            <td><span class="badge bg-danger">Critical</span></td>
+                            <td><span class="badge bg-warning">In Progress</span></td>
+                            <td>John Smith</td>
+                            <td>2025-06-30</td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>EDU-002</td>
+                            <td>Create Unity Tutorial Series</td>
+                            <td>Develop a series of video tutorials for Unity game development</td>
+                            <td><span class="badge bg-primary">High</span></td>
+                            <td><span class="badge bg-secondary">To Do</span></td>
+                            <td>Jane Doe</td>
+                            <td>2025-07-15</td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>EDU-003</td>
+                            <td>Schedule Guest Lecturer</td>
+                            <td>Coordinate with industry professionals for guest lectures</td>
+                            <td><span class="badge bg-info">Medium</span></td>
+                            <td><span class="badge bg-success">Done</span></td>
+                            <td>Robert Johnson</td>
+                            <td>2025-06-10</td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>EDU-004</td>
+                            <td>Update Learning Management System</td>
+                            <td>Implement new features in the LMS for better tracking</td>
+                            <td><span class="badge bg-primary">High</span></td>
+                            <td><span class="badge bg-warning">In Progress</span></td>
+                            <td>Sarah Williams</td>
+                            <td>2025-07-05</td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>EDU-005</td>
+                            <td>Prepare Student Showcase</td>
+                            <td>Organize end-of-term student project showcase event</td>
+                            <td><span class="badge bg-info">Medium</span></td>
+                            <td><span class="badge bg-secondary">To Do</span></td>
+                            <td>Michael Brown</td>
+                            <td>2025-08-20</td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Task Modal -->
+<div class="modal fade" id="addTaskModal" tabindex="-1" aria-labelledby="addTaskModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addTaskModalLabel">Add New Task</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="taskName" class="form-label">Task Name</label>
+                        <input type="text" class="form-control" id="taskName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="taskDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="taskDescription" rows="3" required></textarea>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="taskPriority" class="form-label">Priority</label>
+                            <select class="form-select" id="taskPriority" required>
+                                <option value="">Select Priority</option>
+                                <option value="critical">Critical</option>
+                                <option value="high">High</option>
+                                <option value="medium">Medium</option>
+                                <option value="low">Low</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="taskStatus" class="form-label">Status</label>
+                            <select class="form-select" id="taskStatus" required>
+                                <option value="">Select Status</option>
+                                <option value="to_do">To Do</option>
+                                <option value="in_progress">In Progress</option>
+                                <option value="in_review">In Review</option>
+                                <option value="done">Done</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="assignedTo" class="form-label">Assigned To</label>
+                            <select class="form-select" id="assignedTo" required>
+                                <option value="">Select Team Member</option>
+                                <option value="1">John Smith</option>
+                                <option value="2">Jane Doe</option>
+                                <option value="3">Robert Johnson</option>
+                                <option value="4">Sarah Williams</option>
+                                <option value="5">Michael Brown</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="dueDate" class="form-label">Due Date</label>
+                            <input type="date" class="form-control" id="dueDate" required>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary">Save Task</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        $('#educationTasksTable').DataTable();
+    });
+</script>
+{% endblock %}

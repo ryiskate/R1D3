@@ -187,22 +187,22 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white-50" href="#">
+                            <a class="nav-link text-white-50" href="/education/">
                                 <i class="fas fa-graduation-cap me-1"></i> Education
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white-50" href="#">
+                            <a class="nav-link text-white-50" href="/social-media/">
                                 <i class="fas fa-users me-1"></i> Social Media
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white-50" href="#">
+                            <a class="nav-link text-white-50" href="/arcade/">
                                 <i class="fas fa-arcade me-1"></i> Arcade Entertainment
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white-50" href="#">
+                            <a class="nav-link text-white-50" href="/theme-park/">
                                 <i class="fas fa-mountain me-1"></i> Theme Park
                             </a>
                         </li>
@@ -234,43 +234,36 @@
                 
                 <hr class="sidebar-divider">
                 
-                <div class="sidebar-heading">
-                    Game Development
+                <!-- Dynamic Department Sidebar Content -->
+                <div id="sidebar-content">
+                    <!-- This content will be dynamically replaced by department_sidebar.js -->
+                    <div class="sidebar-heading">
+                        Game Development
+                    </div>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.namespace == 'games' and request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'games:dashboard' %}">
+                            <i class="fas fa-fw fa-gamepad"></i>
+                            <span>Game Dashboard</span>
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.namespace == 'games' and request.resolver_match.url_name == 'game_list' %}active{% endif %}" href="{% url 'games:game_list' %}">
+                            <i class="fas fa-fw fa-list"></i>
+                            <span>Game Projects</span>
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-fw fa-tasks"></i>
+                            <span>Game Tasks</span>
+                        </a>
+                    </li>
                 </div>
-                
-                <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.namespace == 'games' and request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'games:dashboard' %}">
-                        <i class="fas fa-fw fa-gamepad"></i>
-                        <span>Game Dashboard</span>
-                    </a>
-                </li>
-                
-                <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.namespace == 'games' and request.resolver_match.url_name == 'game_list' %}active{% endif %}" href="{% url 'games:game_list' %}">
-                        <i class="fas fa-fw fa-list"></i>
-                        <span>Game Projects</span>
-                    </a>
-                </li>
                 
                 <hr class="sidebar-divider">
-                
-                <div class="sidebar-heading">
-                    Organization
-                </div>
-                
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-fw fa-bullseye"></i>
-                        <span>Strategy</span>
-                    </a>
-                </li>
-                
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-fw fa-project-diagram"></i>
-                        <span>Projects</span>
-                    </a>
-                </li>
                 
                 <hr class="sidebar-divider">
                 
@@ -389,6 +382,9 @@
     
     <!-- Bootstrap JS Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Department Sidebar Script -->
+    <script src="/static/js/department_sidebar.js"></script>
     
     {% block extra_js %}{% endblock %}
 </body>

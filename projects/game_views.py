@@ -891,7 +891,8 @@ class GameTaskKanbanView(LoginRequiredMixin, ListView):
 
 class GameDesignDocumentCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
     """
-    Create a game design document or redirect to edit if one already exists
+    Create a game design document or redirect to edit if one already exists.
+    This view now redirects to the structured GDD creation interface for a better user experience.
     """
     def test_func(self):
         # Only allow staff or game leads to create GDDs
@@ -907,17 +908,16 @@ class GameDesignDocumentCreateView(LoginRequiredMixin, UserPassesTestMixin, View
         try:
             existing_gdd = GameDesignDocument.objects.get(game=game)
             messages.info(request, "A Game Design Document already exists for this game. You can edit it below.")
-            return redirect('games:gdd_edit', pk=existing_gdd.id)
+            # Redirect to the structured edit interface instead of the HTML editor
+            return redirect('games:gdd_structured_edit', pk=existing_gdd.id)
         except GameDesignDocument.DoesNotExist:
-            # No GDD exists, proceed to create form
-            form = GameDesignDocumentForm()
-            return render(request, 'projects/gdd_form.html', {
-                'form': form,
-                'game': game,
-                'game_id': game_id
-            })
+            # No GDD exists, redirect to the structured creation interface
+            messages.info(request, "Create a new Game Design Document using the user-friendly interface.")
+            return redirect('games:gdd_structured_create', game_id=game_id)
     
     def post(self, request, *args, **kwargs):
+        # This method should not be called directly anymore since we're redirecting in get()
+        # But we'll keep it for backward compatibility
         game_id = self.kwargs.get('game_id')
         game = get_object_or_404(GameProject, id=game_id)
         
@@ -925,22 +925,10 @@ class GameDesignDocumentCreateView(LoginRequiredMixin, UserPassesTestMixin, View
         try:
             existing_gdd = GameDesignDocument.objects.get(game=game)
             messages.error(request, "A Game Design Document already exists for this game. You cannot create another one.")
-            return redirect('games:gdd_edit', pk=existing_gdd.id)
+            return redirect('games:gdd_structured_edit', pk=existing_gdd.id)
         except GameDesignDocument.DoesNotExist:
-            # No GDD exists, proceed to create
-            form = GameDesignDocumentForm(request.POST)
-            if form.is_valid():
-                gdd = form.save(commit=False)
-                gdd.game = game
-                gdd.save()
-                messages.success(request, "Game Design Document created successfully!")
-                return redirect('games:game_detail', pk=game.id)
-            else:
-                return render(request, 'projects/gdd_form.html', {
-                    'form': form,
-                    'game': game,
-                    'game_id': game_id
-                })
+            # Redirect to the structured creation interface
+            return redirect('games:gdd_structured_create', game_id=game_id)
 
 
 class GameAssetListView(LoginRequiredMixin, ListView):

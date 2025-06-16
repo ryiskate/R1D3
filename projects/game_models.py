@@ -168,10 +168,32 @@ class GDDFeature(TimeStampedModel):
     )
     
     section = models.ForeignKey(GDDSection, on_delete=models.CASCADE, related_name='features')
+    subsection_id = models.CharField(max_length=50, blank=True, null=True, help_text="ID of the subsection this feature belongs to")
     feature_name = models.CharField(max_length=100)
     description = models.TextField()
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='medium')
     task = models.OneToOneField('GameTask', on_delete=models.SET_NULL, null=True, blank=True, related_name='gdd_feature')
+    order = models.PositiveIntegerField(default=0, help_text="Order of this feature within its section/subsection")
+    
+    def save(self, *args, **kwargs):
+        # If order is not set, set it to the next available order number
+        if self.order is None or self.order == 0:
+            # Get the highest order number for features in this section and subsection
+            if self.subsection_id:
+                max_order = GDDFeature.objects.filter(
+                    section=self.section,
+                    subsection_id=self.subsection_id
+                ).aggregate(models.Max('order'))['order__max'] or 0
+            else:
+                max_order = GDDFeature.objects.filter(
+                    section=self.section,
+                    subsection_id__isnull=True
+                ).aggregate(models.Max('order'))['order__max'] or 0
+            
+            # Set order to one more than the highest existing order
+            self.order = max_order + 1
+            
+        super().save(*args, **kwargs)
     
     def __str__(self):
         return f"{self.feature_name} - {self.section.title}"
@@ -184,7 +206,7 @@ class GDDFeature(TimeStampedModel):
         return "Planned"
     
     class Meta:
-        ordering = ['priority', 'feature_name']
+        ordering = ['order', 'priority', 'feature_name']
 
 
 class GameAsset(TimeStampedModel):

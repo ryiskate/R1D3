@@ -1,0 +1,273 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Theme Park Schedule | R1D3{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-4 text-gray-800">Theme Park Schedule</h1>
+    
+    <!-- Date Controls -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Date Selection</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="input-group mb-3">
+                        <input type="date" class="form-control" id="scheduleDate" value="2025-06-16">
+                        <button class="btn btn-primary" type="button" id="updateDate">View Date</button>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="btn-group float-end" role="group">
+                        <button type="button" class="btn btn-outline-secondary">Today</button>
+                        <button type="button" class="btn btn-outline-secondary">Tomorrow</button>
+                        <button type="button" class="btn btn-outline-secondary">This Week</button>
+                        <button type="button" class="btn btn-outline-secondary">This Month</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Park Hours -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 font-weight-bold text-primary">Park Hours</h6>
+            <div class="dropdown no-arrow">
+                <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                    <div class="dropdown-header">Actions:</div>
+                    <a class="dropdown-item" href="#"><i class="fas fa-edit fa-sm fa-fw mr-2 text-gray-400"></i>Edit Hours</a>
+                    <a class="dropdown-item" href="#"><i class="fas fa-calendar fa-sm fa-fw mr-2 text-gray-400"></i>View Calendar</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="#"><i class="fas fa-print fa-sm fa-fw mr-2 text-gray-400"></i>Print Schedule</a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-header bg-primary text-white">
+                            <h6 class="m-0 font-weight-bold">Main Park</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-6">
+                                    <p class="mb-0"><strong>Opening:</strong> 9:00 AM</p>
+                                </div>
+                                <div class="col-6">
+                                    <p class="mb-0"><strong>Closing:</strong> 10:00 PM</p>
+                                </div>
+                            </div>
+                            <hr>
+                            <p class="mb-0"><strong>Special Notes:</strong> Extended evening hours for summer season</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-header bg-info text-white">
+                            <h6 class="m-0 font-weight-bold">Water Park</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-6">
+                                    <p class="mb-0"><strong>Opening:</strong> 10:00 AM</p>
+                                </div>
+                                <div class="col-6">
+                                    <p class="mb-0"><strong>Closing:</strong> 8:00 PM</p>
+                                </div>
+                            </div>
+                            <hr>
+                            <p class="mb-0"><strong>Special Notes:</strong> Wave pool maintenance from 2:00 PM - 3:00 PM</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Attraction Schedule -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Attraction Schedule</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="attractionScheduleTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Attraction</th>
+                            <th>Area</th>
+                            <th>Opening Time</th>
+                            <th>Closing Time</th>
+                            <th>Current Wait</th>
+                            <th>Status</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Space Mountain</td>
+                            <td>Future Zone</td>
+                            <td>9:00 AM</td>
+                            <td>10:00 PM</td>
+                            <td>45 min</td>
+                            <td><span class="badge bg-success">Open</span></td>
+                            <td>Fast Pass available</td>
+                        </tr>
+                        <tr>
+                            <td>Pirate's Cove</td>
+                            <td>Adventure Land</td>
+                            <td>9:30 AM</td>
+                            <td>9:30 PM</td>
+                            <td>30 min</td>
+                            <td><span class="badge bg-success">Open</span></td>
+                            <td>Water ride - may get wet</td>
+                        </tr>
+                        <tr>
+                            <td>Dragon's Lair</td>
+                            <td>Fantasy Kingdom</td>
+                            <td>10:00 AM</td>
+                            <td>9:00 PM</td>
+                            <td>60 min</td>
+                            <td><span class="badge bg-success">Open</span></td>
+                            <td>Height restriction: 48 inches</td>
+                        </tr>
+                        <tr>
+                            <td>Wild West Shootout</td>
+                            <td>Frontier Land</td>
+                            <td>9:00 AM</td>
+                            <td>8:00 PM</td>
+                            <td>15 min</td>
+                            <td><span class="badge bg-success">Open</span></td>
+                            <td>Interactive ride</td>
+                        </tr>
+                        <tr>
+                            <td>Jungle Rapids</td>
+                            <td>Adventure Land</td>
+                            <td>10:00 AM</td>
+                            <td>7:00 PM</td>
+                            <td>-</td>
+                            <td><span class="badge bg-danger">Closed</span></td>
+                            <td>Maintenance until 2:00 PM</td>
+                        </tr>
+                        <tr>
+                            <td>Haunted Mansion</td>
+                            <td>Spooky Hollow</td>
+                            <td>11:00 AM</td>
+                            <td>10:00 PM</td>
+                            <td>25 min</td>
+                            <td><span class="badge bg-success">Open</span></td>
+                            <td>Not recommended for children under 8</td>
+                        </tr>
+                        <tr>
+                            <td>Mermaid Lagoon</td>
+                            <td>Fantasy Kingdom</td>
+                            <td>9:00 AM</td>
+                            <td>7:30 PM</td>
+                            <td>10 min</td>
+                            <td><span class="badge bg-success">Open</span></td>
+                            <td>Perfect for young children</td>
+                        </tr>
+                        <tr>
+                            <td>Tornado Twister</td>
+                            <td>Thrill Zone</td>
+                            <td>10:00 AM</td>
+                            <td>9:00 PM</td>
+                            <td>40 min</td>
+                            <td><span class="badge bg-warning">Temporary Closure</span></td>
+                            <td>Weather conditions - check back at 11:30 AM</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Show Schedule -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Show Schedule</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="showScheduleTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Show Name</th>
+                            <th>Location</th>
+                            <th>Show Times</th>
+                            <th>Duration</th>
+                            <th>Capacity</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Magic Spectacular</td>
+                            <td>Grand Theater</td>
+                            <td>11:00 AM, 2:00 PM, 5:00 PM, 8:00 PM</td>
+                            <td>45 min</td>
+                            <td>500</td>
+                            <td><span class="badge bg-success">Running</span></td>
+                        </tr>
+                        <tr>
+                            <td>Stunt Show Extravaganza</td>
+                            <td>Stunt Arena</td>
+                            <td>12:30 PM, 3:30 PM, 6:30 PM</td>
+                            <td>30 min</td>
+                            <td>350</td>
+                            <td><span class="badge bg-success">Running</span></td>
+                        </tr>
+                        <tr>
+                            <td>Character Parade</td>
+                            <td>Main Street</td>
+                            <td>1:00 PM, 7:00 PM</td>
+                            <td>25 min</td>
+                            <td>Unlimited</td>
+                            <td><span class="badge bg-success">Running</span></td>
+                        </tr>
+                        <tr>
+                            <td>Underwater Adventure</td>
+                            <td>Aquatic Theater</td>
+                            <td>2:30 PM, 4:30 PM</td>
+                            <td>40 min</td>
+                            <td>300</td>
+                            <td><span class="badge bg-warning">Modified</span></td>
+                        </tr>
+                        <tr>
+                            <td>Fireworks Spectacular</td>
+                            <td>Castle Plaza</td>
+                            <td>9:30 PM</td>
+                            <td>15 min</td>
+                            <td>Unlimited</td>
+                            <td><span class="badge bg-success">Running</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        $('#attractionScheduleTable').DataTable({
+            "order": [[1, "asc"]] // Sort by area by default
+        });
+        
+        $('#showScheduleTable').DataTable({
+            "order": [[2, "asc"]] // Sort by show times by default
+        });
+    });
+</script>
+{% endblock %}

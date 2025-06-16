@@ -1,0 +1,405 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Arcade Tasks | R1D3{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-4 text-gray-800">Arcade Tasks</h1>
+    
+    <!-- Task Controls -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Task Management</h6>
+                    <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">Task Actions:</div>
+                            <a class="dropdown-item" href="#"><i class="fas fa-file-export fa-sm fa-fw mr-2 text-gray-400"></i>Export Tasks</a>
+                            <a class="dropdown-item" href="#"><i class="fas fa-file-import fa-sm fa-fw mr-2 text-gray-400"></i>Import Tasks</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#"><i class="fas fa-cog fa-sm fa-fw mr-2 text-gray-400"></i>Task Settings</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addTaskModal">
+                        <i class="fas fa-plus"></i> Add New Task
+                    </button>
+                    
+                    <div class="btn-group mb-3 ml-2">
+                        <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            Filter by Status
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">All Statuses</a></li>
+                            <li><a class="dropdown-item" href="#">To Do</a></li>
+                            <li><a class="dropdown-item" href="#">In Progress</a></li>
+                            <li><a class="dropdown-item" href="#">In Review</a></li>
+                            <li><a class="dropdown-item" href="#">Done</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="btn-group mb-3 ml-2">
+                        <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            Filter by Priority
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">All Priorities</a></li>
+                            <li><a class="dropdown-item" href="#">High</a></li>
+                            <li><a class="dropdown-item" href="#">Medium</a></li>
+                            <li><a class="dropdown-item" href="#">Low</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="btn-group mb-3 ml-2">
+                        <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            Filter by Location
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">All Locations</a></li>
+                            <li><a class="dropdown-item" href="#">Headquarters</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#">New York</a></li>
+                            <li><a class="dropdown-item" href="#">Los Angeles</a></li>
+                            <li><a class="dropdown-item" href="#">Tokyo</a></li>
+                            <li><a class="dropdown-item" href="#">London</a></li>
+                            <li><a class="dropdown-item" href="#">Sydney</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Task Summary Cards -->
+    <div class="row">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total Tasks</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">32</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Completed Tasks</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">12</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                In Progress</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">15</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-spinner fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-danger shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                Overdue Tasks</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">5</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-exclamation-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tasks Table -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Arcade Tasks</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="tasksTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Task ID</th>
+                            <th>Title</th>
+                            <th>Description</th>
+                            <th>Due Date</th>
+                            <th>Assignee</th>
+                            <th>Location</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>ARC-T001</td>
+                            <td>Repair Speed Racer X machine</td>
+                            <td>Fix joystick and replace broken screen on cabinet #12</td>
+                            <td>June 18, 2025</td>
+                            <td>John Smith</td>
+                            <td>New York</td>
+                            <td><span class="badge bg-danger">High</span></td>
+                            <td><span class="badge bg-warning">In Progress</span></td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                                <a href="#" class="btn btn-sm btn-success"><i class="fas fa-check"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>ARC-T002</td>
+                            <td>Install new Zombie Blaster machines</td>
+                            <td>Set up and configure 3 new Zombie Blaster cabinets</td>
+                            <td>June 20, 2025</td>
+                            <td>Sarah Johnson</td>
+                            <td>Los Angeles</td>
+                            <td><span class="badge bg-danger">High</span></td>
+                            <td><span class="badge bg-warning">In Progress</span></td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                                <a href="#" class="btn btn-sm btn-success"><i class="fas fa-check"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>ARC-T003</td>
+                            <td>Update firmware on all machines</td>
+                            <td>Apply latest firmware update to all arcade machines</td>
+                            <td>June 22, 2025</td>
+                            <td>Mike Williams</td>
+                            <td>Tokyo</td>
+                            <td><span class="badge bg-warning">Medium</span></td>
+                            <td><span class="badge bg-secondary">To Do</span></td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                                <a href="#" class="btn btn-sm btn-success"><i class="fas fa-check"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>ARC-T004</td>
+                            <td>Restock prize counter</td>
+                            <td>Order and restock prizes for the redemption counter</td>
+                            <td>June 17, 2025</td>
+                            <td>Emily Chen</td>
+                            <td>New York</td>
+                            <td><span class="badge bg-warning">Medium</span></td>
+                            <td><span class="badge bg-danger">Overdue</span></td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                                <a href="#" class="btn btn-sm btn-success"><i class="fas fa-check"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>ARC-T005</td>
+                            <td>Monthly maintenance check</td>
+                            <td>Perform routine maintenance on all machines</td>
+                            <td>June 15, 2025</td>
+                            <td>David Lee</td>
+                            <td>Sydney</td>
+                            <td><span class="badge bg-info">Low</span></td>
+                            <td><span class="badge bg-success">Done</span></td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                                <a href="#" class="btn btn-sm btn-secondary"><i class="fas fa-redo"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>ARC-T006</td>
+                            <td>Update price signage</td>
+                            <td>Update all price signage to reflect new pricing structure</td>
+                            <td>June 25, 2025</td>
+                            <td>Unassigned</td>
+                            <td>All Locations</td>
+                            <td><span class="badge bg-warning">Medium</span></td>
+                            <td><span class="badge bg-secondary">To Do</span></td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                                <a href="#" class="btn btn-sm btn-success"><i class="fas fa-check"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>ARC-T007</td>
+                            <td>Prepare for weekend tournament</td>
+                            <td>Set up tournament area and configure machines for Street Fighter Pro tournament</td>
+                            <td>June 19, 2025</td>
+                            <td>John Smith</td>
+                            <td>Tokyo</td>
+                            <td><span class="badge bg-warning">Medium</span></td>
+                            <td><span class="badge bg-warning">In Progress</span></td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                                <a href="#" class="btn btn-sm btn-success"><i class="fas fa-check"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>ARC-T008</td>
+                            <td>Clean and sanitize all machines</td>
+                            <td>Perform deep cleaning and sanitization of all arcade machines</td>
+                            <td>June 16, 2025</td>
+                            <td>Sarah Johnson</td>
+                            <td>Los Angeles</td>
+                            <td><span class="badge bg-info">Low</span></td>
+                            <td><span class="badge bg-success">Done</span></td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                                <a href="#" class="btn btn-sm btn-secondary"><i class="fas fa-redo"></i></a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Task Modal -->
+<div class="modal fade" id="addTaskModal" tabindex="-1" aria-labelledby="addTaskModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addTaskModalLabel">Add New Task</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="taskTitle" class="form-label">Task Title</label>
+                            <input type="text" class="form-control" id="taskTitle" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="taskDueDate" class="form-label">Due Date</label>
+                            <input type="date" class="form-control" id="taskDueDate" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="taskDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="taskDescription" rows="3" required></textarea>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="taskAssignee" class="form-label">Assignee</label>
+                            <select class="form-select" id="taskAssignee">
+                                <option value="" selected>Unassigned</option>
+                                <option value="john_smith">John Smith</option>
+                                <option value="sarah_johnson">Sarah Johnson</option>
+                                <option value="mike_williams">Mike Williams</option>
+                                <option value="emily_chen">Emily Chen</option>
+                                <option value="david_lee">David Lee</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="taskPriority" class="form-label">Priority</label>
+                            <select class="form-select" id="taskPriority" required>
+                                <option value="high">High</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="low">Low</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="taskStatus" class="form-label">Status</label>
+                            <select class="form-select" id="taskStatus" required>
+                                <option value="to_do" selected>To Do</option>
+                                <option value="in_progress">In Progress</option>
+                                <option value="in_review">In Review</option>
+                                <option value="done">Done</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="taskLocation" class="form-label">Location</label>
+                        <select class="form-select" id="taskLocation" required>
+                            <option value="all_locations">All Locations</option>
+                            <option value="headquarters">Headquarters</option>
+                            <option value="new_york">New York</option>
+                            <option value="los_angeles">Los Angeles</option>
+                            <option value="tokyo">Tokyo</option>
+                            <option value="london">London</option>
+                            <option value="sydney">Sydney</option>
+                            <option value="rio">Rio de Janeiro</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="taskRelatedProject" class="form-label">Related Project</label>
+                        <select class="form-select" id="taskRelatedProject">
+                            <option value="" selected>None</option>
+                            <option value="speed_racer_x">Speed Racer X</option>
+                            <option value="zombie_blaster">Zombie Blaster</option>
+                            <option value="puzzle_master">Puzzle Master</option>
+                            <option value="street_fighter_pro">Street Fighter Pro</option>
+                            <option value="basketball_champions">Basketball Champions</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="taskAttachments" class="form-label">Attachments</label>
+                        <input class="form-control" type="file" id="taskAttachments" multiple>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary">Save Task</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        $('#tasksTable').DataTable({
+            "order": [[3, "asc"]] // Sort by due date by default
+        });
+    });
+</script>
+{% endblock %}

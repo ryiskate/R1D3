@@ -1,9 +1,11 @@
 from django.urls import path
 from . import game_views
 from .task_status_update_view import TaskStatusUpdateView
-from .gdd_views import GameDesignDocumentEditView, TaskGDDSectionLinkView
-from .gdd_feature_views import ExtractFeaturesView, GDDFeaturesListView, ConvertFeatureToTaskView, ConvertAllFeaturesToTasksView, UpdateGDDWithTaskStatusView, task_status_update_callback
+from .gdd_views import (GameDesignDocumentEditView, TaskGDDSectionLinkView, GameDesignDocumentDeleteView)
+from .gdd_feature_views import (ExtractFeaturesView, GDDFeaturesListView, ConvertFeatureToTaskView, 
+                              ConvertAllFeaturesToTasksView, UpdateGDDWithTaskStatusView, task_status_update_callback)
 from .gdd_upload_view import GDDUploadView
+from .gdd_structured_views import GDDStructuredCreateView, GDDStructuredEditView, GDDSectionFeatureView, UpdateFeatureOrderView
 from .debug_views import debug_tasks_view
 from .game_status_view import GameStatusUpdateView
 
@@ -21,9 +23,16 @@ urlpatterns = [
     # Game Design Document URLs
     path('<int:pk>/gdd/', game_views.GameDesignDocumentView.as_view(), name='gdd_detail'),
     path('<int:game_id>/gdd/create/', game_views.GameDesignDocumentCreateView.as_view(), name='gdd_create'),
+    path('<int:game_id>/gdd/delete/', GameDesignDocumentDeleteView.as_view(), name='gdd_delete'),
     path('gdd/<int:pk>/edit/', GameDesignDocumentEditView.as_view(), name='gdd_edit'),
     path('tasks/<int:task_id>/link-gdd-section/', TaskGDDSectionLinkView.as_view(), name='task_link_gdd_section'),
     path('<int:pk>/gdd/upload/', GDDUploadView.as_view(), name='gdd_upload'),
+    
+    # Structured GDD URLs (New user-friendly interface)
+    path('<int:game_id>/gdd/structured/create/', GDDStructuredCreateView.as_view(), name='gdd_structured_create'),
+    path('gdd/<int:pk>/structured/edit/', GDDStructuredEditView.as_view(), name='gdd_structured_edit'),
+    path('<int:game_id>/gdd/section/<str:section_id>/features/', GDDSectionFeatureView.as_view(), name='gdd_section_features'),
+    path('<int:game_id>/gdd/section/<int:section_id>/update-order/', UpdateFeatureOrderView.as_view(), name='update_feature_order'),
     
     # GDD Feature Management URLs
     path('gdd/<int:pk>/extract-features/', ExtractFeaturesView.as_view(), name='extract_features'),

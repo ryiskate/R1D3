@@ -1,6 +1,8 @@
 from bs4 import BeautifulSoup
 import re
+from django.forms import formset_factory
 from .game_models import GDDSection, GDDFeature, GameTask
+from .gdd_structured_form import GDDFeatureFormSet, GDDSubsectionFormSet, STANDARD_GDD_SECTIONS
 
 def extract_features_from_html(html_content):
     """
@@ -190,3 +192,84 @@ def update_gdd_html_with_task_status(gdd):
     gdd.save()
     
     return gdd.html_content
+
+
+def prepare_structured_gdd_sections(gdd=None):
+    """
+    Prepare structured GDD sections for the template based on the 13-section industry-standard template.
+    If a GDD is provided, it will map existing sections to the standard template.
+    Returns a dictionary with section formsets and feature formsets.
+    """
+    section_formsets = {}
+    
+    # Map existing sections to standard sections if GDD exists
+    existing_sections = {}
+    existing_subsections = {}
+    existing_features = {}
+    
+    if gdd:
+        # Get all sections for this GDD
+        for section in GDDSection.objects.filter(gdd=gdd).order_by('order'):
+            existing_sections[section.section_id] = section
+            
+            # Get features for this section and organize by subsection_id
+            section_features = GDDFeature.objects.filter(section=section).order_by('id')
+            for feature in section_features:
+                if section.section_id not in existing_features:
+                    existing_features[section.section_id] = {}
+                
+                subsection_key = feature.subsection_id if feature.subsection_id else 'main'
+                if subsection_key not in existing_features[section.section_id]:
+                    existing_features[section.section_id][subsection_key] = []
+                
+                existing_features[section.section_id][subsection_key].append(feature)
+    
+    # Prepare formsets for each standard section
+    for section in STANDARD_GDD_SECTIONS:
+        section_id = section['section_id']
+        section_data = {
+            'title': section['title'],
+            'section_id': section_id,
+            'order': section['order'],
+            'content': '',
+            'description': section.get('description', ''),
+            'subsections': []
+        }
+        
+        # If this section exists in the GDD, use its content
+        if section_id in existing_sections:
+            existing_section = existing_sections[section_id]
+            section_data['content'] = existing_section.content
+            section_data['id'] = existing_section.id
+        
+        # Process subsections
+        subsections_data = {}
+        for i, subsection in enumerate(section.get('subsections', [])):
+            subsection_id = subsection.get('subsection_id', f"{section_id}_{i}")
+            subsection_data = {
+                'title': subsection.get('title', ''),
+                'subsection_id': subsection_id,
+                'description': subsection.get('description', ''),
+                'order': i,
+                'content': ''
+            }
+            
+            # Add to section data
+            section_data['subsections'].append(subsection_data)
+            
+            # Store for formset
+            subsections_data[subsection_id] = subsection_data['content']
+        
+        # Create feature formsets - we'll create empty ones here
+        # The actual feature formsets will be loaded via AJAX
+        feature_formset = GDDFeatureFormSet(prefix=f'feature_{section_id}', 
+                                          queryset=GDDFeature.objects.none())
+        
+        # Store formsets
+        section_formsets[section_id] = {
+            'section': section_data,
+            'feature_formset': feature_formset,
+            'subsections': subsections_data
+        }
+    
+    return section_formsets

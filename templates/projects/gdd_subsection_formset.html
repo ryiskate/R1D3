@@ -1,0 +1,42 @@
+{{ subsection_formset.management_form }}
+
+{% for subsection_form in subsection_formset %}
+    <div class="subsection" data-subsection-id="{{ subsection_form.subsection_id.value|default:subsection_form.initial.subsection_id }}">
+        <h4 class="subsection-title">
+            {{ section_number }}.{{ forloop.counter }}. {{ subsection_form.title.value|default:subsection_form.initial.title }}
+            {{ subsection_form.id }}
+            {{ subsection_form.subsection_id }}
+        </h4>
+        <div class="mb-4">
+            <div class="mb-2">
+                <small class="text-muted"><i class="bi bi-info-circle"></i> {{ subsection_form.description.value|default:subsection_form.initial.description }}</small>
+            </div>
+            <label for="id_{{ subsection_form.prefix }}-{{ forloop.counter0 }}-content" class="form-label">Subsection Content</label>
+            {{ subsection_form.content }}
+        </div>
+        
+        <!-- Feature Table for this Subsection -->
+        <div class="feature-section">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="mb-0"><i class="bi bi-list-check"></i> Features & Tasks</h5>
+                <button type="button" class="btn btn-sm btn-outline-primary add-feature-btn" 
+                        data-section-id="{{ section_id }}" 
+                        data-subsection-id="{{ subsection_form.subsection_id.value|default:subsection_form.initial.subsection_id }}">
+                    <i class="bi bi-plus"></i> Add Feature
+                </button>
+            </div>
+            <div class="card">
+                <div class="card-body p-0">
+                    <div id="features-{{ section_id }}-{{ subsection_form.subsection_id.value|default:subsection_form.initial.subsection_id }}-container" 
+                         class="feature-formset-container">
+                        <!-- Feature formset will be loaded via AJAX -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% empty %}
+    <div class="alert alert-light">
+        <i class="bi bi-info-circle"></i> No subsections defined for this section.
+    </div>
+{% endfor %}

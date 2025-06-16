@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.views.generic import View, UpdateView
+from django.views.generic import View, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.contrib import messages
 from django.http import JsonResponse
 import json
@@ -17,6 +17,23 @@ class GameDesignDocumentEditView(LoginRequiredMixin, UserPassesTestMixin, Update
     model = GameDesignDocument
     form_class = GameDesignDocumentForm
     template_name = 'projects/gdd_form.html'
+    
+    def get_object(self, queryset=None):
+        # Override get_object to add debugging and ensure game relationship
+        obj = super().get_object(queryset)
+        # Make sure we have a valid game relationship
+        if not obj.game:
+            # Try to find the game from the URL if possible
+            game_id = self.kwargs.get('game_id')
+            if game_id:
+                from .game_models import GameProject
+                try:
+                    game = GameProject.objects.get(id=game_id)
+                    obj.game = game
+                    obj.save()
+                except GameProject.DoesNotExist:
+                    pass
+        return obj
     
     def test_func(self):
         # Only allow staff or game leads to edit GDDs
@@ -79,7 +96,13 @@ class GameDesignDocumentEditView(LoginRequiredMixin, UserPassesTestMixin, Update
         return redirect(self.get_success_url())
     
     def get_success_url(self):
-        return reverse('games:gdd_detail', kwargs={'pk': self.object.game.id})
+        # Add robust error handling for game ID
+        if self.object and self.object.game and self.object.game.id:
+            # Redirect to the game detail page using the game's ID
+            return reverse('games:game_detail', kwargs={'pk': self.object.game.id})
+        else:
+            # Fallback to the games list if we can't get the game ID
+            return reverse('games:game_list')
 
 
 class TaskGDDSectionLinkView(LoginRequiredMixin, View):
@@ -118,3 +141,28 @@ class TaskGDDSectionLinkView(LoginRequiredMixin, View):
                 'status': 'success', 
                 'message': 'Task unlinked from section'
             })
+
+
+class GameDesignDocumentDeleteView(LoginRequiredMixin, UserPassesTestMixin, View):
+    """
+    Delete a game design document and redirect to the create page.
+    This is primarily for development and testing purposes.
+    """
+    def test_func(self):
+        # Only allow staff or game leads to delete GDDs
+        game_id = self.kwargs.get('game_id')
+        game = get_object_or_404(GameProject, id=game_id)
+        return self.request.user.is_staff or self.request.user == game.lead_developer or self.request.user == game.lead_designer
+    
+    def get(self, request, *args, **kwargs):
+        game_id = self.kwargs.get('game_id')
+        game = get_object_or_404(GameProject, id=game_id)
+        
+        try:
+            gdd = GameDesignDocument.objects.get(game=game)
+            gdd.delete()
+            messages.success(request, "Game Design Document has been deleted. You can now create a new one.")
+        except GameDesignDocument.DoesNotExist:
+            messages.info(request, "No Game Design Document exists for this game.")
+        
+        return redirect('games:gdd_create', game_id=game_id)

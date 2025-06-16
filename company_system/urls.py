@@ -13,6 +13,11 @@ urlpatterns = [
     path('strategy/', include('strategy.urls')),
     path('projects/', include('projects.urls')),
     path('games/', include('projects.game_urls', namespace='games')),
+    # Department URLs
+    path('education/', include('education.urls', namespace='education')),
+    path('social-media/', include('social_media.urls', namespace='social_media')),
+    path('arcade/', include('arcade.urls', namespace='arcade')),
+    path('theme-park/', include('theme_park.urls', namespace='theme_park')),
     # The following paths may not be implemented yet
     # path('resources/', include('resources.urls')),
     # path('docs/', include('docs.urls')),

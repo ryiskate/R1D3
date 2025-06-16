@@ -1,0 +1,435 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Theme Park Staff | R1D3{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-4 text-gray-800">Theme Park Staff Management</h1>
+    
+    <!-- Staff Controls -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 font-weight-bold text-primary">Staff Management</h6>
+            <div class="dropdown no-arrow">
+                <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                    <div class="dropdown-header">Staff Actions:</div>
+                    <a class="dropdown-item" href="#"><i class="fas fa-file-export fa-sm fa-fw mr-2 text-gray-400"></i>Export Staff List</a>
+                    <a class="dropdown-item" href="#"><i class="fas fa-file-import fa-sm fa-fw mr-2 text-gray-400"></i>Import Staff Data</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="#"><i class="fas fa-cog fa-sm fa-fw mr-2 text-gray-400"></i>Staff Settings</a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addStaffModal">
+                <i class="fas fa-plus"></i> Add New Staff
+            </button>
+            
+            <div class="btn-group mb-3 ml-2">
+                <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    Filter by Role
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#">All Roles</a></li>
+                    <li><a class="dropdown-item" href="#">Ride Operator</a></li>
+                    <li><a class="dropdown-item" href="#">Maintenance Technician</a></li>
+                    <li><a class="dropdown-item" href="#">Food Service</a></li>
+                    <li><a class="dropdown-item" href="#">Customer Service</a></li>
+                    <li><a class="dropdown-item" href="#">Security</a></li>
+                    <li><a class="dropdown-item" href="#">Entertainment</a></li>
+                    <li><a class="dropdown-item" href="#">Management</a></li>
+                </ul>
+            </div>
+            
+            <div class="btn-group mb-3 ml-2">
+                <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    Filter by Area
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#">All Areas</a></li>
+                    <li><a class="dropdown-item" href="#">Future Zone</a></li>
+                    <li><a class="dropdown-item" href="#">Adventure Land</a></li>
+                    <li><a class="dropdown-item" href="#">Fantasy Kingdom</a></li>
+                    <li><a class="dropdown-item" href="#">Frontier Land</a></li>
+                    <li><a class="dropdown-item" href="#">Spooky Hollow</a></li>
+                    <li><a class="dropdown-item" href="#">Thrill Zone</a></li>
+                    <li><a class="dropdown-item" href="#">Water Park</a></li>
+                    <li><a class="dropdown-item" href="#">Main Street</a></li>
+                </ul>
+            </div>
+            
+            <div class="btn-group mb-3 ml-2">
+                <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    Filter by Status
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#">All Statuses</a></li>
+                    <li><a class="dropdown-item" href="#">Active</a></li>
+                    <li><a class="dropdown-item" href="#">On Leave</a></li>
+                    <li><a class="dropdown-item" href="#">Inactive</a></li>
+                    <li><a class="dropdown-item" href="#">Seasonal</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Staff Summary Cards -->
+    <div class="row">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total Staff</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">248</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Active Staff</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">215</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-user-check fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                On Leave</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">12</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-user-clock fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Seasonal Staff</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">21</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-user-plus fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Staff Table -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Staff Directory</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="staffTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Role</th>
+                            <th>Area</th>
+                            <th>Contact</th>
+                            <th>Start Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>TP-S001</td>
+                            <td>John Smith</td>
+                            <td>Ride Operator</td>
+                            <td>Future Zone</td>
+                            <td>jsmith@r1d3.com</td>
+                            <td>March 15, 2023</td>
+                            <td><span class="badge bg-success">Active</span></td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                                <a href="#" class="btn btn-sm btn-secondary"><i class="fas fa-calendar"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>TP-S002</td>
+                            <td>Sarah Johnson</td>
+                            <td>Maintenance Technician</td>
+                            <td>Adventure Land</td>
+                            <td>sjohnson@r1d3.com</td>
+                            <td>June 5, 2022</td>
+                            <td><span class="badge bg-success">Active</span></td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                                <a href="#" class="btn btn-sm btn-secondary"><i class="fas fa-calendar"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>TP-S003</td>
+                            <td>Michael Williams</td>
+                            <td>Food Service Manager</td>
+                            <td>Main Street</td>
+                            <td>mwilliams@r1d3.com</td>
+                            <td>January 10, 2021</td>
+                            <td><span class="badge bg-success">Active</span></td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                                <a href="#" class="btn btn-sm btn-secondary"><i class="fas fa-calendar"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>TP-S004</td>
+                            <td>Emily Chen</td>
+                            <td>Customer Service</td>
+                            <td>Main Street</td>
+                            <td>echen@r1d3.com</td>
+                            <td>April 22, 2024</td>
+                            <td><span class="badge bg-success">Active</span></td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                                <a href="#" class="btn btn-sm btn-secondary"><i class="fas fa-calendar"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>TP-S005</td>
+                            <td>David Lee</td>
+                            <td>Security Officer</td>
+                            <td>All Areas</td>
+                            <td>dlee@r1d3.com</td>
+                            <td>August 15, 2022</td>
+                            <td><span class="badge bg-success">Active</span></td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                                <a href="#" class="btn btn-sm btn-secondary"><i class="fas fa-calendar"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>TP-S006</td>
+                            <td>Jessica Martinez</td>
+                            <td>Entertainment Lead</td>
+                            <td>Fantasy Kingdom</td>
+                            <td>jmartinez@r1d3.com</td>
+                            <td>May 3, 2023</td>
+                            <td><span class="badge bg-warning">On Leave</span></td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                                <a href="#" class="btn btn-sm btn-secondary"><i class="fas fa-calendar"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>TP-S007</td>
+                            <td>Robert Taylor</td>
+                            <td>Ride Operator</td>
+                            <td>Thrill Zone</td>
+                            <td>rtaylor@r1d3.com</td>
+                            <td>June 1, 2025</td>
+                            <td><span class="badge bg-info">Seasonal</span></td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                                <a href="#" class="btn btn-sm btn-secondary"><i class="fas fa-calendar"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>TP-S008</td>
+                            <td>Amanda Wilson</td>
+                            <td>Operations Manager</td>
+                            <td>All Areas</td>
+                            <td>awilson@r1d3.com</td>
+                            <td>February 12, 2020</td>
+                            <td><span class="badge bg-success">Active</span></td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                                <a href="#" class="btn btn-sm btn-secondary"><i class="fas fa-calendar"></i></a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Staff Modal -->
+<div class="modal fade" id="addStaffModal" tabindex="-1" aria-labelledby="addStaffModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addStaffModalLabel">Add New Staff</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="staffFirstName" class="form-label">First Name</label>
+                            <input type="text" class="form-control" id="staffFirstName" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="staffLastName" class="form-label">Last Name</label>
+                            <input type="text" class="form-control" id="staffLastName" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="staffEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="staffEmail" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="staffPhone" class="form-label">Phone</label>
+                            <input type="tel" class="form-control" id="staffPhone" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="staffRole" class="form-label">Role</label>
+                            <select class="form-select" id="staffRole" required>
+                                <option value="" selected disabled>Select Role</option>
+                                <option value="ride_operator">Ride Operator</option>
+                                <option value="maintenance_technician">Maintenance Technician</option>
+                                <option value="food_service">Food Service</option>
+                                <option value="food_service_manager">Food Service Manager</option>
+                                <option value="customer_service">Customer Service</option>
+                                <option value="security">Security Officer</option>
+                                <option value="entertainment">Entertainment</option>
+                                <option value="entertainment_lead">Entertainment Lead</option>
+                                <option value="operations_manager">Operations Manager</option>
+                                <option value="area_manager">Area Manager</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="staffArea" class="form-label">Primary Area</label>
+                            <select class="form-select" id="staffArea" required>
+                                <option value="" selected disabled>Select Area</option>
+                                <option value="all_areas">All Areas</option>
+                                <option value="future_zone">Future Zone</option>
+                                <option value="adventure_land">Adventure Land</option>
+                                <option value="fantasy_kingdom">Fantasy Kingdom</option>
+                                <option value="frontier_land">Frontier Land</option>
+                                <option value="spooky_hollow">Spooky Hollow</option>
+                                <option value="thrill_zone">Thrill Zone</option>
+                                <option value="water_park">Water Park</option>
+                                <option value="main_street">Main Street</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="staffStartDate" class="form-label">Start Date</label>
+                            <input type="date" class="form-control" id="staffStartDate" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="staffStatus" class="form-label">Status</label>
+                            <select class="form-select" id="staffStatus" required>
+                                <option value="active" selected>Active</option>
+                                <option value="on_leave">On Leave</option>
+                                <option value="inactive">Inactive</option>
+                                <option value="seasonal">Seasonal</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="staffAddress" class="form-label">Address</label>
+                        <input type="text" class="form-control" id="staffAddress">
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="staffCity" class="form-label">City</label>
+                            <input type="text" class="form-control" id="staffCity">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="staffState" class="form-label">State/Province</label>
+                            <input type="text" class="form-control" id="staffState">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="staffZip" class="form-label">Zip/Postal Code</label>
+                            <input type="text" class="form-control" id="staffZip">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="staffEmergencyContact" class="form-label">Emergency Contact</label>
+                        <input type="text" class="form-control" id="staffEmergencyContact">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="staffEmergencyPhone" class="form-label">Emergency Contact Phone</label>
+                        <input type="tel" class="form-control" id="staffEmergencyPhone">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="staffNotes" class="form-label">Notes</label>
+                        <textarea class="form-control" id="staffNotes" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="staffPhoto" class="form-label">Staff Photo</label>
+                        <input class="form-control" type="file" id="staffPhoto">
+                    </div>
+                    
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="staffTrainingComplete">
+                        <label class="form-check-label" for="staffTrainingComplete">
+                            Initial Training Complete
+                        </label>
+                    </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary">Save Staff</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        $('#staffTable').DataTable();
+    });
+</script>
+{% endblock %}

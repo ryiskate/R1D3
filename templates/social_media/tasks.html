@@ -1,0 +1,395 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Social Media Tasks | R1D3{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-4 text-gray-800">Social Media Tasks</h1>
+    
+    <!-- Task Controls -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Task Management</h6>
+                    <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">Task Actions:</div>
+                            <a class="dropdown-item" href="#"><i class="fas fa-file-export fa-sm fa-fw mr-2 text-gray-400"></i>Export Tasks</a>
+                            <a class="dropdown-item" href="#"><i class="fas fa-file-import fa-sm fa-fw mr-2 text-gray-400"></i>Import Tasks</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#"><i class="fas fa-cog fa-sm fa-fw mr-2 text-gray-400"></i>Task Settings</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addTaskModal">
+                        <i class="fas fa-plus"></i> Add New Task
+                    </button>
+                    
+                    <div class="btn-group mb-3 ml-2">
+                        <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            Filter by Status
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">All Statuses</a></li>
+                            <li><a class="dropdown-item" href="#">To Do</a></li>
+                            <li><a class="dropdown-item" href="#">In Progress</a></li>
+                            <li><a class="dropdown-item" href="#">In Review</a></li>
+                            <li><a class="dropdown-item" href="#">Done</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="btn-group mb-3 ml-2">
+                        <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            Filter by Priority
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">All Priorities</a></li>
+                            <li><a class="dropdown-item" href="#">High</a></li>
+                            <li><a class="dropdown-item" href="#">Medium</a></li>
+                            <li><a class="dropdown-item" href="#">Low</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="btn-group mb-3 ml-2">
+                        <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            Filter by Assignee
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">All Assignees</a></li>
+                            <li><a class="dropdown-item" href="#">My Tasks</a></li>
+                            <li><a class="dropdown-item" href="#">Unassigned</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#">John Doe</a></li>
+                            <li><a class="dropdown-item" href="#">Jane Smith</a></li>
+                            <li><a class="dropdown-item" href="#">Alex Johnson</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Task Summary Cards -->
+    <div class="row">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total Tasks</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">24</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Completed Tasks</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">8</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                In Progress</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">10</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-spinner fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-danger shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                Overdue Tasks</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">3</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-exclamation-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tasks Table -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Social Media Tasks</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="tasksTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Task ID</th>
+                            <th>Title</th>
+                            <th>Description</th>
+                            <th>Due Date</th>
+                            <th>Assignee</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>SM-T001</td>
+                            <td>Create weekly content calendar</td>
+                            <td>Develop a content calendar for all social media platforms for the upcoming week</td>
+                            <td>June 18, 2025</td>
+                            <td>Jane Smith</td>
+                            <td><span class="badge bg-danger">High</span></td>
+                            <td><span class="badge bg-warning">In Progress</span></td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                                <a href="#" class="btn btn-sm btn-success"><i class="fas fa-check"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>SM-T002</td>
+                            <td>Design game announcement graphics</td>
+                            <td>Create graphics for the upcoming game announcement across all platforms</td>
+                            <td>June 20, 2025</td>
+                            <td>Alex Johnson</td>
+                            <td><span class="badge bg-danger">High</span></td>
+                            <td><span class="badge bg-warning">In Progress</span></td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                                <a href="#" class="btn btn-sm btn-success"><i class="fas fa-check"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>SM-T003</td>
+                            <td>Schedule developer interview</td>
+                            <td>Coordinate and schedule an interview with the lead developer for YouTube content</td>
+                            <td>June 22, 2025</td>
+                            <td>John Doe</td>
+                            <td><span class="badge bg-warning">Medium</span></td>
+                            <td><span class="badge bg-secondary">To Do</span></td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                                <a href="#" class="btn btn-sm btn-success"><i class="fas fa-check"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>SM-T004</td>
+                            <td>Respond to community comments</td>
+                            <td>Review and respond to comments on recent posts across all platforms</td>
+                            <td>June 17, 2025</td>
+                            <td>Jane Smith</td>
+                            <td><span class="badge bg-warning">Medium</span></td>
+                            <td><span class="badge bg-danger">Overdue</span></td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                                <a href="#" class="btn btn-sm btn-success"><i class="fas fa-check"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>SM-T005</td>
+                            <td>Analyze last campaign performance</td>
+                            <td>Review metrics and create a report on the last social media campaign</td>
+                            <td>June 15, 2025</td>
+                            <td>Alex Johnson</td>
+                            <td><span class="badge bg-info">Low</span></td>
+                            <td><span class="badge bg-success">Done</span></td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                                <a href="#" class="btn btn-sm btn-secondary"><i class="fas fa-redo"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>SM-T006</td>
+                            <td>Create TikTok content strategy</td>
+                            <td>Develop a content strategy specifically for TikTok platform</td>
+                            <td>June 25, 2025</td>
+                            <td>Unassigned</td>
+                            <td><span class="badge bg-warning">Medium</span></td>
+                            <td><span class="badge bg-secondary">To Do</span></td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                                <a href="#" class="btn btn-sm btn-success"><i class="fas fa-check"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>SM-T007</td>
+                            <td>Record gameplay footage</td>
+                            <td>Record gameplay footage for upcoming social media posts</td>
+                            <td>June 19, 2025</td>
+                            <td>John Doe</td>
+                            <td><span class="badge bg-warning">Medium</span></td>
+                            <td><span class="badge bg-warning">In Progress</span></td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                                <a href="#" class="btn btn-sm btn-success"><i class="fas fa-check"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>SM-T008</td>
+                            <td>Update social media profiles</td>
+                            <td>Update profile information and banners across all platforms</td>
+                            <td>June 16, 2025</td>
+                            <td>Jane Smith</td>
+                            <td><span class="badge bg-info">Low</span></td>
+                            <td><span class="badge bg-success">Done</span></td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                                <a href="#" class="btn btn-sm btn-secondary"><i class="fas fa-redo"></i></a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Task Modal -->
+<div class="modal fade" id="addTaskModal" tabindex="-1" aria-labelledby="addTaskModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addTaskModalLabel">Add New Task</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="taskTitle" class="form-label">Task Title</label>
+                            <input type="text" class="form-control" id="taskTitle" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="taskDueDate" class="form-label">Due Date</label>
+                            <input type="date" class="form-control" id="taskDueDate" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="taskDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="taskDescription" rows="3" required></textarea>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="taskAssignee" class="form-label">Assignee</label>
+                            <select class="form-select" id="taskAssignee">
+                                <option value="" selected>Unassigned</option>
+                                <option value="john_doe">John Doe</option>
+                                <option value="jane_smith">Jane Smith</option>
+                                <option value="alex_johnson">Alex Johnson</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="taskPriority" class="form-label">Priority</label>
+                            <select class="form-select" id="taskPriority" required>
+                                <option value="high">High</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="low">Low</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="taskStatus" class="form-label">Status</label>
+                            <select class="form-select" id="taskStatus" required>
+                                <option value="to_do" selected>To Do</option>
+                                <option value="in_progress">In Progress</option>
+                                <option value="in_review">In Review</option>
+                                <option value="done">Done</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Related Platforms</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="twitter" id="platformTwitter">
+                            <label class="form-check-label" for="platformTwitter">Twitter</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="facebook" id="platformFacebook">
+                            <label class="form-check-label" for="platformFacebook">Facebook</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="instagram" id="platformInstagram">
+                            <label class="form-check-label" for="platformInstagram">Instagram</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="youtube" id="platformYouTube">
+                            <label class="form-check-label" for="platformYouTube">YouTube</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="tiktok" id="platformTikTok">
+                            <label class="form-check-label" for="platformTikTok">TikTok</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="linkedin" id="platformLinkedIn">
+                            <label class="form-check-label" for="platformLinkedIn">LinkedIn</label>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="taskAttachments" class="form-label">Attachments</label>
+                        <input class="form-control" type="file" id="taskAttachments" multiple>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary">Save Task</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        $('#tasksTable').DataTable({
+            "order": [[3, "asc"]] // Sort by due date by default
+        });
+    });
+</script>
+{% endblock %}

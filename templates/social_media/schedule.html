@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Social Media Schedule | R1D3{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-4 text-gray-800">Social Media Post Schedule</h1>
+    
+    <!-- Schedule Calendar Section -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 font-weight-bold text-primary">Content Calendar</h6>
+            <div class="dropdown no-arrow">
+                <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                    <div class="dropdown-header">Calendar Actions:</div>
+                    <a class="dropdown-item" href="#"><i class="fas fa-plus fa-sm fa-fw mr-2 text-gray-400"></i>Add New Post</a>
+                    <a class="dropdown-item" href="#"><i class="fas fa-print fa-sm fa-fw mr-2 text-gray-400"></i>Print Calendar</a>
+                    <a class="dropdown-item" href="#"><i class="fas fa-file-export fa-sm fa-fw mr-2 text-gray-400"></i>Export Calendar</a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div id="calendar"></div>
+        </div>
+    </div>
+    
+    <!-- Upcoming Posts Section -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Upcoming Posts</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="upcomingPostsTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Post ID</th>
+                            <th>Title</th>
+                            <th>Platform</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>SM-P001</td>
+                            <td>New Game Teaser Announcement</td>
+                            <td><span class="badge bg-primary">Twitter</span> <span class="badge bg-danger">Instagram</span></td>
+                            <td>June 17, 2025</td>
+                            <td>10:00 AM</td>
+                            <td><span class="badge bg-warning">Scheduled</span></td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>SM-P002</td>
+                            <td>Developer Interview Video</td>
+                            <td><span class="badge bg-danger">YouTube</span> <span class="badge bg-primary">Facebook</span></td>
+                            <td>June 18, 2025</td>
+                            <td>2:00 PM</td>
+                            <td><span class="badge bg-warning">Scheduled</span></td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>SM-P003</td>
+                            <td>Game Feature Spotlight</td>
+                            <td><span class="badge bg-primary">Twitter</span> <span class="badge bg-info">LinkedIn</span></td>
+                            <td>June 19, 2025</td>
+                            <td>11:30 AM</td>
+                            <td><span class="badge bg-secondary">Draft</span></td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>SM-P004</td>
+                            <td>Community Highlight</td>
+                            <td><span class="badge bg-danger">Instagram</span> <span class="badge bg-primary">Facebook</span></td>
+                            <td>June 20, 2025</td>
+                            <td>3:00 PM</td>
+                            <td><span class="badge bg-secondary">Draft</span></td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>SM-P005</td>
+                            <td>Weekend Game Sale Announcement</td>
+                            <td><span class="badge bg-primary">All Platforms</span></td>
+                            <td>June 21, 2025</td>
+                            <td>9:00 AM</td>
+                            <td><span class="badge bg-info">In Review</span></td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        $('#upcomingPostsTable').DataTable();
+        
+        // Calendar initialization would go here
+        // This is a placeholder for actual calendar implementation
+        // which would require a calendar library like FullCalendar
+        $('#calendar').html('<div class="alert alert-info">Calendar view will be implemented here using a JavaScript calendar library.</div>');
+    });
+</script>
+{% endblock %}

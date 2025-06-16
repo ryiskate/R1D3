@@ -1,0 +1,71 @@
+<div class="section-card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center" id="heading-{{ section.section_id }}">
+        <h5 class="mb-0">
+            <span class="section-number">{{ section_number }}.</span> {{ section.title }}
+        </h5>
+        <button class="btn btn-link toggle-section" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ section.section_id }}" aria-expanded="true" aria-controls="collapse-{{ section.section_id }}">
+            <i class="bi bi-chevron-up"></i>
+        </button>
+    </div>
+    
+    <div id="collapse-{{ section.section_id }}" class="collapse show" aria-labelledby="heading-{{ section.section_id }}">
+        <div class="card-body">
+            <!-- Section Content -->
+            <div class="section-intro">
+                <p><strong>{{ section.title }}</strong> - {{ section.description }}</p>
+                <div class="mb-3">
+                    <label for="section_content_{{ section.section_id }}" class="form-label">Section Overview</label>
+                    <textarea name="section_content_{{ section.section_id }}" id="section_content_{{ section.section_id }}" class="form-control" rows="3" placeholder="Provide an overview of this section...">{{ section.content }}</textarea>
+                </div>
+            </div>
+            
+            <!-- Subsections -->
+            {% for subsection in section.subsections %}
+                <div class="subsection" data-subsection-id="{{ subsection.subsection_id }}">
+                    <h4 class="subsection-title">{{ section_number }}.{{ forloop.counter }}. {{ subsection.title }}</h4>
+                    <div class="mb-4">
+                        <div class="mb-2">
+                            <small class="text-muted"><i class="bi bi-info-circle"></i> {{ subsection.description }}</small>
+                        </div>
+                        <label for="subsection_content_{{ section.section_id }}_{{ subsection.subsection_id }}" class="form-label">Subsection Content</label>
+                        <textarea name="subsection_content_{{ section.section_id }}_{{ subsection.subsection_id }}" id="subsection_content_{{ section.section_id }}_{{ subsection.subsection_id }}" class="form-control" rows="3" placeholder="Provide details for this subsection...">{{ subsection.content }}</textarea>
+                    </div>
+                    
+                    <!-- Feature Table for this Subsection -->
+                    <div class="feature-section">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0"><i class="bi bi-list-check"></i> Features & Tasks</h5>
+                            <button type="button" class="btn btn-sm btn-outline-primary add-feature-btn" data-section-id="{{ section.section_id }}" data-subsection-id="{{ subsection.subsection_id }}">
+                                <i class="bi bi-plus"></i> Add Feature
+                            </button>
+                        </div>
+                        <div class="card">
+                            <div class="card-body p-0">
+                                <div id="features-{{ section.section_id }}-{{ subsection.subsection_id }}-container" class="feature-formset-container">
+                                    <!-- Feature formset will be loaded via AJAX -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            
+            <!-- Section-level features (if no subsections or additional features needed) -->
+            <div class="feature-section mt-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0"><i class="bi bi-list-check"></i> Section Features</h5>
+                    <button type="button" class="btn btn-sm btn-outline-primary add-feature-btn" data-section-id="{{ section.section_id }}">
+                        <i class="bi bi-plus"></i> Add Section Feature
+                    </button>
+                </div>
+                <div class="card">
+                    <div class="card-body p-0">
+                        <div id="features-{{ section.section_id }}-container" class="feature-formset-container">
+                            <!-- Features will be loaded via AJAX -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

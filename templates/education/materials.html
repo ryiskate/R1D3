@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Education Course Materials | R1D3{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-4 text-gray-800">Course Materials</h1>
+    
+    <!-- Course Materials Section -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 font-weight-bold text-primary">Available Materials</h6>
+            <div class="dropdown no-arrow">
+                <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                    <div class="dropdown-header">Material Actions:</div>
+                    <a class="dropdown-item" href="#"><i class="fas fa-plus fa-sm fa-fw mr-2 text-gray-400"></i>Add New Material</a>
+                    <a class="dropdown-item" href="#"><i class="fas fa-filter fa-sm fa-fw mr-2 text-gray-400"></i>Filter Materials</a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="materialsTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Material ID</th>
+                            <th>Title</th>
+                            <th>Type</th>
+                            <th>Related Class</th>
+                            <th>Author</th>
+                            <th>Date Added</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>MAT-001</td>
+                            <td>Game Design Principles Handbook</td>
+                            <td><span class="badge bg-primary">PDF</span></td>
+                            <td>Game Design Fundamentals</td>
+                            <td>John Smith</td>
+                            <td>2025-05-10</td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-download"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>MAT-002</td>
+                            <td>Unity Beginner Tutorial Series</td>
+                            <td><span class="badge bg-success">Video</span></td>
+                            <td>Unity Game Development</td>
+                            <td>Jane Doe</td>
+                            <td>2025-05-15</td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-play"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>MAT-003</td>
+                            <td>3D Modeling Exercise Files</td>
+                            <td><span class="badge bg-info">ZIP</span></td>
+                            <td>3D Modeling for Games</td>
+                            <td>Robert Johnson</td>
+                            <td>2025-05-20</td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-download"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>MAT-004</td>
+                            <td>Game Animation Principles</td>
+                            <td><span class="badge bg-warning">Presentation</span></td>
+                            <td>Game Art and Animation</td>
+                            <td>Sarah Williams</td>
+                            <td>2025-05-25</td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>MAT-005</td>
+                            <td>Sound Design Resource Pack</td>
+                            <td><span class="badge bg-danger">Audio</span></td>
+                            <td>Game Audio Design</td>
+                            <td>Michael Brown</td>
+                            <td>2025-06-01</td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-download"></i></a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        $('#materialsTable').DataTable();
+    });
+</script>
+{% endblock %}

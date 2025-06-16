@@ -1,0 +1,317 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Social Media Post Ideas | R1D3{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-4 text-gray-800">Social Media Post Ideas</h1>
+    
+    <!-- Post Ideas Controls -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Content Ideas Management</h6>
+                    <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">Idea Actions:</div>
+                            <a class="dropdown-item" href="#"><i class="fas fa-file-export fa-sm fa-fw mr-2 text-gray-400"></i>Export Ideas</a>
+                            <a class="dropdown-item" href="#"><i class="fas fa-file-import fa-sm fa-fw mr-2 text-gray-400"></i>Import Ideas</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addIdeaModal">
+                        <i class="fas fa-plus"></i> Add New Idea
+                    </button>
+                    
+                    <div class="btn-group mb-3 ml-2">
+                        <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            Filter by Platform
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">All Platforms</a></li>
+                            <li><a class="dropdown-item" href="#">Twitter</a></li>
+                            <li><a class="dropdown-item" href="#">Facebook</a></li>
+                            <li><a class="dropdown-item" href="#">Instagram</a></li>
+                            <li><a class="dropdown-item" href="#">YouTube</a></li>
+                            <li><a class="dropdown-item" href="#">TikTok</a></li>
+                            <li><a class="dropdown-item" href="#">LinkedIn</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="btn-group mb-3 ml-2">
+                        <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            Filter by Status
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">All Statuses</a></li>
+                            <li><a class="dropdown-item" href="#">New</a></li>
+                            <li><a class="dropdown-item" href="#">In Development</a></li>
+                            <li><a class="dropdown-item" href="#">Approved</a></li>
+                            <li><a class="dropdown-item" href="#">Scheduled</a></li>
+                            <li><a class="dropdown-item" href="#">Published</a></li>
+                            <li><a class="dropdown-item" href="#">Rejected</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Post Ideas Board -->
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 bg-light">
+                    <h6 class="m-0 font-weight-bold text-primary">New Ideas</h6>
+                </div>
+                <div class="card-body idea-column">
+                    <div class="card mb-3 idea-card">
+                        <div class="card-body">
+                            <span class="badge bg-primary mb-2">Twitter</span>
+                            <h5 class="card-title">Game Development Poll</h5>
+                            <p class="card-text">Poll asking followers which feature they'd like to see in the next update.</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">Added: June 15, 2025</small>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-sm btn-outline-primary"><i class="fas fa-arrow-right"></i></button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary"><i class="fas fa-edit"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card mb-3 idea-card">
+                        <div class="card-body">
+                            <span class="badge bg-danger mb-2">Instagram</span>
+                            <h5 class="card-title">Character Art Showcase</h5>
+                            <p class="card-text">Carousel post showing the evolution of character designs.</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">Added: June 14, 2025</small>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-sm btn-outline-primary"><i class="fas fa-arrow-right"></i></button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary"><i class="fas fa-edit"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 bg-light">
+                    <h6 class="m-0 font-weight-bold text-primary">In Development</h6>
+                </div>
+                <div class="card-body idea-column">
+                    <div class="card mb-3 idea-card">
+                        <div class="card-body">
+                            <span class="badge bg-danger mb-2">YouTube</span>
+                            <h5 class="card-title">Developer Diary</h5>
+                            <p class="card-text">Behind-the-scenes look at the development process with team interviews.</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">Added: June 10, 2025</small>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-sm btn-outline-primary"><i class="fas fa-arrow-right"></i></button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary"><i class="fas fa-edit"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card mb-3 idea-card">
+                        <div class="card-body">
+                            <span class="badge bg-primary mb-2">Facebook</span>
+                            <h5 class="card-title">Fan Art Friday</h5>
+                            <p class="card-text">Weekly showcase of the best fan art submissions from the community.</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">Added: June 12, 2025</small>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-sm btn-outline-primary"><i class="fas fa-arrow-right"></i></button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary"><i class="fas fa-edit"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 bg-light">
+                    <h6 class="m-0 font-weight-bold text-primary">Approved</h6>
+                </div>
+                <div class="card-body idea-column">
+                    <div class="card mb-3 idea-card">
+                        <div class="card-body">
+                            <span class="badge bg-info mb-2">TikTok</span>
+                            <h5 class="card-title">Game Mechanic Showcase</h5>
+                            <p class="card-text">Short video demonstrating a unique game mechanic with developer commentary.</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">Added: June 8, 2025</small>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-sm btn-outline-primary"><i class="fas fa-arrow-right"></i></button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary"><i class="fas fa-edit"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card mb-3 idea-card">
+                        <div class="card-body">
+                            <span class="badge bg-primary mb-2">Twitter</span>
+                            <h5 class="card-title">Game Tip Tuesday</h5>
+                            <p class="card-text">Weekly tips and tricks for players to improve their gameplay.</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">Added: June 9, 2025</small>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-sm btn-outline-primary"><i class="fas fa-arrow-right"></i></button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary"><i class="fas fa-edit"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 bg-light">
+                    <h6 class="m-0 font-weight-bold text-primary">Scheduled</h6>
+                </div>
+                <div class="card-body idea-column">
+                    <div class="card mb-3 idea-card">
+                        <div class="card-body">
+                            <span class="badge bg-primary mb-2">All Platforms</span>
+                            <h5 class="card-title">New Game Teaser</h5>
+                            <p class="card-text">Short teaser video for upcoming game release with key art.</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">Scheduled: June 17, 2025</small>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-sm btn-outline-primary"><i class="fas fa-arrow-right"></i></button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary"><i class="fas fa-edit"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card mb-3 idea-card">
+                        <div class="card-body">
+                            <span class="badge bg-danger mb-2">YouTube</span>
+                            <span class="badge bg-primary mb-2">Facebook</span>
+                            <h5 class="card-title">Developer Interview</h5>
+                            <p class="card-text">Interview with lead developer discussing upcoming features.</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">Scheduled: June 18, 2025</small>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-sm btn-outline-primary"><i class="fas fa-arrow-right"></i></button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary"><i class="fas fa-edit"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Idea Modal -->
+<div class="modal fade" id="addIdeaModal" tabindex="-1" aria-labelledby="addIdeaModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addIdeaModalLabel">Add New Post Idea</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="ideaTitle" class="form-label">Title</label>
+                        <input type="text" class="form-control" id="ideaTitle" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="ideaDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="ideaDescription" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Platforms</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="twitter" id="platformTwitter">
+                            <label class="form-check-label" for="platformTwitter">Twitter</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="facebook" id="platformFacebook">
+                            <label class="form-check-label" for="platformFacebook">Facebook</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="instagram" id="platformInstagram">
+                            <label class="form-check-label" for="platformInstagram">Instagram</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="youtube" id="platformYouTube">
+                            <label class="form-check-label" for="platformYouTube">YouTube</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="tiktok" id="platformTikTok">
+                            <label class="form-check-label" for="platformTikTok">TikTok</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="linkedin" id="platformLinkedIn">
+                            <label class="form-check-label" for="platformLinkedIn">LinkedIn</label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="ideaStatus" class="form-label">Status</label>
+                        <select class="form-select" id="ideaStatus" required>
+                            <option value="new" selected>New</option>
+                            <option value="in_development">In Development</option>
+                            <option value="approved">Approved</option>
+                            <option value="scheduled">Scheduled</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary">Save Idea</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Initialize drag and drop functionality for idea cards
+        // This would be implemented with a library like Sortable.js
+    });
+</script>
+
+{% block extra_css %}
+<style>
+    .idea-column {
+        min-height: 300px;
+    }
+    
+    .idea-card {
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .idea-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+</style>
+{% endblock %}
+{% endblock %}

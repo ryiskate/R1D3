@@ -1,0 +1,579 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Theme Park Revenue | R1D3{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-4 text-gray-800">Theme Park Revenue</h1>
+    
+    <!-- Revenue Controls -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 font-weight-bold text-primary">Revenue Dashboard</h6>
+            <div class="dropdown no-arrow">
+                <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                    <div class="dropdown-header">Revenue Actions:</div>
+                    <a class="dropdown-item" href="#"><i class="fas fa-file-export fa-sm fa-fw mr-2 text-gray-400"></i>Export Revenue Report</a>
+                    <a class="dropdown-item" href="#"><i class="fas fa-print fa-sm fa-fw mr-2 text-gray-400"></i>Print Report</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="#"><i class="fas fa-cog fa-sm fa-fw mr-2 text-gray-400"></i>Revenue Settings</a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label for="dateRangeSelect" class="form-label">Date Range</label>
+                    <select class="form-select" id="dateRangeSelect">
+                        <option value="today">Today</option>
+                        <option value="yesterday">Yesterday</option>
+                        <option value="last7days">Last 7 Days</option>
+                        <option value="last30days" selected>Last 30 Days</option>
+                        <option value="thisMonth">This Month</option>
+                        <option value="lastMonth">Last Month</option>
+                        <option value="thisQuarter">This Quarter</option>
+                        <option value="lastQuarter">Last Quarter</option>
+                        <option value="thisYear">This Year</option>
+                        <option value="lastYear">Last Year</option>
+                        <option value="custom">Custom Range</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="startDate" class="form-label">Start Date</label>
+                    <input type="date" class="form-control" id="startDate">
+                </div>
+                <div class="col-md-4">
+                    <label for="endDate" class="form-label">End Date</label>
+                    <input type="date" class="form-control" id="endDate">
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <button class="btn btn-primary" id="updateRevenueBtn">
+                        <i class="fas fa-sync-alt"></i> Update Report
+                    </button>
+                    <button class="btn btn-secondary ml-2" id="compareBtn">
+                        <i class="fas fa-chart-line"></i> Compare to Previous Period
+                    </button>
+                    <button class="btn btn-info ml-2" id="forecastBtn">
+                        <i class="fas fa-chart-bar"></i> View Forecast
+                    </button>
+                    <button class="btn btn-success ml-2" data-bs-toggle="modal" data-bs-target="#addRevenueModal">
+                        <i class="fas fa-plus"></i> Add Revenue Entry
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Revenue Summary Cards -->
+    <div class="row">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total Revenue</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">$1,285,600</div>
+                            <div class="text-xs text-success mt-1">
+                                <i class="fas fa-arrow-up"></i> 8.3% vs Last Period
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Ticket Sales</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">$745,200</div>
+                            <div class="text-xs text-success mt-1">
+                                <i class="fas fa-arrow-up"></i> 12.1% vs Last Period
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-ticket-alt fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Food & Beverage</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">$312,400</div>
+                            <div class="text-xs text-success mt-1">
+                                <i class="fas fa-arrow-up"></i> 5.2% vs Last Period
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-utensils fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Merchandise</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">$228,000</div>
+                            <div class="text-xs text-danger mt-1">
+                                <i class="fas fa-arrow-down"></i> 2.8% vs Last Period
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-shopping-bag fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Revenue Charts -->
+    <div class="row">
+        <!-- Monthly Revenue Chart -->
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Monthly Revenue</h6>
+                    <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">Chart Options:</div>
+                            <a class="dropdown-item" href="#">View as Bar Chart</a>
+                            <a class="dropdown-item" href="#">View as Line Chart</a>
+                            <a class="dropdown-item" href="#">Export Chart</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-area">
+                        <canvas id="monthlyRevenueChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Revenue Sources Chart -->
+        <div class="col-xl-4 col-lg-5">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Revenue Sources</h6>
+                    <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">Chart Options:</div>
+                            <a class="dropdown-item" href="#">View as Pie Chart</a>
+                            <a class="dropdown-item" href="#">View as Doughnut Chart</a>
+                            <a class="dropdown-item" href="#">Export Chart</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-pie pt-4 pb-2">
+                        <canvas id="revenueSourcesChart"></canvas>
+                    </div>
+                    <div class="mt-4 text-center small">
+                        <span class="mr-2">
+                            <i class="fas fa-circle text-primary"></i> Tickets
+                        </span>
+                        <span class="mr-2">
+                            <i class="fas fa-circle text-success"></i> Food & Beverage
+                        </span>
+                        <span class="mr-2">
+                            <i class="fas fa-circle text-info"></i> Merchandise
+                        </span>
+                        <span class="mr-2">
+                            <i class="fas fa-circle text-warning"></i> Other
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Revenue by Area Table -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Revenue by Park Area</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="revenueByAreaTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Area</th>
+                            <th>Ticket Revenue</th>
+                            <th>Food & Beverage</th>
+                            <th>Merchandise</th>
+                            <th>Other</th>
+                            <th>Total</th>
+                            <th>% of Park</th>
+                            <th>YoY Change</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Adventure Land</td>
+                            <td>$245,800</td>
+                            <td>$98,600</td>
+                            <td>$76,500</td>
+                            <td>$12,400</td>
+                            <td>$433,300</td>
+                            <td>33.7%</td>
+                            <td><span class="text-success">+12.4%</span></td>
+                        </tr>
+                        <tr>
+                            <td>Fantasy Kingdom</td>
+                            <td>$186,300</td>
+                            <td>$87,200</td>
+                            <td>$64,800</td>
+                            <td>$8,900</td>
+                            <td>$347,200</td>
+                            <td>27.0%</td>
+                            <td><span class="text-success">+8.2%</span></td>
+                        </tr>
+                        <tr>
+                            <td>Sci-Fi City</td>
+                            <td>$142,500</td>
+                            <td>$52,400</td>
+                            <td>$38,700</td>
+                            <td>$6,800</td>
+                            <td>$240,400</td>
+                            <td>18.7%</td>
+                            <td><span class="text-success">+5.6%</span></td>
+                        </tr>
+                        <tr>
+                            <td>Wild West Zone</td>
+                            <td>$98,200</td>
+                            <td>$43,600</td>
+                            <td>$29,500</td>
+                            <td>$5,200</td>
+                            <td>$176,500</td>
+                            <td>13.7%</td>
+                            <td><span class="text-danger">-2.3%</span></td>
+                        </tr>
+                        <tr>
+                            <td>Aqua World</td>
+                            <td>$72,400</td>
+                            <td>$30,600</td>
+                            <td>$18,500</td>
+                            <td>$4,700</td>
+                            <td>$126,200</td>
+                            <td>9.8%</td>
+                            <td><span class="text-success">+15.7%</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Revenue Entry Modal -->
+<div class="modal fade" id="addRevenueModal" tabindex="-1" aria-labelledby="addRevenueModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addRevenueModalLabel">Add Revenue Entry</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addRevenueForm">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="entryDate" class="form-label">Date</label>
+                            <input type="date" class="form-control" id="entryDate" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="revenueArea" class="form-label">Park Area</label>
+                            <select class="form-select" id="revenueArea" required>
+                                <option value="" selected disabled>Select Area</option>
+                                <option value="Adventure Land">Adventure Land</option>
+                                <option value="Fantasy Kingdom">Fantasy Kingdom</option>
+                                <option value="Sci-Fi City">Sci-Fi City</option>
+                                <option value="Wild West Zone">Wild West Zone</option>
+                                <option value="Aqua World">Aqua World</option>
+                                <option value="Entire Park">Entire Park (General)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="revenueCategory" class="form-label">Revenue Category</label>
+                            <select class="form-select" id="revenueCategory" required>
+                                <option value="" selected disabled>Select Category</option>
+                                <option value="Tickets">Tickets</option>
+                                <option value="Food & Beverage">Food & Beverage</option>
+                                <option value="Merchandise">Merchandise</option>
+                                <option value="Parking">Parking</option>
+                                <option value="Special Events">Special Events</option>
+                                <option value="VIP Experiences">VIP Experiences</option>
+                                <option value="Photo Services">Photo Services</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="revenueAmount" class="form-label">Amount ($)</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" id="revenueAmount" step="0.01" min="0" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="paymentMethod" class="form-label">Payment Method</label>
+                            <select class="form-select" id="paymentMethod">
+                                <option value="" selected disabled>Select Method</option>
+                                <option value="Cash">Cash</option>
+                                <option value="Credit Card">Credit Card</option>
+                                <option value="Debit Card">Debit Card</option>
+                                <option value="Mobile Payment">Mobile Payment</option>
+                                <option value="Park Card">Park Card</option>
+                                <option value="Online">Online</option>
+                                <option value="Mixed">Mixed</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="transactionCount" class="form-label">Number of Transactions</label>
+                            <input type="number" class="form-control" id="transactionCount" min="1">
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="relatedAttraction" class="form-label">Related Attraction</label>
+                            <select class="form-select" id="relatedAttraction">
+                                <option value="" selected>None</option>
+                                <option value="Cosmic Coaster">Cosmic Coaster</option>
+                                <option value="Pirate's Adventure">Pirate's Adventure</option>
+                                <option value="Enchanted Castle">Enchanted Castle</option>
+                                <option value="Space Odyssey">Space Odyssey</option>
+                                <option value="Wild River Rapids">Wild River Rapids</option>
+                                <option value="Frontier Shootout">Frontier Shootout</option>
+                                <option value="Mermaid Lagoon">Mermaid Lagoon</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="relatedEvent" class="form-label">Related Event</label>
+                            <select class="form-select" id="relatedEvent">
+                                <option value="" selected>None</option>
+                                <option value="Summer Festival">Summer Festival</option>
+                                <option value="Halloween Night">Halloween Night</option>
+                                <option value="Winter Wonderland">Winter Wonderland</option>
+                                <option value="Spring Celebration">Spring Celebration</option>
+                                <option value="Character Breakfast">Character Breakfast</option>
+                                <option value="Night Parade">Night Parade</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="revenueNotes" class="form-label">Notes</label>
+                        <textarea class="form-control" id="revenueNotes" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="isRecurring">
+                                <label class="form-check-label" for="isRecurring">
+                                    Recurring Revenue
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="includeTax">
+                                <label class="form-check-label" for="includeTax">
+                                    Tax Included in Amount
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="receiptUpload" class="form-label">Upload Receipt/Documentation</label>
+                        <input class="form-control" type="file" id="receiptUpload">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveRevenueBtn">Save Revenue Entry</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#revenueByAreaTable').DataTable({
+            "order": [[5, "desc"]],
+            "pageLength": 10,
+            "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]]
+        });
+        
+        // Monthly Revenue Chart
+        var ctx = document.getElementById("monthlyRevenueChart");
+        var myLineChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+                datasets: [{
+                    label: "Revenue",
+                    lineTension: 0.3,
+                    backgroundColor: "rgba(78, 115, 223, 0.05)",
+                    borderColor: "rgba(78, 115, 223, 1)",
+                    pointRadius: 3,
+                    pointBackgroundColor: "rgba(78, 115, 223, 1)",
+                    pointBorderColor: "rgba(78, 115, 223, 1)",
+                    pointHoverRadius: 3,
+                    pointHoverBackgroundColor: "rgba(78, 115, 223, 1)",
+                    pointHoverBorderColor: "rgba(78, 115, 223, 1)",
+                    pointHitRadius: 10,
+                    pointBorderWidth: 2,
+                    data: [850000, 920000, 1100000, 1250000, 1320000, 1480000, 1620000, 1580000, 1420000, 1280000, 1150000, 980000],
+                }],
+            },
+            options: {
+                maintainAspectRatio: false,
+                layout: {
+                    padding: {
+                        left: 10,
+                        right: 25,
+                        top: 25,
+                        bottom: 0
+                    }
+                },
+                scales: {
+                    y: {
+                        ticks: {
+                            maxTicksLimit: 5,
+                            padding: 10,
+                            callback: function(value, index, values) {
+                                return '$' + value.toLocaleString();
+                            }
+                        },
+                        grid: {
+                            color: "rgb(234, 236, 244)",
+                            zeroLineColor: "rgb(234, 236, 244)",
+                            drawBorder: false,
+                            borderDash: [2],
+                            zeroLineBorderDash: [2]
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false,
+                            drawBorder: false
+                        },
+                        ticks: {
+                            maxTicksLimit: 12
+                        }
+                    },
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: "rgb(255,255,255)",
+                        bodyColor: "#858796",
+                        titleMarginBottom: 10,
+                        titleColor: '#6e707e',
+                        titleFont: {
+                            size: 14
+                        },
+                        borderColor: '#dddfeb',
+                        borderWidth: 1,
+                        padding: 15,
+                        displayColors: false,
+                        intersect: false,
+                        mode: 'index',
+                        caretPadding: 10,
+                        callbacks: {
+                            label: function(context) {
+                                var label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += '$' + context.parsed.y.toLocaleString();
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Revenue Sources Chart
+        var ctx2 = document.getElementById("revenueSourcesChart");
+        var myPieChart = new Chart(ctx2, {
+            type: 'doughnut',
+            data: {
+                labels: ["Tickets", "Food & Beverage", "Merchandise", "Other"],
+                datasets: [{
+                    data: [58, 24, 18, 10],
+                    backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e'],
+                    hoverBackgroundColor: ['#2e59d9', '#17a673', '#2c9faf', '#dda20a'],
+                    hoverBorderColor: "rgba(234, 236, 244, 1)",
+                }],
+            },
+            options: {
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: "rgb(255,255,255)",
+                        bodyColor: "#858796",
+                        borderColor: '#dddfeb',
+                        borderWidth: 1,
+                        displayColors: false,
+                        caretPadding: 10,
+                    },
+                },
+                cutout: '70%',
+            },
+        });
+    });
+</script>
+{% endblock %}
