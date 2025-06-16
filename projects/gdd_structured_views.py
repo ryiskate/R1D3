@@ -233,12 +233,103 @@ class GDDSimpleCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
                 </div>
                 '''
             
+            # Get features section title and description
+            features_section_title = request.POST.get('features_section_title', 'Core Game Features')
+            features_section_description = request.POST.get('features_section_description', 'Define the essential features that make your game unique')
+            
+            # Process dynamic sections
+            dynamic_sections_html = ''
+            dynamic_section_prefix = 'dynamic_section_'
+            dynamic_sections = set()
+            
+            # Find all dynamic section fields in the POST data
+            for key in request.POST.keys():
+                if key.startswith(dynamic_section_prefix) and '_title' in key:
+                    section_id = key.split('_title')[0].replace(dynamic_section_prefix, '')
+                    dynamic_sections.add(section_id)
+            
+            # Process each dynamic section
+            for section_id in dynamic_sections:
+                section_title = request.POST.get(f'{dynamic_section_prefix}{section_id}_title', f'Section {section_id}')
+                section_description = request.POST.get(f'{dynamic_section_prefix}{section_id}_description', '')
+                
+                # Start the section HTML
+                section_html = f'''
+                <h3>{section_title}</h3>
+                <p>{section_description}</p>
+                '''
+                
+                # Check if this is a table section or bullet section
+                feature_keys = [k for k in request.POST.keys() if k.startswith(f'{dynamic_section_prefix}{section_id}_feature_') and 
+                                not k.endswith('_name') and not k.endswith('_priority') and 
+                                not k.endswith('_status') and not k.endswith('_notes')]
+                
+                bullet_keys = [k for k in request.POST.keys() if k.startswith(f'{dynamic_section_prefix}{section_id}_bullet_')]
+                
+                # If it has features, create a table
+                if feature_keys:
+                    section_html += '''
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>Description</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                    '''
+                    
+                    # Process each feature in this section
+                    for feature_key in feature_keys:
+                        feature_id = feature_key.split(f'{dynamic_section_prefix}{section_id}_feature_')[1]
+                        feature_name = request.POST.get(f'{dynamic_section_prefix}{section_id}_feature_{feature_id}_name', f'Feature {feature_id}')
+                        feature_desc = request.POST.get(feature_key, '')
+                        feature_priority = request.POST.get(f'{dynamic_section_prefix}{section_id}_feature_{feature_id}_priority', 'medium')
+                        feature_status = request.POST.get(f'{dynamic_section_prefix}{section_id}_feature_{feature_id}_status', 'backlog')
+                        feature_notes = request.POST.get(f'{dynamic_section_prefix}{section_id}_feature_{feature_id}_notes', '')
+                        
+                        # Add the feature row
+                        section_html += f'''
+                        <tr>
+                            <td>{feature_name}</td>
+                            <td>{feature_desc}</td>
+                            <td><span class="badge bg-primary">{feature_priority}</span></td>
+                            <td><span class="badge bg-secondary">{feature_status}</span></td>
+                            <td>{feature_notes}</td>
+                        </tr>
+                        '''
+                    
+                    section_html += '''
+                        </tbody>
+                    </table>
+                    '''
+                
+                # If it has bullets, create a bullet list
+                elif bullet_keys:
+                    section_html += '<ul>\n'
+                    
+                    # Process each bullet point
+                    for bullet_key in sorted(bullet_keys):
+                        bullet_content = request.POST.get(bullet_key, '')
+                        if bullet_content.strip():
+                            section_html += f'<li>{bullet_content}</li>\n'
+                    
+                    section_html += '</ul>\n'
+                
+                # Add the section HTML to the dynamic sections
+                dynamic_sections_html += section_html
+            
             # Create HTML content for the GDD
             html_content = f'''
             <h2>Game Overview</h2>
             <p>This Game Design Document outlines the core features and elements of {game.title}.</p>
             
-            <h3>Features</h3>
+            <h3>{features_section_title}</h3>
+            <p>{features_section_description}</p>
+            
             <table class="table table-bordered">
                 <thead>
                     <tr>
@@ -276,6 +367,8 @@ class GDDSimpleCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
             </table>
             
             {custom_section_html}
+            
+            {dynamic_sections_html}
             '''
             
             # Create the GDD with HTML content mode enabled

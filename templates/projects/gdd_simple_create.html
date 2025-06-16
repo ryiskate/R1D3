@@ -145,6 +145,17 @@
                             <h4>Game Overview</h4>
                         </div>
                         
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <input type="text" class="form-control form-control-lg" name="features_section_title" value="Core Game Features" placeholder="Section Title">
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <input type="text" class="form-control" name="features_section_description" value="Define the essential features that make your game unique" placeholder="Section Description">
+                            </div>
+                        </div>
+                        
                         <table class="feature-table">
                             <thead>
                                 <tr>
@@ -278,6 +289,36 @@
                             </div>
                         </div>
                         
+                        <!-- Container for dynamically added blocks -->
+                        <div id="dynamic-blocks-container">
+                            <!-- Dynamic blocks will be inserted here -->
+                        </div>
+                        
+                        <!-- Add Block Dropdown -->
+                        <div class="mb-4">
+                            <div class="card">
+                                <div class="card-header bg-light">
+                                    <h5 class="mb-0">Add New Section</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <select class="form-select" id="block-type-select">
+                                                <option value="">-- Select Block Type --</option>
+                                                <option value="table">Feature Table</option>
+                                                <option value="bullet">Bullet Points</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <button type="button" class="btn btn-success" id="add-block-btn" disabled>
+                                                <i class="bi bi-plus-circle"></i> Add Section
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <div class="mt-4 d-flex justify-content-between">
                             <a href="{% url 'games:game_detail' game.id %}" class="btn btn-outline-secondary">
                                 <i class="bi bi-x-circle"></i> Cancel
@@ -300,10 +341,14 @@
         // Get references to the buttons and containers
         const addFeatureBtn = document.getElementById('add-feature-btn');
         const addBulletBtn = document.getElementById('add-bullet-btn');
+        const addBlockBtn = document.getElementById('add-block-btn');
+        const blockTypeSelect = document.getElementById('block-type-select');
+        const dynamicBlocksContainer = document.getElementById('dynamic-blocks-container');
         const featuresTable = document.querySelector('.feature-table tbody');
         const bulletPointsContainer = document.querySelector('.bullet-points');
         let featureCounter = 1;
         let bulletCounter = 4; // Start from 4 since we already have 3 bullet points
+        let sectionCounter = 1; // Counter for dynamic sections
         
         // Remove any existing event listeners to prevent duplicates
         const newAddFeatureBtn = addFeatureBtn.cloneNode(true);
@@ -350,6 +395,255 @@
             // Focus on the new input
             bulletInput.focus();
         });
+        
+        // Enable/disable the Add Section button based on selection
+        blockTypeSelect.addEventListener('change', function() {
+            addBlockBtn.disabled = !this.value;
+        });
+        
+        // Add event listener for adding new blocks
+        addBlockBtn.addEventListener('click', function() {
+            const blockType = blockTypeSelect.value;
+            if (!blockType) return;
+            
+            // Create a new section container
+            const sectionContainer = document.createElement('div');
+            sectionContainer.className = 'dynamic-section mb-5';
+            sectionContainer.dataset.sectionId = `dynamic_section_${sectionCounter}`;
+            
+            // Create section header with title and description inputs
+            const sectionHeader = document.createElement('div');
+            sectionHeader.className = 'row mb-3';
+            sectionHeader.innerHTML = `
+                <div class="col-md-12">
+                    <input type="text" class="form-control form-control-lg" 
+                           name="dynamic_section_${sectionCounter}_title" 
+                           value="${blockType === 'table' ? 'New Feature Section' : 'New Bullet Section'}" 
+                           placeholder="Section Title">
+                </div>
+                <div class="col-md-12 mt-2">
+                    <input type="text" class="form-control" 
+                           name="dynamic_section_${sectionCounter}_description" 
+                           value="${blockType === 'table' ? 'Define features for this section' : 'List key points for this section'}" 
+                           placeholder="Section Description">
+                </div>
+            `;
+            
+            // Add the header to the section container
+            sectionContainer.appendChild(sectionHeader);
+            
+            // Create content based on block type
+            if (blockType === 'table') {
+                // Create a feature table
+                const tableContainer = document.createElement('div');
+                tableContainer.innerHTML = `
+                    <table class="feature-table dynamic-feature-table" data-table-id="${sectionCounter}">
+                        <thead>
+                            <tr>
+                                <th style="width: 20%">Feature</th>
+                                <th style="width: 40%">Description</th>
+                                <th style="width: 10%">Priority</th>
+                                <th style="width: 10%">Status</th>
+                                <th style="width: 20%">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <input type="text" class="form-control form-control-sm" 
+                                           name="dynamic_section_${sectionCounter}_feature_1_name" 
+                                           value="Feature 1" placeholder="Feature name">
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control form-control-sm" 
+                                           name="dynamic_section_${sectionCounter}_feature_1" 
+                                           placeholder="Feature description">
+                                </td>
+                                <td>
+                                    <select class="form-select form-select-sm" 
+                                            name="dynamic_section_${sectionCounter}_feature_1_priority">
+                                        <option value="critical">Critical</option>
+                                        <option value="high" selected>High</option>
+                                        <option value="medium">Medium</option>
+                                        <option value="low">Low</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="form-select form-select-sm" 
+                                            name="dynamic_section_${sectionCounter}_feature_1_status">
+                                        <option value="backlog" selected>Backlog</option>
+                                        <option value="to_do">To Do</option>
+                                        <option value="in_progress">In Progress</option>
+                                        <option value="in_review">In Review</option>
+                                        <option value="done">Done</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control form-control-sm" 
+                                           name="dynamic_section_${sectionCounter}_feature_1_notes" 
+                                           placeholder="Additional notes">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="d-flex justify-content-start mt-1 mb-2">
+                        <button type="button" class="btn btn-outline-primary btn-sm dynamic-add-feature-btn" 
+                                data-section="${sectionCounter}">
+                            <i class="bi bi-plus-circle"></i> Add Feature
+                        </button>
+                    </div>
+                `;
+                sectionContainer.appendChild(tableContainer);
+            } else if (blockType === 'bullet') {
+                // Create bullet points
+                const bulletContainer = document.createElement('div');
+                bulletContainer.className = 'mb-4';
+                bulletContainer.innerHTML = `
+                    <div class="dynamic-bullet-points" data-bullet-section="${sectionCounter}">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="me-2">•</span>
+                            <input type="text" class="form-control form-control-sm" 
+                                   name="dynamic_section_${sectionCounter}_bullet_1" 
+                                   placeholder="Key point 1">
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="me-2">•</span>
+                            <input type="text" class="form-control form-control-sm" 
+                                   name="dynamic_section_${sectionCounter}_bullet_2" 
+                                   placeholder="Key point 2">
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="me-2">•</span>
+                            <input type="text" class="form-control form-control-sm" 
+                                   name="dynamic_section_${sectionCounter}_bullet_3" 
+                                   placeholder="Key point 3">
+                        </div>
+                        <div class="d-flex justify-content-start mt-1">
+                            <button type="button" class="btn btn-outline-secondary btn-sm dynamic-add-bullet-btn" 
+                                    data-section="${sectionCounter}">
+                                <i class="bi bi-plus-circle"></i> Add Bullet
+                            </button>
+                        </div>
+                    </div>
+                `;
+                sectionContainer.appendChild(bulletContainer);
+            }
+            
+            // Add a remove button for the section
+            const removeButtonContainer = document.createElement('div');
+            removeButtonContainer.className = 'd-flex justify-content-end mb-3';
+            const removeButton = document.createElement('button');
+            removeButton.type = 'button';
+            removeButton.className = 'btn btn-outline-danger btn-sm';
+            removeButton.innerHTML = '<i class="bi bi-trash"></i> Remove Section';
+            removeButton.addEventListener('click', function() {
+                sectionContainer.remove();
+            });
+            removeButtonContainer.appendChild(removeButton);
+            sectionContainer.appendChild(removeButtonContainer);
+            
+            // Add a horizontal rule for visual separation
+            const hr = document.createElement('hr');
+            hr.className = 'my-4';
+            sectionContainer.appendChild(hr);
+            
+            // Add the new section to the container
+            dynamicBlocksContainer.appendChild(sectionContainer);
+            
+            // Increment the section counter
+            sectionCounter++;
+            
+            // Reset the dropdown
+            blockTypeSelect.value = '';
+            addBlockBtn.disabled = true;
+            
+            // Add event listeners for the dynamic buttons
+            setupDynamicButtonListeners();
+        });
+        
+        // Function to set up event listeners for dynamically added buttons
+        function setupDynamicButtonListeners() {
+            // Add feature buttons
+            document.querySelectorAll('.dynamic-add-feature-btn').forEach(btn => {
+                btn.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    
+                    const sectionId = this.dataset.section;
+                    const tableBody = document.querySelector(`.dynamic-feature-table[data-table-id="${sectionId}"] tbody`);
+                    const featureRows = tableBody.querySelectorAll('tr');
+                    const featureIndex = featureRows.length + 1;
+                    
+                    // Create a new row
+                    const newRow = document.createElement('tr');
+                    newRow.innerHTML = `
+                        <td>
+                            <input type="text" class="form-control form-control-sm" 
+                                   name="dynamic_section_${sectionId}_feature_${featureIndex}_name" 
+                                   value="Feature ${featureIndex}" placeholder="Feature name">
+                        </td>
+                        <td>
+                            <input type="text" class="form-control form-control-sm" 
+                                   name="dynamic_section_${sectionId}_feature_${featureIndex}" 
+                                   placeholder="Feature description">
+                        </td>
+                        <td>
+                            <select class="form-select form-select-sm" 
+                                    name="dynamic_section_${sectionId}_feature_${featureIndex}_priority">
+                                <option value="critical">Critical</option>
+                                <option value="high">High</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="low">Low</option>
+                            </select>
+                        </td>
+                        <td>
+                            <select class="form-select form-select-sm" 
+                                    name="dynamic_section_${sectionId}_feature_${featureIndex}_status">
+                                <option value="backlog" selected>Backlog</option>
+                                <option value="to_do">To Do</option>
+                                <option value="in_progress">In Progress</option>
+                                <option value="in_review">In Review</option>
+                                <option value="done">Done</option>
+                            </select>
+                        </td>
+                        <td>
+                            <input type="text" class="form-control form-control-sm" 
+                                   name="dynamic_section_${sectionId}_feature_${featureIndex}_notes" 
+                                   placeholder="Additional notes">
+                        </td>
+                    `;
+                    
+                    tableBody.appendChild(newRow);
+                });
+            });
+            
+            // Add bullet buttons
+            document.querySelectorAll('.dynamic-add-bullet-btn').forEach(btn => {
+                btn.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    
+                    const sectionId = this.dataset.section;
+                    const bulletContainer = document.querySelector(`.dynamic-bullet-points[data-bullet-section="${sectionId}"]`);
+                    const bulletPoints = bulletContainer.querySelectorAll('input[type="text"]');
+                    const bulletIndex = bulletPoints.length + 1;
+                    
+                    // Create a new bullet point
+                    const newBulletContainer = document.createElement('div');
+                    newBulletContainer.className = 'd-flex align-items-center mb-2';
+                    newBulletContainer.innerHTML = `
+                        <span class="me-2">•</span>
+                        <input type="text" class="form-control form-control-sm" 
+                               name="dynamic_section_${sectionId}_bullet_${bulletIndex}" 
+                               placeholder="Key point ${bulletIndex}">
+                    `;
+                    
+                    // Insert the new bullet point before the button container
+                    const buttonContainer = this.parentElement.parentElement;
+                    bulletContainer.insertBefore(newBulletContainer, buttonContainer);
+                });
+            });
+        }
         
         // Add the event listener to the new feature button
         newAddFeatureBtn.addEventListener('click', function(event) {
