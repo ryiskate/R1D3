@@ -237,6 +237,128 @@ class GDDSimpleCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
             features_section_title = request.POST.get('features_section_title', 'Core Game Features')
             features_section_description = request.POST.get('features_section_description', 'Define the essential features that make your game unique')
             
+            # Process static sections
+            static_sections_html = ''
+            static_sections = [
+                'gameplay', 'gameworld', 'characters', 'narrative', 'technical', 
+                'audio', 'ui', 'art', 'monetization', 'development', 'marketing', 'appendices'
+            ]
+            
+            section_titles = {
+                'gameplay': '2. Gameplay',
+                'gameworld': '3. Game World',
+                'characters': '4. Characters',
+                'narrative': '5. Narrative',
+                'technical': '6. Technical Requirements',
+                'audio': '7. Audio Design',
+                'ui': '8. User Interface & UX',
+                'art': '9. Art Direction',
+                'monetization': '10. Monetization',
+                'development': '11. Development & Production',
+                'marketing': '12. Marketing & Distribution',
+                'appendices': '13. Appendices'
+            }
+            
+            section_descriptions = {
+                'gameplay': 'Define the core mechanics, controls, progression systems, and game economy',
+                'gameworld': 'Define the world overview, environments, level design, and world interaction',
+                'characters': 'Define player characters, NPCs, enemies, and relationships',
+                'narrative': 'Define the story overview, narrative structure, storytelling methods, and player choice',
+                'technical': 'Define platform-specific requirements and technical specifications',
+                'audio': 'Define music, sound effects, voice acting, and audio implementation',
+                'ui': 'Define UI design, HUD, menus, and accessibility features',
+                'art': 'Define visual style, character art, environment art, and visual effects',
+                'monetization': 'Define revenue model, in-game purchases, monetization balance, and additional revenue streams',
+                'development': 'Define development roadmap, team structure, budget, and post-launch support',
+                'marketing': 'Define marketing strategy, promotional channels, distribution platforms, and community engagement',
+                'appendices': 'Additional reference materials, technical specifications, change log, and glossary'
+            }
+            
+            for section_key in static_sections:
+                # Check if section has content
+                has_feature_table = False
+                has_bullet_points = False
+                
+                # Check for feature table
+                feature_keys = []
+                for key in request.POST.keys():
+                    if key.startswith(f"{section_key}_feature_") and not key.endswith('_name') and not key.endswith('_priority') and not key.endswith('_status') and not key.endswith('_notes'):
+                        feature_keys.append(key)
+                        has_feature_table = True
+                
+                # Check for bullet points
+                bullet_keys = []
+                for key in request.POST.keys():
+                    if key.startswith(f"{section_key}_bullet_"):
+                        bullet_keys.append(key)
+                        has_bullet_points = True
+                
+                # If section has content, generate HTML
+                if has_feature_table or has_bullet_points:
+                    section_html = f'''
+                    <h2>{section_titles.get(section_key, f'Section {section_key}')}</h2>
+                    <p>{section_descriptions.get(section_key, '')}</p>
+                    '''
+                    
+                    if has_feature_table:
+                        # Generate feature table HTML
+                        section_html += '''
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th style="width: 20%">Feature</th>
+                                    <th style="width: 40%">Description</th>
+                                    <th style="width: 10%">Priority</th>
+                                    <th style="width: 10%">Status</th>
+                                    <th style="width: 20%">Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                        '''
+                        
+                        # Sort feature keys to maintain order
+                        feature_keys.sort(key=lambda x: int(x.split('_')[-1]) if x.split('_')[-1].isdigit() else 0)
+                        
+                        for feature_key in feature_keys:
+                            feature_id = feature_key.split(f"{section_key}_feature_")[1]
+                            feature_name = request.POST.get(f"{section_key}_feature_{feature_id}_name", f"Feature {feature_id}")
+                            feature_desc = request.POST.get(feature_key, "")
+                            feature_priority = request.POST.get(f"{section_key}_feature_{feature_id}_priority", "medium")
+                            feature_status = request.POST.get(f"{section_key}_feature_{feature_id}_status", "backlog")
+                            feature_notes = request.POST.get(f"{section_key}_feature_{feature_id}_notes", "")
+                            
+                            section_html += f'''
+                            <tr>
+                                <td>{feature_name}</td>
+                                <td>{feature_desc}</td>
+                                <td><span class="badge bg-primary">{feature_priority}</span></td>
+                                <td><span class="badge bg-secondary">{feature_status}</span></td>
+                                <td>{feature_notes}</td>
+                            </tr>
+                            '''
+                        
+                        section_html += '''
+                            </tbody>
+                        </table>
+                        '''
+                    
+                    if has_bullet_points:
+                        # Generate bullet points HTML
+                        section_html += '<ul>\n'
+                        
+                        # Sort bullet keys to maintain order
+                        bullet_keys.sort(key=lambda x: int(x.split('_')[-1]) if x.split('_')[-1].isdigit() else 0)
+                        
+                        for bullet_key in bullet_keys:
+                            bullet_text = request.POST.get(bullet_key, "").strip()
+                            if bullet_text:  # Only add non-empty bullet points
+                                section_html += f'<li>{bullet_text}</li>\n'
+                        
+                        section_html += '</ul>\n'
+                    
+                    # Add section HTML to static sections HTML
+                    static_sections_html += section_html
+            
             # Process dynamic sections
             dynamic_sections_html = ''
             dynamic_section_prefix = 'dynamic_section_'
@@ -286,7 +408,7 @@ class GDDSimpleCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
                     for feature_key in feature_keys:
                         feature_id = feature_key.split(f'{dynamic_section_prefix}{section_id}_feature_')[1]
                         feature_name = request.POST.get(f'{dynamic_section_prefix}{section_id}_feature_{feature_id}_name', f'Feature {feature_id}')
-                        feature_desc = request.POST.get(feature_key, '')
+                        feature_desc = request.POST.get(feature_key, "")
                         feature_priority = request.POST.get(f'{dynamic_section_prefix}{section_id}_feature_{feature_id}_priority', 'medium')
                         feature_status = request.POST.get(f'{dynamic_section_prefix}{section_id}_feature_{feature_id}_status', 'backlog')
                         feature_notes = request.POST.get(f'{dynamic_section_prefix}{section_id}_feature_{feature_id}_notes', '')
@@ -324,40 +446,38 @@ class GDDSimpleCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
             
             # Create HTML content for the GDD
             html_content = f'''
-            <h2>Game Overview</h2>
-            <p>This Game Design Document outlines the core features and elements of {game.title}.</p>
+            <h1>{title}</h1>
+            <p>{description}</p>
             
-            <h3>{features_section_title}</h3>
-            <p>{features_section_description}</p>
-            
+            <h2>1. Game Overview</h2>
             <table class="table table-bordered">
                 <thead>
                     <tr>
-                        <th>Feature</th>
-                        <th>Description</th>
-                        <th>Priority</th>
-                        <th>Status</th>
-                        <th>Notes</th>
+                        <th style="width: 20%">Feature</th>
+                        <th style="width: 40%">Description</th>
+                        <th style="width: 10%">Priority</th>
+                        <th style="width: 10%">Status</th>
+                        <th style="width: 20%">Notes</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
                         <td>{high_concept_name}</td>
-                        <td>{high_concept or "A brief description of the game concept."}</td>
-                        <td><span class="badge bg-danger">{high_concept_priority}</span></td>
+                        <td>{high_concept}</td>
+                        <td><span class="badge bg-primary">{high_concept_priority}</span></td>
                         <td><span class="badge bg-secondary">{high_concept_status}</span></td>
                         <td>{high_concept_notes}</td>
                     </tr>
                     <tr>
                         <td>{target_audience_name}</td>
-                        <td>{target_audience or "The types of players the game is designed for."}</td>
-                        <td><span class="badge bg-warning">{target_audience_priority}</span></td>
+                        <td>{target_audience}</td>
+                        <td><span class="badge bg-primary">{target_audience_priority}</span></td>
                         <td><span class="badge bg-secondary">{target_audience_status}</span></td>
                         <td>{target_audience_notes}</td>
                     </tr>
                     <tr>
                         <td>{unique_selling_points_name}</td>
-                        <td>{unique_selling_points or "What makes this game unique."}</td>
+                        <td>{unique_selling_points}</td>
                         <td><span class="badge bg-primary">{unique_selling_points_priority}</span></td>
                         <td><span class="badge bg-secondary">{unique_selling_points_status}</span></td>
                         <td>{unique_selling_points_notes}</td>
@@ -367,7 +487,7 @@ class GDDSimpleCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
             </table>
             
             {custom_section_html}
-            
+            {static_sections_html}
             {dynamic_sections_html}
             '''
             

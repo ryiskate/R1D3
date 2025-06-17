@@ -141,182 +141,251 @@
                             </div>
                         </div>
                         
-                        <div class="section-header">
-                            <h4>Game Overview</h4>
-                        </div>
-                        
-                        <div class="row mb-3">
-                            <div class="col-md-12">
-                                <input type="text" class="form-control form-control-lg" name="features_section_title" value="Core Game Features" placeholder="Section Title">
+                        <div class="gdd-section" id="overview-section" style="background: none;">
+                            <h3 style="color: #E91E63; text-shadow: none;">1. Game Overview</h3>
+                            <p style="color: #212529;">Define the high concept, target audience, unique selling points, and platforms</p>
+                            
+                            <div class="mb-3">
+                                <select class="form-select section-type-select" id="overview-type-select" data-section="overview">
+                                    <option value="">-- Select Content Type --</option>
+                                    <option value="table">Feature Table</option>
+                                    <option value="bullet">Bullet Points</option>
+                                </select>
                             </div>
+                            
+                            <div id="overview-content" class="section-content"></div>
                         </div>
-                        <div class="row mb-3">
-                            <div class="col-md-12">
-                                <input type="text" class="form-control" name="features_section_description" value="Define the essential features that make your game unique" placeholder="Section Description">
+                        
+                        <!-- Section title and additional notes removed as requested -->
+                        
+                        <!-- Static GDD Sections -->
+                        <style>
+                            .gdd-section {
+                                padding: 20px;
+                                border-radius: 8px;
+                                margin-bottom: 30px;
+                                position: relative;
+                                background: none;
+                            }
+                            
+                            .gdd-section::after {
+                                content: '';
+                                position: absolute;
+                                bottom: -15px;
+                                left: 0;
+                                width: 100%;
+                                height: 2px;
+                                background: #333;
+                            }
+                            
+                            .gdd-section h3 {
+                                margin-top: 0;
+                                text-shadow: none;
+                            }
+                            
+                            .gdd-section p {
+                                color: #212529;
+                            }
+                            
+                            /* Colorful titles for each section */
+                            #overview-section h3 { color: #E91E63; }
+                            #gameplay-section h3 { color: #FF5722; }
+                            #gameworld-section h3 { color: #4CAF50; }
+                            #characters-section h3 { color: #2196F3; }
+                            #narrative-section h3 { color: #9C27B0; }
+                            #technical-section h3 { color: #607D8B; }
+                            #audio-section h3 { color: #00BCD4; }
+                            #ui-section h3 { color: #3F51B5; }
+                            #art-section h3 { color: #FF9800; }
+                            #monetization-section h3 { color: #795548; }
+                            #development-section h3 { color: #009688; }
+                            #marketing-section h3 { color: #FFC107; }
+                            #appendices-section h3 { color: #673AB7; }
+                        </style>
+                        
+                        <div class="gdd-section section-gameplay" id="gameplay-section">
+                            <h3>2. Gameplay</h3>
+                            <p>Define the core mechanics, controls, progression systems, and game economy</p>
+                            
+                            <div class="mb-3">
+                                <select class="form-select section-type-select" id="gameplay-type-select" data-section="gameplay">
+                                    <option value="">-- Select Content Type --</option>
+                                    <option value="table">Feature Table</option>
+                                    <option value="bullet">Bullet Points</option>
+                                </select>
                             </div>
+                            
+                            <div id="gameplay-content" class="section-content"></div>
                         </div>
                         
-                        <table class="feature-table">
-                            <thead>
-                                <tr>
-                                    <th style="width: 20%">Feature</th>
-                                    <th style="width: 40%">Description</th>
-                                    <th style="width: 10%">Priority</th>
-                                    <th style="width: 10%">Status</th>
-                                    <th style="width: 20%">Notes</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>
-                                        <input type="text" class="form-control form-control-sm" name="high_concept_name" value="High Concept" placeholder="Feature name">
-                                    </td>
-                                    <td>
-                                        <input type="text" class="form-control form-control-sm" name="high_concept" placeholder="A brief, one or two sentence description of the game">
-                                    </td>
-                                    <td>
-                                        <select class="form-select form-select-sm" name="high_concept_priority">
-                                            <option value="critical" selected>Critical</option>
-                                            <option value="high">High</option>
-                                            <option value="medium">Medium</option>
-                                            <option value="low">Low</option>
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <select class="form-select form-select-sm" name="high_concept_status">
-                                            <option value="backlog" selected>Backlog</option>
-                                            <option value="to_do">To Do</option>
-                                            <option value="in_progress">In Progress</option>
-                                            <option value="in_review">In Review</option>
-                                            <option value="done">Done</option>
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <input type="text" class="form-control form-control-sm" name="high_concept_notes" placeholder="Additional notes">
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <input type="text" class="form-control form-control-sm" name="target_audience_name" value="Target Audience" placeholder="Feature name">
-                                    </td>
-                                    <td>
-                                        <input type="text" class="form-control form-control-sm" name="target_audience" placeholder="The types of players the game is designed for">
-                                    </td>
-                                    <td>
-                                        <select class="form-select form-select-sm" name="target_audience_priority">
-                                            <option value="critical">Critical</option>
-                                            <option value="high">High</option>
-                                            <option value="medium" selected>Medium</option>
-                                            <option value="low">Low</option>
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <select class="form-select form-select-sm" name="target_audience_status">
-                                            <option value="backlog">Backlog</option>
-                                            <option value="to_do" selected>To Do</option>
-                                            <option value="in_progress">In Progress</option>
-                                            <option value="in_review">In Review</option>
-                                            <option value="done">Done</option>
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <input type="text" class="form-control form-control-sm" name="target_audience_notes" placeholder="Additional notes">
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <input type="text" class="form-control form-control-sm" name="unique_selling_points_name" value="Unique Selling Points" placeholder="Feature name">
-                                    </td>
-                                    <td>
-                                        <input type="text" class="form-control form-control-sm" name="unique_selling_points" placeholder="What makes this game unique compared to others">
-                                    </td>
-                                    <td>
-                                        <select class="form-select form-select-sm" name="unique_selling_points_priority">
-                                            <option value="critical">Critical</option>
-                                            <option value="high" selected>High</option>
-                                            <option value="medium">Medium</option>
-                                            <option value="low">Low</option>
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <select class="form-select form-select-sm" name="unique_selling_points_status">
-                                            <option value="backlog">Backlog</option>
-                                            <option value="to_do">To Do</option>
-                                            <option value="in_progress" selected>In Progress</option>
-                                            <option value="in_review">In Review</option>
-                                            <option value="done">Done</option>
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <input type="text" class="form-control form-control-sm" name="unique_selling_points_notes" placeholder="Additional notes">
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <div class="d-flex justify-content-start mt-1 mb-2">
-                            <button type="button" class="btn btn-outline-primary btn-sm" id="add-feature-btn">
-                                <i class="bi bi-plus-circle"></i> Add Feature
-                            </button>
-                        </div>
-                        
-                        <div class="mb-2">
-                            <input type="text" class="form-control" id="section-title" name="section_title" placeholder="Section Title (e.g., Game Mechanics, Art Style, etc.)">
-                        </div>
-                        
-                        <div class="mb-3">
-                            <textarea class="form-control" id="additional-notes" name="additional_notes" rows="3" placeholder="Additional notes about the Game Design Document..."></textarea>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <div class="bullet-points">
-                                <div class="d-flex align-items-center mb-2">
-                                    <span class="me-2">•</span>
-                                    <input type="text" class="form-control form-control-sm" name="bullet_point_1" placeholder="Key point 1">
-                                </div>
-                                <div class="d-flex align-items-center mb-2">
-                                    <span class="me-2">•</span>
-                                    <input type="text" class="form-control form-control-sm" name="bullet_point_2" placeholder="Key point 2">
-                                </div>
-                                <div class="d-flex align-items-center mb-2">
-                                    <span class="me-2">•</span>
-                                    <input type="text" class="form-control form-control-sm" name="bullet_point_3" placeholder="Key point 3">
-                                </div>
-                                <div class="d-flex justify-content-start mt-1">
-                                    <button type="button" class="btn btn-outline-secondary btn-sm" id="add-bullet-btn">
-                                        <i class="bi bi-plus-circle"></i> Add Bullet
-                                    </button>
-                                </div>
+                        <div class="gdd-section section-gameworld" id="gameworld-section">
+                            <h3>3. Game World</h3>
+                            <p>Define the world overview, environments, level design, and world interaction</p>
+                            
+                            <div class="mb-3">
+                                <select class="form-select section-type-select" id="gameworld-type-select" data-section="gameworld">
+                                    <option value="">-- Select Content Type --</option>
+                                    <option value="table">Feature Table</option>
+                                    <option value="bullet">Bullet Points</option>
+                                </select>
                             </div>
+                            
+                            <div id="gameworld-content" class="section-content"></div>
+                        </div>
+                        
+                        <div class="gdd-section section-characters" id="characters-section">
+                            <h3>4. Characters</h3>
+                            <p>Define player characters, NPCs, enemies, and relationships</p>
+                            
+                            <div class="mb-3">
+                                <select class="form-select section-type-select" id="characters-type-select" data-section="characters">
+                                    <option value="">-- Select Content Type --</option>
+                                    <option value="table">Feature Table</option>
+                                    <option value="bullet">Bullet Points</option>
+                                </select>
+                            </div>
+                            
+                            <div id="characters-content" class="section-content"></div>
+                        </div>
+                        
+                        <div class="gdd-section section-narrative" id="narrative-section">
+                            <h3>5. Narrative</h3>
+                            <p>Define the story overview, narrative structure, storytelling methods, and player choice</p>
+                            
+                            <div class="mb-3">
+                                <select class="form-select section-type-select" id="narrative-type-select" data-section="narrative">
+                                    <option value="">-- Select Content Type --</option>
+                                    <option value="table">Feature Table</option>
+                                    <option value="bullet">Bullet Points</option>
+                                </select>
+                            </div>
+                            
+                            <div id="narrative-content" class="section-content"></div>
+                        </div>
+                        
+                        <div class="gdd-section section-technical" id="technical-section">
+                            <h3>6. Technical Requirements</h3>
+                            <p>Define platform-specific requirements and technical specifications</p>
+                            
+                            <div class="mb-3">
+                                <select class="form-select section-type-select" id="technical-type-select" data-section="technical">
+                                    <option value="">-- Select Content Type --</option>
+                                    <option value="table">Feature Table</option>
+                                    <option value="bullet">Bullet Points</option>
+                                </select>
+                            </div>
+                            
+                            <div id="technical-content" class="section-content"></div>
+                        </div>
+                        
+                        <div class="gdd-section section-audio" id="audio-section">
+                            <h3>7. Audio Design</h3>
+                            <p>Define music, sound effects, voice acting, and audio implementation</p>
+                            
+                            <div class="mb-3">
+                                <select class="form-select section-type-select" id="audio-type-select" data-section="audio">
+                                    <option value="">-- Select Content Type --</option>
+                                    <option value="table">Feature Table</option>
+                                    <option value="bullet">Bullet Points</option>
+                                </select>
+                            </div>
+                            
+                            <div id="audio-content" class="section-content"></div>
+                        </div>
+                        
+                        <div class="gdd-section section-ui" id="ui-section">
+                            <h3>8. User Interface & UX</h3>
+                            <p>Define UI design, HUD, menus, and accessibility features</p>
+                            
+                            <div class="mb-3">
+                                <select class="form-select section-type-select" id="ui-type-select" data-section="ui">
+                                    <option value="">-- Select Content Type --</option>
+                                    <option value="table">Feature Table</option>
+                                    <option value="bullet">Bullet Points</option>
+                                </select>
+                            </div>
+                            
+                            <div id="ui-content" class="section-content"></div>
+                        </div>
+                        
+                        <div class="gdd-section section-art" id="art-section">
+                            <h3>9. Art Direction</h3>
+                            <p>Define visual style, character art, environment art, and visual effects</p>
+                            
+                            <div class="mb-3">
+                                <select class="form-select section-type-select" id="art-type-select" data-section="art">
+                                    <option value="">-- Select Content Type --</option>
+                                    <option value="table">Feature Table</option>
+                                    <option value="bullet">Bullet Points</option>
+                                </select>
+                            </div>
+                            
+                            <div id="art-content" class="section-content"></div>
+                        </div>
+                        
+                        <div class="gdd-section section-monetization" id="monetization-section">
+                            <h3>10. Monetization</h3>
+                            <p>Define revenue model, in-game purchases, monetization balance, and additional revenue streams</p>
+                            
+                            <div class="mb-3">
+                                <select class="form-select section-type-select" id="monetization-type-select" data-section="monetization">
+                                    <option value="">-- Select Content Type --</option>
+                                    <option value="table">Feature Table</option>
+                                    <option value="bullet">Bullet Points</option>
+                                </select>
+                            </div>
+                            
+                            <div id="monetization-content" class="section-content"></div>
+                        </div>
+                        
+                        <div class="gdd-section section-development" id="development-section">
+                            <h3>11. Development & Production</h3>
+                            <p>Define development roadmap, team structure, budget, and post-launch support</p>
+                            
+                            <div class="mb-3">
+                                <select class="form-select section-type-select" id="development-type-select" data-section="development">
+                                    <option value="">-- Select Content Type --</option>
+                                    <option value="table">Feature Table</option>
+                                    <option value="bullet">Bullet Points</option>
+                                </select>
+                            </div>
+                            
+                            <div id="development-content" class="section-content"></div>
+                        </div>
+                        
+                        <div class="gdd-section section-marketing" id="marketing-section">
+                            <h3>12. Marketing & Distribution</h3>
+                            <p>Define marketing strategy, promotional channels, distribution platforms, and community engagement</p>
+                            
+                            <div class="mb-3">
+                                <select class="form-select section-type-select" id="marketing-type-select" data-section="marketing">
+                                    <option value="">-- Select Content Type --</option>
+                                    <option value="table">Feature Table</option>
+                                    <option value="bullet">Bullet Points</option>
+                                </select>
+                            </div>
+                            
+                            <div id="marketing-content" class="section-content"></div>
+                        </div>
+                        
+                        <div class="gdd-section section-appendices" id="appendices-section">
+                            <h3>13. Appendices</h3>
+                            <p>Additional reference materials, technical specifications, change log, and glossary</p>
+                            
+                            <div class="mb-3">
+                                <select class="form-select section-type-select" id="appendices-type-select" data-section="appendices">
+                                    <option value="">-- Select Content Type --</option>
+                                    <option value="table">Feature Table</option>
+                                    <option value="bullet">Bullet Points</option>
+                                </select>
+                            </div>
+                            
+                            <div id="appendices-content" class="section-content"></div>
                         </div>
                         
                         <!-- Container for dynamically added blocks -->
                         <div id="dynamic-blocks-container">
                             <!-- Dynamic blocks will be inserted here -->
-                        </div>
-                        
-                        <!-- Add Block Dropdown -->
-                        <div class="mb-4">
-                            <div class="card">
-                                <div class="card-header bg-light">
-                                    <h5 class="mb-0">Add New Section</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <select class="form-select" id="block-type-select">
-                                                <option value="">-- Select Block Type --</option>
-                                                <option value="table">Feature Table</option>
-                                                <option value="bullet">Bullet Points</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <button type="button" class="btn btn-success" id="add-block-btn" disabled>
-                                                <i class="bi bi-plus-circle"></i> Add Section
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                         
                         <div class="mt-4 d-flex justify-content-between">
@@ -342,13 +411,187 @@
         const addFeatureBtn = document.getElementById('add-feature-btn');
         const addBulletBtn = document.getElementById('add-bullet-btn');
         const addBlockBtn = document.getElementById('add-block-btn');
+        const addTemplateSectionBtn = document.getElementById('add-template-section-btn');
         const blockTypeSelect = document.getElementById('block-type-select');
+        const sectionTemplateSelect = document.getElementById('section-template-select');
         const dynamicBlocksContainer = document.getElementById('dynamic-blocks-container');
         const featuresTable = document.querySelector('.feature-table tbody');
         const bulletPointsContainer = document.querySelector('.bullet-points');
         let featureCounter = 1;
         let bulletCounter = 4; // Start from 4 since we already have 3 bullet points
         let sectionCounter = 1; // Counter for dynamic sections
+        
+        // Template section definitions
+        const templateSections = {
+            overview: {
+                title: '1. Game Overview',
+                description: 'Define the high concept, target audience, unique selling points, and platforms',
+                type: 'table',
+                features: [
+                    {name: 'High Concept', description: 'A brief, one or two sentence description of the game', priority: 'high'},
+                    {name: 'Target Audience', description: 'The types of players the game is designed for', priority: 'medium'},
+                    {name: 'Unique Selling Points', description: 'What makes this game unique compared to others', priority: 'high'},
+                    {name: 'Platforms', description: 'The platforms the game will be available on', priority: 'medium'}
+                ],
+                bullets: [
+                    'Core game concept',
+                    'Target demographic',
+                    'Key differentiators',
+                    'Platform requirements'
+                ]
+            },
+            gameplay: {
+                title: '2. Gameplay',
+                description: 'Define the core mechanics, controls, progression systems, and game economy',
+                type: 'table',
+                features: [
+                    {name: 'Core Mechanics', description: 'The primary gameplay mechanics and interactions', priority: 'critical'},
+                    {name: 'Controls', description: 'How the player interacts with the game', priority: 'high'},
+                    {name: 'Progression', description: 'How players advance through the game', priority: 'medium'},
+                    {name: 'Game Economy', description: 'In-game resources and their management', priority: 'medium'}
+                ],
+                bullets: [
+                    'Primary gameplay loop',
+                    'Player actions and abilities',
+                    'Difficulty scaling'
+                ]
+            },
+            gameworld: {
+                title: '3. Game World',
+                description: 'Define the world overview, environments, level design, and world interaction',
+                type: 'table',
+                features: [
+                    {name: 'World Overview', description: 'General description of the game world', priority: 'high'},
+                    {name: 'Environments', description: 'Different areas and their characteristics', priority: 'medium'},
+                    {name: 'Level Design', description: 'Structure and flow of game levels', priority: 'high'}
+                ],
+                bullets: [
+                    'World setting and lore',
+                    'Key locations and landmarks',
+                    'Environmental storytelling'
+                ]
+            },
+            characters: {
+                title: '4. Characters',
+                description: 'Define player characters, NPCs, enemies, and relationships',
+                type: 'table',
+                features: [
+                    {name: 'Player Characters', description: 'Playable characters and their abilities', priority: 'critical'},
+                    {name: 'NPCs', description: 'Non-playable characters and their roles', priority: 'high'},
+                    {name: 'Enemies', description: 'Antagonists and obstacles', priority: 'high'}
+                ],
+                bullets: [
+                    'Character progression and development',
+                    'Character relationships and dynamics',
+                    'Character backstories'
+                ]
+            },
+            narrative: {
+                title: '5. Narrative',
+                description: 'Define the story overview, narrative structure, storytelling methods, and player choice',
+                type: 'table',
+                features: [
+                    {name: 'Story Overview', description: 'The main plot and narrative arc', priority: 'high'},
+                    {name: 'Narrative Structure', description: 'How the story is organized and presented', priority: 'medium'},
+                    {name: 'Player Choice', description: 'How player decisions affect the narrative', priority: 'medium'}
+                ],
+                bullets: [
+                    'Main storyline',
+                    'Side quests and optional content',
+                    'Narrative themes and motifs'
+                ]
+            },
+            technical: {
+                title: '6. Technical Requirements',
+                description: 'Define platform-specific requirements and technical specifications',
+                type: 'bullet',
+                bullets: [
+                    'Minimum system requirements',
+                    'Target platforms and specific optimizations',
+                    'Engine and middleware requirements',
+                    'Network infrastructure for multiplayer features',
+                    'Data storage and save system requirements'
+                ]
+            },
+            audio: {
+                title: '7. Audio Design',
+                description: 'Define music, sound effects, voice acting, and audio implementation',
+                type: 'table',
+                features: [
+                    {name: 'Music', description: 'Musical themes, adaptive music system, and soundtrack', priority: 'medium'},
+                    {name: 'Sound Effects', description: 'Environmental sounds, interface sounds, and gameplay feedback', priority: 'high'},
+                    {name: 'Voice Acting', description: 'Character voices, narration, and dialogue', priority: 'medium'},
+                    {name: 'Audio Implementation', description: 'How audio is triggered and managed in-game', priority: 'medium'}
+                ]
+            },
+            ui: {
+                title: '8. User Interface & UX',
+                description: 'Define UI design, HUD, menus, and accessibility features',
+                type: 'table',
+                features: [
+                    {name: 'UI Design', description: 'Visual style and layout of interface elements', priority: 'high'},
+                    {name: 'HUD', description: 'In-game heads-up display elements', priority: 'high'},
+                    {name: 'Menus', description: 'Navigation, options, and other menu screens', priority: 'medium'},
+                    {name: 'Accessibility', description: 'Features to make the game accessible to all players', priority: 'medium'}
+                ]
+            },
+            art: {
+                title: '9. Art Direction',
+                description: 'Define visual style, character art, environment art, and visual effects',
+                type: 'table',
+                features: [
+                    {name: 'Visual Style', description: 'Overall artistic direction and aesthetic', priority: 'critical'},
+                    {name: 'Character Art', description: 'Design principles for characters', priority: 'high'},
+                    {name: 'Environment Art', description: 'Design principles for environments and props', priority: 'high'},
+                    {name: 'Visual Effects', description: 'Special effects, particles, and visual feedback', priority: 'medium'}
+                ]
+            },
+            monetization: {
+                title: '10. Monetization',
+                description: 'Define revenue model, in-game purchases, monetization balance, and additional revenue streams',
+                type: 'table',
+                features: [
+                    {name: 'Revenue Model', description: 'Primary method of generating revenue (F2P, premium, etc.)', priority: 'high'},
+                    {name: 'In-Game Purchases', description: 'Virtual goods, currency, and pricing strategy', priority: 'medium'},
+                    {name: 'Monetization Balance', description: 'Ensuring fair play while maximizing revenue', priority: 'high'},
+                    {name: 'Additional Revenue', description: 'Merchandise, licensing, and other revenue streams', priority: 'low'}
+                ]
+            },
+            development: {
+                title: '11. Development & Production',
+                description: 'Define development roadmap, team structure, budget, and post-launch support',
+                type: 'table',
+                features: [
+                    {name: 'Development Roadmap', description: 'Timeline, milestones, and development phases', priority: 'critical'},
+                    {name: 'Team Structure', description: 'Roles, responsibilities, and resource allocation', priority: 'high'},
+                    {name: 'Budget', description: 'Cost estimates and financial planning', priority: 'high'},
+                    {name: 'Post-Launch Support', description: 'Updates, patches, and ongoing development', priority: 'medium'}
+                ]
+            },
+            marketing: {
+                title: '12. Marketing & Distribution',
+                description: 'Define marketing strategy, promotional channels, distribution platforms, and community engagement',
+                type: 'table',
+                features: [
+                    {name: 'Marketing Strategy', description: 'Overall approach to promoting the game', priority: 'high'},
+                    {name: 'Promotional Channels', description: 'Social media, events, and advertising', priority: 'medium'},
+                    {name: 'Distribution Platforms', description: 'Storefronts and platforms where the game will be available', priority: 'high'},
+                    {name: 'Community', description: 'Community building and engagement strategy', priority: 'medium'}
+                ]
+            },
+            appendices: {
+                title: '13. Appendices',
+                description: 'Additional reference materials, technical specifications, change log, and glossary',
+                type: 'bullet',
+                bullets: [
+                    'Reference materials and inspirations',
+                    'Technical specifications and diagrams',
+                    'Change log to track document updates',
+                    'Glossary of terms specific to the game',
+                    'Additional research and supporting documents'
+                ]
+            }
+        };
         
         // Remove any existing event listeners to prevent duplicates
         const newAddFeatureBtn = addFeatureBtn.cloneNode(true);
@@ -396,12 +639,293 @@
             bulletInput.focus();
         });
         
-        // Enable/disable the Add Section button based on selection
+        // Enable/disable the Add Section buttons based on selection
         blockTypeSelect.addEventListener('change', function() {
             addBlockBtn.disabled = !this.value;
         });
         
-        // Add event listener for adding new blocks
+        sectionTemplateSelect.addEventListener('change', function() {
+            addTemplateSectionBtn.disabled = !this.value;
+        });
+        
+        // Add event listeners for section type selects
+        document.querySelectorAll('.section-type-select').forEach(select => {
+            select.addEventListener('change', function() {
+                const sectionKey = this.dataset.section;
+                const contentType = this.value;
+                const contentContainer = document.getElementById(`${sectionKey}-content`);
+                
+                // Clear previous content
+                contentContainer.innerHTML = '';
+                
+                if (!contentType) return;
+                
+                // Get template data for this section
+                const template = templateSections[sectionKey];
+                
+                if (contentType === 'table') {
+                    // Create a feature table
+                    const tableContainer = document.createElement('div');
+                    tableContainer.innerHTML = `
+                        <table class="feature-table static-feature-table" data-table-id="${sectionKey}">
+                            <thead>
+                                <tr>
+                                    <th style="width: 20%">Feature</th>
+                                    <th style="width: 40%">Description</th>
+                                    <th style="width: 10%">Priority</th>
+                                    <th style="width: 10%">Status</th>
+                                    <th style="width: 20%">Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                        <div class="d-flex justify-content-start mt-1 mb-2">
+                            <button type="button" class="btn btn-outline-primary btn-sm static-add-feature-btn" 
+                                    data-section="${sectionKey}">
+                                <i class="bi bi-plus-circle"></i> Add Feature
+                            </button>
+                        </div>
+                    `;
+                    contentContainer.appendChild(tableContainer);
+                    
+                    // Add template features if available
+                    if (template && template.features) {
+                        const tableBody = tableContainer.querySelector('tbody');
+                        template.features.forEach((feature, index) => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>
+                                    <input type="text" class="form-control form-control-sm" 
+                                           name="${sectionKey}_feature_${index + 1}_name" 
+                                           value="${feature.name}" placeholder="Feature name">
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control form-control-sm" 
+                                           name="${sectionKey}_feature_${index + 1}" 
+                                           value="${feature.description}" placeholder="Feature description">
+                                </td>
+                                <td>
+                                    <select class="form-select form-select-sm" 
+                                            name="${sectionKey}_feature_${index + 1}_priority">
+                                        <option value="critical" ${feature.priority === 'critical' ? 'selected' : ''}>Critical</option>
+                                        <option value="high" ${feature.priority === 'high' ? 'selected' : ''}>High</option>
+                                        <option value="medium" ${feature.priority === 'medium' ? 'selected' : ''}>Medium</option>
+                                        <option value="low" ${feature.priority === 'low' ? 'selected' : ''}>Low</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="form-select form-select-sm" 
+                                            name="${sectionKey}_feature_${index + 1}_status">
+                                        <option value="backlog" selected>Backlog</option>
+                                        <option value="to_do">To Do</option>
+                                        <option value="in_progress">In Progress</option>
+                                        <option value="in_review">In Review</option>
+                                        <option value="done">Done</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control form-control-sm" 
+                                           name="${sectionKey}_feature_${index + 1}_notes" 
+                                           placeholder="Additional notes">
+                                </td>
+                            `;
+                            tableBody.appendChild(row);
+                        });
+                    } else {
+                        // Add a default row if no template features
+                        const tableBody = tableContainer.querySelector('tbody');
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>
+                                <input type="text" class="form-control form-control-sm" 
+                                       name="${sectionKey}_feature_1_name" 
+                                       value="Feature 1" placeholder="Feature name">
+                            </td>
+                            <td>
+                                <input type="text" class="form-control form-control-sm" 
+                                       name="${sectionKey}_feature_1" 
+                                       placeholder="Feature description">
+                            </td>
+                            <td>
+                                <select class="form-select form-select-sm" 
+                                        name="${sectionKey}_feature_1_priority">
+                                    <option value="critical">Critical</option>
+                                    <option value="high" selected>High</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="low">Low</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select class="form-select form-select-sm" 
+                                        name="${sectionKey}_feature_1_status">
+                                    <option value="backlog" selected>Backlog</option>
+                                    <option value="to_do">To Do</option>
+                                    <option value="in_progress">In Progress</option>
+                                    <option value="in_review">In Review</option>
+                                    <option value="done">Done</option>
+                                </select>
+                            </td>
+                            <td>
+                                <input type="text" class="form-control form-control-sm" 
+                                       name="${sectionKey}_feature_1_notes" 
+                                       placeholder="Additional notes">
+                            </td>
+                        `;
+                        tableBody.appendChild(row);
+                    }
+                    
+                } else if (contentType === 'bullet') {
+                    // Create bullet points
+                    const bulletContainer = document.createElement('div');
+                    bulletContainer.className = 'mb-4';
+                    bulletContainer.innerHTML = `
+                        <div class="static-bullet-points" data-bullet-section="${sectionKey}">
+                        </div>
+                    `;
+                    
+                    const bulletPointsDiv = bulletContainer.querySelector('.static-bullet-points');
+                    
+                    // Add template bullets if available
+                    if (template && template.bullets) {
+                        template.bullets.forEach((bullet, index) => {
+                            const bulletPoint = document.createElement('div');
+                            bulletPoint.className = 'd-flex align-items-center mb-2';
+                            bulletPoint.innerHTML = `
+                                <span class="me-2">•</span>
+                                <input type="text" class="form-control form-control-sm" 
+                                       name="${sectionKey}_bullet_${index + 1}" 
+                                       value="${bullet}" placeholder="Key point ${index + 1}">
+                            `;
+                            bulletPointsDiv.appendChild(bulletPoint);
+                        });
+                    } else {
+                        // Add default bullet points if no template bullets
+                        for (let i = 1; i <= 3; i++) {
+                            const bulletPoint = document.createElement('div');
+                            bulletPoint.className = 'd-flex align-items-center mb-2';
+                            bulletPoint.innerHTML = `
+                                <span class="me-2">•</span>
+                                <input type="text" class="form-control form-control-sm" 
+                                       name="${sectionKey}_bullet_${i}" 
+                                       placeholder="Key point ${i}">
+                            `;
+                            bulletPointsDiv.appendChild(bulletPoint);
+                        }
+                    }
+                    
+                    // Add the button for adding more bullets
+                    const buttonContainer = document.createElement('div');
+                    buttonContainer.className = 'd-flex justify-content-start mt-1';
+                    buttonContainer.innerHTML = `
+                        <button type="button" class="btn btn-outline-secondary btn-sm static-add-bullet-btn" 
+                                data-section="${sectionKey}">
+                            <i class="bi bi-plus-circle"></i> Add Bullet
+                        </button>
+                    `;
+                    bulletPointsDiv.appendChild(buttonContainer);
+                    
+                    contentContainer.appendChild(bulletContainer);
+                }
+                
+                // Set up event listeners for the new buttons
+                setupStaticButtonListeners();
+            });
+        });
+        
+        // Function to set up event listeners for static section buttons
+        function setupStaticButtonListeners() {
+            // Add feature buttons for static sections
+            document.querySelectorAll('.static-add-feature-btn').forEach(btn => {
+                // Remove existing event listeners
+                const newBtn = btn.cloneNode(true);
+                btn.parentNode.replaceChild(newBtn, btn);
+                
+                newBtn.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    
+                    const sectionKey = this.dataset.section;
+                    const tableBody = document.querySelector(`.static-feature-table[data-table-id="${sectionKey}"] tbody`);
+                    const featureRows = tableBody.querySelectorAll('tr');
+                    const featureIndex = featureRows.length + 1;
+                    
+                    // Create a new row
+                    const newRow = document.createElement('tr');
+                    newRow.innerHTML = `
+                        <td>
+                            <input type="text" class="form-control form-control-sm" 
+                                   name="${sectionKey}_feature_${featureIndex}_name" 
+                                   value="Feature ${featureIndex}" placeholder="Feature name">
+                        </td>
+                        <td>
+                            <input type="text" class="form-control form-control-sm" 
+                                   name="${sectionKey}_feature_${featureIndex}" 
+                                   placeholder="Feature description">
+                        </td>
+                        <td>
+                            <select class="form-select form-select-sm" 
+                                    name="${sectionKey}_feature_${featureIndex}_priority">
+                                <option value="critical">Critical</option>
+                                <option value="high">High</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="low">Low</option>
+                            </select>
+                        </td>
+                        <td>
+                            <select class="form-select form-select-sm" 
+                                    name="${sectionKey}_feature_${featureIndex}_status">
+                                <option value="backlog" selected>Backlog</option>
+                                <option value="to_do">To Do</option>
+                                <option value="in_progress">In Progress</option>
+                                <option value="in_review">In Review</option>
+                                <option value="done">Done</option>
+                            </select>
+                        </td>
+                        <td>
+                            <input type="text" class="form-control form-control-sm" 
+                                   name="${sectionKey}_feature_${featureIndex}_notes" 
+                                   placeholder="Additional notes">
+                        </td>
+                    `;
+                    
+                    tableBody.appendChild(newRow);
+                });
+            });
+            
+            // Add bullet buttons for static sections
+            document.querySelectorAll('.static-add-bullet-btn').forEach(btn => {
+                // Remove existing event listeners
+                const newBtn = btn.cloneNode(true);
+                btn.parentNode.replaceChild(newBtn, btn);
+                
+                newBtn.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    
+                    const sectionKey = this.dataset.section;
+                    const bulletContainer = document.querySelector(`.static-bullet-points[data-bullet-section="${sectionKey}"]`);
+                    const bulletPoints = bulletContainer.querySelectorAll('input[type="text"]');
+                    const bulletIndex = bulletPoints.length + 1;
+                    
+                    // Create a new bullet point
+                    const newBulletContainer = document.createElement('div');
+                    newBulletContainer.className = 'd-flex align-items-center mb-2';
+                    newBulletContainer.innerHTML = `
+                        <span class="me-2">•</span>
+                        <input type="text" class="form-control form-control-sm" 
+                               name="${sectionKey}_bullet_${bulletIndex}" 
+                               placeholder="Key point ${bulletIndex}">
+                    `;
+                    
+                    // Insert the new bullet point before the button container
+                    const buttonContainer = this.parentElement.parentElement;
+                    bulletContainer.insertBefore(newBulletContainer, buttonContainer);
+                });
+            });
+        }
+        
+        // Add event listener for adding new custom blocks
         addBlockBtn.addEventListener('click', function() {
             const blockType = blockTypeSelect.value;
             if (!blockType) return;
