@@ -309,6 +309,18 @@ class GameTask(TimeStampedModel):
         ('other', 'Other'),
     ]
     
+    COMPANY_SECTION_CHOICES = [
+        ('game_development', 'Game Development'),
+        ('education', 'Education'),
+        ('arcade', 'Arcade'),
+        ('marketing', 'Marketing'),
+        ('finance', 'Finance'),
+        ('hr', 'Human Resources'),
+        ('it', 'IT & Infrastructure'),
+        ('research', 'Research & Development'),
+        ('other', 'Other'),
+    ]
+    
     game = models.ForeignKey(GameProject, on_delete=models.CASCADE, related_name='tasks')
     milestone = models.ForeignKey(GameMilestone, on_delete=models.SET_NULL, null=True, blank=True, related_name='tasks')
     title = models.CharField(max_length=200)
@@ -321,7 +333,32 @@ class GameTask(TimeStampedModel):
     due_date = models.DateField(null=True, blank=True)
     estimated_hours = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
     actual_hours = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
+    company_section = models.CharField(max_length=30, choices=COMPANY_SECTION_CHOICES, default='game_development', help_text="Company section this task belongs to")
+    
+    # Game Development specific fields
     gdd_section = models.ForeignKey(GDDSection, on_delete=models.SET_NULL, null=True, blank=True, related_name='tasks', help_text="GDD section this task is related to")
+    feature_id = models.CharField(max_length=50, null=True, blank=True, help_text="ID of the feature in the GDD")
+    platform = models.CharField(max_length=50, null=True, blank=True, help_text="Platform this task is for (PC, mobile, console, etc.)")
+    
+    # Education specific fields
+    course_id = models.CharField(max_length=50, null=True, blank=True, help_text="Course ID this task is related to")
+    learning_objective = models.TextField(null=True, blank=True, help_text="Learning objective this task addresses")
+    target_audience = models.CharField(max_length=100, null=True, blank=True, help_text="Target audience for this educational task")
+    
+    # Arcade specific fields
+    machine_id = models.CharField(max_length=50, null=True, blank=True, help_text="Arcade machine ID this task is for")
+    location = models.CharField(max_length=100, null=True, blank=True, help_text="Location of the arcade machine")
+    maintenance_type = models.CharField(max_length=50, null=True, blank=True, help_text="Type of maintenance (repair, upgrade, cleaning, etc.)")
+    
+    # Marketing specific fields
+    campaign_id = models.CharField(max_length=50, null=True, blank=True, help_text="Marketing campaign ID this task is part of")
+    channel = models.CharField(max_length=50, null=True, blank=True, help_text="Marketing channel (social media, email, events, etc.)")
+    target_metrics = models.TextField(null=True, blank=True, help_text="Target metrics for this marketing task")
+    
+    # Research & Development specific fields
+    research_area = models.CharField(max_length=100, null=True, blank=True, help_text="Area of research this task is related to")
+    experiment_id = models.CharField(max_length=50, null=True, blank=True, help_text="ID of the experiment this task is part of")
+    hypothesis = models.TextField(null=True, blank=True, help_text="Hypothesis being tested in this research task")
     
     def __str__(self):
         return self.title

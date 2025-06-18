@@ -1,0 +1,363 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Task: {{ task.title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'games:dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'games:game_detail' task.game.id %}">{{ task.game.title }}</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'games:task_dashboard' %}">Tasks</a></li>
+                    <li class="breadcrumb-item active">{{ task.title }}</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>{{ task.title }}</h1>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'games:task_update' task.id %}" class="btn btn-primary">
+                <i class="bi bi-pencil"></i> Edit
+            </a>
+            <a href="{% url 'games:task_delete' task.id %}" class="btn btn-danger ms-2">
+                <i class="bi bi-trash"></i> Delete
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Task Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-3 fw-bold">Status:</div>
+                        <div class="col-md-9">
+                            <span class="badge {% if task.status == 'done' %}bg-success{% elif task.status == 'in_progress' %}bg-warning text-dark{% elif task.status == 'in_review' %}bg-info{% elif task.status == 'blocked' %}bg-danger{% else %}bg-secondary{% endif %}">
+                                {{ task.get_status_display }}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-3 fw-bold">Priority:</div>
+                        <div class="col-md-9">
+                            <span class="badge {% if task.priority == 'critical' %}bg-danger{% elif task.priority == 'high' %}bg-warning text-dark{% elif task.priority == 'medium' %}bg-primary{% else %}bg-secondary{% endif %}">
+                                {{ task.get_priority_display }}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <!-- Task type moved to Game Development section -->
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-3 fw-bold">Company Section:</div>
+                        <div class="col-md-9">
+                            <span class="badge bg-info text-dark">
+                                {{ task.get_company_section_display }}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-3 fw-bold">Assigned To:</div>
+                        <div class="col-md-9">
+                            {% if task.assigned_to %}
+                            {{ task.assigned_to.get_full_name|default:task.assigned_to.username }}
+                            {% else %}
+                            <span class="text-muted">Unassigned</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-3 fw-bold">Due Date:</div>
+                        <div class="col-md-9">
+                            {% if task.due_date %}
+                            {{ task.due_date|date:"F j, Y" }}
+                            {% else %}
+                            <span class="text-muted">No due date</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-3 fw-bold">Hours:</div>
+                        <div class="col-md-9">
+                            {% if task.actual_hours %}
+                            {{ task.actual_hours }} / {{ task.estimated_hours|default:"?" }} estimated
+                            {% else %}
+                            {{ task.estimated_hours|default:"0" }} estimated
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-3 fw-bold">Description:</div>
+                        <div class="col-md-9">{{ task.description|linebreaks|default:"No description" }}</div>
+                    </div>
+                    
+                    {% if task.milestone %}
+                    <div class="row mb-3">
+                        <div class="col-md-3 fw-bold">Milestone:</div>
+                        <div class="col-md-9">{{ task.milestone.title }}</div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Section-specific fields based on company_section -->
+        {% if task.company_section %}
+        <div class="card mb-4">
+            <div class="card-header bg-light">
+                <h5 class="card-title mb-0">
+                    {% if task.company_section == 'game_development' %}
+                        <i class="bi bi-controller text-primary me-2"></i>
+                    {% elif task.company_section == 'education' %}
+                        <i class="bi bi-book text-success me-2"></i>
+                    {% elif task.company_section == 'arcade' %}
+                        <i class="bi bi-joystick text-danger me-2"></i>
+                    {% elif task.company_section == 'marketing' %}
+                        <i class="bi bi-graph-up text-info me-2"></i>
+                    {% elif task.company_section == 'research' %}
+                        <i class="bi bi-lightbulb text-warning me-2"></i>
+                    {% elif task.company_section == 'finance' %}
+                        <i class="bi bi-cash-coin text-secondary me-2"></i>
+                    {% elif task.company_section == 'hr' %}
+                        <i class="bi bi-people text-dark me-2"></i>
+                    {% elif task.company_section == 'it' %}
+                        <i class="bi bi-pc-display text-primary me-2"></i>
+                    {% else %}
+                        <i class="bi bi-folder text-secondary me-2"></i>
+                    {% endif %}
+                    {{ task.get_company_section_display }} Details
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if task.company_section == 'game_development' %}
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 border-light">
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-2 text-muted">Task Type</h6>
+                                <p class="card-text">{{ task.get_task_type_display }}</p>
+                                <small class="text-muted">Development task category</small>
+                            </div>
+                        </div>
+                    </div>
+                    {% if task.gdd_section %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 border-light">
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-2 text-muted">GDD Section</h6>
+                                <p class="card-text">{{ task.gdd_section }}</p>
+                                {% if task.gdd_section.gdd %}
+                                <a href="{% url 'games:gdd_section_detail' task.gdd_section.id %}" class="btn btn-sm btn-outline-primary">View Section</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if task.feature_id %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 border-light">
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-2 text-muted">Feature ID</h6>
+                                <p class="card-text">{{ task.feature_id }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if task.platform %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 border-light">
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-2 text-muted">Platform</h6>
+                                <p class="card-text">{{ task.platform }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                {% elif task.company_section == 'education' %}
+                <div class="row">
+                    {% if task.course_id %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 border-light">
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-2 text-muted">Course ID</h6>
+                                <p class="card-text">{{ task.course_id }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if task.learning_objective %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 border-light">
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-2 text-muted">Learning Objective</h6>
+                                <p class="card-text">{{ task.learning_objective }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if task.target_audience %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 border-light">
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-2 text-muted">Target Audience</h6>
+                                <p class="card-text">{{ task.target_audience }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                {% elif task.company_section == 'arcade' %}
+                <div class="row">
+                    {% if task.machine_id %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 border-light">
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-2 text-muted">Machine ID</h6>
+                                <p class="card-text">{{ task.machine_id }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if task.location %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 border-light">
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-2 text-muted">Location</h6>
+                                <p class="card-text">{{ task.location }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if task.maintenance_type %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 border-light">
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-2 text-muted">Maintenance Type</h6>
+                                <p class="card-text">{{ task.maintenance_type }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                {% elif task.company_section == 'marketing' %}
+                <div class="row">
+                    {% if task.campaign_id %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 border-light">
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-2 text-muted">Campaign ID</h6>
+                                <p class="card-text">{{ task.campaign_id }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if task.channel %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 border-light">
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-2 text-muted">Channel</h6>
+                                <p class="card-text">{{ task.channel }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if task.target_metrics %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 border-light">
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-2 text-muted">Target Metrics</h6>
+                                <p class="card-text">{{ task.target_metrics }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                {% elif task.company_section == 'research' %}
+                <div class="row">
+                    {% if task.research_area %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 border-light">
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-2 text-muted">Research Area</h6>
+                                <p class="card-text">{{ task.research_area }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if task.experiment_id %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 border-light">
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-2 text-muted">Experiment ID</h6>
+                                <p class="card-text">{{ task.experiment_id }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if task.hypothesis %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 border-light">
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-2 text-muted">Hypothesis</h6>
+                                <p class="card-text">{{ task.hypothesis }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Task Info</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-5 fw-bold">Created:</div>
+                        <div class="col-md-7">{{ task.created_at|date:"M d, Y" }}</div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-5 fw-bold">Last Updated:</div>
+                        <div class="col-md-7">{{ task.updated_at|date:"M d, Y" }}</div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-5 fw-bold">Game:</div>
+                        <div class="col-md-7">
+                            <a href="{% url 'games:game_detail' task.game.id %}">{{ task.game.title }}</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Related tasks could go here -->
+        </div>
+    </div>
+</div>
+{% endblock %}

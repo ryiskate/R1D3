@@ -1,0 +1,161 @@
+{% load static %}
+
+<div class="card mb-4 shadow-sm" id="gdd-task-manager">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">
+            <i class="fas fa-tasks me-2"></i> GDD Tasks
+            <span class="badge bg-primary ms-2">{{ tasks|length }}</span>
+        </h5>
+        <div>
+            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="collapse" data-bs-target="#taskPanel">
+                <i class="fas fa-chevron-down"></i>
+            </button>
+        </div>
+    </div>
+    <div class="collapse show" id="taskPanel">
+        <div class="card-body">
+            {% if tasks %}
+            <div class="mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="btn-group btn-group-sm" role="group">
+                        <button type="button" class="btn btn-outline-secondary filter-btn active" data-filter="all">All</button>
+                        <button type="button" class="btn btn-outline-secondary filter-btn" data-filter="backlog">Backlog</button>
+                        <button type="button" class="btn btn-outline-secondary filter-btn" data-filter="to_do">To Do</button>
+                        <button type="button" class="btn btn-outline-secondary filter-btn" data-filter="in_progress">In Progress</button>
+                        <button type="button" class="btn btn-outline-secondary filter-btn" data-filter="in_review">In Review</button>
+                        <button type="button" class="btn btn-outline-secondary filter-btn" data-filter="done">Done</button>
+                    </div>
+                    <div>
+                        <button id="batchUpdateBtn" class="btn btn-sm btn-primary" disabled>
+                            <i class="fas fa-edit"></i> Update Selected
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <form id="batchTaskForm" method="post" action="{% url 'games:batch_task_update' %}">
+                {% csrf_token %}
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover">
+                        <thead>
+                            <tr>
+                                <th style="width: 30px;">
+                                    <input type="checkbox" id="selectAllTasks" class="form-check-input">
+                                </th>
+                                <th>Task</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                                <th>Hours</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for task in tasks %}
+                            <tr class="task-row" data-status="{{ task.status }}">
+                                <td>
+                                    <input type="checkbox" name="task_ids" value="{{ task.id }}" class="form-check-input task-checkbox">
+                                </td>
+                                <td>
+                                    <a href="{% url 'games:task_detail' pk=task.id %}" class="text-decoration-none">
+                                        {{ task.title }}
+                                    </a>
+                                    {% if task.gdd_feature %}
+                                    <span class="badge bg-info">GDD Feature</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if task.priority == 'critical' %}
+                                    <span class="badge bg-danger">Critical</span>
+                                    {% elif task.priority == 'high' %}
+                                    <span class="badge bg-warning text-dark">High</span>
+                                    {% elif task.priority == 'medium' %}
+                                    <span class="badge bg-primary">Medium</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">Low</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <form class="task-status-form" action="{% url 'games:gdd_task_status_update' pk=task.id %}" method="post">
+                                        {% csrf_token %}
+                                        <select name="status" class="form-select form-select-sm status-select" data-task-id="{{ task.id }}">
+                                            <option value="backlog" {% if task.status == 'backlog' %}selected{% endif %}>Backlog</option>
+                                            <option value="to_do" {% if task.status == 'to_do' %}selected{% endif %}>To Do</option>
+                                            <option value="in_progress" {% if task.status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                                            <option value="in_review" {% if task.status == 'in_review' %}selected{% endif %}>In Review</option>
+                                            <option value="done" {% if task.status == 'done' %}selected{% endif %}>Done</option>
+                                            <option value="blocked" {% if task.status == 'blocked' %}selected{% endif %}>Blocked</option>
+                                        </select>
+                                    </form>
+                                </td>
+                                <td>
+                                    <form class="task-hours-form" action="{% url 'games:gdd_task_status_update' pk=task.id %}" method="post">
+                                        {% csrf_token %}
+                                        <div class="input-group input-group-sm">
+                                            <input type="number" name="actual_hours" class="form-control form-control-sm hours-input" 
+                                                value="{{ task.actual_hours|default_if_none:'' }}" step="0.25" min="0" style="width: 60px;">
+                                            <button type="submit" class="btn btn-sm btn-outline-secondary">
+                                                <i class="fas fa-save"></i>
+                                            </button>
+                                        </div>
+                                    </form>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{% url 'games:task_detail' pk=task.id %}" class="btn btn-outline-secondary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{% url 'games:task_update' pk=task.id %}" class="btn btn-outline-secondary">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Batch Update Modal -->
+                <div class="modal fade" id="batchUpdateModal" tabindex="-1" aria-labelledby="batchUpdateModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="batchUpdateModalLabel">Update Selected Tasks</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <label for="batchStatus">Status:</label>
+                                    <select name="status" id="batchStatus" class="form-select">
+                                        <option value="backlog">Backlog</option>
+                                        <option value="to_do">To Do</option>
+                                        <option value="in_progress">In Progress</option>
+                                        <option value="in_review">In Review</option>
+                                        <option value="done">Done</option>
+                                        <option value="blocked">Blocked</option>
+                                    </select>
+                                </div>
+                                <p class="mt-3">
+                                    <span id="selectedTaskCount">0</span> tasks selected
+                                </p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Update Tasks</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            {% else %}
+            <div class="alert alert-info">
+                No tasks found for this GDD. 
+                <a href="{% url 'games:gdd_features' pk=gdd.id %}" class="alert-link">Extract features</a> from the GDD first, 
+                then <a href="{% url 'games:convert_all_features' pk=gdd.id %}" class="alert-link">convert them to tasks</a>.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Task management JavaScript is loaded in the base template -->

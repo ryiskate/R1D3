@@ -740,6 +740,9 @@ class GameDesignDocumentView(LoginRequiredMixin, DetailView):
         # Use ensure_ascii=False to handle non-ASCII characters properly
         context['sections_with_tasks_json'] = json.dumps(sections_with_tasks_json, ensure_ascii=False)
         
+        # Get all tasks for the game for the task management panel
+        context['all_game_tasks'] = GameTask.objects.filter(game=game).select_related('gdd_feature')
+        
         # Return the context
         return context
 
@@ -1377,59 +1380,8 @@ class GameTaskKanbanView(LoginRequiredMixin, ListView):
         
         return context
 
-class GameTaskListView(LoginRequiredMixin, ListView):
-    """
-    List tasks for a game
-    """
-    model = GameTask
-    template_name = 'projects/task_list.html'
-    context_object_name = 'tasks'
-    
-    def get_queryset(self):
-        queryset = GameTask.objects.all()
-        
-        # Filter by game if provided
-        game_id = self.kwargs.get('game_id')
-        if game_id:
-            queryset = queryset.filter(game_id=game_id)
-            
-        # Filter by assigned user if requested
-        if self.request.GET.get('my_tasks'):
-            queryset = queryset.filter(assigned_to=self.request.user)
-            
-        # Filter by status if provided
-        status = self.request.GET.get('status')
-        if status:
-            queryset = queryset.filter(status=status)
-            
-        # Filter by task type if provided
-        task_type = self.request.GET.get('type')
-        if task_type:
-            queryset = queryset.filter(task_type=task_type)
-            
-        return queryset.order_by('-priority', 'due_date')
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        
-        # Add game to context if filtering by game
-        game_id = self.kwargs.get('game_id')
-        if game_id:
-            context['game'] = get_object_or_404(GameProject, id=game_id)
-            
-        # Add task status counts for filters
-        context['status_counts'] = {
-            status[0]: GameTask.objects.filter(status=status[0]).count() 
-            for status in GameTask.STATUS_CHOICES
-        }
-        
-        # Add task type counts for filters
-        context['type_counts'] = {
-            task_type[0]: GameTask.objects.filter(task_type=task_type[0]).count() 
-            for task_type in GameTask.TASK_TYPE_CHOICES
-        }
-        
-        return context
+# GameTaskListView has been removed as it's been replaced by GameTaskDashboardView
+# This reduces potential security vulnerabilities from unused views
 
 
 class GameTaskDetailView(LoginRequiredMixin, DetailView):

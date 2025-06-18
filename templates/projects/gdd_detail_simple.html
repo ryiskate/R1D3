@@ -7,6 +7,25 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/gdd_styles.css' %}">
+<!-- Task management styles -->
+<style>
+    .task-badge {
+        font-size: 0.75rem;
+    }
+    .task-priority-high {
+        background-color: #dc3545;
+    }
+    .task-priority-medium {
+        background-color: #fd7e14;
+    }
+    .task-priority-low {
+        background-color: #20c997;
+    }
+    .task-status-badge {
+        min-width: 80px;
+        text-align: center;
+    }
+</style>
 <style>
     /* Override any width constraints */
     .gdd-container, .gdd-html-content, #gdd-html-content {
@@ -272,6 +291,13 @@
                     {% endif %}
                 </div>
             </div>
+            
+            <!-- Task Management Panel -->
+            {% if can_create_task %}
+            <div class="mx-3 mb-4">
+                {% include "projects/gdd_task_panel.html" with tasks=all_game_tasks gdd=gdd %}
+            </div>
+            {% endif %}
         </div>
         
         <!-- Sidebar -->
@@ -451,6 +477,7 @@ Example feature table:
 
 <script src="{% static 'js/gdd-task-integration.js' %}"></script>
 <script src="{% static 'js/gdd-detail.js' %}"></script>
+<script src="{% static 'js/gdd_task_manager.js' %}"></script>
 <!-- Test script for debugging -->
 <script src="{% static 'js/test-gdd-integration.js' %}"></script>
 <script>

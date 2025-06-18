@@ -54,3 +54,24 @@ def sub(value, arg):
         return float(value) - float(arg)
     except ValueError:
         return 0
+
+@register.filter
+def replace_underscore(value):
+    """
+    Replaces underscores with spaces in a string
+    """
+    if value is None:
+        return ''
+    return value.replace('_', ' ')
+        
+@register.filter
+def percentage(value, total):
+    """
+    Calculates the percentage of value to total
+    """
+    try:
+        if total == 0:
+            return 0
+        return int((float(value) / float(total)) * 100)
+    except (ValueError, ZeroDivisionError, TypeError):
+        return 0

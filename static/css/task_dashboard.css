@@ -1,0 +1,73 @@
+/**
+ * Task Dashboard CSS
+ * Custom styles for the game task management dashboard
+ */
+
+/* Progress bar styles */
+.progress-thin {
+    height: 5px;
+}
+
+/* Status badge colors */
+.bg-purple {
+    background-color: #6f42c1;
+}
+
+/* Card styles */
+.stats-card {
+    transition: all 0.3s ease;
+}
+
+.stats-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.stats-card.todo {
+    border-left: 4px solid #0d6efd;
+}
+
+.stats-card.in-progress {
+    border-left: 4px solid #ffc107;
+}
+
+.stats-card.review {
+    border-left: 4px solid #6f42c1;
+}
+
+.stats-card.done {
+    border-left: 4px solid #198754;
+}
+
+.stats-card.backlog {
+    border-left: 4px solid #6c757d;
+}
+
+/* Filter status badges */
+.filter-status {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.filter-status:hover {
+    opacity: 0.8;
+}
+
+.filter-status.active {
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px #0d6efd;
+}
+
+/* Task row hover effect */
+.task-row:hover {
+    background-color: rgba(0, 0, 0, 0.03);
+}
+
+/* Task action buttons */
+.task-action-btn {
+    padding: 0.25rem 0.5rem;
+}
+
+/* Task checkbox styling */
+.task-checkbox {
+    cursor: pointer;
+}
