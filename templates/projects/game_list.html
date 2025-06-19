@@ -12,80 +12,15 @@
         </a>
     </div>
     
-    <!-- My Tasks Section -->
+    <!-- Debug Information (Hidden) -->
+    {% comment %}
     <div class="alert alert-info mb-4">
         <h5>Debug Information: <a href="{% url 'games:debug_tasks' %}" class="btn btn-sm btn-primary">View Debug Page</a></h5>
         <p>Total tasks assigned to you: {{ task_count|default:"0" }}</p>
-        <p>Tasks by status:</p>
-        <ul>
-            <li>Backlog: {{ task_counts_by_status.backlog|default:"0" }}</li>
-            <li>To Do: {{ task_counts_by_status.to_do|default:"0" }}</li>
-            <li>In Progress: {{ task_counts_by_status.in_progress|default:"0" }}</li>
-            <li>In Review: {{ task_counts_by_status.in_review|default:"0" }}</li>
-            <li>Done: {{ task_counts_by_status.done|default:"0" }}</li>
-            <li>Blocked: {{ task_counts_by_status.blocked|default:"0" }}</li>
-        </ul>
         <p>Is user authenticated: {{ user.is_authenticated }}</p>
         <p>Username: {{ user.username }}</p>
     </div>
-    
-    {% if my_tasks %}
-    <div class="card mb-4">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">My Tasks</h5>
-            <a href="{% url 'games:dashboard' %}" class="btn btn-sm btn-outline-primary">View All Tasks</a>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>Task</th>
-                            <th>Game</th>
-                            <th>Status</th>
-                            <th>Priority</th>
-                            <th>Due Date</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for task in my_tasks %}
-                        <tr>
-                            <td>{{ task.title }}</td>
-                            <td><a href="{% url 'games:game_detail' task.game.id %}">{{ task.game.title }}</a></td>
-                            <td>
-                                <span class="badge {% if task.status == 'to_do' %}bg-secondary
-                                    {% elif task.status == 'in_progress' %}bg-primary
-                                    {% elif task.status == 'in_review' %}bg-info
-                                    {% elif task.status == 'done' %}bg-success
-                                    {% elif task.status == 'blocked' %}bg-danger
-                                    {% elif task.status == 'backlog' %}bg-dark text-white
-                                    {% else %}bg-light{% endif %}">
-                                    {{ task.get_status_display }}
-                                </span>
-                            </td>
-                            <td>
-                                <span class="badge {% if task.priority == 'high' %}bg-danger
-                                    {% elif task.priority == 'medium' %}bg-warning text-dark
-                                    {% else %}bg-info{% endif %}">
-                                    {{ task.get_priority_display }}
-                                </span>
-                            </td>
-                            <td>{% if task.due_date %}{{ task.due_date|date:"M d, Y" }}{% else %}No date{% endif %}</td>
-                            <td>
-                                <div class="btn-group btn-group-sm">
-                                    <a href="{% url 'games:task_detail' task.id %}" class="btn btn-outline-primary">View</a>
-                                    <a href="{% url 'games:task_update' task.id %}" class="btn btn-outline-secondary">Edit</a>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-    {% endif %}
+    {% endcomment %}
     
     <!-- Filters -->
     <div class="card mb-4">

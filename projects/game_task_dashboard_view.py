@@ -85,6 +85,7 @@ class GameTaskDashboardView(LoginRequiredMixin, View):
         context['task_stats'] = {
             'total': tasks.count(),
             'completed': tasks.filter(status='done').count(),
+            'done': tasks.filter(status='done').count(),  # Adding 'done' key for consistency
             'in_progress': tasks.filter(status='in_progress').count(),
             'to_do': tasks.filter(status='to_do').count(),
             'backlog': tasks.filter(status='backlog').count(),

@@ -1,113 +1,16 @@
-{% extends 'base.html' %}
+{% extends 'core/base_task_dashboard.html' %}
 {% load static %}
-{% load project_extras %}
 
-{% block title %}Game Development Tasks{% if game %} - {{ game.title }}{% endif %}{% endblock %}
+{% block dashboard_title %}{% if game %}{{ game.title }} Tasks{% else %}Game Development Tasks{% endif %}{% endblock %}
 
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/task_dashboard.css' %}">
-<style>
-    .task-card {
-        transition: transform 0.2s;
-    }
-    .task-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
-    .status-badge {
-        cursor: pointer;
-    }
-    .priority-badge {
-        width: 80px;
-        text-align: center;
-    }
-    .task-count-badge {
-        font-size: 0.8rem;
-        vertical-align: middle;
-    }
-    .progress {
-        height: 10px;
-    }
-    .stats-card {
-        border-left: 4px solid #6c757d;
-        transition: transform 0.2s;
-    }
-    .stats-card:hover {
-        transform: translateY(-3px);
-    }
-    .stats-card.todo {
-        border-left-color: #0d6efd;
-    }
-    .stats-card.in-progress {
-        border-left-color: #fd7e14;
-    }
-    .stats-card.review {
-        border-left-color: #6f42c1;
-    }
-    .stats-card.done {
-        border-left-color: #198754;
-    }
-    .stats-card.backlog {
-        border-left-color: #6c757d;
-    }
-    .milestone-card {
-        border-left: 4px solid #0dcaf0;
-    }
-    .task-form-control {
-        font-size: 0.9rem;
-        padding: 0.25rem 0.5rem;
-        height: calc(1.5em + 0.5rem + 2px);
-    }
-    .task-action-btn {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.75rem;
-    }
-</style>
-{% endblock %}
+{% block dashboard_heading %}{% if game %}{{ game.title }} Tasks{% else %}Game Development Tasks{% endif %}{% endblock %}
+
+{% block new_task_url %}{% url 'games:task_create_hybrid' %}?section=game_development{% endblock %}
+{% block new_task_text %}New Game Task{% endblock %}
 
 {% block content %}
-<div class="container-fluid mt-4">
-    <!-- Breadcrumb -->
-    <div class="row">
-        <div class="col-12">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{% url 'games:dashboard' %}">Dashboard</a></li>
-                    {% if game %}
-                    <li class="breadcrumb-item"><a href="{% url 'games:game_detail' game.id %}">{{ game.title }}</a></li>
-                    {% endif %}
-                    <li class="breadcrumb-item active">Task Dashboard</li>
-                </ol>
-            </nav>
-        </div>
-    </div>
-
-    <!-- Header -->
-    <div class="row mb-4">
-        <div class="col-md-8">
-            <h1>
-                {% if game %}
-                Game Development Tasks: {{ game.title }}
-                {% else %}
-                Game Development Tasks
-                {% endif %}
-            </h1>
-        </div>
-        <div class="col-md-4 text-end">
-            {% if game %}
-            <a href="{% url 'games:task_create' game.id %}" class="btn btn-primary">
-                <i class="bi bi-plus-circle"></i> New Task
-            </a>
-            <a href="{% url 'games:task_kanban' game.id %}" class="btn btn-outline-secondary ms-2">
-                <i class="bi bi-kanban"></i> Kanban View
-            </a>
-            {% endif %}
-            <button type="button" class="btn btn-outline-primary ms-2" data-bs-toggle="modal" data-bs-target="#batchUpdateModal">
-                <i class="bi bi-pencil-square"></i> Batch Update
-            </button>
-        </div>
-    </div>
-
+{{ block.super }}
+    
     <!-- Stats Cards -->
     <div class="row mb-4">
         <div class="col-md-2">
@@ -116,7 +19,7 @@
                     <h6 class="card-title">To Do</h6>
                     <h2 class="mb-0">{{ task_stats.to_do }}</h2>
                     <div class="progress mt-2">
-                        <div class="progress-bar bg-primary" role="progressbar" data-width="{{ task_stats.to_do|percentage:task_stats.total }}" style="width: {{ task_stats.to_do|percentage:task_stats.total }}%"></div>
+                        <div class="progress-bar bg-primary progress-bar-{% widthratio task_stats.to_do task_stats.total 100 %}" role="progressbar" aria-valuenow="{% widthratio task_stats.to_do task_stats.total 100 %}" aria-valuemin="0" aria-valuemax="100"></div>
                     </div>
                 </div>
             </div>
@@ -127,7 +30,7 @@
                     <h6 class="card-title">In Progress</h6>
                     <h2 class="mb-0">{{ task_stats.in_progress }}</h2>
                     <div class="progress mt-2">
-                        <div class="progress-bar bg-warning" role="progressbar" data-width="{{ task_stats.in_progress|percentage:task_stats.total }}" style="width: {{ task_stats.in_progress|percentage:task_stats.total }}%"></div>
+                        <div class="progress-bar bg-warning progress-bar-{% widthratio task_stats.in_progress task_stats.total 100 %}" role="progressbar" aria-valuenow="{% widthratio task_stats.in_progress task_stats.total 100 %}" aria-valuemin="0" aria-valuemax="100"></div>
                     </div>
                 </div>
             </div>
@@ -138,18 +41,18 @@
                     <h6 class="card-title">In Review</h6>
                     <h2 class="mb-0">{{ task_stats.in_review }}</h2>
                     <div class="progress mt-2">
-                        <div class="progress-bar bg-purple" role="progressbar" data-width="{{ task_stats.in_review|percentage:task_stats.total }}" style="width: {{ task_stats.in_review|percentage:task_stats.total }}%"></div>
+                        <div class="progress-bar bg-purple progress-bar-{% widthratio task_stats.in_review task_stats.total 100 %}" role="progressbar" aria-valuenow="{% widthratio task_stats.in_review task_stats.total 100 %}" aria-valuemin="0" aria-valuemax="100"></div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-md-2">
-            <div class="card stats-card done">
+            <div class="card stats-card completed">
                 <div class="card-body">
                     <h6 class="card-title">Done</h6>
-                    <h2 class="mb-0">{{ task_stats.completed }}</h2>
+                    <h2 class="mb-0">{{ task_stats.done }}</h2>
                     <div class="progress mt-2">
-                        <div class="progress-bar bg-success" role="progressbar" data-width="{{ task_stats.completion_rate }}" style="width: {{ task_stats.completion_rate }}%"></div>
+                        <div class="progress-bar bg-success progress-bar-{{ task_stats.completion_rate|floatformat:0 }}" role="progressbar" aria-valuenow="{{ task_stats.completion_rate|floatformat:0 }}" aria-valuemin="0" aria-valuemax="100"></div>
                     </div>
                 </div>
             </div>
@@ -160,395 +63,461 @@
                     <h6 class="card-title">Backlog</h6>
                     <h2 class="mb-0">{{ task_stats.backlog }}</h2>
                     <div class="progress mt-2">
-                        <div class="progress-bar bg-secondary" role="progressbar" data-width="{{ task_stats.backlog|percentage:task_stats.total }}" style="width: {{ task_stats.backlog|percentage:task_stats.total }}%"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-2">
-            <div class="card stats-card">
-                <div class="card-body">
-                    <h6 class="card-title">Total Tasks</h6>
-                    <h2 class="mb-0">{{ task_stats.total }}</h2>
-                    <div class="progress mt-2">
-                        <div class="progress-bar bg-info" role="progressbar" style="width: 100%"></div>
+                        <div class="progress-bar bg-secondary progress-bar-{% widthratio task_stats.backlog task_stats.total 100 %}" role="progressbar" aria-valuenow="{% widthratio task_stats.backlog task_stats.total 100 %}" aria-valuemin="0" aria-valuemax="100"></div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
     
-    <!-- Main Content -->
-    <div class="row">
-        <!-- Filters -->
-        <div class="col-md-3">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Status Filter</h5>
-                </div>
-                <div class="card-body">
-                    <div class="d-flex flex-wrap gap-2 mb-3">
-                        <span class="badge bg-secondary filter-status active" data-status="all">All <span class="badge bg-light text-dark task-count-badge">{{ task_stats.total }}</span></span>
-                        <span class="badge bg-primary filter-status" data-status="to_do">To Do <span class="badge bg-light text-dark task-count-badge">{{ task_stats.to_do }}</span></span>
-                        <span class="badge bg-warning text-dark filter-status" data-status="in_progress">In Progress <span class="badge bg-light text-dark task-count-badge">{{ task_stats.in_progress }}</span></span>
-                        <span class="badge bg-purple filter-status" data-status="in_review">In Review <span class="badge bg-light text-dark task-count-badge">{{ task_stats.in_review }}</span></span>
-                        <span class="badge bg-success filter-status" data-status="done">Done <span class="badge bg-light text-dark task-count-badge">{{ task_stats.completed }}</span></span>
-                        <span class="badge bg-secondary filter-status" data-status="backlog">Backlog <span class="badge bg-light text-dark task-count-badge">{{ task_stats.backlog }}</span></span>
-                        {% if task_stats.blocked > 0 %}
-                        <span class="badge bg-danger filter-status" data-status="blocked">Blocked <span class="badge bg-light text-dark task-count-badge">{{ task_stats.blocked }}</span></span>
-                        {% endif %}
-                    </div>
-                </div>
+
+    
+    <!-- Task Table -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">
+                All Tasks
+                {% if current_filters %}
+                <span class="ms-2 badge bg-info">Filtered</span>
+                {% endif %}
+            </h6>
+            <div>
+                {% if current_filters %}
+                <a href="{% url 'games:task_dashboard' %}" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-times me-1"></i> Clear Filters
+                </a>
+                {% endif %}
             </div>
-            
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Advanced Filters</h5>
-                </div>
-                <div class="card-body">
-                    <form method="get" action="">
-                        <div class="mb-3">
-                            <label for="priorityFilter" class="form-label">Priority</label>
-                            <select class="form-select form-select-sm" id="priorityFilter" name="priority">
-                                <option value="">All Priorities</option>
-                                {% for priority, label in task.PRIORITY_CHOICES %}
-                                <option value="{{ priority }}" {% if request.GET.priority == priority %}selected{% endif %}>{{ label }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="typeFilter" class="form-label">Task Type</label>
-                            <select class="form-select form-select-sm" id="typeFilter" name="type">
-                                <option value="">All Types</option>
-                                {% for type, label in task.TASK_TYPE_CHOICES %}
-                                <option value="{{ type }}" {% if request.GET.type == type %}selected{% endif %}>{{ label }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        
-                        {% if milestones %}
-                        <div class="mb-3">
-                            <label for="milestoneFilter" class="form-label">Milestone</label>
-                            <select class="form-select form-select-sm" id="milestoneFilter" name="milestone">
-                                <option value="">All Milestones</option>
-                                {% for milestone in milestones %}
-                                <option value="{{ milestone.id }}" {% if request.GET.milestone == milestone.id|stringformat:"i" %}selected{% endif %}>{{ milestone.title }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        {% endif %}
-                        
-                        <div class="mb-3">
-                            <label for="companySectionFilter" class="form-label">Company Section</label>
-                            <select class="form-select form-select-sm" id="companySectionFilter" name="company_section">
-                                <option value="">All Sections</option>
-                                <option value="game_development" {% if request.GET.company_section == 'game_development' %}selected{% endif %}>Game Development</option>
-                                <option value="education" {% if request.GET.company_section == 'education' %}selected{% endif %}>Education</option>
-                                <option value="arcade" {% if request.GET.company_section == 'arcade' %}selected{% endif %}>Arcade</option>
-                                <option value="marketing" {% if request.GET.company_section == 'marketing' %}selected{% endif %}>Marketing</option>
-                                <option value="research" {% if request.GET.company_section == 'research' %}selected{% endif %}>Research & Development</option>
-                                <option value="finance" {% if request.GET.company_section == 'finance' %}selected{% endif %}>Finance</option>
-                                <option value="hr" {% if request.GET.company_section == 'hr' %}selected{% endif %}>HR</option>
-                                <option value="it" {% if request.GET.company_section == 'it' %}selected{% endif %}>IT</option>
-                                <option value="other" {% if request.GET.company_section == 'other' %}selected{% endif %}>Other</option>
-                            </select>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="task_type" class="form-label">Task Type</label>
-                            <select class="form-select" id="task_type" name="task_type">
-                                <option value="">All Types</option>
-                                <option value="design" {% if request.GET.task_type == 'design' %}selected{% endif %}>Design</option>
-                                <option value="art" {% if request.GET.task_type == 'art' %}selected{% endif %}>Art</option>
-                                <option value="programming" {% if request.GET.task_type == 'programming' %}selected{% endif %}>Programming</option>
-                                <option value="audio" {% if request.GET.task_type == 'audio' %}selected{% endif %}>Audio</option>
-                                <option value="testing" {% if request.GET.task_type == 'testing' %}selected{% endif %}>Testing</option>
-                                <option value="writing" {% if request.GET.task_type == 'writing' %}selected{% endif %}>Writing</option>
-                                <option value="other" {% if request.GET.task_type == 'other' %}selected{% endif %}>Other</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" id="myTasksFilter" name="my_tasks" value="1" {% if request.GET.my_tasks %}checked{% endif %}>
-                            <label class="form-check-label" for="myTasksFilter">
-                                My Tasks Only
-                            </label>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-primary btn-sm w-100">Apply Filters</button>
-                        {% if request.GET %}
-                        <a href="{% if game %}{% url 'games:game_task_dashboard' game.id %}{% else %}{% url 'games:task_dashboard' %}{% endif %}" class="btn btn-outline-secondary btn-sm w-100 mt-2">Clear Filters</a>
-                        {% endif %}
-                    </form>
-                </div>
-            </div>
-            
-            {% if milestones %}
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Milestones</h5>
-                </div>
-                <div class="card-body p-0">
-                    <div class="list-group list-group-flush">
-                        {% for milestone in milestones %}
-                        <div class="list-group-item">
-                            <h6 class="mb-1">{{ milestone.title }}</h6>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <small>{{ milestone.completed_tasks }} / {{ milestone.total_tasks }} tasks</small>
-                                <span class="badge {% if milestone.progress >= 100 %}bg-success{% elif milestone.progress >= 50 %}bg-warning{% else %}bg-danger{% endif %}">{{ milestone.progress }}%</span>
-                            </div>
-                            <div class="progress mt-1 progress-thin">
-                                <div class="progress-bar {% if milestone.progress >= 100 %}bg-success{% elif milestone.progress >= 50 %}bg-warning{% else %}bg-danger{% endif %}" role="progressbar" data-width="{{ milestone.progress }}" style="width: {{ milestone.progress }}%"></div>
-                            </div>
-                            {% if milestone.due_date %}
-                            <small class="text-muted">Due: {{ milestone.due_date|date:"M d, Y" }}</small>
-                            {% endif %}
-                        </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover" id="taskTable">
+                    <thead>
+                        <tr>
+                            <th width="30">
+                                <input type="checkbox" class="form-check-input" id="selectAllTasks">
+                            </th>
+                            <th>Title</th>
+                            <th width="120">Company Section</th>
+                            <th width="120">Status</th>
+                            <th width="100">Priority</th>
+                            <th width="120">Assigned To</th>
+                            <th width="120">Due Date</th>
+                            <th class="action-column">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for task in tasks %}
+                        <tr class="task-row" data-task-id="{{ task.id }}" data-status="{{ task.status }}">
+                            <td>
+                                <input type="checkbox" class="form-check-input task-checkbox" data-task-id="{{ task.id }}">
+                            </td>
+                            <td>
+                                <a href="{% url 'games:task_detail_hybrid' task.id %}">{{ task.title }}</a>
+                                {% if task.is_overdue %}
+                                <span class="badge bg-danger ms-1">Overdue</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge section-badge 
+                                    {% if task.company_section == 'game_development' %}bg-primary
+                                    {% elif task.company_section == 'education' %}bg-success
+                                    {% elif task.company_section == 'arcade' %}bg-danger
+                                    {% elif task.company_section == 'marketing' %}bg-info
+                                    {% elif task.company_section == 'research' %}bg-warning
+                                    {% else %}bg-secondary{% endif %}">
+                                    {{ task.company_section|title }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if task.status == 'to_do' %}
+                                <span class="badge bg-primary status-badge">To Do</span>
+                                {% elif task.status == 'in_progress' %}
+                                <span class="badge bg-warning text-dark status-badge">In Progress</span>
+                                {% elif task.status == 'in_review' %}
+                                <span class="badge bg-purple status-badge">In Review</span>
+                                {% elif task.status == 'completed' %}
+                                <span class="badge bg-success status-badge">Done</span>
+                                {% elif task.status == 'backlog' %}
+                                <span class="badge bg-secondary status-badge">Backlog</span>
+                                {% elif task.status == 'blocked' %}
+                                <span class="badge bg-danger status-badge">Blocked</span>
+                                {% else %}
+                                <span class="badge bg-secondary status-badge">{{ task.get_status_display }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if task.priority == 'critical' %}
+                                <span class="badge bg-danger priority-badge">Critical</span>
+                                {% elif task.priority == 'high' %}
+                                <span class="badge bg-warning text-dark priority-badge">High</span>
+                                {% elif task.priority == 'medium' %}
+                                <span class="badge bg-info priority-badge">Medium</span>
+                                {% elif task.priority == 'low' %}
+                                <span class="badge bg-success priority-badge">Low</span>
+                                {% else %}
+                                <span class="badge bg-secondary priority-badge">{{ task.get_priority_display }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if task.assigned_to %}
+                                <span data-bs-toggle="tooltip" title="{{ task.assigned_to.email }}">
+                                    {{ task.assigned_to.get_full_name|default:task.assigned_to.username }}
+                                </span>
+                                {% else %}
+                                <span class="text-muted">Unassigned</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if task.due_date %}
+                                <span {% if task.is_overdue %}class="text-danger"{% endif %}>
+                                    {{ task.due_date|date:"M d, Y" }}
+                                </span>
+                                {% else %}
+                                <span class="text-muted">No date</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                <div class="btn-group">
+                                    <a href="{% url 'games:task_update_hybrid' task.id %}" class="btn btn-sm btn-outline-primary" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'games:task_delete' task.id %}" class="btn btn-sm btn-outline-danger" title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center py-4">
+                                <div class="text-muted">
+                                    <i class="fas fa-search fa-2x mb-3"></i>
+                                    <p>No tasks found matching your criteria.</p>
+                                    {% if current_filters %}
+                                    <a href="{% url 'games:task_dashboard' %}" class="btn btn-sm btn-outline-secondary">
+                                        Clear Filters
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
                         {% endfor %}
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-        </div>
-        
-        <!-- Task Table -->
-        <div class="col-md-9">
-            <div class="card mb-4">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="card-title mb-0">Tasks</h5>
-                    <div class="d-flex align-items-center">
-                        {% if game %}
-                        <a href="{% url 'games:task_create_hybrid_with_game' game.id %}?section=game_development" class="btn btn-primary me-2">
-                            <i class="bi bi-plus-circle"></i> New Game Development Task
-                        </a>
-                        {% endif %}
-                        <span class="badge bg-light text-dark" id="selectedTasksCount">0</span> tasks selected
-                    </div>
-                </div>
-                <div class="card-body p-0">
-                    {% if tasks %}
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead>
-                                <tr>
-                                    <th width="30">
-                                        <input type="checkbox" class="form-check-input" id="selectAllTasks">
-                                    </th>
-                                    <th>Title</th>
-                                    <th width="120">Status</th>
-                                    <th width="100">Priority</th>
-                                    <th width="120">Due Date</th>
-                                    <th width="120">Assigned To</th>
-                                    <th width="120">Section</th>
-                                    <th width="100">Hours</th>
-                                    <th width="80">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for task in tasks %}
-                                <tr class="task-row" data-task-id="{{ task.id }}" data-status="{{ task.status }}">
-                                    <td>
-                                        <input type="checkbox" class="form-check-input task-checkbox" value="{{ task.id }}">
-                                    </td>
-                                    <td>
-                                        <a href="{% url 'games:task_detail' task.id %}" class="text-decoration-none">
-                                            {{ task.title }}
-                                        </a>
-                                        <a href="{% url 'games:task_detail_hybrid' task.id %}" class="ms-1 badge bg-secondary text-white" title="View with section-specific fields">
-                                            <i class="bi bi-layers"></i>
-                                        </a>
-                                        {% if task.milestone %}
-                                        <span class="badge bg-info">{{ task.milestone.title }}</span>
-                                        {% endif %}
-                                        {% if task.gdd_feature %}
-                                        <span class="badge bg-secondary">GDD Feature</span>
-                                        {% endif %}
-                                        <br>
-                                        <small class="text-muted">{{ task.get_task_type_display }}</small>
-                                    </td>
-                                    <td>
-                                        <form class="task-status-form" data-task-id="{{ task.id }}">
-                                            <select class="form-select form-select-sm task-status-select" data-original-value="{{ task.status }}">
-                                                {% for status_value, status_label in task.STATUS_CHOICES %}
-                                                <option value="{{ status_value }}" {% if task.status == status_value %}selected{% endif %}>{{ status_label }}</option>
-                                                {% endfor %}
-                                            </select>
-                                        </form>
-                                    </td>
-                                    <td>
-                                        <span class="badge priority-badge {% if task.priority == 'critical' %}bg-danger{% elif task.priority == 'high' %}bg-warning text-dark{% elif task.priority == 'medium' %}bg-primary{% else %}bg-secondary{% endif %}">
-                                            {{ task.get_priority_display }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        {% if task.due_date %}
-                                        <span class="{% if task.due_date < today and task.status != 'done' %}text-danger{% endif %}">
-                                            {{ task.due_date|date:"M d, Y" }}
-                                        </span>
-                                        {% else %}
-                                        <span class="text-muted">—</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if task.assigned_to %}
-                                        <span data-bs-toggle="tooltip" title="{{ task.assigned_to.email }}">
-                                            {{ task.assigned_to.get_full_name|default:task.assigned_to.username }}
-                                        </span>
-                                        {% else %}
-                                        <span class="text-muted">Unassigned</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-info text-dark">
-                                            {{ task.get_company_section_display }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-info text-dark">
-                                            {{ task.get_company_section_display }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <form class="task-hours-form" data-task-id="{{ task.id }}">
-                                            <div class="input-group input-group-sm">
-                                                <input type="number" class="form-control task-hours-input" value="{{ task.actual_hours|default:0 }}" min="0" step="0.5" data-original-value="{{ task.actual_hours|default:0 }}">
-                                                <span class="input-group-text">hrs</span>
-                                            </div>
-                                        </form>
-                                    </td>
-                                    <td>
-                                        <div class="btn-group">
-                                            <a href="{% url 'games:task_update' task.id %}" class="btn btn-sm btn-outline-primary task-action-btn" data-bs-toggle="tooltip" title="Edit Task">
-                                                <i class="bi bi-pencil"></i>
-                                            </a>
-                                            <a href="{% url 'games:task_update_hybrid' task.id %}" class="btn btn-sm btn-outline-info task-action-btn" data-bs-toggle="tooltip" title="Edit with Section Fields">
-                                                <i class="bi bi-layers"></i>
-                                            </a>
-                                            <a href="{% url 'games:task_detail' task.id %}" class="btn btn-sm btn-outline-info task-action-btn" data-bs-toggle="tooltip" title="View Details">
-                                                <i class="bi bi-eye"></i>
-                                            </a>
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                    {% else %}
-                    <div class="alert alert-info m-3">
-                        <h5 class="alert-heading">No tasks found!</h5>
-                        <p>There are no tasks matching your filter criteria.</p>
-                        {% if game %}
-                        <a href="{% url 'games:task_create' game.id %}" class="btn btn-primary btn-sm">
-                            <i class="bi bi-plus-circle"></i> Create New Task
-                        </a>
-                        {% endif %}
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-            
-            <!-- Recent Activity -->
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <h5 class="card-title mb-0">Recent Tasks</h5>
-                        </div>
-                        <div class="card-body p-0">
-                            <div class="list-group list-group-flush">
-                                {% for task in recent_tasks %}
-                                <a href="{% url 'games:task_detail' task.id %}" class="list-group-item list-group-item-action">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h6 class="mb-1">{{ task.title }}</h6>
-                                        <small>{{ task.modified|timesince }} ago</small>
-                                    </div>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <span class="badge {% if task.status == 'to_do' %}bg-primary{% elif task.status == 'in_progress' %}bg-warning text-dark{% elif task.status == 'in_review' %}bg-purple{% elif task.status == 'done' %}bg-success{% else %}bg-secondary{% endif %}">
-                                            {{ task.get_status_display }}
-                                        </span>
-                                        <small>{{ task.get_task_type_display }}</small>
-                                    </div>
-                                </a>
-                                {% empty %}
-                                <div class="list-group-item">
-                                    <p class="mb-0">No recent tasks found.</p>
-                                </div>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-md-6">
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <h5 class="card-title mb-0">Upcoming Due Tasks</h5>
-                        </div>
-                        <div class="card-body p-0">
-                            <div class="list-group list-group-flush">
-                                {% for task in upcoming_tasks %}
-                                <a href="{% url 'games:task_detail' task.id %}" class="list-group-item list-group-item-action">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h6 class="mb-1">{{ task.title }}</h6>
-                                        <small>Due: {{ task.due_date|date:"M d, Y" }}</small>
-                                    </div>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <span class="badge {% if task.status == 'to_do' %}bg-primary{% elif task.status == 'in_progress' %}bg-warning text-dark{% elif task.status == 'in_review' %}bg-purple{% elif task.status == 'done' %}bg-success{% else %}bg-secondary{% endif %}">
-                                            {{ task.get_status_display }}
-                                        </span>
-                                        <small>{{ task.get_priority_display }} Priority</small>
-                                    </div>
-                                </a>
-                                {% empty %}
-                                <div class="list-group-item">
-                                    <p class="mb-0">No upcoming tasks found.</p>
-                                </div>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
-    
-    <!-- Batch Update Modal -->
-    <div class="modal fade" id="batchUpdateModal" tabindex="-1" aria-labelledby="batchUpdateModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="batchUpdateModalLabel">Batch Update Tasks</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form id="batchUpdateForm">
-                    <div class="modal-body">
-                        <p>Update <span class="badge bg-primary" id="batchSelectedCount">0</span> selected tasks:</p>
-                        
-                        <div class="mb-3">
-                            <label for="batchStatus" class="form-label">Status</label>
-                            <select class="form-select" id="batchStatus" name="status">
-                                {% for status_value, status_label in task.STATUS_CHOICES %}
-                                <option value="{{ status_value }}">{{ status_label }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
+
+<!-- Filter Modal -->
+<div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="filterModalLabel">Filter Tasks</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="taskFilterForm" method="get" action="{% url 'games:task_dashboard' %}">
+                    <div class="mb-3">
+                        <label for="filterStatus" class="form-label">Status</label>
+                        <select class="form-select" id="filterStatus" name="status">
+                            <option value="">All Statuses</option>
+                            <option value="to_do" {% if request.GET.status == 'to_do' %}selected{% endif %}>To Do</option>
+                            <option value="in_progress" {% if request.GET.status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                            <option value="in_review" {% if request.GET.status == 'in_review' %}selected{% endif %}>In Review</option>
+                            <option value="completed" {% if request.GET.status == 'completed' %}selected{% endif %}>Done</option>
+                            <option value="backlog" {% if request.GET.status == 'backlog' %}selected{% endif %}>Backlog</option>
+                            <option value="blocked" {% if request.GET.status == 'blocked' %}selected{% endif %}>Blocked</option>
+                        </select>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary" id="batchUpdateSubmit" disabled>Update Tasks</button>
+                    <div class="mb-3">
+                        <label for="filterPriority" class="form-label">Priority</label>
+                        <select class="form-select" id="filterPriority" name="priority">
+                            <option value="">All Priorities</option>
+                            <option value="critical" {% if request.GET.priority == 'critical' %}selected{% endif %}>Critical</option>
+                            <option value="high" {% if request.GET.priority == 'high' %}selected{% endif %}>High</option>
+                            <option value="medium" {% if request.GET.priority == 'medium' %}selected{% endif %}>Medium</option>
+                            <option value="low" {% if request.GET.priority == 'low' %}selected{% endif %}>Low</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="filterGame" class="form-label">Game</label>
+                        <select class="form-select" id="filterGame" name="game">
+                            <option value="">All Games</option>
+                            {% for game in games %}
+                            <option value="{{ game.id }}" {% if request.GET.game|add:"0" == game.id %}selected{% endif %}>{{ game.title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="filterUser" class="form-label">Assigned To</label>
+                        <select class="form-select" id="filterUser" name="user">
+                            <option value="">All Users</option>
+                            <option value="unassigned" {% if request.GET.user == 'unassigned' %}selected{% endif %}>Unassigned</option>
+                            {% for user in users %}
+                            <option value="{{ user.id }}" {% if request.GET.user|add:"0" == user.id %}selected{% endif %}>{{ user.get_full_name|default:user.username }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="filterDueDate" class="form-label">Due Date</label>
+                        <select class="form-select" id="filterDueDate" name="due_date">
+                            <option value="">All Due Dates</option>
+                            <option value="overdue" {% if request.GET.due_date == 'overdue' %}selected{% endif %}>Overdue</option>
+                            <option value="today" {% if request.GET.due_date == 'today' %}selected{% endif %}>Due Today</option>
+                            <option value="this_week" {% if request.GET.due_date == 'this_week' %}selected{% endif %}>Due This Week</option>
+                            <option value="next_week" {% if request.GET.due_date == 'next_week' %}selected{% endif %}>Due Next Week</option>
+                            <option value="this_month" {% if request.GET.due_date == 'this_month' %}selected{% endif %}>Due This Month</option>
+                            <option value="no_date" {% if request.GET.due_date == 'no_date' %}selected{% endif %}>No Due Date</option>
+                        </select>
                     </div>
                 </form>
             </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="applyFiltersBtn">Apply Filters</button>
+            </div>
         </div>
     </div>
-    
-    <!-- Toast Container -->
-    <div class="toast-container position-fixed bottom-0 end-0 p-3" id="toastContainer"></div>
 </div>
-{% endblock %}
+
+<!-- Batch Update Modal -->
+<div class="modal fade" id="batchUpdateModal" tabindex="-1" aria-labelledby="batchUpdateModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="batchUpdateModalLabel">Batch Update Tasks</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="noTasksSelectedAlert" class="alert alert-warning" style="display: none;">
+                    Please select at least one task to update.
+                </div>
+                <form id="batchUpdateForm">
+                    <div class="mb-3">
+                        <label for="batchStatus" class="form-label">Status</label>
+                        <select class="form-select" id="batchStatus" name="status">
+                            <option value="">No Change</option>
+                            <option value="to_do">To Do</option>
+                            <option value="in_progress">In Progress</option>
+                            <option value="in_review">In Review</option>
+                            <option value="completed">Done</option>
+                            <option value="backlog">Backlog</option>
+                            <option value="blocked">Blocked</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="batchPriority" class="form-label">Priority</label>
+                        <select class="form-select" id="batchPriority" name="priority">
+                            <option value="">No Change</option>
+                            <option value="critical">Critical</option>
+                            <option value="high">High</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="batchAssignedTo" class="form-label">Assigned To</label>
+                        <select class="form-select" id="batchAssignedTo" name="assigned_to">
+                            <option value="">No Change</option>
+                            <option value="unassigned">Unassigned</option>
+                            {% for user in users %}
+                            <option value="{{ user.id }}">{{ user.get_full_name|default:user.username }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="batchDueDate" class="form-label">Due Date</label>
+                        <input type="date" class="form-control" id="batchDueDate" name="due_date">
+                        <div class="form-check mt-2">
+                            <input class="form-check-input" type="checkbox" id="clearDueDate">
+                            <label class="form-check-label" for="clearDueDate">Clear due date</label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="applyBatchUpdateBtn">Update Tasks</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block toast_container %}
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div id="taskToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <strong class="me-auto" id="toastTitle">Notification</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body" id="toastMessage"></div>
+    </div>
+</div>
+{% endblock toast_container %}
+{% endblock content %}
 
 {% block extra_js %}
 <script src="{% static 'js/game_task_manager.js' %}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Game Development Tasks Dashboard loaded');
+        
+        // Initialize tooltips
+        try {
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+            console.log('Tooltips initialized successfully');
+        } catch (error) {
+            console.error('Error initializing tooltips:', error);
+        }
+        
+        // Handle select all tasks checkbox
+        const selectAllCheckbox = document.getElementById('selectAllTasks');
+        if (selectAllCheckbox) {
+            selectAllCheckbox.addEventListener('change', function() {
+                const taskCheckboxes = document.querySelectorAll('.task-checkbox');
+                taskCheckboxes.forEach(checkbox => {
+                    checkbox.checked = selectAllCheckbox.checked;
+                });
+            });
+        }
+        
+        // Handle filter form submission
+        const applyFiltersBtn = document.getElementById('applyFiltersBtn');
+        if (applyFiltersBtn) {
+            applyFiltersBtn.addEventListener('click', function() {
+                document.getElementById('taskFilterForm').submit();
+            });
+        }
+        
+        // Handle batch update
+        const applyBatchUpdateBtn = document.getElementById('applyBatchUpdateBtn');
+        if (applyBatchUpdateBtn) {
+            applyBatchUpdateBtn.addEventListener('click', function() {
+                const selectedTaskIds = Array.from(document.querySelectorAll('.task-checkbox:checked'))
+                    .map(checkbox => checkbox.getAttribute('data-task-id'));
+                
+                if (selectedTaskIds.length === 0) {
+                    document.getElementById('noTasksSelectedAlert').style.display = 'block';
+                    return;
+                }
+                
+                document.getElementById('noTasksSelectedAlert').style.display = 'none';
+                
+                const formData = new FormData(document.getElementById('batchUpdateForm'));
+                const data = {
+                    task_ids: selectedTaskIds,
+                    status: formData.get('status') || null,
+                    priority: formData.get('priority') || null,
+                    assigned_to: formData.get('assigned_to') || null,
+                    due_date: formData.get('due_date') || null,
+                    clear_due_date: document.getElementById('clearDueDate').checked
+                };
+                
+                // Remove null values
+                Object.keys(data).forEach(key => {
+                    if (data[key] === null) {
+                        delete data[key];
+                    }
+                });
+                
+                // Send AJAX request to update tasks
+                fetch('{% url "games:game_batch_task_update" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast('Success', data.message || 'Tasks updated successfully', 'success');
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1500);
+                    } else {
+                        showToast('Error', data.message || 'Failed to update tasks', 'danger');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating tasks:', error);
+                    showToast('Error', 'An error occurred while updating tasks', 'danger');
+                });
+                
+                // Close the modal
+                const batchUpdateModal = bootstrap.Modal.getInstance(document.getElementById('batchUpdateModal'));
+                batchUpdateModal.hide();
+            });
+        }
+        
+        // Handle clear due date checkbox
+        const clearDueDateCheckbox = document.getElementById('clearDueDate');
+        const batchDueDateInput = document.getElementById('batchDueDate');
+        if (clearDueDateCheckbox && batchDueDateInput) {
+            clearDueDateCheckbox.addEventListener('change', function() {
+                batchDueDateInput.disabled = clearDueDateCheckbox.checked;
+                if (clearDueDateCheckbox.checked) {
+                    batchDueDateInput.value = '';
+                }
+            });
+        }
+        
+        // Helper function to show toast notifications
+        function showToast(title, message, type = 'info') {
+            try {
+                console.log(`Showing toast: ${title} - ${message} (${type})`);
+                const toast = document.getElementById('taskToast');
+                const toastTitle = document.getElementById('toastTitle');
+                const toastMessage = document.getElementById('toastMessage');
+                
+                if (!toast || !toastTitle || !toastMessage) {
+                    console.error('Toast elements not found');
+                    return;
+                }
+                
+                // Set toast content
+                toastTitle.textContent = title;
+                toastMessage.textContent = message;
+                
+                // Set toast color based on type
+                toast.className = 'toast';
+                if (type === 'success') {
+                    toast.classList.add('bg-success', 'text-white');
+                } else if (type === 'danger') {
+                    toast.classList.add('bg-danger', 'text-white');
+                } else {
+                    toast.classList.add('bg-info', 'text-white');
+                }
+                
+                // Show the toast
+                const bsToast = new bootstrap.Toast(toast);
+                bsToast.show();
+            } catch (error) {
+                console.error('Error showing toast:', error);
+            }
+        }
+        
+        // Helper function to get CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    });
+</script>
 {% endblock %}

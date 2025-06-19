@@ -24,6 +24,11 @@
             --dark-color: #5a5c69;
         }
         
+        .bg-purple {
+            background-color: #6f42c1 !important;
+            color: white !important;
+        }
+        
         body {
             background-color: #f8f9fc;
         }
@@ -42,10 +47,35 @@
             margin-right: 0.25rem;
             font-weight: 500;
             transition: all 0.2s ease-in-out;
+            background-color: #000 !important;
+            color: #adb5bd !important;
         }
         .company-branches .nav-tabs .nav-link:hover:not(.active) {
-            background-color: rgba(255, 255, 255, 0.1);
+            background-color: #222 !important;
             color: white !important;
+        }
+        .company-branches .nav-tabs .nav-link.active {
+            color: white !important;
+            font-weight: bold !important;
+        }
+        .company-branches .nav-tabs .nav-link.active.tasks-tab {
+            background-color: #0dcaf0 !important;
+        }
+        .company-branches .nav-tabs .nav-link.active.games-tab {
+            background-color: #0d6efd !important;
+        }
+        .company-branches .nav-tabs .nav-link.active.education-tab {
+            background-color: #198754 !important;
+        }
+        .company-branches .nav-tabs .nav-link.active.social-tab {
+            background-color: #6f42c1 !important;
+        }
+        .company-branches .nav-tabs .nav-link.active.arcade-tab {
+            background-color: #dc3545 !important;
+        }
+        .company-branches .nav-tabs .nav-link.active.theme-tab {
+            background-color: #ffc107 !important;
+            color: #212529 !important;
         }
         
         /* Sidebar */
@@ -182,32 +212,38 @@
                 <div class="col">
                     <ul class="nav nav-tabs border-bottom-0">
                         <li class="nav-item">
-                            <a class="nav-link {% if request.resolver_match.namespace == 'core' and request.resolver_match.url_name == 'global_task_dashboard' %}active bg-info text-white{% else %}text-white-50{% endif %}" href="{% url 'core:global_task_dashboard' %}">
+                            <a class="nav-link tasks-tab {% if request.resolver_match.namespace == 'core' and request.resolver_match.url_name == 'global_task_dashboard' %}active{% endif %}" 
+                               href="{% url 'core:global_task_dashboard' %}">
                                 <i class="fas fa-tasks me-1"></i> R1D3 Tasks
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active bg-primary text-white" href="{% url 'games:dashboard' %}">
+                            <a class="nav-link games-tab {% if request.resolver_match.namespace == 'games' %}active{% endif %}" 
+                               href="{% url 'games:dashboard' %}">
                                 <i class="fas fa-gamepad me-1"></i> Game Development
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white-50" href="/education/">
+                            <a class="nav-link education-tab {% if request.path|slice:":10" == '/education' %}active{% endif %}" 
+                               href="/education/">
                                 <i class="fas fa-graduation-cap me-1"></i> Education
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white-50" href="/social-media/">
+                            <a class="nav-link social-tab {% if request.path|slice:":12" == '/social-media' %}active{% endif %}" 
+                               href="/social-media/">
                                 <i class="fas fa-users me-1"></i> Social Media
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white-50" href="/arcade/">
+                            <a class="nav-link arcade-tab {% if request.path|slice:":7" == '/arcade' %}active{% endif %}" 
+                               href="/arcade/">
                                 <i class="fas fa-arcade me-1"></i> Arcade Entertainment
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white-50" href="/theme-park/">
+                            <a class="nav-link theme-tab {% if request.path|slice:":11" == '/theme-park' %}active{% endif %}" 
+                               href="/theme-park/">
                                 <i class="fas fa-mountain me-1"></i> Theme Park
                             </a>
                         </li>

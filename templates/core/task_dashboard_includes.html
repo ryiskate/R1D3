@@ -1,0 +1,21 @@
+{% load static %}
+
+<!-- Modals for Task Dashboard -->
+{% block modals %}
+    <!-- Filter Modal -->
+    {% include "core/filter_modal.html" %}
+    
+    <!-- Batch Update Modal -->
+    {% include "core/batch_update_modal.html" %}
+    
+    <!-- Toast Container -->
+    {% block toast_container %}
+    {% include "core/toast_container.html" %}
+    {% endblock %}
+{% endblock %}
+
+<!-- JavaScript for Task Dashboard -->
+{% block task_dashboard_js %}
+    <!-- Include the JavaScript functionality -->
+    {% include "core/task_dashboard_js.html" %}
+{% endblock %}

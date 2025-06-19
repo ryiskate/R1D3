@@ -1,0 +1,94 @@
+<!-- Filter Modal -->
+<div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="filterModalLabel">Filter Tasks</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="taskFilterForm" method="get" action="{% block filter_form_action %}#{% endblock %}">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="statusFilter" class="form-label">Status</label>
+                            <select class="form-select" id="statusFilter" name="status">
+                                <option value="">All Statuses</option>
+                                {% for status_value, status_label in status_choices %}
+                                <option value="{{ status_value }}" {% if status_value == current_filters.status %}selected{% endif %}>{{ status_label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="priorityFilter" class="form-label">Priority</label>
+                            <select class="form-select" id="priorityFilter" name="priority">
+                                <option value="">All Priorities</option>
+                                {% for priority_value, priority_label in priority_choices %}
+                                <option value="{{ priority_value }}" {% if priority_value == current_filters.priority %}selected{% endif %}>{{ priority_label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="gameFilter" class="form-label">Game</label>
+                            <select class="form-select" id="gameFilter" name="game">
+                                <option value="">All Games</option>
+                                {% for game in games %}
+                                <option value="{{ game.id }}" {% if game.id|stringformat:"s" == current_filters.game %}selected{% endif %}>{{ game.title }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="assignedToFilter" class="form-label">Assigned To</label>
+                            <select class="form-select" id="assignedToFilter" name="assigned_to">
+                                <option value="">All Users</option>
+                                <option value="unassigned" {% if current_filters.assigned_to == 'unassigned' %}selected{% endif %}>Unassigned</option>
+                                <option value="me" {% if current_filters.assigned_to == 'me' %}selected{% endif %}>Assigned to Me</option>
+                                {% for user in users %}
+                                <option value="{{ user.id }}" {% if user.id|stringformat:"s" == current_filters.assigned_to %}selected{% endif %}>{{ user.get_full_name|default:user.username }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="dueDateFilter" class="form-label">Due Date</label>
+                            <select class="form-select" id="dueDateFilter" name="due_date">
+                                <option value="">All Due Dates</option>
+                                <option value="today" {% if current_filters.due_date == 'today' %}selected{% endif %}>Due Today</option>
+                                <option value="this_week" {% if current_filters.due_date == 'this_week' %}selected{% endif %}>Due This Week</option>
+                                <option value="overdue" {% if current_filters.due_date == 'overdue' %}selected{% endif %}>Overdue</option>
+                                <option value="no_date" {% if current_filters.due_date == 'no_date' %}selected{% endif %}>No Due Date</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="companySectionFilter" class="form-label">Company Section</label>
+                            <select class="form-select" id="companySectionFilter" name="company_section">
+                                <option value="">All Sections</option>
+                                <option value="game_development" {% if current_filters.company_section == 'game_development' %}selected{% endif %}>Game Development</option>
+                                <option value="education" {% if current_filters.company_section == 'education' %}selected{% endif %}>Education</option>
+                                <option value="arcade" {% if current_filters.company_section == 'arcade' %}selected{% endif %}>Arcade</option>
+                                <option value="marketing" {% if current_filters.company_section == 'marketing' %}selected{% endif %}>Marketing</option>
+                                <option value="research" {% if current_filters.company_section == 'research' %}selected{% endif %}>Research & Development</option>
+                                <option value="finance" {% if current_filters.company_section == 'finance' %}selected{% endif %}>Finance</option>
+                                <option value="hr" {% if current_filters.company_section == 'hr' %}selected{% endif %}>HR</option>
+                                <option value="it" {% if current_filters.company_section == 'it' %}selected{% endif %}>IT</option>
+                                <option value="other" {% if current_filters.company_section == 'other' %}selected{% endif %}>Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="searchQuery" class="form-label">Search</label>
+                            <input type="text" class="form-control" id="searchQuery" name="q" value="{{ current_filters.q }}" placeholder="Search in title or description">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="applyFiltersBtn">Apply Filters</button>
+            </div>
+        </div>
+    </div>
+</div>

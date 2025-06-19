@@ -10,9 +10,13 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{% url 'games:dashboard' %}">Dashboard</a></li>
+                    {% if task.game %}
                     <li class="breadcrumb-item"><a href="{% url 'games:game_detail' task.game.id %}">{{ task.game.title }}</a></li>
-                    <li class="breadcrumb-item"><a href="{% url 'games:task_list' task.game.id %}">Tasks</a></li>
-                    <li class="breadcrumb-item"><a href="{% url 'games:task_detail' task.id %}">{{ task.title }}</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'games:game_task_dashboard' game_id=task.game.id %}">Tasks</a></li>
+                    {% else %}
+                    <li class="breadcrumb-item"><a href="{% url 'core:global_task_dashboard' %}">Tasks</a></li>
+                    {% endif %}
+                    <li class="breadcrumb-item"><a href="{% url 'games:task_detail_hybrid' task.id %}">{{ task.title }}</a></li>
                     <li class="breadcrumb-item active">Delete</li>
                 </ol>
             </nav>
@@ -43,7 +47,11 @@
                     <form method="post">
                         {% csrf_token %}
                         <div class="d-grid gap-2 d-md-flex justify-content-md-center mt-4">
-                            <a href="{% url 'games:task_detail' task.id %}" class="btn btn-secondary me-md-2">Cancel</a>
+                            {% if task.game %}
+                            <a href="{% url 'games:game_task_dashboard' game_id=task.game.id %}" class="btn btn-secondary me-md-2">Cancel</a>
+                            {% else %}
+                            <a href="{% url 'core:global_task_dashboard' %}" class="btn btn-secondary me-md-2">Cancel</a>
+                            {% endif %}
                             <button type="submit" class="btn btn-danger">Delete Task</button>
                         </div>
                     </form>

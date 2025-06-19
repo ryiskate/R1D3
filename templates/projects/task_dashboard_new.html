@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Game Development Tasks Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <h1>Game Development Tasks Dashboard</h1>
+    <p>This is a simplified version of the dashboard to troubleshoot loading issues.</p>
+    
+    <!-- Task Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">To Do</h5>
+                    <p class="card-text">{{ task_stats.to_do }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">In Progress</h5>
+                    <p class="card-text">{{ task_stats.in_progress }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">In Review</h5>
+                    <p class="card-text">{{ task_stats.in_review }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Done</h5>
+                    <p class="card-text">{{ task_stats.completed }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Task Table -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">Tasks</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Status</th>
+                            <th>Priority</th>
+                            <th>Assigned To</th>
+                            <th>Due Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for task in tasks %}
+                        <tr>
+                            <td>{{ task.title }}</td>
+                            <td>{{ task.get_status_display }}</td>
+                            <td>{{ task.get_priority_display }}</td>
+                            <td>{{ task.assigned_to|default:"Unassigned" }}</td>
+                            <td>{{ task.due_date|default:"No date" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center">No tasks found</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    console.log('Simplified Game Task Dashboard loaded');
+</script>
+{% endblock %}

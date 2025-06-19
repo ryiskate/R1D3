@@ -58,6 +58,8 @@ urlpatterns = [
     path('tasks/<int:pk>/update_status/', GameTaskStatusUpdateView.as_view(), name='task_status_update'),
     path('tasks/<int:pk>/update_hours/', GameTaskHoursUpdateView.as_view(), name='task_hours_update'),
     path('tasks/batch_update/', GameTaskBatchUpdateView.as_view(), name='game_batch_task_update'),
+    # Alias for backward compatibility
+    path('tasks/batch-update-tasks/', GameTaskBatchUpdateView.as_view(), name='batch_update_tasks'),
     
     # Game Asset URLs
     path('<int:game_id>/assets/', game_views.GameAssetListView.as_view(), name='asset_list'),

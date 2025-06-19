@@ -1,0 +1,58 @@
+/**
+ * Social Media Task Dashboard CSS
+ * Custom styles for the social media task management dashboard
+ */
+
+/* Social media section specific styles */
+.bg-social {
+    background-color: #6f42c1 !important;
+    color: white !important;
+}
+
+/* Platform-specific styles */
+.twitter-icon {
+    color: #1DA1F2;
+}
+
+.instagram-icon {
+    color: #E1306C;
+}
+
+.facebook-icon {
+    color: #4267B2;
+}
+
+.youtube-icon {
+    color: #FF0000;
+}
+
+/* Platform card styles */
+.platform-card {
+    transition: all 0.3s ease;
+}
+
+.platform-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
+}
+
+/* Social media specific badge colors */
+.badge-twitter {
+    background-color: #1DA1F2;
+    color: white;
+}
+
+.badge-instagram {
+    background-color: #E1306C;
+    color: white;
+}
+
+.badge-facebook {
+    background-color: #4267B2;
+    color: white;
+}
+
+.badge-youtube {
+    background-color: #FF0000;
+    color: white;
+}

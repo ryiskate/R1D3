@@ -54,15 +54,29 @@ def sub(value, arg):
         return float(value) - float(arg)
     except ValueError:
         return 0
+        
+@register.filter(name='add_class')
+def add_class(field, css_class):
+    """
+    Add a CSS class to a Django form field.
+    Usage: {{ form.field|add_class:"form-control" }}
+    """
+    if hasattr(field, 'as_widget'):
+        return field.as_widget(attrs={"class": css_class})
+    else:
+        # If it's not a form field object (e.g., it's already rendered as a string),
+        # just return it unchanged
+        return field
 
 @register.filter
 def replace_underscore(value):
     """
     Replaces underscores with spaces in a string
+    Usage: {{ 'game_development'|replace_underscore }} -> 'game development'
     """
     if value is None:
         return ''
-    return value.replace('_', ' ')
+    return str(value).replace('_', ' ')
         
 @register.filter
 def percentage(value, total):
