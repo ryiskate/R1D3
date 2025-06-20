@@ -134,10 +134,10 @@ class ProjectUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
 class TaskListView(LoginRequiredMixin, ListView):
     """
-    List all tasks or tasks filtered by project
+    List all tasks or tasks filtered by project using the modern task dashboard template
     """
     model = Task
-    template_name = 'projects/task_list.html'
+    template_name = 'projects/task_dashboard.html'
     context_object_name = 'tasks'
     
     def get_queryset(self):
@@ -166,5 +166,16 @@ class TaskListView(LoginRequiredMixin, ListView):
         project_id = self.kwargs.get('project_id')
         if project_id:
             context['project'] = get_object_or_404(Project, pk=project_id)
+            
+        # Add task statistics for the dashboard
+        tasks = self.get_queryset()
+        context['task_stats'] = {
+            'total': tasks.count(),
+            'to_do': tasks.filter(status='to_do').count(),
+            'in_progress': tasks.filter(status='in_progress').count(),
+            'in_review': tasks.filter(status='in_review').count(),
+            'done': tasks.filter(status='done').count(),
+            'blocked': tasks.filter(status='blocked').count(),
+        }
             
         return context

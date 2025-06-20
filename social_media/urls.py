@@ -10,4 +10,5 @@ urlpatterns = [
     path('ideas/', views.PostIdeasView.as_view(), name='ideas'),
     path('analytics/', views.AnalyticsView.as_view(), name='analytics'),
     path('tasks/', views.SocialMediaTasksView.as_view(), name='tasks'),
+    path('tasks/batch-update/', views.SocialMediaTaskBatchUpdateView.as_view(), name='batch_task_update'),
 ]

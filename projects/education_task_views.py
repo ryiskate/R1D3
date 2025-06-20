@@ -1,5 +1,4 @@
-from django.shortcuts import render
-from django.views.generic import TemplateView, ListView, View
+from django.views.generic import ListView, View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count, Q
 from django.utils import timezone
@@ -9,52 +8,13 @@ from django.utils.decorators import method_decorator
 import json
 from datetime import date, timedelta
 
-from projects.game_models import GameTask
+from .game_models import GameTask
 from django.contrib.auth.models import User
 
-
-class EducationDashboardView(LoginRequiredMixin, TemplateView):
-    """Dashboard view for the Education department"""
-    template_name = 'education/dashboard.html'
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['active_department'] = 'education'
-        return context
-
-
-class ClassesView(LoginRequiredMixin, TemplateView):
-    """View for managing education classes"""
-    template_name = 'education/classes.html'
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['active_department'] = 'education'
-        return context
-
-
-class CourseMaterialsView(LoginRequiredMixin, TemplateView):
-    """View for managing course materials"""
-    template_name = 'education/materials.html'
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['active_department'] = 'education'
-        return context
-
-
-class ScheduleView(LoginRequiredMixin, TemplateView):
-    """View for class schedules"""
-    template_name = 'education/schedule.html'
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['active_department'] = 'education'
-        return context
-
-
-class EducationTasksView(LoginRequiredMixin, ListView):
-    """View for displaying education-specific tasks in a dashboard format"""
+class EducationTaskDashboardView(LoginRequiredMixin, ListView):
+    """
+    View for displaying education-specific tasks in a dashboard format
+    """
     model = GameTask
     template_name = 'projects/education_task_dashboard_enhanced.html'
     context_object_name = 'education_tasks'
@@ -112,7 +72,6 @@ class EducationTasksView(LoginRequiredMixin, ListView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['active_department'] = 'education'
         
         # Get all education tasks for statistics
         all_education_tasks = GameTask.objects.filter(company_section='education')

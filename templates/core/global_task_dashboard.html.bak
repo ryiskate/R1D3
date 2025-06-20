@@ -10,19 +10,11 @@
 
 {% block new_task_text %}New R1D3 Task{% endblock %}
 
-{% block clear_filters_url %}{% url 'core:global_task_dashboard' %}{% endblock %}
+{% block table_new_task_url %}{% url 'games:task_create_hybrid' %}?section=r1d3{% endblock %}
 
-{% block header_buttons %}
-<a href="{% url 'games:task_create_hybrid' %}?section=r1d3" class="btn btn-primary">
-    <i class="fas fa-plus-circle me-1"></i> New R1D3 Task
-</a>
-<button type="button" class="btn btn-outline-secondary ms-2" data-bs-toggle="modal" data-bs-target="#filterModal">
-    <i class="fas fa-filter me-1"></i> Filters
-</button>
-<button type="button" class="btn btn-outline-primary ms-2" data-bs-toggle="modal" data-bs-target="#batchUpdateModal">
-    <i class="fas fa-pencil-alt me-1"></i> Batch Update
-</button>
-{% endblock %}
+{% block table_new_task_text %}New R1D3 Task{% endblock %}
+
+{% block clear_filters_url %}{% url 'core:global_task_dashboard' %}{% endblock %}
 
 {% block content %}
     <!-- Stats Cards -->
@@ -127,16 +119,7 @@
         </div>
     </div>
 
-    {% block task_table %}
-    <!-- Task Table -->
-    <div class="card shadow mb-4">
-        <div class="card-header py-3 d-flex justify-content-between align-items-center">
-            <h6 class="m-0 font-weight-bold text-primary">
-                {% block table_title %}R1D3 Tasks{% endblock %}
-                {% if current_filters %}
-                <span class="ms-2 badge bg-info">Filtered</span>
-                {% endif %}
-            </h6>
+    {% block table_title %}R1D3 Tasks{% endblock %}
             <div>
                 {% if current_filters %}
                 <a href="{% url 'core:global_task_dashboard' %}" class="btn btn-sm btn-outline-secondary">

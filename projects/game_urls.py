@@ -13,6 +13,7 @@ from .gdd_structured_views import GDDStructuredCreateView, GDDStructuredEditView
 from .debug_views import debug_tasks_view
 from .game_status_view import GameStatusUpdateView
 from .game_task_hybrid_views import GameTaskHybridDetailView, GameTaskHybridCreateView, GameTaskHybridUpdateView
+from .education_task_views import EducationTaskDashboardView, EducationTaskBatchUpdateView
 
 app_name = 'games'
 
@@ -82,5 +83,9 @@ urlpatterns = [
     path('tasks/hybrid/create/', GameTaskHybridCreateView.as_view(), name='task_create_hybrid'),
     path('tasks/<int:pk>/hybrid/', GameTaskHybridDetailView.as_view(), name='task_detail_hybrid'),
     path('tasks/<int:pk>/hybrid/update/', GameTaskHybridUpdateView.as_view(), name='task_update_hybrid'),
+    
+    # Education Task Dashboard
+    path('education/tasks/', EducationTaskDashboardView.as_view(), name='education_task_dashboard'),
+    path('education/tasks/batch-update/', EducationTaskBatchUpdateView.as_view(), name='education_batch_task_update'),
     path('debug/tasks/', debug_tasks_view, name='debug_tasks'),
 ]

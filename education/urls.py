@@ -10,4 +10,5 @@ urlpatterns = [
     path('materials/', views.CourseMaterialsView.as_view(), name='materials'),
     path('schedule/', views.ScheduleView.as_view(), name='schedule'),
     path('tasks/', views.EducationTasksView.as_view(), name='tasks'),
+    path('tasks/batch-update/', views.EducationTaskBatchUpdateView.as_view(), name='batch_task_update'),
 ]

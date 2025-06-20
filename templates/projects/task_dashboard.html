@@ -8,9 +8,9 @@
 {% block new_task_url %}{% url 'games:task_create_hybrid' %}?section=game_development{% endblock %}
 {% block new_task_text %}New Game Task{% endblock %}
 
-{% block content %}
-{{ block.super }}
-    
+{% block clear_filters_url %}{% url 'games:task_dashboard' %}{% endblock %}
+
+{% block stats_cards %}
     <!-- Stats Cards -->
     <div class="row mb-4">
         <div class="col-md-2">
@@ -69,9 +69,11 @@
             </div>
         </div>
     </div>
-    
+{% endblock %}
 
-    
+{% block section_stats %}{% endblock %}
+
+{% block task_table %}
     <!-- Task Table -->
     <div class="card shadow mb-4">
         <div class="card-header py-3 d-flex justify-content-between align-items-center">
@@ -98,7 +100,6 @@
                                 <input type="checkbox" class="form-check-input" id="selectAllTasks">
                             </th>
                             <th>Title</th>
-                            <th width="120">Company Section</th>
                             <th width="120">Status</th>
                             <th width="100">Priority</th>
                             <th width="120">Assigned To</th>
@@ -117,17 +118,6 @@
                                 {% if task.is_overdue %}
                                 <span class="badge bg-danger ms-1">Overdue</span>
                                 {% endif %}
-                            </td>
-                            <td>
-                                <span class="badge section-badge 
-                                    {% if task.company_section == 'game_development' %}bg-primary
-                                    {% elif task.company_section == 'education' %}bg-success
-                                    {% elif task.company_section == 'arcade' %}bg-danger
-                                    {% elif task.company_section == 'marketing' %}bg-info
-                                    {% elif task.company_section == 'research' %}bg-warning
-                                    {% else %}bg-secondary{% endif %}">
-                                    {{ task.company_section|title }}
-                                </span>
                             </td>
                             <td>
                                 {% if task.status == 'to_do' %}
@@ -190,7 +180,7 @@
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="7" class="text-center py-4">
+                            <td colspan="6" class="text-center py-4">
                                 <div class="text-muted">
                                     <i class="fas fa-search fa-2x mb-3"></i>
                                     <p>No tasks found matching your criteria.</p>
@@ -209,6 +199,9 @@
         </div>
     </div>
 
+{% endblock %}
+
+{% block filter_modal %}
 <!-- Filter Modal -->
 <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -281,7 +274,9 @@
         </div>
     </div>
 </div>
+{% endblock %}
 
+{% block batch_update_modal %}
 <!-- Batch Update Modal -->
 <div class="modal fade" id="batchUpdateModal" tabindex="-1" aria-labelledby="batchUpdateModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -344,6 +339,7 @@
         </div>
     </div>
 </div>
+{% endblock %}
 
 {% block toast_container %}
 <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
@@ -355,11 +351,9 @@
         <div class="toast-body" id="toastMessage"></div>
     </div>
 </div>
-{% endblock toast_container %}
-{% endblock content %}
+{% endblock %}
 
-{% block extra_js %}
-<script src="{% static 'js/game_task_manager.js' %}"></script>
+{% block task_dashboard_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         console.log('Game Development Tasks Dashboard loaded');

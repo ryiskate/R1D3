@@ -23,9 +23,6 @@
     .priority-badge {
         cursor: pointer;
     }
-    .section-badge {
-        font-size: 0.8rem;
-    }
     
     /* Table Styling */
     .action-column {
@@ -77,11 +74,11 @@
         background-color: #6f42c1 !important;
         color: white !important;
     }
-    
-    /* Additional CSS from child templates */
-    {% block additional_css %}{% endblock %}
+
 </style>
 {% endblock %}
+
+{% block additional_css %}{% endblock %}
 
 {% block content %}
 <div class="container-fluid py-4">
@@ -223,8 +220,17 @@
                 {% endif %}
             </h6>
             <div>
+                <a href="{% block table_new_task_url %}{% url 'games:task_create_hybrid' %}?section=r1d3{% endblock %}" class="btn btn-sm btn-primary">
+                    <i class="fas fa-plus-circle me-1"></i> {% block table_new_task_text %}New Task{% endblock %}
+                </a>
+                <button type="button" class="btn btn-sm btn-outline-secondary ms-2" data-bs-toggle="modal" data-bs-target="#filterModal">
+                    <i class="fas fa-filter me-1"></i> Filter
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-secondary ms-2" data-bs-toggle="modal" data-bs-target="#batchUpdateModal">
+                    <i class="fas fa-tasks me-1"></i> Batch Update
+                </button>
                 {% if current_filters %}
-                <a href="{% block clear_filters_url %}#{% endblock %}" class="btn btn-sm btn-outline-secondary">
+                <a href="{% block clear_filters_url %}#{% endblock %}" class="btn btn-sm btn-outline-secondary ms-2">
                     <i class="fas fa-times me-1"></i> Clear Filters
                 </a>
                 {% endif %}
@@ -239,7 +245,6 @@
                                 <input type="checkbox" class="form-check-input" id="selectAllTasks">
                             </th>
                             <th>Title</th>
-                            <th width="120">Company Section</th>
                             <th width="120">Status</th>
                             <th width="100">Priority</th>
                             <th width="120">Assigned To</th>
@@ -258,17 +263,6 @@
                                 {% if task.is_overdue %}
                                 <span class="badge bg-danger ms-1">Overdue</span>
                                 {% endif %}
-                            </td>
-                            <td>
-                                <span class="badge section-badge 
-                                    {% if task.company_section == 'game_development' %}bg-primary
-                                    {% elif task.company_section == 'education' %}bg-success
-                                    {% elif task.company_section == 'arcade' %}bg-danger
-                                    {% elif task.company_section == 'marketing' %}bg-info
-                                    {% elif task.company_section == 'research' %}bg-warning
-                                    {% else %}bg-secondary{% endif %}">
-                                    {{ task.company_section|title }}
-                                </span>
                             </td>
                             <td>
                                 <span class="badge status-badge 
@@ -321,7 +315,7 @@
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="8" class="text-center py-4">
+                            <td colspan="7" class="text-center py-4">
                                 <p class="text-muted mb-0">No tasks found matching your criteria.</p>
                             </td>
                         </tr>

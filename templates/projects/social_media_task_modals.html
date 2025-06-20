@@ -1,0 +1,222 @@
+<!-- Filter Tasks Modal -->
+<div class="modal fade" id="filterTasksModal" tabindex="-1" aria-labelledby="filterTasksModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="filterTasksModalLabel">Filter Social Media Tasks</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="filterForm" method="get" action="{% url 'social_media:tasks' %}">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-select" id="status" name="status">
+                                <option value="">All Statuses</option>
+                                <option value="backlog">Backlog</option>
+                                <option value="to_do">To Do</option>
+                                <option value="in_progress">In Progress</option>
+                                <option value="in_review">In Review</option>
+                                <option value="done">Done</option>
+                                <option value="blocked">Blocked</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="priority" class="form-label">Priority</label>
+                            <select class="form-select" id="priority" name="priority">
+                                <option value="">All Priorities</option>
+                                <option value="high">High</option>
+                                <option value="medium">Medium</option>
+                                <option value="low">Low</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="campaign_id" class="form-label">Campaign</label>
+                            <select class="form-select" id="campaign_id" name="campaign_id">
+                                <option value="">All Campaigns</option>
+                                {% for campaign in campaigns %}
+                                <option value="{{ campaign.id }}">{{ campaign.title }} ({{ campaign.count }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="channel" class="form-label">Platform</label>
+                            <select class="form-select" id="channel" name="channel">
+                                <option value="">All Platforms</option>
+                                <option value="facebook">Facebook</option>
+                                <option value="twitter">Twitter</option>
+                                <option value="instagram">Instagram</option>
+                                <option value="tiktok">TikTok</option>
+                                <option value="youtube">YouTube</option>
+                                <option value="linkedin">LinkedIn</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="assigned_to" class="form-label">Assigned To</label>
+                            <select class="form-select" id="assigned_to" name="assigned_to">
+                                <option value="">All Users</option>
+                                <option value="unassigned">Unassigned</option>
+                                {% for user in users %}
+                                <option value="{{ user.id }}">{{ user.get_full_name|default:user.username }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="due_date_range" class="form-label">Due Date</label>
+                            <select class="form-select" id="due_date_range" name="due_date_range">
+                                <option value="">All Dates</option>
+                                <option value="overdue">Overdue</option>
+                                <option value="today">Today</option>
+                                <option value="this_week">This Week</option>
+                                <option value="next_week">Next Week</option>
+                                <option value="this_month">This Month</option>
+                                <option value="no_date">No Due Date</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="applyFiltersBtn">Apply Filters</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Batch Update Modal -->
+<div class="modal fade" id="batchUpdateModal" tabindex="-1" aria-labelledby="batchUpdateModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="batchUpdateModalLabel">Batch Update Social Media Tasks</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> Select the fields you want to update for all selected tasks.
+                </div>
+                <div id="noTasksSelectedAlert" class="alert alert-warning d-none">
+                    <i class="fas fa-exclamation-triangle"></i> No tasks selected. Please select at least one task from the table.
+                </div>
+                <form id="batchUpdateForm">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="updateStatus">
+                                <label class="form-check-label" for="updateStatus">
+                                    Update Status
+                                </label>
+                            </div>
+                            <select class="form-select" id="batchStatus" disabled>
+                                <option value="">Select Status</option>
+                                <option value="backlog">Backlog</option>
+                                <option value="to_do">To Do</option>
+                                <option value="in_progress">In Progress</option>
+                                <option value="in_review">In Review</option>
+                                <option value="done">Done</option>
+                                <option value="blocked">Blocked</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="updatePriority">
+                                <label class="form-check-label" for="updatePriority">
+                                    Update Priority
+                                </label>
+                            </div>
+                            <select class="form-select" id="batchPriority" disabled>
+                                <option value="">Select Priority</option>
+                                <option value="high">High</option>
+                                <option value="medium">Medium</option>
+                                <option value="low">Low</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="updateAssignee">
+                                <label class="form-check-label" for="updateAssignee">
+                                    Update Assignee
+                                </label>
+                            </div>
+                            <select class="form-select" id="batchAssignee" disabled>
+                                <option value="">Select Assignee</option>
+                                <option value="unassigned">Unassigned</option>
+                                {% for user in users %}
+                                <option value="{{ user.id }}">{{ user.get_full_name|default:user.username }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="updateDueDate">
+                                <label class="form-check-label" for="updateDueDate">
+                                    Update Due Date
+                                </label>
+                            </div>
+                            <input type="date" class="form-control" id="batchDueDate" disabled>
+                            <div class="form-check mt-2">
+                                <input class="form-check-input" type="checkbox" id="removeDueDate" disabled>
+                                <label class="form-check-label" for="removeDueDate">
+                                    Remove due date
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="updateCampaign">
+                                <label class="form-check-label" for="updateCampaign">
+                                    Update Campaign
+                                </label>
+                            </div>
+                            <select class="form-select" id="batchCampaign" disabled>
+                                <option value="">Select Campaign</option>
+                                {% for campaign in campaigns %}
+                                <option value="{{ campaign.id }}">{{ campaign.title }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="updateChannel">
+                                <label class="form-check-label" for="updateChannel">
+                                    Update Platform
+                                </label>
+                            </div>
+                            <select class="form-select" id="batchChannel" disabled>
+                                <option value="">Select Platform</option>
+                                <option value="facebook">Facebook</option>
+                                <option value="twitter">Twitter</option>
+                                <option value="instagram">Instagram</option>
+                                <option value="tiktok">TikTok</option>
+                                <option value="youtube">YouTube</option>
+                                <option value="linkedin">LinkedIn</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="applyBatchUpdateBtn">Apply Updates</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Set the batch update URL for the JavaScript file
+    const batchUpdateUrl = "{% url 'social_media:batch_task_update' %}";
+</script>

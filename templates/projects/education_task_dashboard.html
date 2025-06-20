@@ -1,0 +1,225 @@
+{% extends 'core/base_task_dashboard.html' %}
+{% load static %}
+
+{% block dashboard_title %}Education Tasks{% endblock %}
+
+{% block dashboard_heading %}Education Tasks{% endblock %}
+
+{% block new_task_url %}{% url 'games:task_create_hybrid' %}?section=education{% endblock %}
+{% block new_task_text %}New Education Task{% endblock %}
+
+{% block content %}
+{{ block.super }}
+
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-2">
+            <div class="card stats-card todo">
+                <div class="card-body">
+                    <h6 class="card-title">To Do</h6>
+                    <h2 class="mb-0">{{ task_stats.to_do }}</h2>
+                    <div class="progress mt-2">
+                        <div class="progress-bar bg-primary progress-bar-{% widthratio task_stats.to_do task_stats.total 100 %}" role="progressbar" aria-valuenow="{% widthratio task_stats.to_do task_stats.total 100 %}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card stats-card in-progress">
+                <div class="card-body">
+                    <h6 class="card-title">In Progress</h6>
+                    <h2 class="mb-0">{{ task_stats.in_progress }}</h2>
+                    <div class="progress mt-2">
+                        <div class="progress-bar bg-warning progress-bar-{% widthratio task_stats.in_progress task_stats.total 100 %}" role="progressbar" aria-valuenow="{% widthratio task_stats.in_progress task_stats.total 100 %}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card stats-card review">
+                <div class="card-body">
+                    <h6 class="card-title">In Review</h6>
+                    <h2 class="mb-0">{{ task_stats.in_review }}</h2>
+                    <div class="progress mt-2">
+                        <div class="progress-bar bg-purple progress-bar-{% widthratio task_stats.in_review task_stats.total 100 %}" role="progressbar" aria-valuenow="{% widthratio task_stats.in_review task_stats.total 100 %}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card stats-card completed">
+                <div class="card-body">
+                    <h6 class="card-title">Done</h6>
+                    <h2 class="mb-0">{{ task_stats.done }}</h2>
+                    <div class="progress mt-2">
+                        <div class="progress-bar bg-success progress-bar-{% widthratio task_stats.done task_stats.total 100 %}" role="progressbar" aria-valuenow="{% widthratio task_stats.done task_stats.total 100 %}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card stats-card backlog">
+                <div class="card-body">
+                    <h6 class="card-title">Backlog</h6>
+                    <h2 class="mb-0">{{ task_stats.backlog }}</h2>
+                    <div class="progress mt-2">
+                        <div class="progress-bar bg-secondary progress-bar-{% widthratio task_stats.backlog task_stats.total 100 %}" role="progressbar" aria-valuenow="{% widthratio task_stats.backlog task_stats.total 100 %}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card stats-card blocked">
+                <div class="card-body">
+                    <h6 class="card-title">Blocked</h6>
+                    <h2 class="mb-0">{{ task_stats.blocked }}</h2>
+                    <div class="progress mt-2">
+                        <div class="progress-bar bg-danger progress-bar-{% widthratio task_stats.blocked task_stats.total 100 %}" role="progressbar" aria-valuenow="{% widthratio task_stats.blocked task_stats.total 100 %}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- All Tasks Table -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">
+                Education Tasks
+                {% if current_filters %}
+                <span class="badge bg-info text-white ml-2">Filtered</span>
+                {% endif %}
+            </h6>
+            <div>
+                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#filterModal">
+                    <i class="fas fa-filter"></i> Filter
+                </button>
+                {% if current_filters %}
+                <a href="{% url 'games:education_task_dashboard' %}" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-times"></i> Clear Filters
+                </a>
+                {% endif %}
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="batchUpdateBtn" disabled>
+                    <i class="fas fa-edit"></i> Batch Update
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover" id="taskTable">
+                    <thead>
+                        <tr>
+                            <th width="30">
+                                <input type="checkbox" class="form-check-input" id="selectAllTasks">
+                            </th>
+                            <th>Title</th>
+                            <th>Status</th>
+                            <th>Priority</th>
+                            <th>Course</th>
+                            <th>Target Audience</th>
+                            <th>Assigned To</th>
+                            <th>Due Date</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for task in education_tasks %}
+                        <tr class="task-row" data-task-id="{{ task.id }}" data-status="{{ task.status }}">
+                            <td>
+                                <input type="checkbox" class="form-check-input task-checkbox" data-task-id="{{ task.id }}">
+                            </td>
+                            <td>
+                                <a href="{% url 'games:task_detail_hybrid' task.id %}" class="task-title">
+                                    {{ task.title }}
+                                </a>
+                            </td>
+                            <td>
+                                <span class="badge rounded-pill {% if task.status == 'to_do' %}bg-primary{% elif task.status == 'in_progress' %}bg-warning{% elif task.status == 'in_review' %}bg-purple{% elif task.status == 'done' %}bg-success{% elif task.status == 'blocked' %}bg-danger{% else %}bg-secondary{% endif %}">
+                                    <i class="fas {% if task.status == 'to_do' %}fa-clipboard-list{% elif task.status == 'in_progress' %}fa-spinner{% elif task.status == 'in_review' %}fa-search{% elif task.status == 'done' %}fa-check-circle{% elif task.status == 'blocked' %}fa-ban{% else %}fa-tasks{% endif %} fa-fw"></i>
+                                    {{ task.get_status_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge rounded-pill {% if task.priority == 'low' %}bg-success{% elif task.priority == 'medium' %}bg-info{% elif task.priority == 'high' %}bg-warning{% elif task.priority == 'critical' %}bg-danger{% endif %}">
+                                    <i class="fas {% if task.priority == 'low' %}fa-arrow-down{% elif task.priority == 'medium' %}fa-equals{% elif task.priority == 'high' %}fa-arrow-up{% elif task.priority == 'critical' %}fa-exclamation-circle{% endif %} fa-fw"></i>
+                                    {{ task.get_priority_display }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if task.course_id %}
+                                <span class="badge bg-info rounded-pill">
+                                    <i class="fas fa-book fa-fw"></i>
+                                    {{ task.course_id }}
+                                </span>
+                                {% else %}
+                                <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if task.target_audience %}
+                                <span class="badge bg-secondary rounded-pill">
+                                    <i class="fas fa-users fa-fw"></i>
+                                    {{ task.target_audience }}
+                                </span>
+                                {% else %}
+                                <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if task.assigned_to %}
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-circle avatar-xs bg-primary mr-2">
+                                        {{ task.assigned_to.first_name|first }}{{ task.assigned_to.last_name|first }}
+                                    </div>
+                                    <span>{{ task.assigned_to.get_full_name }}</span>
+                                </div>
+                                {% else %}
+                                <span class="text-muted">Unassigned</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if task.due_date %}
+                                <span class="{% if task.due_date < today %}text-danger{% elif task.due_date == today %}text-warning{% else %}text-muted{% endif %}">
+                                    <i class="fas fa-calendar-alt fa-fw"></i>
+                                    {{ task.due_date|date:"M d, Y" }}
+                                </span>
+                                {% else %}
+                                <span class="text-muted">No due date</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                <div class="btn-group">
+                                    <a href="{% url 'games:task_update_hybrid' task.id %}" class="btn btn-sm btn-outline-primary" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'games:task_detail_hybrid' task.id %}" class="btn btn-sm btn-outline-info" title="View">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{% url 'games:task_delete' task.id %}" class="btn btn-sm btn-outline-danger" title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="9" class="text-center py-4">
+                                <div class="text-muted">
+                                    <i class="fas fa-info-circle fa-2x mb-3"></i>
+                                    <p>No education tasks found.</p>
+                                    <a href="{% url 'games:task_create_hybrid' %}?section=education" class="btn btn-sm btn-primary btn-icon-split">
+                                        <span class="icon text-white-50">
+                                            <i class="fas fa-plus"></i>
+                                        </span>
+                                        <span class="text">Create Education Task</span>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
