@@ -42,7 +42,14 @@ document.addEventListener('DOMContentLoaded', function() {
             // Safely parse JSON with better error handling
             let sectionsJson = [];
             try {
-                sectionsJson = JSON.parse(rawSectionsData || '[]');
+                // Ensure we have valid JSON by checking for proper formatting
+                if (rawSectionsData && 
+                    (rawSectionsData.trim().startsWith('[') && rawSectionsData.trim().endsWith(']'))) {
+                    sectionsJson = JSON.parse(rawSectionsData);
+                } else {
+                    console.warn('Sections data is not properly formatted JSON array, using empty array');
+                    sectionsJson = [];
+                }
             } catch (parseError) {
                 console.error('Error parsing sections JSON:', parseError);
                 console.log('Invalid JSON content:', rawSectionsData);
@@ -52,7 +59,14 @@ document.addEventListener('DOMContentLoaded', function() {
             
             let sectionsWithTasksJson = {};
             try {
-                sectionsWithTasksJson = JSON.parse(rawSectionsWithTasksData || '{}');
+                // Ensure we have valid JSON by checking for proper formatting
+                if (rawSectionsWithTasksData && 
+                    (rawSectionsWithTasksData.trim().startsWith('{') && rawSectionsWithTasksData.trim().endsWith('}'))) {
+                    sectionsWithTasksJson = JSON.parse(rawSectionsWithTasksData);
+                } else {
+                    console.warn('Sections with tasks data is not properly formatted JSON object, using empty object');
+                    sectionsWithTasksJson = {};
+                }
             } catch (parseError) {
                 console.error('Error parsing sections with tasks JSON:', parseError);
                 console.log('Invalid JSON content:', rawSectionsWithTasksData);

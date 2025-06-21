@@ -68,7 +68,7 @@
                             <i class="bi bi-file-earmark-plus"></i> Create GDD
                         </a></li>
                     {% else %}
-                        <li><a class="dropdown-item" href="{% url 'games:gdd_detail' gdd.id %}">
+                        <li><a class="dropdown-item" href="{% url 'games:gdd_detail' game.id %}">
                             <i class="bi bi-file-text"></i> View GDD
                         </a></li>
                         <li><a class="dropdown-item" href="{% url 'games:gdd_structured_edit' gdd.id %}">
@@ -149,7 +149,7 @@
                             <i class="bi bi-upload"></i> Upload GDD
                         </a>
                         {% if gdd %}
-                            <a href="{% url 'games:gdd_detail' gdd.id %}" class="btn btn-sm btn-outline-primary">View Full GDD</a>
+                            <a href="{% url 'games:gdd_detail' game.id %}" class="btn btn-sm btn-outline-primary">View Full GDD</a>
                         {% else %}
                             <a href="{% url 'games:gdd_simple_create' game.id %}" class="btn btn-sm btn-primary">Create GDD</a>
                         {% endif %}
@@ -241,7 +241,7 @@
                                     });
                                 </script>
                             </div>
-                            <a href="{% url 'games:gdd_detail' gdd.id %}" class="view-full-gdd-btn">
+                            <a href="{% url 'games:gdd_detail' game.id %}" class="view-full-gdd-btn">
                                 <i class="bi bi-arrows-fullscreen"></i> View Full Game Design Document
                             </a>
                         {% else %}

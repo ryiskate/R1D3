@@ -108,9 +108,6 @@ STANDARD_GDD_SECTIONS = [
     }
 ]
 
-import logging
-logger = logging.getLogger(__name__)
-
 class GDDSimpleCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
     """
     View for creating a Game Design Document using a simplified form approach
@@ -490,7 +487,7 @@ class GDDSimpleCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
                                 feature_name=feature_name,
                                 description=feature_desc,
                                 priority=feature_priority,
-                                # status field doesn't exist in the database table
+                                status_value=feature_status,
                                 notes=feature_notes,
                                 order=i+1
                             )
@@ -529,114 +526,52 @@ class GDDSimpleCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
                                 feature_name=f'Bullet Point {i+1}',
                                 description=bullet_content,
                                 priority='medium',
-                                status='backlog',
+                                status_value='backlog',
                                 order=i+1
                             )
                     
                     section_html += '</ul>\n'
                 
-                # Add the section HTML to the dynamic sections
-                dynamic_sections_html += section_html
+            <p>{description}</p>
             
-            # Process all form data to extract section-specific content
-            section_content = {}
-            for key in request.POST.keys():
-                # Extract section-specific content from form fields
-                # Format: section_id_field_name (e.g., gameplay_core_mechanics)
-                if '_' in key:
-                    parts = key.split('_')
-                    if len(parts) >= 2:
-                        section_id = parts[0]
-                        field_name = '_'.join(parts[1:])
-                        
-                        if section_id not in section_content:
-                            section_content[section_id] = {}
-                        
-                        section_content[section_id][field_name] = request.POST.get(key, '')
+            <h2>1. Game Overview</h2>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th style="width: 20%">Feature</th>
+                        <th style="width: 40%">Description</th>
+                        <th style="width: 10%">Priority</th>
+                        <th style="width: 10%">Status</th>
+                        <th style="width: 20%">Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{high_concept_name}</td>
+                        <td>{high_concept}</td>
+                        <td><span class="badge bg-primary">{high_concept_priority}</span></td>
+                        <td><span class="badge bg-secondary">{high_concept_status}</span></td>
+                        <td>{high_concept_notes}</td>
+                    </tr>
+                    <tr>
+                        <td>{target_audience_name}</td>
+                        <td>{target_audience}</td>
+                        <td><span class="badge bg-primary">{target_audience_priority}</span></td>
+                        <td><span class="badge bg-secondary">{target_audience_status}</span></td>
+                        <td>{target_audience_notes}</td>
+                    </tr>
+                    <tr>
+                        <td>{unique_selling_points_name}</td>
+                        <td>{unique_selling_points}</td>
+                        <td><span class="badge bg-primary">{unique_selling_points_priority}</span></td>
+                        <td><span class="badge bg-secondary">{unique_selling_points_status}</span></td>
+                        <td>{unique_selling_points_notes}</td>
+                    </tr>
+                    {custom_features_html}
+                </tbody>
+            </table>
             
-            # Generate HTML for standard sections
-            standard_sections_html = ''
-            
-            # Add each standard section to the HTML content
-            for section in STANDARD_GDD_SECTIONS:
-                section_id = section['section_id']
-                section_title = section['title']
-                section_description = section['description']
-                section_order = section['order']
-                
-                # Get section-specific content if available
-                section_data = section_content.get(section_id, {})
-                
-                standard_sections_html += f'''
-                <h2>{section_order}. {section_title}</h2>
-                <p>{section_data.get('description', section_description)}</p>
-                '''
-                
-                # Add tables for specific sections based on industry standard
-                if section_id == 'game_overview':
-                    # Get user-entered values or fallback to defaults
-                    high_concept = request.POST.get('high_concept', '')
-                    if not high_concept:
-                        high_concept = section_data.get('high_concept', 'A brief description of the game.')
-                        
-                    target_audience = request.POST.get('target_audience', '')
-                    if not target_audience:
-                        target_audience = section_data.get('target_audience', 'The types of players the game is designed for.')
-                        
-                    unique_selling_points = request.POST.get('unique_selling_points', '')
-                    if not unique_selling_points:
-                        unique_selling_points = section_data.get('unique_selling_points', 'What makes this game unique.')
-                    
-                    # Get priority and status values if available
-                    high_concept_priority = section_data.get('high_concept_priority', 'high')
-                    high_concept_status = section_data.get('high_concept_status', 'backlog')
-                    target_audience_priority = section_data.get('target_audience_priority', 'medium')
-                    target_audience_status = section_data.get('target_audience_status', 'backlog')
-                    unique_selling_points_priority = section_data.get('unique_selling_points_priority', 'high')
-                    unique_selling_points_status = section_data.get('unique_selling_points_status', 'backlog')
-                    
-                    standard_sections_html += f'''
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th style="width: 20%">Feature</th>
-                                <th style="width: 40%">Description</th>
-                                <th style="width: 10%">Priority</th>
-                                <th style="width: 10%">Status</th>
-                                <th style="width: 20%">Notes</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>High Concept</td>
-                                <td>{high_concept}</td>
-                                <td><span class="badge bg-primary">{high_concept_priority}</span></td>
-                                <td><span class="badge bg-secondary">{high_concept_status}</span></td>
-                                <td>{section_data.get('high_concept_notes', '')}</td>
-                            </tr>
-                            <tr>
-                                <td>Target Audience</td>
-                                <td>{target_audience}</td>
-                                <td><span class="badge bg-primary">{target_audience_priority}</span></td>
-                                <td><span class="badge bg-secondary">{target_audience_status}</span></td>
-                                <td>{section_data.get('target_audience_notes', '')}</td>
-                            </tr>
-                            <tr>
-                                <td>Unique Selling Points</td>
-                                <td>{unique_selling_points}</td>
-                                <td><span class="badge bg-primary">{unique_selling_points_priority}</span></td>
-                                <td><span class="badge bg-secondary">{unique_selling_points_status}</span></td>
-                                <td>{section_data.get('unique_selling_points_notes', '')}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    '''
-            
-            # Create the HTML content with user input and standard sections
-            html_content = f'''
-            <h1>{request.POST.get('title', title)}</h1>
-            <p>{request.POST.get('description', description)}</p>
-            {standard_sections_html}
+            {custom_section_html}
             {static_sections_html}
             {dynamic_sections_html}
             '''
@@ -745,28 +680,23 @@ class GDDSimpleCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
                     
                     for i, bullet_key in enumerate(bullet_keys):
                         bullet_text = request.POST.get(bullet_key, "").strip()
-                        if bullet_text:
-                            # Add to HTML
-                            block_html += f'<li>{bullet_text}</li>\n'
-                    
-                    block_html += '</ul>\n'
-                
-                # Close the block
-                block_html += '</div>\n'
-                
-                # Add to the appropriate section
-                if section_key in static_sections:
-                    static_sections_html += block_html
-                else:
-                    dynamic_sections_html += block_html
+                     # Add the section HTML to the dynamic sections
+                dynamic_sections_html += section_html
             
-            # HTML content was already created above, so we don't need to recreate it here
+            # Create HTML content with user input
+            html_content = f'''
+            <h1>{request.POST.get('title', title)}</h1>
+            <p>{request.POST.get('description', description)}</p>
+            {static_sections_html}
+            {dynamic_sections_html}
+            '''
             
             # Create the GDD with HTML content mode enabled
             gdd = GameDesignDocument.objects.create(
                 game=game,
                 high_concept=request.POST.get('title', title),
                 player_experience=request.POST.get('description', description),
+                player_experience=description,
                 core_mechanics="Core gameplay mechanics will be defined here",
                 game_rules="Game rules will be defined here",
                 controls="Controls will be defined here",
@@ -777,142 +707,29 @@ class GDDSimpleCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
             # Map section keys to GDDSection objects for database reference
             section_objects = {}
             
-            # Initialize section_content with user input from the form
-            section_content = {
-                'game_overview': {
-                    'title': request.POST.get('game_overview_title', 'Game Overview'),
-                    'description': request.POST.get('game_overview_description', 'Provide a high-level overview of your game concept, target audience, and unique selling points.'),
-                    'high_concept': high_concept or "My game is a unique concept that...",
-                    'high_concept_priority': high_concept_priority,
-                    'high_concept_notes': high_concept_notes,
-                    'target_audience': target_audience or "Players who enjoy...",
-                    'target_audience_priority': target_audience_priority,
-                    'target_audience_notes': target_audience_notes,
-                    'unique_selling_points': unique_selling_points or "Features that make this game unique include...",
-                    'unique_selling_points_priority': unique_selling_points_priority,
-                    'unique_selling_points_notes': unique_selling_points_notes
-                },
-                'gameplay': {
-                    'title': request.POST.get('gameplay_title', 'Gameplay'),
-                    'description': request.POST.get('gameplay_description', 'Custom gameplay mechanics and features.')
-                },
-                'game_world': {
-                    'title': request.POST.get('game_world_title', 'Game World'),
-                    'description': request.POST.get('game_world_description', 'Custom world design and environments.')
-                },
-                'characters': {
-                    'title': request.POST.get('characters_title', 'Characters'),
-                    'description': request.POST.get('characters_description', 'Custom character designs and roles.')
-                },
-                'narrative': {
-                    'title': request.POST.get('narrative_title', 'Narrative'),
-                    'description': request.POST.get('narrative_description', 'Custom story and narrative elements.')
-                },
-                'technical': {
-                    'title': request.POST.get('technical_title', 'Technical Requirements'),
-                    'description': request.POST.get('technical_description', 'Custom technical specifications and requirements.')
-                },
-                'audio': {
-                    'title': request.POST.get('audio_title', 'Audio Design'),
-                    'description': request.POST.get('audio_description', 'Custom audio design and sound elements.')
-                },
-                'ui_ux': {
-                    'title': request.POST.get('ui_ux_title', 'User Interface & UX'),
-                    'description': request.POST.get('ui_ux_description', 'Custom UI/UX design and features.')
-                },
-                'art': {
-                    'title': request.POST.get('art_title', 'Art Direction'),
-                    'description': request.POST.get('art_description', 'Custom art style and visual elements.')
-                },
-                'monetization': {
-                    'title': request.POST.get('monetization_title', 'Monetization'),
-                    'description': request.POST.get('monetization_description', 'Custom monetization strategy and revenue model.')
-                },
-                'development': {
-                    'title': request.POST.get('development_title', 'Development & Production'),
-                    'description': request.POST.get('development_description', 'Custom development roadmap and production plan.')
-                },
-                'marketing': {
-                    'title': request.POST.get('marketing_title', 'Marketing & Distribution'),
-                    'description': request.POST.get('marketing_description', 'Custom marketing strategy and distribution channels.')
-                },
-                'appendices': {
-                    'title': request.POST.get('appendices_title', 'Appendices'),
-                    'description': request.POST.get('appendices_description', 'Custom appendices and additional materials.')
-                }
-            }
-            
-            # Create GDDSection objects for the standard sections
-            for section in STANDARD_GDD_SECTIONS:
+            # Create GDDSection objects for each standard section
+            for i, section in enumerate(STANDARD_GDD_SECTIONS, 1):
                 section_id = section['section_id']
-                section_order = section['order']
+                section_title = section['title']
+                section_description = section['description']
                 
-                # Get section content from user input or use default
-                user_section_content = section_content.get(section_id, {})
-                section_title = user_section_content.get('title', section['title'])
-                section_description = user_section_content.get('description', section['description'])
-                
-                # Create the section with user-provided content
+                # Create the section
                 section_obj = GDDSection.objects.create(
                     gdd=gdd,
                     title=section_title,
                     section_id=section_id,
-                    order=section_order,
+                    order=i,
                     content=section_description
                 )
+                
+                # Store the section object for reference
                 section_objects[section_id] = section_obj
                 
-                # If this is the Game Overview section, create features for the standard items
+                # If this is the Game Overview section, store it separately for backward compatibility
                 if section_id == 'game_overview':
-                    # Get user-provided content for the Game Overview features
-                    overview_content = section_content.get('game_overview', {})
-                    
-                    # High Concept - Use the user's input directly
-                    high_concept_text = overview_content.get('high_concept', '')
-                    if not high_concept_text or high_concept_text == "My game is a unique concept that...":
-                        high_concept_text = request.POST.get('high_concept', 'A brief description of the game.')
-                    
-                    GDDFeature.objects.create(
-                        section=section_obj,
-                        subsection_id=f"{section_id}_high_concept",
-                        feature_name="High Concept",
-                        description=high_concept_text,
-                        priority=overview_content.get('high_concept_priority', 'high'),
-                        notes=overview_content.get('high_concept_notes', ''),
-                        order=1
-                    )
-                    
-                    # Target Audience - Use the user's input directly
-                    target_audience_text = overview_content.get('target_audience', '')
-                    if not target_audience_text or target_audience_text == "Players who enjoy...":
-                        target_audience_text = request.POST.get('target_audience', 'The intended audience for this game.')
-                    
-                    GDDFeature.objects.create(
-                        section=section_obj,
-                        subsection_id=f"{section_id}_target_audience",
-                        feature_name="Target Audience",
-                        description=target_audience_text,
-                        priority=overview_content.get('target_audience_priority', 'medium'),
-                        notes=overview_content.get('target_audience_notes', ''),
-                        order=2
-                    )
-                    
-                    # Unique Selling Points - Use the user's input directly
-                    usp_text = overview_content.get('unique_selling_points', '')
-                    if not usp_text or usp_text == "Features that make this game unique include...":
-                        usp_text = request.POST.get('unique_selling_points', 'What makes this game unique.')
-                    
-                    GDDFeature.objects.create(
-                        section=section_obj,
-                        subsection_id=f"{section_id}_usp",
-                        feature_name="Unique Selling Points",
-                        description=usp_text,
-                        priority=overview_content.get('unique_selling_points_priority', 'high'),
-                        notes=overview_content.get('unique_selling_points_notes', ''),
-                        order=3
-                    )
+                    overview_section = section_obj
             
-            # Now process content blocks and save features
+            # Now that we have created all the standard sections, process content blocks and save features
             for block_key, block_data in content_blocks.items():
                 section_key = block_data['section_key']
                 block_id = block_data['block_id']
@@ -931,7 +748,7 @@ class GDDSimpleCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
                         feature_name=block_title,
                         description=block_description,
                         priority="medium",
-                        # status field doesn't exist in the database table
+                        status_value="backlog",
                         order=1  # First item in the block
                     )
                     
@@ -959,7 +776,7 @@ class GDDSimpleCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
                                     feature_name=feature_name,
                                     description=feature_desc,
                                     priority=feature_priority,
-                                    # status field doesn't exist in the database table
+                                    status_value=feature_status,
                                     notes=feature_notes,
                                     order=feature_order
                                 )
@@ -984,7 +801,7 @@ class GDDSimpleCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
                                     feature_name=f"Bullet Point {i+1}",
                                     description=bullet_text,
                                     priority="medium",
-                                    # status field doesn't exist in the database table
+                                    status_value="backlog",
                                     order=feature_order
                                 )
                                 feature_order += 1
@@ -996,12 +813,7 @@ class GDDSimpleCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
             
             # Create the initial features with data from the form including custom names
             # Avoid using status field directly as it's overridden by a property
-            # Create features using objects.create() to avoid status field issues
-            # Note: status field doesn't exist in the database table
-            
-            # Get the Game Overview section from the section_objects dictionary
-            overview_section = section_objects.get('game_overview')
-            GDDFeature.objects.create(
+            feature = GDDFeature(
                 section=overview_section,
                 subsection_id="high_concept",
                 feature_name=high_concept_name,  # Use custom name
@@ -1010,8 +822,9 @@ class GDDSimpleCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
                 notes=high_concept_notes,
                 order=1
             )
+            feature.save()
             
-            GDDFeature.objects.create(
+            feature = GDDFeature(
                 section=overview_section,
                 subsection_id="target_audience",
                 feature_name=target_audience_name,  # Use custom name
@@ -1020,8 +833,9 @@ class GDDSimpleCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
                 notes=target_audience_notes,
                 order=2
             )
+            feature.save()
             
-            GDDFeature.objects.create(
+            feature = GDDFeature(
                 section=overview_section,
                 subsection_id="unique_selling_points",
                 feature_name=unique_selling_points_name,  # Use custom name
@@ -1030,6 +844,7 @@ class GDDSimpleCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
                 notes=unique_selling_points_notes,
                 order=3
             )
+            feature.save()
         
             # Create a custom section if a title was provided
             if section_title:
@@ -1047,8 +862,7 @@ class GDDSimpleCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
                 
                 # If there are bullet points, create features for each one
                 for i, point in enumerate(bullet_points, 1):
-                    # Note: status field doesn't exist in the database table
-                    GDDFeature.objects.create(
+                    feature = GDDFeature(
                         section=custom_section,
                         subsection_id=f"{section_id}_point_{i}",
                         feature_name=f"Point {i}",
@@ -1056,6 +870,7 @@ class GDDSimpleCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
                         priority="medium",
                         order=i
                     )
+                    feature.save()
             
             # Process any dynamically added custom features
             custom_feature_prefix = 'custom_feature_'
@@ -1075,9 +890,7 @@ class GDDSimpleCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
                     feature_notes = request.POST.get(f"{feature_id}_notes", "")
                     
                     # Create the feature - avoid using status property
-                    # Note: status field doesn't exist in the database table
-                    # We're not setting status even though it's in the model definition
-                    GDDFeature.objects.create(
+                    feature = GDDFeature(
                         section=overview_section,
                         subsection_id=feature_id,
                         feature_name=feature_name,
@@ -1086,6 +899,7 @@ class GDDSimpleCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
                         notes=feature_notes,
                         order=feature_order
                     )
+                    feature.save()
                     
                     feature_order += 1
             
@@ -1162,7 +976,7 @@ class GDDSimpleCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
                                 feature_name=feature_name,
                                 description=feature_desc,
                                 priority=feature_priority,
-                                # status field doesn't exist in the database table
+                                status_value=feature_status,
                                 notes=feature_notes,
                                 order=feature_order
                             )
@@ -1187,7 +1001,7 @@ class GDDSimpleCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
                                 feature_name=f"Bullet Point {i}",
                                 description=bullet_text,
                                 priority="medium",
-                                # status field doesn't exist in the database table
+                                status_value="backlog",
                                 order=feature_order + i
                             )
             
@@ -1306,7 +1120,7 @@ class GDDStructuredCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
                                 feature_name=feature_name,
                                 description=feature_desc,
                                 priority=feature_priority,
-                                # status field doesn't exist in the database table
+                                status_value=feature_status,
                                 notes=feature_notes,
                                 order=feature_order
                             )
@@ -1336,7 +1150,7 @@ class GDDStructuredCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
                                             feature_name=feature_name,
                                             description=feature_desc,
                                             priority=feature_priority,
-                                            # status field doesn't exist in the database table
+                                            status_value=feature_status,
                                             notes=feature_notes,
                                             order=feature_order
                                         )
@@ -1424,7 +1238,7 @@ class GDDStructuredCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
                         feature_name=high_concept_name,
                         description=high_concept_desc or "A brief, one or two sentence description of the game.",
                         priority=high_concept_priority,
-                        # status field doesn't exist in the database table
+                        status=high_concept_status,
                         order=1
                     )
                     
@@ -1440,7 +1254,7 @@ class GDDStructuredCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
                         feature_name=target_audience_name,
                         description=target_audience_desc or "The types of players the game is designed for.",
                         priority=target_audience_priority,
-                        # status field doesn't exist in the database table
+                        status=target_audience_status,
                         order=2
                     )
                     
@@ -1456,7 +1270,7 @@ class GDDStructuredCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
                         feature_name=usp_name,
                         description=usp_desc or "What makes this game unique compared to others.",
                         priority=usp_priority,
-                        # status field doesn't exist in the database table
+                        status=usp_status,
                         order=3
                     )
                     
@@ -1474,7 +1288,7 @@ class GDDStructuredCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
                         feature_name=core_mechanics_name,
                         description=core_mechanics_desc or "The primary gameplay mechanics that define the experience.",
                         priority=core_mechanics_priority,
-                        # status field doesn't exist in the database table
+                        status=core_mechanics_status,
                         order=1
                     )
                     
@@ -1490,7 +1304,7 @@ class GDDStructuredCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
                         feature_name=controls_name,
                         description=controls_desc or "How the player interacts with the game.",
                         priority=controls_priority,
-                        # status field doesn't exist in the database table
+                        status=controls_status,
                         order=2
                     )
                     
@@ -1506,7 +1320,7 @@ class GDDStructuredCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
                         feature_name=progression_name,
                         description=progression_desc or "How the player advances through the game.",
                         priority=progression_priority,
-                        # status field doesn't exist in the database table
+                        status=progression_status,
                         order=3
                     )
                     
@@ -1524,7 +1338,7 @@ class GDDStructuredCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
                         feature_name=world_overview_name,
                         description=world_overview_desc or "The setting and general atmosphere of the game world.",
                         priority=world_overview_priority,
-                        # status field doesn't exist in the database table
+                        status=world_overview_status,
                         order=1
                     )
                     
@@ -1540,7 +1354,7 @@ class GDDStructuredCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
                         feature_name=environments_name,
                         description=environments_desc or "Different environments players will encounter.",
                         priority=environments_priority,
-                        # status field doesn't exist in the database table
+                        status=environments_status,
                         order=2
                     )
                     
@@ -1556,7 +1370,7 @@ class GDDStructuredCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
                         feature_name=level_design_name,
                         description=level_design_desc or "How levels are structured and what they contain.",
                         priority=level_design_priority,
-                        # status field doesn't exist in the database table
+                        status=level_design_status,
                         order=3
                     )
                     
@@ -1574,7 +1388,7 @@ class GDDStructuredCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
                         feature_name=player_characters_name,
                         description=player_characters_desc or "Description of playable characters, their abilities, and progression.",
                         priority=player_characters_priority,
-                        # status field doesn't exist in the database table
+                        status=player_characters_status,
                         order=1
                     )
                     
@@ -1590,7 +1404,7 @@ class GDDStructuredCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
                         feature_name=npcs_name,
                         description=npcs_desc or "Non-player characters and their roles in the game.",
                         priority=npcs_priority,
-                        # status field doesn't exist in the database table
+                        status=npcs_status,
                         order=2
                     )
                     
@@ -1614,6 +1428,7 @@ class GDDStructuredCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
                             feature_name=feature_name,
                             description=feature_desc or "Click to edit this feature",
                             priority=feature_priority,
+                            status=feature_status,
                             order=1
                         )
                     else:
@@ -1623,6 +1438,7 @@ class GDDStructuredCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
                             feature_name=f"Add {section_title} features here",
                             description="Click to edit this placeholder feature",
                             priority="medium",
+                            status="backlog",
                             order=1
                         )
             

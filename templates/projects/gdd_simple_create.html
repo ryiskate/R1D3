@@ -145,15 +145,20 @@
                             <h3 style="color: #E91E63; text-shadow: none;">1. Game Overview</h3>
                             <p style="color: #212529;">Define the high concept, target audience, unique selling points, and platforms</p>
                             
-                            <div class="mb-3">
-                                <select class="form-select section-type-select" id="overview-type-select" data-section="overview">
-                                    <option value="">-- Select Content Type --</option>
-                                    <option value="table">Feature Table</option>
-                                    <option value="bullet">Bullet Points</option>
-                                </select>
-                            </div>
+                            <div id="overview-content" class="section-content mb-4"></div>
                             
-                            <div id="overview-content" class="section-content"></div>
+                            <div class="mb-3">
+                                <div class="input-group">
+                                    <select class="form-select section-type-select" id="overview-type-select" data-section="overview">
+                                        <option value="">-- Select Content Type --</option>
+                                        <option value="table">Feature Table</option>
+                                        <option value="bullet">Bullet Points</option>
+                                    </select>
+                                    <button type="button" class="btn btn-primary add-section-btn" data-section="overview">
+                                        <i class="fas fa-plus"></i> Add
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         
                         <!-- Section title and additional notes removed as requested -->
@@ -207,180 +212,240 @@
                             <h3>2. Gameplay</h3>
                             <p>Define the core mechanics, controls, progression systems, and game economy</p>
                             
-                            <div class="mb-3">
-                                <select class="form-select section-type-select" id="gameplay-type-select" data-section="gameplay">
-                                    <option value="">-- Select Content Type --</option>
-                                    <option value="table">Feature Table</option>
-                                    <option value="bullet">Bullet Points</option>
-                                </select>
-                            </div>
+                            <div id="gameplay-content" class="section-content mb-4"></div>
                             
-                            <div id="gameplay-content" class="section-content"></div>
+                            <div class="mb-3">
+                                <div class="input-group">
+                                    <select class="form-select section-type-select" id="gameplay-type-select" data-section="gameplay">
+                                        <option value="">-- Select Content Type --</option>
+                                        <option value="table">Feature Table</option>
+                                        <option value="bullet">Bullet Points</option>
+                                    </select>
+                                    <button type="button" class="btn btn-primary add-section-btn" data-section="gameplay">
+                                        <i class="fas fa-plus"></i> Add
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         
                         <div class="gdd-section section-gameworld" id="gameworld-section">
                             <h3>3. Game World</h3>
                             <p>Define the world overview, environments, level design, and world interaction</p>
                             
-                            <div class="mb-3">
-                                <select class="form-select section-type-select" id="gameworld-type-select" data-section="gameworld">
-                                    <option value="">-- Select Content Type --</option>
-                                    <option value="table">Feature Table</option>
-                                    <option value="bullet">Bullet Points</option>
-                                </select>
-                            </div>
+                            <div id="gameworld-content" class="section-content mb-4"></div>
                             
-                            <div id="gameworld-content" class="section-content"></div>
+                            <div class="mb-3">
+                                <div class="input-group">
+                                    <select class="form-select section-type-select" id="gameworld-type-select" data-section="gameworld">
+                                        <option value="">-- Select Content Type --</option>
+                                        <option value="table">Feature Table</option>
+                                        <option value="bullet">Bullet Points</option>
+                                    </select>
+                                    <button type="button" class="btn btn-primary add-section-btn" data-section="gameworld">
+                                        <i class="fas fa-plus"></i> Add
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         
                         <div class="gdd-section section-characters" id="characters-section">
                             <h3>4. Characters</h3>
                             <p>Define player characters, NPCs, enemies, and relationships</p>
                             
-                            <div class="mb-3">
-                                <select class="form-select section-type-select" id="characters-type-select" data-section="characters">
-                                    <option value="">-- Select Content Type --</option>
-                                    <option value="table">Feature Table</option>
-                                    <option value="bullet">Bullet Points</option>
-                                </select>
-                            </div>
+                            <div id="characters-content" class="section-content mb-4"></div>
                             
-                            <div id="characters-content" class="section-content"></div>
+                            <div class="mb-3">
+                                <div class="input-group">
+                                    <select class="form-select section-type-select" id="characters-type-select" data-section="characters">
+                                        <option value="">-- Select Content Type --</option>
+                                        <option value="table">Feature Table</option>
+                                        <option value="bullet">Bullet Points</option>
+                                    </select>
+                                    <button type="button" class="btn btn-primary add-section-btn" data-section="characters">
+                                        <i class="fas fa-plus"></i> Add
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         
                         <div class="gdd-section section-narrative" id="narrative-section">
                             <h3>5. Narrative</h3>
                             <p>Define the story overview, narrative structure, storytelling methods, and player choice</p>
                             
-                            <div class="mb-3">
-                                <select class="form-select section-type-select" id="narrative-type-select" data-section="narrative">
-                                    <option value="">-- Select Content Type --</option>
-                                    <option value="table">Feature Table</option>
-                                    <option value="bullet">Bullet Points</option>
-                                </select>
-                            </div>
+                            <div id="narrative-content" class="section-content mb-4"></div>
                             
-                            <div id="narrative-content" class="section-content"></div>
+                            <div class="mb-3">
+                                <div class="input-group">
+                                    <select class="form-select section-type-select" id="narrative-type-select" data-section="narrative">
+                                        <option value="">-- Select Content Type --</option>
+                                        <option value="table">Feature Table</option>
+                                        <option value="bullet">Bullet Points</option>
+                                    </select>
+                                    <button type="button" class="btn btn-primary add-section-btn" data-section="narrative">
+                                        <i class="fas fa-plus"></i> Add
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         
                         <div class="gdd-section section-technical" id="technical-section">
                             <h3>6. Technical Requirements</h3>
                             <p>Define platform-specific requirements and technical specifications</p>
                             
-                            <div class="mb-3">
-                                <select class="form-select section-type-select" id="technical-type-select" data-section="technical">
-                                    <option value="">-- Select Content Type --</option>
-                                    <option value="table">Feature Table</option>
-                                    <option value="bullet">Bullet Points</option>
-                                </select>
-                            </div>
+                            <div id="technical-content" class="section-content mb-4"></div>
                             
-                            <div id="technical-content" class="section-content"></div>
+                            <div class="mb-3">
+                                <div class="input-group">
+                                    <select class="form-select section-type-select" id="technical-type-select" data-section="technical">
+                                        <option value="">-- Select Content Type --</option>
+                                        <option value="table">Feature Table</option>
+                                        <option value="bullet">Bullet Points</option>
+                                    </select>
+                                    <button type="button" class="btn btn-primary add-section-btn" data-section="technical">
+                                        <i class="fas fa-plus"></i> Add
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         
                         <div class="gdd-section section-audio" id="audio-section">
                             <h3>7. Audio Design</h3>
                             <p>Define music, sound effects, voice acting, and audio implementation</p>
                             
-                            <div class="mb-3">
-                                <select class="form-select section-type-select" id="audio-type-select" data-section="audio">
-                                    <option value="">-- Select Content Type --</option>
-                                    <option value="table">Feature Table</option>
-                                    <option value="bullet">Bullet Points</option>
-                                </select>
-                            </div>
+                            <div id="audio-content" class="section-content mb-4"></div>
                             
-                            <div id="audio-content" class="section-content"></div>
+                            <div class="mb-3">
+                                <div class="input-group">
+                                    <select class="form-select section-type-select" id="audio-type-select" data-section="audio">
+                                        <option value="">-- Select Content Type --</option>
+                                        <option value="table">Feature Table</option>
+                                        <option value="bullet">Bullet Points</option>
+                                    </select>
+                                    <button type="button" class="btn btn-primary add-section-btn" data-section="audio">
+                                        <i class="fas fa-plus"></i> Add
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         
                         <div class="gdd-section section-ui" id="ui-section">
                             <h3>8. User Interface & UX</h3>
                             <p>Define UI design, HUD, menus, and accessibility features</p>
                             
-                            <div class="mb-3">
-                                <select class="form-select section-type-select" id="ui-type-select" data-section="ui">
-                                    <option value="">-- Select Content Type --</option>
-                                    <option value="table">Feature Table</option>
-                                    <option value="bullet">Bullet Points</option>
-                                </select>
-                            </div>
+                            <div id="ui-content" class="section-content mb-4"></div>
                             
-                            <div id="ui-content" class="section-content"></div>
+                            <div class="mb-3">
+                                <div class="input-group">
+                                    <select class="form-select section-type-select" id="ui-type-select" data-section="ui">
+                                        <option value="">-- Select Content Type --</option>
+                                        <option value="table">Feature Table</option>
+                                        <option value="bullet">Bullet Points</option>
+                                    </select>
+                                    <button type="button" class="btn btn-primary add-section-btn" data-section="ui">
+                                        <i class="fas fa-plus"></i> Add
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         
                         <div class="gdd-section section-art" id="art-section">
                             <h3>9. Art Direction</h3>
                             <p>Define visual style, character art, environment art, and visual effects</p>
                             
-                            <div class="mb-3">
-                                <select class="form-select section-type-select" id="art-type-select" data-section="art">
-                                    <option value="">-- Select Content Type --</option>
-                                    <option value="table">Feature Table</option>
-                                    <option value="bullet">Bullet Points</option>
-                                </select>
-                            </div>
+                            <div id="art-content" class="section-content mb-4"></div>
                             
-                            <div id="art-content" class="section-content"></div>
+                            <div class="mb-3">
+                                <div class="input-group">
+                                    <select class="form-select section-type-select" id="art-type-select" data-section="art">
+                                        <option value="">-- Select Content Type --</option>
+                                        <option value="table">Feature Table</option>
+                                        <option value="bullet">Bullet Points</option>
+                                    </select>
+                                    <button type="button" class="btn btn-primary add-section-btn" data-section="art">
+                                        <i class="fas fa-plus"></i> Add
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         
                         <div class="gdd-section section-monetization" id="monetization-section">
                             <h3>10. Monetization</h3>
                             <p>Define revenue model, in-game purchases, monetization balance, and additional revenue streams</p>
                             
-                            <div class="mb-3">
-                                <select class="form-select section-type-select" id="monetization-type-select" data-section="monetization">
-                                    <option value="">-- Select Content Type --</option>
-                                    <option value="table">Feature Table</option>
-                                    <option value="bullet">Bullet Points</option>
-                                </select>
-                            </div>
+                            <div id="monetization-content" class="section-content mb-4"></div>
                             
-                            <div id="monetization-content" class="section-content"></div>
+                            <div class="mb-3">
+                                <div class="input-group">
+                                    <select class="form-select section-type-select" id="monetization-type-select" data-section="monetization">
+                                        <option value="">-- Select Content Type --</option>
+                                        <option value="table">Feature Table</option>
+                                        <option value="bullet">Bullet Points</option>
+                                    </select>
+                                    <button type="button" class="btn btn-primary add-section-btn" data-section="monetization">
+                                        <i class="fas fa-plus"></i> Add
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         
                         <div class="gdd-section section-development" id="development-section">
                             <h3>11. Development & Production</h3>
                             <p>Define development roadmap, team structure, budget, and post-launch support</p>
                             
-                            <div class="mb-3">
-                                <select class="form-select section-type-select" id="development-type-select" data-section="development">
-                                    <option value="">-- Select Content Type --</option>
-                                    <option value="table">Feature Table</option>
-                                    <option value="bullet">Bullet Points</option>
-                                </select>
-                            </div>
+                            <div id="development-content" class="section-content mb-4"></div>
                             
-                            <div id="development-content" class="section-content"></div>
+                            <div class="mb-3">
+                                <div class="input-group">
+                                    <select class="form-select section-type-select" id="development-type-select" data-section="development">
+                                        <option value="">-- Select Content Type --</option>
+                                        <option value="table">Feature Table</option>
+                                        <option value="bullet">Bullet Points</option>
+                                    </select>
+                                    <button type="button" class="btn btn-primary add-section-btn" data-section="development">
+                                        <i class="fas fa-plus"></i> Add
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         
                         <div class="gdd-section section-marketing" id="marketing-section">
                             <h3>12. Marketing & Distribution</h3>
                             <p>Define marketing strategy, promotional channels, distribution platforms, and community engagement</p>
                             
-                            <div class="mb-3">
-                                <select class="form-select section-type-select" id="marketing-type-select" data-section="marketing">
-                                    <option value="">-- Select Content Type --</option>
-                                    <option value="table">Feature Table</option>
-                                    <option value="bullet">Bullet Points</option>
-                                </select>
-                            </div>
+                            <div id="marketing-content" class="section-content mb-4"></div>
                             
-                            <div id="marketing-content" class="section-content"></div>
+                            <div class="mb-3">
+                                <div class="input-group">
+                                    <select class="form-select section-type-select" id="marketing-type-select" data-section="marketing">
+                                        <option value="">-- Select Content Type --</option>
+                                        <option value="table">Feature Table</option>
+                                        <option value="bullet">Bullet Points</option>
+                                    </select>
+                                    <button type="button" class="btn btn-primary add-section-btn" data-section="marketing">
+                                        <i class="fas fa-plus"></i> Add
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         
                         <div class="gdd-section section-appendices" id="appendices-section">
                             <h3>13. Appendices</h3>
                             <p>Additional reference materials, technical specifications, change log, and glossary</p>
                             
-                            <div class="mb-3">
-                                <select class="form-select section-type-select" id="appendices-type-select" data-section="appendices">
-                                    <option value="">-- Select Content Type --</option>
-                                    <option value="table">Feature Table</option>
-                                    <option value="bullet">Bullet Points</option>
-                                </select>
-                            </div>
+                            <div id="appendices-content" class="section-content mb-4"></div>
                             
-                            <div id="appendices-content" class="section-content"></div>
+                            <div class="mb-3">
+                                <div class="input-group">
+                                    <select class="form-select section-type-select" id="appendices-type-select" data-section="appendices">
+                                        <option value="">-- Select Content Type --</option>
+                                        <option value="table">Feature Table</option>
+                                        <option value="bullet">Bullet Points</option>
+                                    </select>
+                                    <button type="button" class="btn btn-primary add-section-btn" data-section="appendices">
+                                        <i class="fas fa-plus"></i> Add
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         
                         <!-- Container for dynamically added blocks -->
@@ -417,6 +482,10 @@
         const dynamicBlocksContainer = document.getElementById('dynamic-blocks-container');
         const featuresTable = document.querySelector('.feature-table tbody');
         const bulletPointsContainer = document.querySelector('.bullet-points');
+        
+        // Initialize variables that will be used later
+        let newAddFeatureBtn = null;
+        let newAddBulletBtn = null;
         let featureCounter = 1;
         let bulletCounter = 4; // Start from 4 since we already have 3 bullet points
         let sectionCounter = 1; // Counter for dynamic sections
@@ -593,15 +662,20 @@
             }
         };
         
-        // Remove any existing event listeners to prevent duplicates
-        const newAddFeatureBtn = addFeatureBtn.cloneNode(true);
-        addFeatureBtn.parentNode.replaceChild(newAddFeatureBtn, addFeatureBtn);
+        // Only clone nodes if they exist to prevent errors
+        if (addFeatureBtn) {
+            newAddFeatureBtn = addFeatureBtn.cloneNode(true);
+            addFeatureBtn.parentNode.replaceChild(newAddFeatureBtn, addFeatureBtn);
+        }
         
-        const newAddBulletBtn = addBulletBtn.cloneNode(true);
-        addBulletBtn.parentNode.replaceChild(newAddBulletBtn, addBulletBtn);
+        if (addBulletBtn) {
+            newAddBulletBtn = addBulletBtn.cloneNode(true);
+            addBulletBtn.parentNode.replaceChild(newAddBulletBtn, addBulletBtn);
+        }
         
-        // Add the event listener to the new bullet button
-        newAddBulletBtn.addEventListener('click', function(event) {
+        // Add the event listener to the new bullet button if it exists
+        if (newAddBulletBtn) {
+            newAddBulletBtn.addEventListener('click', function(event) {
             // Prevent any default actions or event bubbling
             event.preventDefault();
             event.stopPropagation();
@@ -635,130 +709,151 @@
             // Insert the new bullet point before the button container
             bulletPointsContainer.insertBefore(newBulletContainer, lastBulletContainer);
             
-            // Focus on the new input
+            // Focus on the new bullet input
             bulletInput.focus();
         });
+        }
         
         // Enable/disable the Add Section buttons based on selection
-        blockTypeSelect.addEventListener('change', function() {
-            addBlockBtn.disabled = !this.value;
-        });
+        if (blockTypeSelect && addBlockBtn) {
+            blockTypeSelect.addEventListener('change', function() {
+                addBlockBtn.disabled = !this.value;
+            });
+        }
         
-        sectionTemplateSelect.addEventListener('change', function() {
-            addTemplateSectionBtn.disabled = !this.value;
-        });
+        if (sectionTemplateSelect && addTemplateSectionBtn) {
+            sectionTemplateSelect.addEventListener('change', function() {
+                addTemplateSectionBtn.disabled = !this.value;
+            });
+        }
         
-        // Add event listeners for section type selects
+        // First, remove any existing event listeners by cloning and replacing all relevant elements
         document.querySelectorAll('.section-type-select').forEach(select => {
-            select.addEventListener('change', function() {
+            const newSelect = select.cloneNode(true);
+            select.parentNode.replaceChild(newSelect, select);
+        });
+        
+        document.querySelectorAll('.add-section-btn').forEach(button => {
+            const newButton = button.cloneNode(true);
+            button.parentNode.replaceChild(newButton, button);
+        });
+        
+        // Now add fresh event listeners to the Add buttons only (not to the selects)
+        document.querySelectorAll('.add-section-btn').forEach(button => {
+            button.addEventListener('click', function(event) {
+                // Prevent default behavior
+                event.preventDefault();
+                event.stopPropagation();
+                
                 const sectionKey = this.dataset.section;
-                const contentType = this.value;
+                const select = document.getElementById(`${sectionKey}-type-select`);
+                const contentType = select.value;
                 const contentContainer = document.getElementById(`${sectionKey}-content`);
                 
-                // Clear previous content
-                contentContainer.innerHTML = '';
-                
-                if (!contentType) return;
+                if (!contentType) {
+                    alert('Please select a content type first');
+                    return;
+                }
                 
                 // Get template data for this section
                 const template = templateSections[sectionKey];
                 
-                if (contentType === 'table') {
-                    // Create a feature table
-                    const tableContainer = document.createElement('div');
-                    tableContainer.innerHTML = `
-                        <table class="feature-table static-feature-table" data-table-id="${sectionKey}">
-                            <thead>
-                                <tr>
-                                    <th style="width: 20%">Feature</th>
-                                    <th style="width: 40%">Description</th>
-                                    <th style="width: 10%">Priority</th>
-                                    <th style="width: 10%">Status</th>
-                                    <th style="width: 20%">Notes</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
-                        <div class="d-flex justify-content-start mt-1 mb-2">
-                            <button type="button" class="btn btn-outline-primary btn-sm static-add-feature-btn" 
-                                    data-section="${sectionKey}">
-                                <i class="bi bi-plus-circle"></i> Add Feature
-                            </button>
+                // Add the selected content type
+                addContentToSection(sectionKey, contentType, contentContainer, template);
+            });
+        });
+        
+        // Helper function to add content to a section
+        function addContentToSection(sectionKey, contentType, contentContainer, template) {
+            // Create a unique ID for this content block
+            const blockId = `${sectionKey}-block-${Date.now()}`;
+            
+            // Create a new content block container
+            const blockContainer = document.createElement('div');
+            blockContainer.className = 'content-block mb-4 p-3 border rounded';
+            blockContainer.id = blockId;
+            
+            // Add title and description fields for all content types
+            const headerContainer = document.createElement('div');
+            headerContainer.className = 'content-header mb-3';
+            headerContainer.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="flex-grow-1">
+                        <div class="form-group mb-2">
+                            <label for="${blockId}-title" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="${blockId}-title" name="${sectionKey}_block_${blockId}_title" placeholder="Enter a title for this section">
                         </div>
-                    `;
-                    contentContainer.appendChild(tableContainer);
-                    
-                    // Add template features if available
-                    if (template && template.features) {
-                        const tableBody = tableContainer.querySelector('tbody');
-                        template.features.forEach((feature, index) => {
-                            const row = document.createElement('tr');
-                            row.innerHTML = `
-                                <td>
-                                    <input type="text" class="form-control form-control-sm" 
-                                           name="${sectionKey}_feature_${index + 1}_name" 
-                                           value="${feature.name}" placeholder="Feature name">
-                                </td>
-                                <td>
-                                    <input type="text" class="form-control form-control-sm" 
-                                           name="${sectionKey}_feature_${index + 1}" 
-                                           value="${feature.description}" placeholder="Feature description">
-                                </td>
-                                <td>
-                                    <select class="form-select form-select-sm" 
-                                            name="${sectionKey}_feature_${index + 1}_priority">
-                                        <option value="critical" ${feature.priority === 'critical' ? 'selected' : ''}>Critical</option>
-                                        <option value="high" ${feature.priority === 'high' ? 'selected' : ''}>High</option>
-                                        <option value="medium" ${feature.priority === 'medium' ? 'selected' : ''}>Medium</option>
-                                        <option value="low" ${feature.priority === 'low' ? 'selected' : ''}>Low</option>
-                                    </select>
-                                </td>
-                                <td>
-                                    <select class="form-select form-select-sm" 
-                                            name="${sectionKey}_feature_${index + 1}_status">
-                                        <option value="backlog" selected>Backlog</option>
-                                        <option value="to_do">To Do</option>
-                                        <option value="in_progress">In Progress</option>
-                                        <option value="in_review">In Review</option>
-                                        <option value="done">Done</option>
-                                    </select>
-                                </td>
-                                <td>
-                                    <input type="text" class="form-control form-control-sm" 
-                                           name="${sectionKey}_feature_${index + 1}_notes" 
-                                           placeholder="Additional notes">
-                                </td>
-                            `;
-                            tableBody.appendChild(row);
-                        });
-                    } else {
-                        // Add a default row if no template features
-                        const tableBody = tableContainer.querySelector('tbody');
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-outline-danger btn-sm remove-block-btn" data-block-id="${blockId}">
+                            <i class="bi bi-trash"></i> Remove
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group mb-3">
+                    <label for="${blockId}-description" class="form-label">Description</label>
+                    <textarea class="form-control" id="${blockId}-description" name="${sectionKey}_block_${blockId}_description" rows="2" placeholder="Enter a description for this section"></textarea>
+                </div>
+                <hr class="my-3">
+            `;
+            blockContainer.appendChild(headerContainer);
+            
+            if (contentType === 'table') {                
+                // Create a feature table
+                const tableContainer = document.createElement('div');
+                tableContainer.className = 'mb-4';
+                tableContainer.innerHTML = `
+                    <h5 class="mb-2">Feature Table</h5>
+                    <table class="feature-table static-feature-table table table-bordered" data-table-id="${blockId}">
+                        <thead>
+                            <tr>
+                                <th style="width: 20%">Feature</th>
+                                <th style="width: 40%">Description</th>
+                                <th style="width: 10%">Priority</th>
+                                <th style="width: 10%">Status</th>
+                                <th style="width: 20%">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                    <div class="d-flex justify-content-start mt-1 mb-2">
+                        <button type="button" class="btn btn-outline-primary btn-sm static-add-feature-btn" 
+                                data-block-id="${blockId}" data-section="${sectionKey}">
+                            <i class="bi bi-plus-circle"></i> Add Feature
+                        </button>
+                    </div>
+                `;
+                blockContainer.appendChild(tableContainer);
+                
+                // Add template features if available
+                if (template && template.features) {
+                    const tableBody = tableContainer.querySelector('tbody');
+                    template.features.forEach((feature, index) => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
                             <td>
                                 <input type="text" class="form-control form-control-sm" 
-                                       name="${sectionKey}_feature_1_name" 
-                                       value="Feature 1" placeholder="Feature name">
+                                       name="${sectionKey}_block_${blockId}_feature_${index + 1}_name" 
+                                       value="${feature.name}" placeholder="Feature name">
                             </td>
                             <td>
                                 <input type="text" class="form-control form-control-sm" 
-                                       name="${sectionKey}_feature_1" 
-                                       placeholder="Feature description">
+                                       name="${sectionKey}_block_${blockId}_feature_${index + 1}" 
+                                       value="${feature.description}" placeholder="Feature description">
                             </td>
                             <td>
                                 <select class="form-select form-select-sm" 
-                                        name="${sectionKey}_feature_1_priority">
-                                    <option value="critical">Critical</option>
-                                    <option value="high" selected>High</option>
-                                    <option value="medium">Medium</option>
-                                    <option value="low">Low</option>
+                                        name="${sectionKey}_block_${blockId}_feature_${index + 1}_priority">
+                                    <option value="critical" ${feature.priority === 'critical' ? 'selected' : ''}>Critical</option>
+                                    <option value="high" ${feature.priority === 'high' ? 'selected' : ''}>High</option>
+                                    <option value="medium" ${feature.priority === 'medium' ? 'selected' : ''}>Medium</option>
+                                    <option value="low" ${feature.priority === 'low' ? 'selected' : ''}>Low</option>
                                 </select>
                             </td>
                             <td>
                                 <select class="form-select form-select-sm" 
-                                        name="${sectionKey}_feature_1_status">
+                                        name="${sectionKey}_block_${blockId}_feature_${index + 1}_status">
                                     <option value="backlog" selected>Backlog</option>
                                     <option value="to_do">To Do</option>
                                     <option value="in_progress">In Progress</option>
@@ -768,75 +863,157 @@
                             </td>
                             <td>
                                 <input type="text" class="form-control form-control-sm" 
-                                       name="${sectionKey}_feature_1_notes" 
+                                       name="${sectionKey}_block_${blockId}_feature_${index + 1}_notes" 
                                        placeholder="Additional notes">
                             </td>
                         `;
                         tableBody.appendChild(row);
-                    }
-                    
-                } else if (contentType === 'bullet') {
-                    // Create bullet points
-                    const bulletContainer = document.createElement('div');
-                    bulletContainer.className = 'mb-4';
-                    bulletContainer.innerHTML = `
-                        <div class="static-bullet-points" data-bullet-section="${sectionKey}">
-                        </div>
-                    `;
-                    
-                    const bulletPointsDiv = bulletContainer.querySelector('.static-bullet-points');
-                    
-                    // Add template bullets if available
-                    if (template && template.bullets) {
-                        template.bullets.forEach((bullet, index) => {
-                            const bulletPoint = document.createElement('div');
-                            bulletPoint.className = 'd-flex align-items-center mb-2';
-                            bulletPoint.innerHTML = `
-                                <span class="me-2">•</span>
-                                <input type="text" class="form-control form-control-sm" 
-                                       name="${sectionKey}_bullet_${index + 1}" 
-                                       value="${bullet}" placeholder="Key point ${index + 1}">
-                            `;
-                            bulletPointsDiv.appendChild(bulletPoint);
-                        });
-                    } else {
-                        // Add default bullet points if no template bullets
-                        for (let i = 1; i <= 3; i++) {
-                            const bulletPoint = document.createElement('div');
-                            bulletPoint.className = 'd-flex align-items-center mb-2';
-                            bulletPoint.innerHTML = `
-                                <span class="me-2">•</span>
-                                <input type="text" class="form-control form-control-sm" 
-                                       name="${sectionKey}_bullet_${i}" 
-                                       placeholder="Key point ${i}">
-                            `;
-                            bulletPointsDiv.appendChild(bulletPoint);
-                        }
-                    }
-                    
-                    // Add the button for adding more bullets
-                    const buttonContainer = document.createElement('div');
-                    buttonContainer.className = 'd-flex justify-content-start mt-1';
-                    buttonContainer.innerHTML = `
-                        <button type="button" class="btn btn-outline-secondary btn-sm static-add-bullet-btn" 
-                                data-section="${sectionKey}">
-                            <i class="bi bi-plus-circle"></i> Add Bullet
-                        </button>
-                    `;
-                    bulletPointsDiv.appendChild(buttonContainer);
-                    
-                    contentContainer.appendChild(bulletContainer);
+                    });
                 }
                 
-                // Set up event listeners for the new buttons
-                setupStaticButtonListeners();
-            });
+                // Add event listener for the Add Feature button
+                const addFeatureBtn = tableContainer.querySelector('.static-add-feature-btn');
+                if (addFeatureBtn) {
+                    addFeatureBtn.addEventListener('click', function() {
+                        const section = this.dataset.section;
+                        const tableBody = this.closest('.section-content').querySelector('tbody');
+                        const rowCount = tableBody.querySelectorAll('tr').length;
+                        
+                        const newRow = document.createElement('tr');
+                        newRow.innerHTML = `
+                            <td>
+                                <input type="text" class="form-control form-control-sm" 
+                                       name="${section}_feature_${rowCount + 1}_name" 
+                                       placeholder="Feature name">
+                            </td>
+                            <td>
+                                <input type="text" class="form-control form-control-sm" 
+                                       name="${section}_feature_${rowCount + 1}" 
+                                       placeholder="Feature description">
+                            </td>
+                            <td>
+                                <select class="form-select form-select-sm" 
+                                        name="${section}_feature_${rowCount + 1}_priority">
+                                    <option value="critical">Critical</option>
+                                    <option value="high">High</option>
+                                    <option value="medium" selected>Medium</option>
+                                    <option value="low">Low</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select class="form-select form-select-sm" 
+                                        name="${section}_feature_${rowCount + 1}_status">
+                                    <option value="backlog" selected>Backlog</option>
+                                    <option value="to_do">To Do</option>
+                                    <option value="in_progress">In Progress</option>
+                                    <option value="in_review">In Review</option>
+                                    <option value="done">Done</option>
+                                </select>
+                            </td>
+                            <td>
+                                <input type="text" class="form-control form-control-sm" 
+                                       name="${section}_feature_${rowCount + 1}_notes" 
+                                       placeholder="Additional notes">
+                            </td>
+                        `;
+                        tableBody.appendChild(newRow);
+                    });
+                }
+            } else if (contentType === 'bullet') {
+                // Create bullet points
+                const bulletContainer = document.createElement('div');
+                bulletContainer.className = 'bullet-points static-bullet-points';
+                bulletContainer.dataset.section = sectionKey;
+                bulletContainer.dataset.blockId = blockId;
+                
+                let bulletHTML = `<h5 class="mb-2">Bullet Points</h5>`;
+                
+                // Add template bullets if available
+                if (template && template.bullets) {
+                    template.bullets.forEach((bullet, index) => {
+                        bulletHTML += `
+                            <div class="bullet-point-container mb-2">
+                                <div class="input-group">
+                                    <span class="input-group-text">•</span>
+                                    <input type="text" class="form-control" 
+                                           name="${sectionKey}_block_${blockId}_bullet_${index + 1}" 
+                                           value="${bullet}" placeholder="Bullet point">
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                
+                // Add button to add more bullet points
+                bulletHTML += `
+                    <div class="bullet-point-container mb-2">
+                        <button type="button" class="btn btn-outline-primary btn-sm static-add-bullet-btn" 
+                                data-section="${sectionKey}" data-block-id="${blockId}">
+                            <i class="bi bi-plus-circle"></i> Add Bullet Point
+                        </button>
+                    </div>
+                `;
+                
+                bulletContainer.innerHTML = bulletHTML;
+                blockContainer.appendChild(bulletContainer);
+                
+                // Add event listener for the Add Bullet Point button
+                const addBulletBtn = bulletContainer.querySelector('.static-add-bullet-btn');
+                if (addBulletBtn) {
+                    addBulletBtn.addEventListener('click', function() {
+                        const section = this.dataset.section;
+                        const blockId = this.dataset.blockId;
+                        const bulletContainer = this.closest('.bullet-points');
+                        const bulletCount = bulletContainer.querySelectorAll('input[type="text"]').length;
+                        const buttonContainer = this.closest('.bullet-point-container');
+                        
+                        const newBulletContainer = document.createElement('div');
+                        newBulletContainer.className = 'bullet-point-container mb-2';
+                        newBulletContainer.innerHTML = `
+                            <div class="input-group">
+                                <span class="input-group-text">•</span>
+                                <input type="text" class="form-control" 
+                                       name="${section}_block_${blockId}_bullet_${bulletCount + 1}" 
+                                       placeholder="Bullet point">
+                            </div>
+                        `;
+                        
+                        buttonContainer.parentNode.insertBefore(newBulletContainer, buttonContainer);
+                    });
+                }
+            }
+            
+            // Add the block to the content container
+            contentContainer.appendChild(blockContainer);
+            
+            // Add event listener for the remove button
+            const removeBtn = blockContainer.querySelector('.remove-block-btn');
+            if (removeBtn) {
+                removeBtn.addEventListener('click', function() {
+                    const blockId = this.dataset.blockId;
+                    const block = document.getElementById(blockId);
+                    if (block) {
+                        block.remove();
+                    }
+                });
+            }
+        }
+        
+        // We're removing the automatic content addition on select change
+        // Now content will only be added when the Add button is clicked
+        
+        $(document).ready(function() {
+            // Set up event listeners for static section buttons
+            setupStaticButtonListeners();
+            
+            // Set up event listeners for any existing content blocks
+            setupContentBlockEventListeners();
         });
         
         // Function to set up event listeners for static section buttons
         function setupStaticButtonListeners() {
-            // Add feature buttons for static sections
-            document.querySelectorAll('.static-add-feature-btn').forEach(btn => {
+            // Add section buttons
+            document.querySelectorAll('.add-section-btn').forEach(btn => {
                 // Remove existing event listeners
                 const newBtn = btn.cloneNode(true);
                 btn.parentNode.replaceChild(newBtn, btn);
@@ -846,26 +1023,102 @@
                     event.stopPropagation();
                     
                     const sectionKey = this.dataset.section;
-                    const tableBody = document.querySelector(`.static-feature-table[data-table-id="${sectionKey}"] tbody`);
+                    const selectElement = document.querySelector(`#${sectionKey}-type-select`);
+                    
+                    if (!selectElement) {
+                        console.error(`Could not find select element for section ${sectionKey}`);
+                        return;
+                    }
+                    
+                    const contentType = selectElement.value;
+                    const contentContainer = document.querySelector(`#${sectionKey}-content`);
+                    
+                    if (!contentType) {
+                        alert('Please select a content type first.');
+                        return;
+                    }
+                    
+                    if (!contentContainer) {
+                        console.error(`Could not find content container for section ${sectionKey}`);
+                        return;
+                    }
+                    
+                    // Get template data if available
+                    const template = {};
+                    
+                    // Add content to the section
+                    addContentToSection(sectionKey, contentType, contentContainer, template);
+                    
+                    // Set up event listeners for the newly added content block
+                    setupContentBlockEventListeners();
+                });
+            });
+            
+        }
+        
+        // Function to set up event listeners for content blocks
+        function setupContentBlockEventListeners() {
+            // First, remove all existing event listeners by removing data-listener-attached attribute
+            document.querySelectorAll('[data-listener-attached]').forEach(el => {
+                el.removeAttribute('data-listener-attached');
+            });
+            
+            // Add feature buttons for static sections
+            document.querySelectorAll('.static-add-feature-btn').forEach(btn => {
+                // Skip if already has listener
+                if (btn.hasAttribute('data-listener-attached')) {
+                    return;
+                }
+                
+                // Mark as having a listener attached
+                btn.setAttribute('data-listener-attached', 'true');
+                
+                // Remove any existing listeners by cloning
+                const newBtn = btn.cloneNode(true);
+                if (btn.parentNode) {
+                    btn.parentNode.replaceChild(newBtn, btn);
+                }
+                
+                // Add the event listener to the new button
+                newBtn.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    
+                    const sectionKey = this.dataset.section;
+                    const blockId = this.dataset.blockId;
+                    
+                    // Find the table body within the same block as this button
+                    const block = document.getElementById(blockId);
+                    if (!block) {
+                        console.error(`Could not find block ${blockId}`);
+                        return;
+                    }
+                    
+                    // Use a more specific selector to ensure we only get the table in this block
+                    const tableBody = block.querySelector('.static-feature-table tbody');
+                    if (!tableBody) {
+                        console.error(`Could not find table body in block ${blockId}`);
+                        return;
+                    }
+                    
                     const featureRows = tableBody.querySelectorAll('tr');
                     const featureIndex = featureRows.length + 1;
                     
-                    // Create a new row
                     const newRow = document.createElement('tr');
                     newRow.innerHTML = `
                         <td>
                             <input type="text" class="form-control form-control-sm" 
-                                   name="${sectionKey}_feature_${featureIndex}_name" 
-                                   value="Feature ${featureIndex}" placeholder="Feature name">
+                                   name="${sectionKey}_block_${blockId}_feature_${featureIndex}_name" 
+                                   placeholder="Feature name">
                         </td>
                         <td>
                             <input type="text" class="form-control form-control-sm" 
-                                   name="${sectionKey}_feature_${featureIndex}" 
+                                   name="${sectionKey}_block_${blockId}_feature_${featureIndex}" 
                                    placeholder="Feature description">
                         </td>
                         <td>
                             <select class="form-select form-select-sm" 
-                                    name="${sectionKey}_feature_${featureIndex}_priority">
+                                    name="${sectionKey}_block_${blockId}_feature_${featureIndex}_priority">
                                 <option value="critical">Critical</option>
                                 <option value="high">High</option>
                                 <option value="medium" selected>Medium</option>
@@ -874,7 +1127,7 @@
                         </td>
                         <td>
                             <select class="form-select form-select-sm" 
-                                    name="${sectionKey}_feature_${featureIndex}_status">
+                                    name="${sectionKey}_block_${blockId}_feature_${featureIndex}_status">
                                 <option value="backlog" selected>Backlog</option>
                                 <option value="to_do">To Do</option>
                                 <option value="in_progress">In Progress</option>
@@ -884,7 +1137,7 @@
                         </td>
                         <td>
                             <input type="text" class="form-control form-control-sm" 
-                                   name="${sectionKey}_feature_${featureIndex}_notes" 
+                                   name="${sectionKey}_block_${blockId}_feature_${featureIndex}_notes" 
                                    placeholder="Additional notes">
                         </td>
                     `;
@@ -895,40 +1148,81 @@
             
             // Add bullet buttons for static sections
             document.querySelectorAll('.static-add-bullet-btn').forEach(btn => {
-                // Remove existing event listeners
-                const newBtn = btn.cloneNode(true);
-                btn.parentNode.replaceChild(newBtn, btn);
+                // Skip if already has listener
+                if (btn.hasAttribute('data-listener-attached')) {
+                    return;
+                }
                 
+                // Mark as having a listener attached
+                btn.setAttribute('data-listener-attached', 'true');
+                
+                // Remove any existing listeners by cloning
+                const newBtn = btn.cloneNode(true);
+                if (btn.parentNode) {
+                    btn.parentNode.replaceChild(newBtn, btn);
+                }
+                
+                // Add the event listener to the new button
                 newBtn.addEventListener('click', function(event) {
                     event.preventDefault();
                     event.stopPropagation();
                     
                     const sectionKey = this.dataset.section;
-                    const bulletContainer = document.querySelector(`.static-bullet-points[data-bullet-section="${sectionKey}"]`);
+                    const blockId = this.dataset.blockId;
+                    const bulletContainer = this.closest('.bullet-points');
                     const bulletPoints = bulletContainer.querySelectorAll('input[type="text"]');
                     const bulletIndex = bulletPoints.length + 1;
                     
                     // Create a new bullet point
                     const newBulletContainer = document.createElement('div');
-                    newBulletContainer.className = 'd-flex align-items-center mb-2';
+                    newBulletContainer.className = 'bullet-point-container mb-2';
                     newBulletContainer.innerHTML = `
-                        <span class="me-2">•</span>
-                        <input type="text" class="form-control form-control-sm" 
-                               name="${sectionKey}_bullet_${bulletIndex}" 
-                               placeholder="Key point ${bulletIndex}">
+                        <div class="input-group">
+                            <span class="input-group-text">•</span>
+                            <input type="text" class="form-control" 
+                                   name="${sectionKey}_block_${blockId}_bullet_${bulletIndex}" 
+                                   placeholder="Bullet point">
+                        </div>
                     `;
                     
                     // Insert the new bullet point before the button container
-                    const buttonContainer = this.parentElement.parentElement;
-                    bulletContainer.insertBefore(newBulletContainer, buttonContainer);
+                    const buttonContainer = this.closest('.bullet-point-container');
+                    buttonContainer.parentNode.insertBefore(newBulletContainer, buttonContainer);
+                });
+            });
+            
+            // Add event listeners for remove buttons
+            document.querySelectorAll('.remove-block-btn').forEach(btn => {
+                // Skip if already has listener
+                if (btn.hasAttribute('data-listener-attached')) {
+                    return;
+                }
+                
+                // Mark as having a listener attached
+                btn.setAttribute('data-listener-attached', 'true');
+                
+                // Remove any existing listeners by cloning
+                const newBtn = btn.cloneNode(true);
+                if (btn.parentNode) {
+                    btn.parentNode.replaceChild(newBtn, btn);
+                }
+                
+                // Add the event listener to the new button
+                newBtn.addEventListener('click', function() {
+                    const blockId = this.dataset.blockId;
+                    const block = document.getElementById(blockId);
+                    if (block) {
+                        block.remove();
+                    }
                 });
             });
         }
         
-        // Add event listener for adding new custom blocks
-        addBlockBtn.addEventListener('click', function() {
-            const blockType = blockTypeSelect.value;
-            if (!blockType) return;
+        // Add event listener for adding new custom blocks if it exists
+        if (addBlockBtn) {
+            addBlockBtn.addEventListener('click', function() {
+                const blockType = blockTypeSelect.value;
+                if (!blockType) return;
             
             // Create a new section container
             const sectionContainer = document.createElement('div');
@@ -1084,6 +1378,7 @@
             // Add event listeners for the dynamic buttons
             setupDynamicButtonListeners();
         });
+        }
         
         // Function to set up event listeners for dynamically added buttons
         function setupDynamicButtonListeners() {
@@ -1169,8 +1464,9 @@
             });
         }
         
-        // Add the event listener to the new feature button
-        newAddFeatureBtn.addEventListener('click', function(event) {
+        // Add the event listener to the new feature button if it exists
+        if (newAddFeatureBtn) {
+            newAddFeatureBtn.addEventListener('click', function(event) {
             // Prevent any default actions or event bubbling
             event.preventDefault();
             event.stopPropagation();
@@ -1273,7 +1569,8 @@
             // Focus on the new feature name input
             nameInput.focus();
         });
+        }
     });
 </script>
-{% endblock %}
-{% endblock %}
+{% endblock %} {# extra_js block #}
+{% endblock %} {# content block #}

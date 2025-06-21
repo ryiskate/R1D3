@@ -1,5 +1,6 @@
 import json
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import Http404
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, View
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy, reverse
@@ -688,10 +689,33 @@ class GameTaskKanbanView(LoginRequiredMixin, ListView):
 class GameDesignDocumentView(LoginRequiredMixin, DetailView):
     """
     View a game design document with support for HTML content and task integration
+    The view expects the game's ID, not the GDD's ID
     """
     model = GameDesignDocument
     template_name = 'projects/gdd_detail_simple.html'
     context_object_name = 'gdd'
+    
+    def get_object(self, queryset=None):
+        """
+        Get the GDD by the game ID instead of the GDD ID
+        """
+        if queryset is None:
+            queryset = self.get_queryset()
+            
+        # Get the game ID from the URL
+        game_id = self.kwargs.get('pk')
+        
+        # Look up the GDD by the game ID
+        try:
+            # Get the game first
+            from projects.game_models import GameProject
+            game = GameProject.objects.get(id=game_id)
+            
+            # Then get the GDD for this game
+            return queryset.get(game=game)
+        except (GameProject.DoesNotExist, GameDesignDocument.DoesNotExist):
+            raise Http404("No game design document found for this game")
+
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -725,7 +749,10 @@ class GameDesignDocumentView(LoginRequiredMixin, DetailView):
             'title': section.title,
             'section_id': section.section_id
         } for section in self.object.sections.all()]
-        context['sections_json'] = json.dumps(sections_json, ensure_ascii=False)
+        
+        # Use ensure_ascii=False to handle non-ASCII characters properly and escape HTML entities
+        from django.utils.html import escapejs
+        context['sections_json'] = escapejs(json.dumps(sections_json, ensure_ascii=False))
         
         sections_with_tasks_json = {}
         for section_id, tasks in sections_with_tasks.items():
@@ -737,8 +764,8 @@ class GameDesignDocumentView(LoginRequiredMixin, DetailView):
                 'status_display': task.get_status_display()
             } for task in tasks]
         
-        # Use ensure_ascii=False to handle non-ASCII characters properly
-        context['sections_with_tasks_json'] = json.dumps(sections_with_tasks_json, ensure_ascii=False)
+        # Use ensure_ascii=False to handle non-ASCII characters properly and escape HTML entities
+        context['sections_with_tasks_json'] = escapejs(json.dumps(sections_with_tasks_json, ensure_ascii=False))
         
         # Get all tasks for the game for the task management panel
         context['all_game_tasks'] = GameTask.objects.filter(game=game).select_related('gdd_feature')

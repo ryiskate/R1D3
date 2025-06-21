@@ -172,14 +172,17 @@ class GDDFeature(TimeStampedModel):
     feature_name = models.CharField(max_length=100)
     description = models.TextField()
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='medium')
+    # Use db_column to specify a different column name in the database
+    # This avoids conflict with the status property method
     status = models.CharField(max_length=20, default='backlog', 
-                           choices=(
-                               ('backlog', 'Backlog'),
-                               ('to_do', 'To Do'),
-                               ('in_progress', 'In Progress'),
-                               ('in_review', 'In Review'),
-                               ('done', 'Done'),
-                           ))
+                            db_column='status_value',  # Use a different column name in the database
+                            choices=(
+                                ('backlog', 'Backlog'),
+                                ('to_do', 'To Do'),
+                                ('in_progress', 'In Progress'),
+                                ('in_review', 'In Review'),
+                                ('done', 'Done'),
+                            ))
     notes = models.TextField(blank=True, null=True, help_text="Additional notes about this feature")
     task = models.OneToOneField('GameTask', on_delete=models.SET_NULL, null=True, blank=True, related_name='gdd_feature')
     order = models.PositiveIntegerField(default=0, help_text="Order of this feature within its section/subsection")
@@ -201,14 +204,26 @@ class GDDFeature(TimeStampedModel):
             
             # Set order to one more than the highest existing order
             self.order = max_order + 1
-            
+        
+        # Temporarily remove the status attribute to prevent database error
+        # since the status column doesn't exist in the database table
+        status_value = None
+        if hasattr(self, '_status'):
+            status_value = self._status
+            delattr(self, '_status')
+        
+        # Call the parent save method
         super().save(*args, **kwargs)
+        
+        # Restore the status attribute if it was set
+        if status_value is not None:
+            self._status = status_value
     
     def __str__(self):
         return f"{self.feature_name} - {self.section.title}"
     
     @property
-    def status(self):
+    def task_status(self):
         """Return the status of the linked task, or 'Planned' if no task is linked"""
         if self.task:
             return self.task.get_status_display()

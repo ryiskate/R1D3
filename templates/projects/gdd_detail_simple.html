@@ -468,12 +468,25 @@ Example feature table:
 {% block extra_js %}
 <!-- Store Django template variables as data attributes to avoid JavaScript lint errors -->
 <div id="gdd-data" 
-     data-sections="{% if sections_json %}{{ sections_json|safe }}{% else %}[]{% endif %}"
-     data-sections-with-tasks="{% if sections_with_tasks_json %}{{ sections_with_tasks_json|safe }}{% else %}{}{% endif %}"
+     data-sections="{% if sections_json %}{{ sections_json }}{% else %}[]{% endif %}"
+     data-sections-with-tasks="{% if sections_with_tasks_json %}{{ sections_with_tasks_json }}{% else %}{}{% endif %}"
      data-can-create-task="{% if can_create_task %}true{% else %}false{% endif %}"
      data-can-link-tasks="{% if can_link_tasks %}true{% else %}false{% endif %}"
      style="display: none;">
 </div>
+
+<!-- Debug information for troubleshooting -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Log JSON data for debugging
+        console.log('GDD Detail Page Loaded');
+        const gddData = document.getElementById('gdd-data');
+        if (gddData) {
+            console.log('Sections JSON:', gddData.getAttribute('data-sections'));
+            console.log('Sections with Tasks JSON:', gddData.getAttribute('data-sections-with-tasks'));
+        }
+    });
+</script>
 
 <script src="{% static 'js/gdd-task-integration.js' %}"></script>
 <script src="{% static 'js/gdd-detail.js' %}"></script>
