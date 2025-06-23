@@ -38,35 +38,19 @@ class GameTaskHybridCreateView(LoginRequiredMixin, CreateView):
     form_class = GameTaskForm
     template_name = 'projects/task_form_hybrid.html'
     
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['company_section'] = self.request.GET.get('section', 'game')
+        return kwargs
+
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
         # Limit milestone choices to the current game
         game_id = self.kwargs.get('game_id')
         if game_id:
             form.fields['milestone'].queryset = GameMilestone.objects.filter(game_id=game_id)
-            form.fields['gdd_section'].queryset = GDDSection.objects.filter(gdd__game_id=game_id)
-            
-            # Get section from query parameter or default to game_development for game context
-            section = self.request.GET.get('section', 'game_development')
-            form.fields['company_section'].initial = section
-            
-            # If section is explicitly set to game_development, make the game field required
-            if section == 'game_development':
-                form.fields['game'].required = True
-        else:
-            # For global task creation, show all milestones and GDD sections
-            form.fields['milestone'].queryset = GameMilestone.objects.all()
-            form.fields['gdd_section'].queryset = GDDSection.objects.all()
-            
-            # Pre-select company section from query parameter if provided
-            section = self.request.GET.get('section', 'r1d3')
-            form.fields['company_section'].initial = section
-            
-            # For R1D3 tasks, the game field should not be required
-            if section == 'r1d3':
-                form.fields['game'].required = False
         return form
-    
+
     def form_valid(self, form):
         # Set the game for this task if provided
         game_id = self.kwargs.get('game_id')
@@ -114,8 +98,23 @@ class GameTaskHybridUpdateView(LoginRequiredMixin, UpdateView):
     form_class = GameTaskForm
     template_name = 'projects/task_form_hybrid.html'
     
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['company_section'] = self.request.GET.get('section', 'game')
+        return kwargs
+
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
+        company_section = self.request.GET.get('section', 'game')
+        
+        # Initialize form with section-specific fields
+        if company_section == 'education':
+            form.fields['course_id'].required = True
+            form.fields['learning_objective'].required = True
+        elif company_section == 'arcade':
+            form.fields['machine_id'].required = True
+            form.fields['location'].required = True
+            
         # Limit milestone choices to the current game if the task has a game
         if self.object.game:
             form.fields['milestone'].queryset = GameMilestone.objects.filter(game=self.object.game)

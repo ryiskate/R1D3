@@ -105,13 +105,33 @@ class GameTaskForm(forms.ModelForm):
         fields = [
             'title', 'description', 'task_type', 'status', 'priority',
             'milestone', 'assigned_to', 'due_date', 'estimated_hours', 'actual_hours',
-            'gdd_section'
+            'gdd_section', 'company_section', 'course_id', 'learning_objective', 'machine_id', 'location'
         ]
         widgets = {
             'description': forms.Textarea(attrs={'rows': 3}),
             'due_date': forms.DateInput(attrs={'type': 'date'}),
             'gdd_section': forms.Select(attrs={'class': 'form-select'}),
         }
+        
+    def __init__(self, *args, **kwargs):
+        self.company_section = kwargs.pop('company_section', 'game')
+        super().__init__(*args, **kwargs)
+        
+        # Initialize section-specific fields
+        if self.company_section == 'education':
+            if 'course_id' in self.fields:
+                self.fields['course_id'].required = True
+            if 'learning_objective' in self.fields:
+                self.fields['learning_objective'].required = True
+        elif self.company_section == 'arcade':
+            if 'machine_id' in self.fields:
+                self.fields['machine_id'].required = True
+            if 'location' in self.fields:
+                self.fields['location'].required = True
+            
+        # Set up game-related fields
+        if 'game' in self.fields:
+            self.fields['game'].required = (self.company_section == 'game')
 
 
 class GameBuildForm(forms.ModelForm):
