@@ -6,6 +6,9 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
+# Import the specific views we need for direct URL patterns
+from projects.debug_views import DebugAllTasksView, TemplateDebugView, DebugSidebarView
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
@@ -13,6 +16,10 @@ urlpatterns = [
     path('strategy/', include('strategy.urls')),
     path('projects/', include('projects.urls')),
     path('games/', include('projects.game_urls')),
+    # Debug URL patterns
+    path('debug-tasks/', DebugAllTasksView.as_view(), name='debug_all_tasks'),
+    path('template-debug/', TemplateDebugView.as_view(), name='template_debug'),
+    path('debug-sidebar/', DebugSidebarView.as_view(), name='debug_sidebar'),
     # Department URLs
     path('education/', include('education.urls', namespace='education')),
     path('social-media/', include('social_media.urls', namespace='social_media')),

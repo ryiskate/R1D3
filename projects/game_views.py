@@ -9,6 +9,8 @@ from django.db.models import Q, Sum, Count
 from django.utils import timezone
 from datetime import date
 
+from .task_models import GameDevelopmentTask
+from .task_forms import GameDevelopmentTaskForm
 from .game_models import (
     GameProject, GameDesignDocument, GameAsset, GameMilestone, 
     GameTask, GameBuild, PlaytestSession, PlaytestFeedback, GameBug
@@ -52,153 +54,19 @@ class GameDashboardView(LoginRequiredMixin, ListView):
         return context
 
 
-class GameTaskDetailView(LoginRequiredMixin, DetailView):
-    """
-    View details of a specific task
-    """
-    model = GameTask
-    template_name = 'projects/task_detail.html'
-    context_object_name = 'task'
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['game'] = self.object.game
-        context['today'] = date.today()
-        return context
 
 
-class GameTaskCreateView(LoginRequiredMixin, CreateView):
-    """
-    Create a new task for a game
-    """
-    model = GameTask
-    form_class = GameTaskForm
-    template_name = 'projects/task_form.html'
-    
-    def get_form(self, form_class=None):
-        form = super().get_form(form_class)
-        # Limit milestone choices to the current game
-        game_id = self.kwargs.get('game_id')
-        if game_id:
-            form.fields['milestone'].queryset = GameMilestone.objects.filter(game_id=game_id)
-        return form
-    
-    def form_valid(self, form):
-        # Set the game for this task
-        game_id = self.kwargs.get('game_id')
-        form.instance.game_id = game_id
-        
-        # Set the creator as the current user if not specified
-        if not form.instance.assigned_to:
-            form.instance.assigned_to = self.request.user
-            
-        messages.success(self.request, f"Task '{form.instance.title}' created successfully!")
-        return super().form_valid(form)
-    
-    def get_success_url(self):
-        return reverse_lazy('games:task_list', kwargs={'game_id': self.object.game.id})
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        game_id = self.kwargs.get('game_id')
-        context['game'] = get_object_or_404(GameProject, id=game_id)
-        context['title'] = 'Create New Task'
-        context['submit_text'] = 'Create Task'
-        return context
 
 
-class GameTaskUpdateView(LoginRequiredMixin, UpdateView):
-    """
-    Update an existing task
-    """
-    model = GameTask
-    form_class = GameTaskForm
-    template_name = 'projects/task_form.html'
-    
-    def get_form(self, form_class=None):
-        form = super().get_form(form_class)
-        # Limit milestone choices to the current game
-        form.fields['milestone'].queryset = GameMilestone.objects.filter(game=self.object.game)
-        return form
-    
-    def form_valid(self, form):
-        messages.success(self.request, f"Task '{form.instance.title}' updated successfully!")
-        return super().form_valid(form)
-    
-    def get_success_url(self):
-        return reverse_lazy('games:task_detail', kwargs={'pk': self.object.pk})
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['game'] = self.object.game
-        context['title'] = 'Update Task'
-        context['submit_text'] = 'Save Changes'
-        return context
 
 
-class GameTaskDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
-    """
-    Delete a task
-    """
-    model = GameTask
-    template_name = 'projects/task_confirm_delete.html'
-    context_object_name = 'task'
-    
-    def test_func(self):
-        # Only allow task deletion by staff or the task creator
-        return self.request.user.is_staff or self.get_object().assigned_to == self.request.user
-    
-    def get_success_url(self):
-        messages.success(self.request, f"Task '{self.object.title}' deleted successfully!")
-        return reverse_lazy('games:task_list', kwargs={'game_id': self.object.game.id})
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['game'] = self.object.game
-        context['today'] = date.today()
-        return context
 
 
-class GameTaskKanbanView(LoginRequiredMixin, ListView):
-    """
-    Kanban board view for tasks
-    """
-    model = GameTask
-    template_name = 'projects/task_kanban.html'
-    context_object_name = 'tasks'
-    
-    def get_queryset(self):
-        queryset = GameTask.objects.all()
-        
-        # Filter by game if provided
-        game_id = self.kwargs.get('game_id')
-        if game_id:
-            queryset = queryset.filter(game_id=game_id)
-            
-        # Filter by assigned user if requested
-        if self.request.GET.get('my_tasks'):
-            queryset = queryset.filter(assigned_to=self.request.user)
-            
-        return queryset
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        
-        # Add game to context if filtering by game
-        game_id = self.kwargs.get('game_id')
-        if game_id:
-            context['game'] = get_object_or_404(GameProject, id=game_id)
-        
-        # Group tasks by status for kanban columns
-        tasks_by_status = {}
-        for status, label in GameTask.STATUS_CHOICES:
-            tasks_by_status[status] = self.get_queryset().filter(status=status).order_by('-priority', 'due_date')
-        
-        context['tasks_by_status'] = tasks_by_status
-        context['status_choices'] = GameTask.STATUS_CHOICES
-        context['today'] = date.today()
-        
-        return context
+
+
+
+
+
 
 class GameProjectListView(LoginRequiredMixin, ListView):
     """
@@ -283,15 +151,15 @@ class GameProjectDetailView(LoginRequiredMixin, DetailView):
         # Get game milestones
         context['milestones'] = game.milestones.all().order_by('due_date')
         
-        # Get game tasks
-        context['tasks'] = game.tasks.all().order_by('-priority', 'due_date')
+        # Get game tasks - using gametask_set since there's no explicit related_name
+        context['tasks'] = GameTask.objects.filter(game=game).order_by('-priority', 'due_date')
         context['tasks_by_status'] = {
-            'backlog': game.tasks.filter(status='backlog').count(),
-            'to_do': game.tasks.filter(status='to_do').count(),
-            'in_progress': game.tasks.filter(status='in_progress').count(),
-            'in_review': game.tasks.filter(status='in_review').count(),
-            'done': game.tasks.filter(status='done').count(),
-            'blocked': game.tasks.filter(status='blocked').count(),
+            'backlog': GameTask.objects.filter(game=game, status='backlog').count(),
+            'to_do': GameTask.objects.filter(game=game, status='to_do').count(),
+            'in_progress': GameTask.objects.filter(game=game, status='in_progress').count(),
+            'in_review': GameTask.objects.filter(game=game, status='in_review').count(),
+            'done': GameTask.objects.filter(game=game, status='done').count(),
+            'blocked': GameTask.objects.filter(game=game, status='blocked').count(),
         }
         
         # Get game assets
@@ -318,153 +186,19 @@ class GameProjectDetailView(LoginRequiredMixin, DetailView):
         return context
 
 
-class GameTaskDetailView(LoginRequiredMixin, DetailView):
-    """
-    View details of a specific task
-    """
-    model = GameTask
-    template_name = 'projects/task_detail.html'
-    context_object_name = 'task'
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['game'] = self.object.game
-        context['today'] = date.today()
-        return context
 
 
-class GameTaskCreateView(LoginRequiredMixin, CreateView):
-    """
-    Create a new task for a game
-    """
-    model = GameTask
-    form_class = GameTaskForm
-    template_name = 'projects/task_form.html'
-    
-    def get_form(self, form_class=None):
-        form = super().get_form(form_class)
-        # Limit milestone choices to the current game
-        game_id = self.kwargs.get('game_id')
-        if game_id:
-            form.fields['milestone'].queryset = GameMilestone.objects.filter(game_id=game_id)
-        return form
-    
-    def form_valid(self, form):
-        # Set the game for this task
-        game_id = self.kwargs.get('game_id')
-        form.instance.game_id = game_id
-        
-        # Set the creator as the current user if not specified
-        if not form.instance.assigned_to:
-            form.instance.assigned_to = self.request.user
-            
-        messages.success(self.request, f"Task '{form.instance.title}' created successfully!")
-        return super().form_valid(form)
-    
-    def get_success_url(self):
-        return reverse_lazy('games:task_list', kwargs={'game_id': self.object.game.id})
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        game_id = self.kwargs.get('game_id')
-        context['game'] = get_object_or_404(GameProject, id=game_id)
-        context['title'] = 'Create New Task'
-        context['submit_text'] = 'Create Task'
-        return context
 
 
-class GameTaskUpdateView(LoginRequiredMixin, UpdateView):
-    """
-    Update an existing task
-    """
-    model = GameTask
-    form_class = GameTaskForm
-    template_name = 'projects/task_form.html'
-    
-    def get_form(self, form_class=None):
-        form = super().get_form(form_class)
-        # Limit milestone choices to the current game
-        form.fields['milestone'].queryset = GameMilestone.objects.filter(game=self.object.game)
-        return form
-    
-    def form_valid(self, form):
-        messages.success(self.request, f"Task '{form.instance.title}' updated successfully!")
-        return super().form_valid(form)
-    
-    def get_success_url(self):
-        return reverse_lazy('games:task_detail', kwargs={'pk': self.object.pk})
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['game'] = self.object.game
-        context['title'] = 'Update Task'
-        context['submit_text'] = 'Save Changes'
-        return context
 
 
-class GameTaskDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
-    """
-    Delete a task
-    """
-    model = GameTask
-    template_name = 'projects/task_confirm_delete.html'
-    context_object_name = 'task'
-    
-    def test_func(self):
-        # Only allow task deletion by staff or the task creator
-        return self.request.user.is_staff or self.get_object().assigned_to == self.request.user
-    
-    def get_success_url(self):
-        messages.success(self.request, f"Task '{self.object.title}' deleted successfully!")
-        return reverse_lazy('games:task_list', kwargs={'game_id': self.object.game.id})
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['game'] = self.object.game
-        context['today'] = date.today()
-        return context
 
 
-class GameTaskKanbanView(LoginRequiredMixin, ListView):
-    """
-    Kanban board view for tasks
-    """
-    model = GameTask
-    template_name = 'projects/task_kanban.html'
-    context_object_name = 'tasks'
-    
-    def get_queryset(self):
-        queryset = GameTask.objects.all()
-        
-        # Filter by game if provided
-        game_id = self.kwargs.get('game_id')
-        if game_id:
-            queryset = queryset.filter(game_id=game_id)
-            
-        # Filter by assigned user if requested
-        if self.request.GET.get('my_tasks'):
-            queryset = queryset.filter(assigned_to=self.request.user)
-            
-        return queryset
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        
-        # Add game to context if filtering by game
-        game_id = self.kwargs.get('game_id')
-        if game_id:
-            context['game'] = get_object_or_404(GameProject, id=game_id)
-        
-        # Group tasks by status for kanban columns
-        tasks_by_status = {}
-        for status, label in GameTask.STATUS_CHOICES:
-            tasks_by_status[status] = self.get_queryset().filter(status=status).order_by('-priority', 'due_date')
-        
-        context['tasks_by_status'] = tasks_by_status
-        context['status_choices'] = GameTask.STATUS_CHOICES
-        context['today'] = date.today()
-        
-        return context
+
+
+
+
+
 
 class GameProjectCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     """
@@ -520,170 +254,18 @@ class GameProjectUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView)
         return reverse_lazy('games:game_detail', kwargs={'pk': self.object.pk})
 
 
-class GameTaskDetailView(LoginRequiredMixin, DetailView):
-    """
-    View details of a specific task
-    """
-    model = GameTask
-    template_name = 'projects/task_detail.html'
-    context_object_name = 'task'
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['game'] = self.object.game
-        context['today'] = date.today()
-        return context
 
 
-class GameTaskCreateView(LoginRequiredMixin, CreateView):
-    """
-    Create a new task for a game
-    """
-    model = GameTask
-    form_class = GameTaskForm
-    template_name = 'projects/task_form.html'
-    
-    def get_form(self, form_class=None):
-        form = super().get_form(form_class)
-        # Limit milestone choices to the current game
-        game_id = self.kwargs.get('game_id')
-        if game_id:
-            form.fields['milestone'].queryset = GameMilestone.objects.filter(game_id=game_id)
-        return form
-    
-    def form_valid(self, form):
-        # Set the game for this task
-        game_id = self.kwargs.get('game_id')
-        form.instance.game_id = game_id
-        
-        # Set the creator as the current user if not specified
-        if not form.instance.assigned_to:
-            form.instance.assigned_to = self.request.user
-            
-        messages.success(self.request, f"Task '{form.instance.title}' created successfully!")
-        return super().form_valid(form)
-    
-    def get_success_url(self):
-        return reverse_lazy('games:task_list', kwargs={'game_id': self.object.game.id})
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        game_id = self.kwargs.get('game_id')
-        context['game'] = get_object_or_404(GameProject, id=game_id)
-        context['title'] = 'Create New Task'
-        context['submit_text'] = 'Create Task'
-        return context
 
 
-class GameTaskUpdateView(LoginRequiredMixin, UpdateView):
-    """
-    Update an existing task
-    """
-    model = GameTask
-    form_class = GameTaskForm
-    template_name = 'projects/task_form.html'
-    
-    def get_form(self, form_class=None):
-        form = super().get_form(form_class)
-        # Limit milestone choices to the current game
-        form.fields['milestone'].queryset = GameMilestone.objects.filter(game=self.object.game)
-        return form
-    
-    def form_valid(self, form):
-        messages.success(self.request, f"Task '{form.instance.title}' updated successfully!")
-        return super().form_valid(form)
-    
-    def get_success_url(self):
-        return reverse_lazy('games:task_detail', kwargs={'pk': self.object.pk})
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['game'] = self.object.game
-        context['title'] = 'Update Task'
-        context['submit_text'] = 'Save Changes'
-        return context
 
 
-class GameTaskDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
-    """
-    Delete a task
-    """
-    model = GameTask
-    template_name = 'projects/task_confirm_delete.html'
-    context_object_name = 'task'
-    
-    def test_func(self):
-        # Only allow task deletion by staff or the task creator
-        return self.request.user.is_staff or self.get_object().assigned_to == self.request.user
-    
-    def get_success_url(self):
-        messages.success(self.request, f"Task '{self.object.title}' deleted successfully!")
-        return reverse_lazy('games:task_list', kwargs={'game_id': self.object.game.id})
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['game'] = self.object.game
-        context['today'] = date.today()
-        return context
 
 
-class GameTaskKanbanView(LoginRequiredMixin, ListView):
-    """
-    Kanban board view for tasks
-    """
-    model = GameTask
-    template_name = 'projects/task_kanban.html'
-    context_object_name = 'tasks'
-    
-    def get_queryset(self):
-        queryset = GameTask.objects.all()
-        
-        # Filter by game if provided
-        game_id = self.kwargs.get('game_id')
-        if game_id:
-            queryset = queryset.filter(game_id=game_id)
-            
-        # Filter by assigned user if requested
-        if self.request.GET.get('my_tasks'):
-            queryset = queryset.filter(assigned_to=self.request.user)
-            
-        return queryset
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        
-        # Add game to context if filtering by game
-        game_id = self.kwargs.get('game_id')
-        if game_id:
-            context['game'] = get_object_or_404(GameProject, id=game_id)
-        
-        # Group tasks by status for kanban columns
-        tasks_by_status = {}
-        for status, label in GameTask.STATUS_CHOICES:
-            tasks_by_status[status] = self.get_queryset().filter(status=status).order_by('-priority', 'due_date')
-        
-        context['tasks_by_status'] = tasks_by_status
-        context['status_choices'] = GameTask.STATUS_CHOICES
-        context['today'] = date.today()
-        
-        return context    
-    def form_valid(self, form):
-        # Set the project lead to the current user if not specified
-        if not form.instance.lead_developer:
-            form.instance.lead_developer = self.request.user
-            
-        # Handle GitHub integration
-        if form.cleaned_data.get('github_repository'):
-            # Store GitHub token securely - in a real app, you'd encrypt this
-            # This is just a placeholder for demonstration
-            pass
-            
-        messages.success(self.request, f"Game project '{form.instance.title}' created successfully!")
-        return super().form_valid(form)
-    
-    def get_success_url(self):
-        # Redirect to the newly created game's detail page
-        return reverse_lazy('games:game_detail', kwargs={'pk': self.object.pk})
+
+
+
+
 
 
 class GameDesignDocumentView(LoginRequiredMixin, DetailView):
@@ -774,153 +356,155 @@ class GameDesignDocumentView(LoginRequiredMixin, DetailView):
         return context
 
 
-class GameTaskDetailView(LoginRequiredMixin, DetailView):
-    """
-    View details of a specific task
-    """
-    model = GameTask
-    template_name = 'projects/task_detail.html'
-    context_object_name = 'task'
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['game'] = self.object.game
-        context['today'] = date.today()
-        return context
 
 
-class GameTaskCreateView(LoginRequiredMixin, CreateView):
-    """
-    Create a new task for a game
-    """
-    model = GameTask
-    form_class = GameTaskForm
-    template_name = 'projects/task_form.html'
-    
-    def get_form(self, form_class=None):
-        form = super().get_form(form_class)
-        # Limit milestone choices to the current game
-        game_id = self.kwargs.get('game_id')
-        if game_id:
-            form.fields['milestone'].queryset = GameMilestone.objects.filter(game_id=game_id)
-        return form
-    
-    def form_valid(self, form):
-        # Set the game for this task
-        game_id = self.kwargs.get('game_id')
-        form.instance.game_id = game_id
-        
-        # Set the creator as the current user if not specified
-        if not form.instance.assigned_to:
-            form.instance.assigned_to = self.request.user
-            
-        messages.success(self.request, f"Task '{form.instance.title}' created successfully!")
-        return super().form_valid(form)
-    
-    def get_success_url(self):
-        return reverse_lazy('games:task_list', kwargs={'game_id': self.object.game.id})
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        game_id = self.kwargs.get('game_id')
-        context['game'] = get_object_or_404(GameProject, id=game_id)
-        context['title'] = 'Create New Task'
-        context['submit_text'] = 'Create Task'
-        return context
 
 
-class GameTaskUpdateView(LoginRequiredMixin, UpdateView):
-    """
-    Update an existing task
-    """
-    model = GameTask
-    form_class = GameTaskForm
-    template_name = 'projects/task_form.html'
-    
-    def get_form(self, form_class=None):
-        form = super().get_form(form_class)
-        # Limit milestone choices to the current game
-        form.fields['milestone'].queryset = GameMilestone.objects.filter(game=self.object.game)
-        return form
-    
-    def form_valid(self, form):
-        messages.success(self.request, f"Task '{form.instance.title}' updated successfully!")
-        return super().form_valid(form)
-    
-    def get_success_url(self):
-        return reverse_lazy('games:task_detail', kwargs={'pk': self.object.pk})
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['game'] = self.object.game
-        context['title'] = 'Update Task'
-        context['submit_text'] = 'Save Changes'
-        return context
 
 
-class GameTaskDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
-    """
-    Delete a task
-    """
-    model = GameTask
-    template_name = 'projects/task_confirm_delete.html'
-    context_object_name = 'task'
-    
-    def test_func(self):
-        # Only allow task deletion by staff or the task creator
-        return self.request.user.is_staff or self.get_object().assigned_to == self.request.user
-    
-    def get_success_url(self):
-        messages.success(self.request, f"Task '{self.object.title}' deleted successfully!")
-        return reverse_lazy('games:task_list', kwargs={'game_id': self.object.game.id})
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['game'] = self.object.game
-        context['today'] = date.today()
-        return context
 
 
-class GameTaskKanbanView(LoginRequiredMixin, ListView):
+
+
+
+
+
+
+class GameAssetListView(LoginRequiredMixin, ListView):
     """
-    Kanban board view for tasks
+    List assets for a game with filtering and sorting options
     """
-    model = GameTask
-    template_name = 'projects/task_kanban.html'
-    context_object_name = 'tasks'
+    model = GameAsset
+    template_name = 'projects/asset_list.html'
+    context_object_name = 'assets'
+    paginate_by = 12
     
     def get_queryset(self):
-        queryset = GameTask.objects.all()
-        
-        # Filter by game if provided
         game_id = self.kwargs.get('game_id')
-        if game_id:
-            queryset = queryset.filter(game_id=game_id)
-            
-        # Filter by assigned user if requested
-        if self.request.GET.get('my_tasks'):
-            queryset = queryset.filter(assigned_to=self.request.user)
+        queryset = GameAsset.objects.filter(game_id=game_id)
+        
+        # Apply filters
+        type_filter = self.request.GET.get('type')
+        status_filter = self.request.GET.get('status')
+        search_query = self.request.GET.get('search')
+        sort_by = self.request.GET.get('sort')
+        
+        if type_filter:
+            queryset = queryset.filter(asset_type=type_filter)
+        
+        if status_filter:
+            queryset = queryset.filter(status=status_filter)
+        
+        if search_query:
+            queryset = queryset.filter(
+                models.Q(name__icontains=search_query) |
+                models.Q(description__icontains=search_query) |
+                models.Q(subtype__icontains=search_query) |
+                models.Q(tags__icontains=search_query)
+            )
+        
+        # Apply sorting
+        if sort_by == 'name':
+            queryset = queryset.order_by('name')
+        elif sort_by == 'type':
+            queryset = queryset.order_by('asset_type', 'name')
+        elif sort_by == 'status':
+            queryset = queryset.order_by('status', 'name')
+        elif sort_by == 'date':
+            queryset = queryset.order_by('-created_at')
+        else:
+            queryset = queryset.order_by('-created_at')  # Default sort
             
         return queryset
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        
-        # Add game to context if filtering by game
         game_id = self.kwargs.get('game_id')
-        if game_id:
-            context['game'] = get_object_or_404(GameProject, id=game_id)
+        context['game'] = get_object_or_404(GameProject, id=game_id)
         
-        # Group tasks by status for kanban columns
-        tasks_by_status = {}
-        for status, label in GameTask.STATUS_CHOICES:
-            tasks_by_status[status] = self.get_queryset().filter(status=status).order_by('-priority', 'due_date')
-        
-        context['tasks_by_status'] = tasks_by_status
-        context['status_choices'] = GameTask.STATUS_CHOICES
-        context['today'] = date.today()
+        # Pass filter parameters to context
+        context['type_filter'] = self.request.GET.get('type')
+        context['status_filter'] = self.request.GET.get('status')
+        context['search_query'] = self.request.GET.get('search')
+        context['sort_by'] = self.request.GET.get('sort', 'date')
         
         return context
+
+
+class GameAssetCreateView(LoginRequiredMixin, CreateView):
+    """
+    Create a new asset for a game
+    """
+    model = GameAsset
+    form_class = GameAssetForm
+    template_name = 'projects/asset_form.html'
+    
+    def get_success_url(self):
+        return reverse('games:asset_list', kwargs={'game_id': self.object.game.id})
+    
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        # If you need to customize the form, do it here
+        return kwargs
+    
+    def form_valid(self, form):
+        form.instance.game_id = self.kwargs.get('game_id')
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        game_id = self.kwargs.get('game_id')
+        context['game'] = get_object_or_404(GameProject, id=game_id)
+        return context
+
+
+class GameAssetUpdateView(LoginRequiredMixin, UpdateView):
+    """
+    Update an existing game asset
+    """
+    model = GameAsset
+    form_class = GameAssetForm
+    template_name = 'projects/asset_form.html'
+    pk_url_kwarg = 'asset_id'
+    
+    def get_success_url(self):
+        return reverse('games:asset_list', kwargs={'game_id': self.object.game.id})
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['game'] = self.object.game
+        return context
+
+
+class GameAssetDetailView(LoginRequiredMixin, DetailView):
+    """
+    View details of a specific asset
+    """
+    model = GameAsset
+    template_name = 'projects/asset_detail.html'
+    context_object_name = 'asset'
+    pk_url_kwarg = 'asset_id'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['game'] = self.object.game
+        return context
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 class GameDesignDocumentCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
     """
@@ -1086,153 +670,19 @@ class GameAssetDetailView(LoginRequiredMixin, DetailView):
         return context
 
 
-class GameTaskDetailView(LoginRequiredMixin, DetailView):
-    """
-    View details of a specific task
-    """
-    model = GameTask
-    template_name = 'projects/task_detail.html'
-    context_object_name = 'task'
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['game'] = self.object.game
-        context['today'] = date.today()
-        return context
 
 
-class GameTaskCreateView(LoginRequiredMixin, CreateView):
-    """
-    Create a new task for a game
-    """
-    model = GameTask
-    form_class = GameTaskForm
-    template_name = 'projects/task_form.html'
-    
-    def get_form(self, form_class=None):
-        form = super().get_form(form_class)
-        # Limit milestone choices to the current game
-        game_id = self.kwargs.get('game_id')
-        if game_id:
-            form.fields['milestone'].queryset = GameMilestone.objects.filter(game_id=game_id)
-        return form
-    
-    def form_valid(self, form):
-        # Set the game for this task
-        game_id = self.kwargs.get('game_id')
-        form.instance.game_id = game_id
-        
-        # Set the creator as the current user if not specified
-        if not form.instance.assigned_to:
-            form.instance.assigned_to = self.request.user
-            
-        messages.success(self.request, f"Task '{form.instance.title}' created successfully!")
-        return super().form_valid(form)
-    
-    def get_success_url(self):
-        return reverse_lazy('games:task_list', kwargs={'game_id': self.object.game.id})
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        game_id = self.kwargs.get('game_id')
-        context['game'] = get_object_or_404(GameProject, id=game_id)
-        context['title'] = 'Create New Task'
-        context['submit_text'] = 'Create Task'
-        return context
 
 
-class GameTaskUpdateView(LoginRequiredMixin, UpdateView):
-    """
-    Update an existing task
-    """
-    model = GameTask
-    form_class = GameTaskForm
-    template_name = 'projects/task_form.html'
-    
-    def get_form(self, form_class=None):
-        form = super().get_form(form_class)
-        # Limit milestone choices to the current game
-        form.fields['milestone'].queryset = GameMilestone.objects.filter(game=self.object.game)
-        return form
-    
-    def form_valid(self, form):
-        messages.success(self.request, f"Task '{form.instance.title}' updated successfully!")
-        return super().form_valid(form)
-    
-    def get_success_url(self):
-        return reverse_lazy('games:task_detail', kwargs={'pk': self.object.pk})
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['game'] = self.object.game
-        context['title'] = 'Update Task'
-        context['submit_text'] = 'Save Changes'
-        return context
 
 
-class GameTaskDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
-    """
-    Delete a task
-    """
-    model = GameTask
-    template_name = 'projects/task_confirm_delete.html'
-    context_object_name = 'task'
-    
-    def test_func(self):
-        # Only allow task deletion by staff or the task creator
-        return self.request.user.is_staff or self.get_object().assigned_to == self.request.user
-    
-    def get_success_url(self):
-        messages.success(self.request, f"Task '{self.object.title}' deleted successfully!")
-        return reverse_lazy('games:task_list', kwargs={'game_id': self.object.game.id})
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['game'] = self.object.game
-        context['today'] = date.today()
-        return context
 
 
-class GameTaskKanbanView(LoginRequiredMixin, ListView):
-    """
-    Kanban board view for tasks
-    """
-    model = GameTask
-    template_name = 'projects/task_kanban.html'
-    context_object_name = 'tasks'
-    
-    def get_queryset(self):
-        queryset = GameTask.objects.all()
-        
-        # Filter by game if provided
-        game_id = self.kwargs.get('game_id')
-        if game_id:
-            queryset = queryset.filter(game_id=game_id)
-            
-        # Filter by assigned user if requested
-        if self.request.GET.get('my_tasks'):
-            queryset = queryset.filter(assigned_to=self.request.user)
-            
-        return queryset
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        
-        # Add game to context if filtering by game
-        game_id = self.kwargs.get('game_id')
-        if game_id:
-            context['game'] = get_object_or_404(GameProject, id=game_id)
-        
-        # Group tasks by status for kanban columns
-        tasks_by_status = {}
-        for status, label in GameTask.STATUS_CHOICES:
-            tasks_by_status[status] = self.get_queryset().filter(status=status).order_by('-priority', 'due_date')
-        
-        context['tasks_by_status'] = tasks_by_status
-        context['status_choices'] = GameTask.STATUS_CHOICES
-        context['today'] = date.today()
-        
-        return context
+
+
+
+
+
 
 class GameAssetCreateView(LoginRequiredMixin, CreateView):
     """
@@ -1259,95 +709,68 @@ class GameAssetCreateView(LoginRequiredMixin, CreateView):
         return context
 
 
-class GameTaskDetailView(LoginRequiredMixin, DetailView):
-    """
-    View details of a specific task
-    """
-    model = GameTask
-    template_name = 'projects/task_detail.html'
-    context_object_name = 'task'
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['game'] = self.object.game
-        context['today'] = date.today()
-        return context
 
 
-class GameTaskCreateView(LoginRequiredMixin, CreateView):
+
+
+
+
+
+
+
+
+
+
+
+
+class GameAssetCreateView(LoginRequiredMixin, CreateView):
     """
-    Create a new task for a game
+    Create a new game asset
     """
-    model = GameTask
-    form_class = GameTaskForm
-    template_name = 'projects/task_form.html'
-    
-    def get_form(self, form_class=None):
-        form = super().get_form(form_class)
-        # Limit milestone choices to the current game
-        game_id = self.kwargs.get('game_id')
-        if game_id:
-            form.fields['milestone'].queryset = GameMilestone.objects.filter(game_id=game_id)
-        return form
+    model = GameAsset
+    form_class = GameAssetForm
+    template_name = 'projects/asset_form.html'
     
     def form_valid(self, form):
-        # Set the game for this task
         game_id = self.kwargs.get('game_id')
-        form.instance.game_id = game_id
-        
-        # Set the creator as the current user if not specified
-        if not form.instance.assigned_to:
-            form.instance.assigned_to = self.request.user
-            
-        messages.success(self.request, f"Task '{form.instance.title}' created successfully!")
+        form.instance.game = get_object_or_404(GameProject, id=game_id)
+        form.instance.created_by = self.request.user
+        messages.success(self.request, "Asset created successfully!")
         return super().form_valid(form)
     
     def get_success_url(self):
-        return reverse_lazy('games:task_list', kwargs={'game_id': self.object.game.id})
+        return reverse_lazy('games:asset_list', kwargs={'game_id': self.object.game.id})
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         game_id = self.kwargs.get('game_id')
         context['game'] = get_object_or_404(GameProject, id=game_id)
-        context['title'] = 'Create New Task'
-        context['submit_text'] = 'Create Task'
         return context
 
 
-class GameTaskUpdateView(LoginRequiredMixin, UpdateView):
-    """
-    Update an existing task
-    """
-    model = GameTask
-    form_class = GameTaskForm
-    template_name = 'projects/task_form.html'
-    
-    def get_form(self, form_class=None):
-        form = super().get_form(form_class)
-        # Limit milestone choices to the current game
-        form.fields['milestone'].queryset = GameMilestone.objects.filter(game=self.object.game)
-        return form
-    
-    def form_valid(self, form):
-        messages.success(self.request, f"Task '{form.instance.title}' updated successfully!")
-        return super().form_valid(form)
-    
-    def get_success_url(self):
-        return reverse_lazy('games:task_detail', kwargs={'pk': self.object.pk})
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['game'] = self.object.game
-        context['title'] = 'Update Task'
-        context['submit_text'] = 'Save Changes'
-        return context
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# GameTaskDashboardView has been moved to game_task_dashboard_view.py
+# This reduces code duplication and centralizes the dashboard functionality
 
 
 class GameTaskDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     """
-    Delete a task
+    Delete a game development task
     """
-    model = GameTask
+    model = GameDevelopmentTask
     template_name = 'projects/task_confirm_delete.html'
     context_object_name = 'task'
     
@@ -1368,14 +791,14 @@ class GameTaskDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 class GameTaskKanbanView(LoginRequiredMixin, ListView):
     """
-    Kanban board view for tasks
+    Kanban board view for game development tasks
     """
-    model = GameTask
+    model = GameDevelopmentTask
     template_name = 'projects/task_kanban.html'
     context_object_name = 'tasks'
     
     def get_queryset(self):
-        queryset = GameTask.objects.all()
+        queryset = GameDevelopmentTask.objects.all()
         
         # Filter by game if provided
         game_id = self.kwargs.get('game_id')
@@ -1398,7 +821,7 @@ class GameTaskKanbanView(LoginRequiredMixin, ListView):
         
         # Group tasks by status for kanban columns
         tasks_by_status = {}
-        for status, label in GameTask.STATUS_CHOICES:
+        for status, label in self.model.STATUS_CHOICES:
             tasks_by_status[status] = self.get_queryset().filter(status=status).order_by('-priority', 'due_date')
         
         context['tasks_by_status'] = tasks_by_status
@@ -1406,155 +829,97 @@ class GameTaskKanbanView(LoginRequiredMixin, ListView):
         context['today'] = date.today()
         
         return context
+
+
+class GameTaskCreateView(LoginRequiredMixin, CreateView):
+    """
+    Create a new game development task for a game
+    """
+    model = GameDevelopmentTask
+    form_class = GameDevelopmentTaskForm
+    template_name = 'projects/task_form.html'
+    
+    def get_success_url(self):
+        messages.success(self.request, f"Task '{self.object.title}' created successfully!")
+        return reverse_lazy('games:task_list', kwargs={'game_id': self.object.game.id})
+    
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        # Add game_id to form kwargs for filtering related fields
+        kwargs['game_id'] = self.kwargs.get('game_id')
+        return kwargs
+    
+    def form_valid(self, form):
+        # Set the game for the task
+        form.instance.game_id = self.kwargs.get('game_id')
+        # Set the created_by field to the current user
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        game_id = self.kwargs.get('game_id')
+        context['game'] = get_object_or_404(GameProject, id=game_id)
+        context['today'] = date.today()
+        return context
+
+
+class GameTaskDetailView(LoginRequiredMixin, DetailView):
+    """
+    View details of a specific game development task
+    """
+    model = GameDevelopmentTask
+    template_name = 'projects/task_detail.html'
+    context_object_name = 'task'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Only set game in context if it exists
+        if hasattr(self.object, 'game') and self.object.game is not None:
+            context['game'] = self.object.game
+        else:
+            context['game'] = None
+            
+        context['status_choices'] = self.model.STATUS_CHOICES
+        context['priority_choices'] = self.model.PRIORITY_CHOICES
+        context['today'] = date.today()
+        
+        # Get related tasks
+        if hasattr(self.object, 'related_tasks') and self.object.related_tasks.exists():
+            context['related_tasks'] = self.object.related_tasks.all()
+        
+        # Get task comments
+        if hasattr(self.object, 'comments'):
+            context['comments'] = self.object.comments.order_by('-created_at')
+        
+        return context
+
+
+class GameTaskUpdateView(LoginRequiredMixin, UpdateView):
+    """
+    Update an existing game development task
+    """
+    model = GameDevelopmentTask
+    form_class = GameDevelopmentTaskForm
+    template_name = 'projects/task_form.html'
+    
+    def get_success_url(self):
+        messages.success(self.request, f"Task '{self.object.title}' updated successfully!")
+        return reverse_lazy('games:task_detail', kwargs={'pk': self.object.id})
+    
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        # Add game_id to form kwargs for filtering related fields
+        kwargs['game_id'] = self.object.game.id
+        return kwargs
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['game'] = self.object.game
+        context['today'] = date.today()
+        context['is_update'] = True
+        return context
+
 
 # GameTaskListView has been removed as it's been replaced by GameTaskDashboardView
 # This reduces potential security vulnerabilities from unused views
-
-
-class GameTaskDetailView(LoginRequiredMixin, DetailView):
-    """
-    View details of a specific task
-    """
-    model = GameTask
-    template_name = 'projects/task_detail.html'
-    context_object_name = 'task'
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['game'] = self.object.game
-        context['today'] = date.today()
-        return context
-
-
-class GameTaskCreateView(LoginRequiredMixin, CreateView):
-    """
-    Create a new task for a game
-    """
-    model = GameTask
-    form_class = GameTaskForm
-    template_name = 'projects/task_form.html'
-    
-    def get_form(self, form_class=None):
-        form = super().get_form(form_class)
-        # Limit milestone choices to the current game
-        game_id = self.kwargs.get('game_id')
-        if game_id:
-            form.fields['milestone'].queryset = GameMilestone.objects.filter(game_id=game_id)
-        return form
-    
-    def form_valid(self, form):
-        # Set the game for this task
-        game_id = self.kwargs.get('game_id')
-        form.instance.game_id = game_id
-        
-        # Set the creator as the current user if not specified
-        if not form.instance.assigned_to:
-            form.instance.assigned_to = self.request.user
-            
-        messages.success(self.request, f"Task '{form.instance.title}' created successfully!")
-        return super().form_valid(form)
-    
-    def get_success_url(self):
-        return reverse_lazy('games:task_list', kwargs={'game_id': self.object.game.id})
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        game_id = self.kwargs.get('game_id')
-        context['game'] = get_object_or_404(GameProject, id=game_id)
-        context['title'] = 'Create New Task'
-        context['submit_text'] = 'Create Task'
-        return context
-
-
-class GameTaskUpdateView(LoginRequiredMixin, UpdateView):
-    """
-    Update an existing task
-    """
-    model = GameTask
-    form_class = GameTaskForm
-    template_name = 'projects/task_form.html'
-    
-    def get_form(self, form_class=None):
-        form = super().get_form(form_class)
-        # Limit milestone choices to the current game
-        form.fields['milestone'].queryset = GameMilestone.objects.filter(game=self.object.game)
-        return form
-    
-    def form_valid(self, form):
-        messages.success(self.request, f"Task '{form.instance.title}' updated successfully!")
-        return super().form_valid(form)
-    
-    def get_success_url(self):
-        return reverse_lazy('games:task_detail', kwargs={'pk': self.object.pk})
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['game'] = self.object.game
-        context['title'] = 'Update Task'
-        context['submit_text'] = 'Save Changes'
-        return context
-
-
-class GameTaskDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
-    """
-    Delete a task
-    """
-    model = GameTask
-    template_name = 'projects/task_confirm_delete.html'
-    context_object_name = 'task'
-    
-    def test_func(self):
-        # Only allow task deletion by staff or the task creator
-        return self.request.user.is_staff or self.get_object().assigned_to == self.request.user
-    
-    def get_success_url(self):
-        messages.success(self.request, f"Task '{self.object.title}' deleted successfully!")
-        return reverse_lazy('games:task_list', kwargs={'game_id': self.object.game.id})
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['game'] = self.object.game
-        context['today'] = date.today()
-        return context
-
-
-class GameTaskKanbanView(LoginRequiredMixin, ListView):
-    """
-    Kanban board view for tasks
-    """
-    model = GameTask
-    template_name = 'projects/task_kanban.html'
-    context_object_name = 'tasks'
-    
-    def get_queryset(self):
-        queryset = GameTask.objects.all()
-        
-        # Filter by game if provided
-        game_id = self.kwargs.get('game_id')
-        if game_id:
-            queryset = queryset.filter(game_id=game_id)
-            
-        # Filter by assigned user if requested
-        if self.request.GET.get('my_tasks'):
-            queryset = queryset.filter(assigned_to=self.request.user)
-            
-        return queryset
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        
-        # Add game to context if filtering by game
-        game_id = self.kwargs.get('game_id')
-        if game_id:
-            context['game'] = get_object_or_404(GameProject, id=game_id)
-        
-        # Group tasks by status for kanban columns
-        tasks_by_status = {}
-        for status, label in GameTask.STATUS_CHOICES:
-            tasks_by_status[status] = self.get_queryset().filter(status=status).order_by('-priority', 'due_date')
-        
-        context['tasks_by_status'] = tasks_by_status
-        context['status_choices'] = GameTask.STATUS_CHOICES
-        context['today'] = date.today()
-        
-        return context

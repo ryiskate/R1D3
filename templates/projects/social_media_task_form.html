@@ -1,0 +1,129 @@
+{% extends "projects/unified_task_form.html" %}
+{% load crispy_forms_filters %}
+
+{% block section_css %}
+<style>
+    .social-media-badge {
+        background-color: #4e73df;
+    }
+    .campaign-info {
+        border-left: 4px solid #4e73df;
+        padding-left: 15px;
+    }
+    .channel-icons {
+        display: flex;
+        justify-content: space-around;
+        margin: 15px 0;
+    }
+    .channel-icons i {
+        font-size: 2rem;
+        color: #4e73df;
+    }
+    .metrics-info {
+        background-color: #f8f9fc;
+        border-radius: 5px;
+        padding: 10px;
+        margin-bottom: 15px;
+    }
+</style>
+{% endblock %}
+
+{% block form_title %}
+    {% if form.instance.id %}
+    <h1 class="h3 mb-4 text-gray-800">Update Social Media Task</h1>
+    {% else %}
+    <h1 class="h3 mb-4 text-gray-800">Create New Social Media Task</h1>
+    {% endif %}
+{% endblock %}
+
+{% block section_badge %}
+<span class="badge social-media-badge rounded-pill">
+    <i class="fas fa-hashtag me-1"></i> Social Media
+</span>
+{% endblock %}
+
+{% block section_specific_fields %}
+<div class="card mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">
+            <i class="fas fa-hashtag me-1"></i> Social Media Details
+        </h6>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                {{ form.campaign_id|as_crispy_field }}
+            </div>
+            <div class="col-md-6">
+                {{ form.channel|as_crispy_field }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                {{ form.target_metrics|as_crispy_field }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block sidebar_content %}
+<div class="card mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">
+            <i class="fas fa-info-circle me-1"></i> Social Media Information
+        </h6>
+    </div>
+    <div class="card-body">
+        <div class="channel-icons">
+            <i class="fab fa-facebook"></i>
+            <i class="fab fa-twitter"></i>
+            <i class="fab fa-instagram"></i>
+            <i class="fab fa-tiktok"></i>
+            <i class="fab fa-youtube"></i>
+        </div>
+        
+        <div class="campaign-info mb-3">
+            <h5>Campaign Types</h5>
+            <ul class="list-unstyled small">
+                <li><i class="fas fa-bullhorn me-2"></i> Product Launch</li>
+                <li><i class="fas fa-chart-line me-2"></i> Brand Awareness</li>
+                <li><i class="fas fa-users me-2"></i> Community Engagement</li>
+                <li><i class="fas fa-ticket-alt me-2"></i> Event Promotion</li>
+                <li><i class="fas fa-percentage me-2"></i> Sales & Promotions</li>
+            </ul>
+        </div>
+        
+        <div class="metrics-info">
+            <h5>Key Metrics</h5>
+            <ul class="small">
+                <li><strong>Engagement:</strong> Likes, comments, shares</li>
+                <li><strong>Reach:</strong> Number of unique viewers</li>
+                <li><strong>Conversion:</strong> Click-through rates</li>
+                <li><strong>Growth:</strong> New followers/subscribers</li>
+                <li><strong>Sentiment:</strong> Positive/negative feedback</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block section_js %}
+<script>
+    $(document).ready(function() {
+        // Initialize select2 for campaign dropdown
+        $('#id_campaign_id').select2({
+            placeholder: "Select a campaign",
+            allowClear: true,
+            width: '100%'
+        });
+        
+        // Initialize select2 for channel dropdown
+        $('#id_channel').select2({
+            placeholder: "Select channel",
+            allowClear: true,
+            width: '100%'
+        });
+    });
+</script>
+{% endblock %}

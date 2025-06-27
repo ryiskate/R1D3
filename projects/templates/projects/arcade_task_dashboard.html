@@ -1,0 +1,355 @@
+{% extends "projects/unified_task_dashboard.html" %}
+{% load static %}
+
+{% block title %}Arcade Tasks Dashboard{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+  .machine-badge {
+    background-color: #e74a3b;
+    color: white;
+    border-radius: 50px;
+    padding: 0.35em 0.65em;
+    font-size: 0.75em;
+  }
+  .location-badge {
+    background-color: #4e73df;
+    color: white;
+    border-radius: 50px;
+    padding: 0.35em 0.65em;
+    font-size: 0.75em;
+  }
+  .maintenance-badge {
+    background-color: #f6c23e;
+    color: #333;
+    border-radius: 50px;
+    padding: 0.35em 0.65em;
+    font-size: 0.75em;
+  }
+  .arcade-icon {
+    color: #e74a3b;
+  }
+  .machine-card {
+    border-left: 0.25rem solid #e74a3b;
+  }
+  .progress-bar-custom {
+    display: block;
+    height: 100%;
+    background-color: #1cc88a;
+    color: white;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <!-- Page Heading -->
+  <div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">
+      Arcade Tasks Dashboard
+    </h1>
+    <div>
+      <a href="{% url 'projects:arcade_task_create' %}" class="btn btn-primary btn-icon-split">
+        <span class="icon text-white-50">
+          <i class="fas fa-plus"></i>
+        </span>
+        <span class="text">New Task</span>
+      </a>
+      <a href="#" class="btn btn-info btn-icon-split" data-toggle="modal" data-target="#filterModal">
+        <span class="icon text-white-50">
+          <i class="fas fa-filter"></i>
+        </span>
+        <span class="text">Filter</span>
+      </a>
+      <a href="#" class="btn btn-success btn-icon-split" data-toggle="modal" data-target="#batchUpdateModal">
+        <span class="icon text-white-50">
+          <i class="fas fa-tasks"></i>
+        </span>
+        <span class="text">Batch Update</span>
+      </a>
+      <a href="?" class="btn btn-secondary btn-icon-split">
+        <span class="icon text-white-50">
+          <i class="fas fa-undo"></i>
+        </span>
+        <span class="text">Clear Filters</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Task Statistics Cards -->
+  {{ block.super }}
+
+  <!-- Arcade-specific Location Breakdown -->
+  <div class="row">
+    <div class="col-xl-8 col-lg-7">
+      <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+          <h6 class="m-0 font-weight-bold text-primary">Tasks by Location</h6>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-bordered" width="100%" cellspacing="0">
+              <thead>
+                <tr>
+                  <th>Location</th>
+                  <th>Total Tasks</th>
+                  <th>Completed</th>
+                  <th>Progress</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for location, count in location_stats.items %}
+                <tr>
+                  <td>
+                    <span class="location-badge">{{ location }}</span>
+                  </td>
+                  <td>{{ count.total }}</td>
+                  <td>{{ count.completed }}</td>
+                  <td>
+                    <div class="progress">
+                      <div class="progress-bar bg-success progress-bar-custom" role="progressbar" 
+                           aria-valuenow="{{ count.percentage }}" aria-valuemin="0" aria-valuemax="100"
+                           style="width: {{ count.percentage }}%">
+                        {{ count.percentage }}%
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="4" class="text-center">No location data available</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-4 col-lg-5">
+      <div class="card shadow mb-4">
+        <div class="card-header py-3">
+          <h6 class="m-0 font-weight-bold text-primary">Maintenance Types</h6>
+        </div>
+        <div class="card-body">
+          <div class="chart-pie pt-4">
+            <ul class="list-group">
+              {% for maintenance_type, count in maintenance_types.items %}
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                {{ maintenance_type }}
+                <span class="badge bg-primary rounded-pill">{{ count }}</span>
+              </li>
+              {% empty %}
+              <li class="list-group-item">No maintenance type data available</li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Machine Status Section -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card shadow mb-4">
+        <div class="card-header py-3">
+          <h6 class="m-0 font-weight-bold text-primary">Machine Status</h6>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            {% for machine in machines %}
+            <div class="col-lg-4 col-md-6 mb-4">
+              <div class="card machine-card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                  <h6 class="font-weight-bold m-0">{{ machine.name }}</h6>
+                  <span class="machine-badge">{{ machine.machine_id }}</span>
+                </div>
+                <div class="card-body">
+                  <p><strong>Location:</strong> <span class="location-badge">{{ machine.location }}</span></p>
+                  <p><strong>Status:</strong> 
+                    <span class="badge {% if machine.status == 'operational' %}bg-success{% elif machine.status == 'maintenance' %}bg-warning{% else %}bg-danger{% endif %} text-white">
+                      {{ machine.status|title }}
+                    </span>
+                  </p>
+                  <p><strong>Open Tasks:</strong> {{ machine.open_tasks }}</p>
+                  <a href="?machine_id={{ machine.machine_id }}" class="btn btn-sm btn-primary">
+                    View Tasks
+                  </a>
+                </div>
+              </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+              <p class="text-center">No machine data available</p>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Task List Section -->
+  <div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+      <h6 class="m-0 font-weight-bold text-primary">Arcade Tasks</h6>
+      <div class="dropdown no-arrow">
+        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+        </a>
+        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+          <div class="dropdown-header">Actions:</div>
+          <a class="dropdown-item" href="{% url 'projects:arcade_task_create' %}">Create New Task</a>
+          <a class="dropdown-item" href="#" data-toggle="modal" data-target="#batchUpdateModal">Batch Update</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="#" data-toggle="modal" data-target="#filterModal">Filter Tasks</a>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-bordered" id="taskTable" width="100%" cellspacing="0">
+          <thead>
+            <tr>
+              <th><input type="checkbox" id="selectAll"></th>
+              <th>Title</th>
+              <th>Machine ID</th>
+              <th>Location</th>
+              <th>Maintenance Type</th>
+              <th>Status</th>
+              <th>Priority</th>
+              <th>Due Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for task in tasks %}
+            <tr>
+              <td><input type="checkbox" class="task-checkbox" value="{{ task.id }}"></td>
+              <td>{{ task.title }}</td>
+              <td>
+                {% if task.machine_id %}
+                <span class="machine-badge">{{ task.machine_id }}</span>
+                {% else %}
+                <span class="text-muted">N/A</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if task.location %}
+                <span class="location-badge">{{ task.location }}</span>
+                {% else %}
+                <span class="text-muted">N/A</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if task.maintenance_type %}
+                <span class="maintenance-badge">{{ task.maintenance_type }}</span>
+                {% else %}
+                <span class="text-muted">N/A</span>
+                {% endif %}
+              </td>
+              <td>
+                <span class="badge status-badge 
+                  {% if task.status == 'done' %}bg-success text-white{% endif %}
+                  {% if task.status == 'in_progress' %}bg-primary text-white{% endif %}
+                  {% if task.status == 'to_do' %}bg-info text-white{% endif %}
+                  {% if task.status == 'backlog' %}bg-secondary text-white{% endif %}
+                  {% if task.status == 'blocked' %}bg-danger text-white{% endif %}
+                  {% if task.status == 'in_review' %}bg-warning text-dark{% endif %}
+                ">
+                  {{ task.get_status_display }}
+                </span>
+              </td>
+              <td>
+                <span class="badge priority-badge
+                  {% if task.priority == 'high' %}bg-danger text-white{% endif %}
+                  {% if task.priority == 'medium' %}bg-warning text-dark{% endif %}
+                  {% if task.priority == 'low' %}bg-info text-white{% endif %}
+                ">
+                  {{ task.get_priority_display }}
+                </span>
+              </td>
+              <td>
+                {% if task.due_date %}
+                  {% if task.due_date < today and task.status != 'done' %}
+                    <span class="text-danger">{{ task.due_date }}</span>
+                  {% else %}
+                    {{ task.due_date }}
+                  {% endif %}
+                {% else %}
+                  <span class="text-muted">No date</span>
+                {% endif %}
+              </td>
+              <td>
+                <a href="{% url 'projects:arcade_task_detail' task.id %}" class="btn btn-info btn-sm">
+                  <i class="fas fa-eye"></i>
+                </a>
+                <a href="{% url 'projects:arcade_task_update' task.id %}" class="btn btn-primary btn-sm">
+                  <i class="fas fa-edit"></i>
+                </a>
+                <a href="{% url 'projects:arcade_task_delete' task.id %}" class="btn btn-danger btn-sm">
+                  <i class="fas fa-trash"></i>
+                </a>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="9" class="text-center">No tasks found</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+  $(document).ready(function() {
+    // Arcade-specific JavaScript can go here
+    
+    // Update batch update URL for arcade tasks
+    $('#batchUpdateButton').click(function() {
+      const selectedTasks = [];
+      $('.task-checkbox:checked').each(function() {
+        selectedTasks.push($(this).val());
+      });
+      
+      if (selectedTasks.length === 0) {
+        alert('Please select at least one task to update.');
+        return;
+      }
+      
+      const formData = {
+        task_ids: selectedTasks,
+        status: $('#batchStatus').val(),
+        priority: $('#batchPriority').val(),
+        assigned_to: $('#batchAssignedTo').val()
+      };
+      
+      $.ajax({
+        url: '{% url "projects:arcade_task_batch_update" %}',
+        type: 'POST',
+        data: JSON.stringify(formData),
+        contentType: 'application/json',
+        headers: {
+          'X-CSRFToken': '{{ csrf_token }}'
+        },
+        success: function(response) {
+          location.reload();
+        },
+        error: function(error) {
+          console.error('Error updating tasks:', error);
+          alert('An error occurred while updating tasks. Please try again.');
+        }
+      });
+    });
+  });
+</script>
+{% endblock %}

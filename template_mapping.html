@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>R1D3 Template Mapping</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #444;
+            margin-top: 20px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) { 
+            background-color: #f9f9f9;
+        }
+        .active {
+            background-color: #e6f7ff;
+            font-weight: bold;
+        }
+        .unused {
+            background-color: #ffeeee;
+        }
+        .remove {
+            background-color: #ffeeee;
+            text-decoration: line-through;
+        }
+        .note {
+            font-style: italic;
+        }
+        .verified {
+            background-color: #d4edda !important;
+        }
+        .legend {
+            margin: 20px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            color: #666;
+        }
+        .section {
+            background-color: #f8f9fa;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #007bff;
+        }
+    </style>
+</head>
+<body>
+    <h1>R1D3 Template Mapping</h1>
+    
+    <div class="section">
+        <p>This document maps URLs to their corresponding views and templates to help clean up unused templates and identify URL conflicts.</p>
+        <p><strong>Last Updated:</strong> June 25, 2025</p>
+    </div>
+    
+    <h2>Core URLs</h2>
+    <table>
+        <tr>
+            <th>URL</th>
+            <th>View</th>
+            <th>Template</th>
+            <th>Status</th>
+            <th>Notes</th>
+        </tr>
+        <tr class="active">
+            <td>/</td>
+            <td>HomeView</td>
+            <td>core/home.html</td>
+            <td>Active</td>
+            <td>Main landing page</td>
+        </tr>
+        <tr class="active">
+            <td>/dashboard/</td>
+            <td>DashboardView</td>
+            <td>core/dashboard.html</td>
+            <td>Active</td>
+            <td>Main dashboard with game stats and company strategy</td>
+        </tr>
+        <tr class="active">
+            <td>/R1D3-tasks/</td>
+            <td>GlobalTaskDashboardView</td>
+            <td>core/global_task_dashboard.html</td>
+            <td>Active</td>
+            <td>URL changed from /all-tasks/ to avoid conflict</td>
+        </tr>
+        <tr class="active">
+            <td>/test/</td>
+            <td>TestView</td>
+            <td>N/A (Direct HttpResponse)</td>
+            <td>Active</td>
+            <td>Simple test endpoint</td>
+        </tr>
+    </table>
+    
+    <h2>Project URLs</h2>
+    <table>
+        <tr>
+            <th>URL</th>
+            <th>View</th>
+            <th>Template</th>
+            <th>Status</th>
+            <th>Notes</th>
+        </tr>
+        <tr class="active">
+            <td>/all-tasks/</td>
+            <td>AllTasksDashboardView</td>
+            <td>projects/all_tasks_dashboard.html</td>
+            <td>Active</td>
+            <td>Main tasks dashboard</td>
+        </tr>
+    </table>
+    
+    <h2>Task Dashboard Templates</h2>
+    <table>
+        <tr>
+            <th>URL</th>
+            <th>View</th>
+            <th>Template</th>
+            <th>Status</th>
+            <th>Notes</th>
+        </tr>
+        <tr class="active">
+            <td>/all-tasks/</td>
+            <td>AllTasksDashboardView</td>
+            <td>projects/all_tasks_dashboard.html</td>
+            <td>Active</td>
+            <td>Main tasks dashboard</td>
+        </tr>
+        <tr class="active">
+            <td>/R1D3-tasks/</td>
+            <td>GlobalTaskDashboardView</td>
+            <td>core/global_task_dashboard.html</td>
+            <td>Active</td>
+            <td>URL changed from /all-tasks/ to avoid conflict</td>
+        </tr>
+        <tr class="active">
+            <td>/game/tasks/</td>
+            <td>GameTaskDashboardView</td>
+            <td>projects/game_task_dashboard.html</td>
+            <td>Active</td>
+            <td>Game development tasks</td>
+        </tr>
+        <tr class="active">
+            <td>/education/tasks/</td>
+            <td>EducationTaskDashboardView</td>
+            <td>projects/education_task_dashboard.html</td>
+            <td>Active</td>
+            <td>Education tasks</td>
+        </tr>
+        <tr class="active">
+            <td>/social-media/tasks/</td>
+            <td>SocialMediaTaskDashboardView</td>
+            <td>projects/social_media_task_dashboard.html</td>
+            <td>Active</td>
+            <td>Social media tasks</td>
+        </tr>
+        <tr class="active">
+            <td>/arcade/tasks/</td>
+            <td>ArcadeTaskDashboardView</td>
+            <td>projects/arcade_task_dashboard.html</td>
+            <td>Active</td>
+            <td>Arcade tasks</td>
+        </tr>
+        <tr class="active">
+            <td>/theme-park/tasks/</td>
+            <td>ThemeParkTaskDashboardView</td>
+            <td>projects/theme_park_task_dashboard.html</td>
+            <td>Active</td>
+            <td>Theme park tasks</td>
+        </tr>
+        <tr class="active">
+            <td>/r1d3/tasks/</td>
+            <td>R1D3TaskDashboardView</td>
+            <td>projects/r1d3_task_dashboard.html</td>
+            <td>Active</td>
+            <td>General R1D3 tasks</td>
+        </tr>
+    </table>
+    
+    <h2>Unused Templates</h2>
+    <table>
+        <tr>
+            <th>Template Path</th>
+            <th>Status</th>
+            <th>Notes</th>
+        </tr>
+        <tr class="active">
+            <td>projects/unified_task_dashboard.html</td>
+            <td>Base Template</td>
+            <td>Used as the base template that other task dashboard templates extend from (e.g., game_task_dashboard.html)</td>
+        </tr>
+        <tr class="unused">
+            <td>projects/all_tasks_dashboard_test.html</td>
+            <td>Unused</td>
+            <td>No views reference this template, can be safely removed</td>
+        </tr>
+        <tr class="unused">
+            <td>projects/task_dashboard_basic.html</td>
+            <td>Unused</td>
+            <td>No views reference this template, can be safely removed</td>
+        </tr>
+        <tr class="unused">
+            <td>projects/task_dashboard_new.html</td>
+            <td>Unused</td>
+            <td>No views reference this template, can be safely removed</td>
+        </tr>
+    </table>
+    
+    <h2>All URL Paths</h2>
+    <table>
+        <tr>
+            <th>URL Path</th>
+            <th>App</th>
+            <th>View</th>
+            <th>Template</th>
+            <th>Status</th>
+        </tr>
+        <!-- Core URLs -->
+        <tr class="active verified" style="background-color: #d4edda;">
+            <td>/</td>
+            <td>core</td>
+            <td>HomeView</td>
+            <td>core/home.html</td>
+            <td>Active</td>
+        </tr>
+        <tr class="active verified" style="background-color: #d4edda;">
+            <td>/dashboard/</td>
+            <td>core</td>
+            <td>DashboardView</td>
+            <td>core/dashboard.html</td>
+            <td>Active</td>
+        </tr>
+        <tr class="active">
+            <td>/R1D3-tasks/</td>
+            <td>core</td>
+            <td>GlobalTaskDashboardView</td>
+            <td>core/global_task_dashboard.html</td>
+            <td>Active</td>
+        </tr>
+        <tr class="active">
+            <td>/test/</td>
+            <td>core</td>
+            <td>TestView</td>
+            <td>N/A (Direct HttpResponse)</td>
+            <td>Active</td>
+        </tr>
+        
+        <!-- Projects URLs -->
+        <tr class="active">
+            <td>/projects/</td>
+            <td>projects</td>
+            <td>ProjectDashboardView</td>
+            <td>projects/dashboard.html</td>
+            <td>Active</td>
+        </tr>
+        <tr class="active">
+            <td>/projects/list/</td>
+            <td>projects</td>
+            <td>ProjectListView</td>
+            <td>projects/project_list.html</td>
+            <td>Active</td>
+        </tr>
+        
+        <!-- Game Project URLs -->
+        <tr class="active verified" style="background-color: #d4edda;">
+            <td>/games/</td>
+            <td>projects</td>
+            <td>GameDashboardView</td>
+            <td>projects/game_dashboard.html</td>
+            <td>Active</td>
+        </tr>
+        <tr class="active verified" style="background-color: #d4edda;">
+            <td>/games/list/</td>
+            <td>projects</td>
+            <td>GameProjectListView</td>
+            <td>projects/game_list.html</td>
+            <td>Active</td>
+        </tr>
+        <tr class="active verified" style="background-color: #d4edda;">
+            <td>/games/create/</td>
+            <td>projects</td>
+            <td>GameProjectCreateView</td>
+            <td>projects/game_form.html</td>
+            <td>Active</td>
+        </tr>
+        <tr class="active verified" style="background-color: #d4edda;">
+            <td>/games/{id}/</td>
+            <td>projects</td>
+            <td>GameProjectDetailView</td>
+            <td>projects/game_detail.html</td>
+            <td>Active</td>
+        </tr>
+
+        <tr class="active verified" style="background-color: #d4edda;">
+            <td>/games/{id}/update/</td>
+            <td>projects</td>
+            <td>GameProjectUpdateView</td>
+            <td>projects/game_form.html</td>
+            <td>Active</td>
+        </tr>
+        <tr class="active">
+            <td>/games/{id}/update-status/</td>
+            <td>projects</td>
+            <td>GameStatusUpdateView</td>
+            <td>AJAX/JSON Response</td>
+            <td>Active</td>
+        </tr>
+        
+        <!-- Game Design Document (GDD) URLs -->
+        <tr class="active verified" style="background-color: #d4edda;">
+            <td>/games/{id}/gdd/</td>
+            <td>projects</td>
+            <td>GameDesignDocumentView</td>
+            <td>projects/gdd_detail_simple.html</td>
+            <td>Active</td>
+        </tr>
+        <tr class="active verified" style="background-color: #d4edda;">
+            <td>/games/{id}/gdd/upload/</td>
+            <td>projects</td>
+            <td>GDDUploadView</td>
+            <td>projects/gdd_upload.html</td>
+            <td>Active</td>
+        </tr>
+        <tr class="active verified" style="background-color: #d4edda;">
+            <td>/games/{game_id}/gdd/create/</td>
+            <td>projects</td>
+            <td>GDDSimpleCreateView</td>
+            <td>projects/gdd_simple_create.html</td>
+            <td>Active</td>
+        </tr>
+        <tr class="active">
+            <td>/games/{game_id}/gdd/delete/</td>
+            <td>projects</td>
+            <td>GameDesignDocumentDeleteView</td>
+            <td>projects/games/gdd_confirm_delete.html</td>
+            <td>Active</td>
+        </tr>
+        
+        <!-- Game Task URLs -->
+        <tr class="active verified" style="background-color: #d4edda;">
+            <td>/games/tasks/{game_id}/</td>
+            <td>projects</td>
+            <td>GameTaskDashboardView</td>
+            <td>projects/task_dashboard.html</td>
+            <td>Active</td>
+        </tr>
+        <tr class="active verified" style="background-color: #d4edda;">
+            <td>/games/{game_id}/tasks/create/</td>
+            <td>projects</td>
+            <td>GameTaskCreateView</td>
+            <td>projects/task_form.html</td>
+            <td>Active</td>
+        </tr>
+        <tr class="active">
+            <td>/games/gdd/{id}/edit/</td>
+            <td>projects</td>
+            <td>GameDesignDocumentEditView</td>
+            <td>projects/games/gdd_form.html</td>
+            <td>Active</td>
+        </tr>
+        <tr class="active">
+            <td>/games/{game_id}/gdd/create/</td>
+            <td>projects</td>
+            <td>GDDSimpleCreateView</td>
+            <td>projects/games/gdd_simple_form.html</td>
+            <td>Active</td>
+        </tr>
+        <tr class="active">
+            <td>/games/gdd/{id}/structured/edit/</td>
+            <td>projects</td>
+            <td>GDDStructuredEditView</td>
+            <td>projects/games/gdd_structured_form.html</td>
+            <td>Active</td>
+        </tr>
+        <tr class="active">
+            <td>/games/{game_id}/gdd/upload/</td>
+            <td>projects</td>
+            <td>GDDUploadView</td>
+            <td>projects/games/gdd_upload.html</td>
+            <td>Active</td>
+        </tr>
+        <tr class="active">
+            <td>/games/gdd/{id}/extract-features/</td>
+            <td>projects</td>
+            <td>ExtractFeaturesView</td>
+            <td>projects/games/extract_features.html</td>
+            <td>Active</td>
+        </tr>
+        <tr class="active">
+            <td>/games/gdd/{id}/features/</td>
+            <td>projects</td>
+            <td>GDDFeaturesListView</td>
+            <td>projects/games/gdd_features.html</td>
+            <td>Active</td>
+        </tr>
+        
+        <!-- Game Asset URLs -->
+        <tr class="active">
+            <td>/games/{game_id}/assets/</td>
+            <td>projects</td>
+            <td>GameAssetListView</td>
+            <td>projects/games/asset_list.html</td>
+            <td>Active</td>
+        </tr>
+        <tr class="active">
+            <td>/games/{game_id}/assets/create/</td>
+            <td>projects</td>
+            <td>GameAssetCreateView</td>
+            <td>projects/games/asset_form.html</td>
+            <td>Active</td>
+        </tr>
+        <tr class="active">
+            <td>/games/{game_id}/assets/{asset_id}/</td>
+            <td>projects</td>
+            <td>GameAssetDetailView</td>
+            <td>projects/games/asset_detail.html</td>
+            <td>Active</td>
+        </tr>
+        <tr class="active">
+            <td>/games/{game_id}/assets/{asset_id}/update/</td>
+            <td>projects</td>
+            <td>GameAssetUpdateView</td>
+            <td>projects/games/asset_form.html</td>
+            <td>Active</td>
+        </tr>
+        
+        <!-- Game Task URLs -->
+        <tr class="active">
+            <td>/games/tasks/</td>
+            <td>projects</td>
+            <td>GameTaskDashboardView</td>
+            <td>projects/game_task_dashboard.html</td>
+            <td>Active</td>
+        </tr>
+        <tr class="active">
+            <td>/games/tasks/{game_id}/</td>
+            <td>projects</td>
+            <td>GameTaskDashboardView</td>
+            <td>projects/game_task_dashboard.html</td>
+            <td>Active</td>
+        </tr>
+        <tr class="active">
+            <td>/games/{game_id}/tasks/create/</td>
+            <td>projects</td>
+            <td>GameTaskCreateView</td>
+            <td>projects/games/task_form.html</td>
+            <td>Active</td>
+        </tr>
+        <tr class="active">
+            <td>/games/tasks/{id}/</td>
+            <td>projects</td>
+            <td>GameTaskDetailView</td>
+            <td>projects/games/task_detail.html</td>
+            <td>Active</td>
+        </tr>
+        <tr class="active">
+            <td>/games/tasks/{id}/update/</td>
+            <td>projects</td>
+            <td>GameTaskUpdateView</td>
+            <td>projects/games/task_form.html</td>
+            <td>Active</td>
+        </tr>
+        <tr class="active">
+            <td>/games/tasks/{id}/delete/</td>
+            <td>projects</td>
+            <td>GameTaskDeleteView</td>
+            <td>projects/games/task_confirm_delete.html</td>
+            <td>Active</td>
+        </tr>
+        <tr class="active">
+            <td>/games/{game_id}/tasks/kanban/</td>
+            <td>projects</td>
+            <td>GameTaskKanbanView</td>
+            <td>projects/games/task_kanban.html</td>
+            <td>Active</td>
+        </tr>
+        <tr class="active">
+            <td>/games/{game_id}/tasks/hybrid/create/</td>
+            <td>projects</td>
+            <td>GameTaskHybridCreateView</td>
+            <td>projects/games/task_hybrid_form.html</td>
+            <td>Active</td>
+        </tr>
+        <tr class="active">
+            <td>/games/tasks/{id}/hybrid/</td>
+            <td>projects</td>
+            <td>GameTaskHybridDetailView</td>
+            <td>projects/games/task_hybrid_detail.html</td>
+            <td>Active</td>
+        </tr>
+        <tr class="active">
+            <td>/games/tasks/{id}/hybrid/update/</td>
+            <td>projects</td>
+            <td>GameTaskHybridUpdateView</td>
+            <td>projects/games/task_hybrid_form.html</td>
+            <td>Active</td>
+        </tr>
+        
+        <!-- Task Dashboard URLs -->
+        <tr class="active">
+            <td>/all-tasks/</td>
+            <td>projects</td>
+            <td>AllTasksDashboardView</td>
+            <td>projects/all_tasks_dashboard.html</td>
+            <td>Active</td>
+        </tr>
+        <tr class="active">
+            <td>/game/tasks/</td>
+            <td>projects</td>
+            <td>GameTaskDashboardView</td>
+            <td>projects/game_task_dashboard.html</td>
+            <td>Active</td>
+        </tr>
+        <tr class="active" style="background-color: #e6ffee;">
+            <td>/education/tasks/</td>
+            <td>education</td>
+            <td>EducationTasksView</td>
+            <td>projects/education_task_dashboard_enhanced.html</td>
+            <td>Active</td>
+        </tr>
+        <tr class="active" style="background-color: #e6ffee;">
+            <td>/education/tasks/batch-update/</td>
+            <td>education</td>
+            <td>EducationTaskBatchUpdateView</td>
+            <td>N/A (AJAX endpoint)</td>
+            <td>Active</td>
+        </tr>
+        <tr class="active">
+            <td>/social-media/tasks/</td>
+            <td>projects</td>
+            <td>SocialMediaTaskDashboardView</td>
+            <td>projects/social_media_task_dashboard.html</td>
+            <td>Active</td>
+        </tr>
+        <tr class="active">
+            <td>/arcade/tasks/</td>
+            <td>projects</td>
+            <td>ArcadeTaskDashboardView</td>
+            <td>projects/arcade_task_dashboard.html</td>
+            <td>Active</td>
+        </tr>
+        <tr class="active">
+            <td>/theme-park/tasks/</td>
+            <td>projects</td>
+            <td>ThemeParkTaskDashboardView</td>
+            <td>projects/theme_park_task_dashboard.html</td>
+            <td>Active</td>
+        </tr>
+        <tr class="active">
+            <td>/r1d3/tasks/</td>
+            <td>projects</td>
+            <td>R1D3TaskDashboardView</td>
+            <td>projects/r1d3_task_dashboard.html</td>
+            <td>Active</td>
+        </tr>
+        
+        <!-- Debug URLs -->
+        <tr class="active">
+            <td>/debug-tasks/</td>
+            <td>projects</td>
+            <td>DebugAllTasksView</td>
+            <td>projects/debug_tasks.html</td>
+            <td>Active</td>
+        </tr>
+        <tr class="active">
+            <td>/template-debug/</td>
+            <td>projects</td>
+            <td>TemplateDebugView</td>
+            <td>projects/template_debug.html</td>
+            <td>Active</td>
+        </tr>
+        <tr class="active">
+            <td>/projects/test/r1d3-button/</td>
+            <td>projects</td>
+            <td>TestR1D3ButtonView</td>
+            <td>projects/test_r1d3_button.html</td>
+            <td>Active</td>
+        </tr>
+        <tr class="active">
+            <td>/projects/test/debug-button/</td>
+            <td>projects</td>
+            <td>DebugButtonView</td>
+            <td>projects/debug_button.html</td>
+            <td>Active</td>
+        </tr>
+    </table>
+    
+    <h2>All Templates</h2>
+    <table>
+        <tr>
+            <th>Template Path</th>
+            <th>Status</th>
+            <th>Used By</th>
+            <th>Notes</th>
+        </tr>
+        <!-- Core Templates -->
+        <tr class="active">
+            <td>core/home.html</td>
+            <td>Active</td>
+            <td>HomeView</td>
+            <td>Main landing page</td>
+        </tr>
+        <tr class="active">
+            <td>core/dashboard.html</td>
+            <td>Active</td>
+            <td>DashboardView</td>
+            <td>Main dashboard</td>
+        </tr>
+        <tr class="active">
+            <td>core/global_task_dashboard.html</td>
+            <td>Active</td>
+            <td>GlobalTaskDashboardView</td>
+            <td>Now at /R1D3-tasks/</td>
+        </tr>
+        <tr class="active">
+            <td>core/base_task_dashboard.html</td>
+            <td>Active</td>
+            <td>Base template</td>
+            <td>Extended by other task dashboards</td>
+        </tr>
+        
+        <!-- Game Project Templates -->
+        <tr class="active">
+            <td>projects/games/dashboard.html</td>
+            <td>Active</td>
+            <td>GameDashboardView</td>
+            <td>Game development dashboard</td>
+        </tr>
+        <tr class="active">
+            <td>projects/games/game_list.html</td>
+            <td>Active</td>
+            <td>GameProjectListView</td>
+            <td>List of game projects</td>
+        </tr>
+        <tr class="active">
+            <td>projects/games/game_detail.html</td>
+            <td>Active</td>
+            <td>GameProjectDetailView</td>
+            <td>Game project details</td>
+        </tr>
+        <tr class="active">
+            <td>projects/games/game_form.html</td>
+            <td>Active</td>
+            <td>GameProjectCreateView, GameProjectUpdateView</td>
+            <td>Create/edit game project</td>
+        </tr>
+        
+        <!-- Game Design Document Templates -->
+        <tr class="active">
+            <td>projects/games/gdd_detail.html</td>
+            <td>Active</td>
+            <td>GameDesignDocumentView</td>
+            <td>GDD details view</td>
+        </tr>
+        <tr class="active">
+            <td>projects/games/gdd_form.html</td>
+            <td>Active</td>
+            <td>GameDesignDocumentCreateView, GameDesignDocumentEditView</td>
+            <td>Create/edit GDD</td>
+        </tr>
+        <tr class="active">
+            <td>projects/games/gdd_confirm_delete.html</td>
+            <td>Active</td>
+            <td>GameDesignDocumentDeleteView</td>
+            <td>Confirm GDD deletion</td>
+        </tr>
+        <tr class="active">
+            <td>projects/games/gdd_simple_form.html</td>
+            <td>Active</td>
+            <td>GDDSimpleCreateView</td>
+            <td>User-friendly GDD creation</td>
+        </tr>
+        <tr class="active">
+            <td>projects/games/gdd_structured_form.html</td>
+            <td>Active</td>
+            <td>GDDStructuredEditView</td>
+            <td>Structured GDD editing</td>
+        </tr>
+        <tr class="active">
+            <td>projects/games/gdd_upload.html</td>
+            <td>Active</td>
+            <td>GDDUploadView</td>
+            <td>Upload GDD document</td>
+        </tr>
+        <tr class="active">
+            <td>projects/games/extract_features.html</td>
+            <td>Active</td>
+            <td>ExtractFeaturesView</td>
+            <td>Extract features from GDD</td>
+        </tr>
+        <tr class="active">
+            <td>projects/games/gdd_features.html</td>
+            <td>Active</td>
+            <td>GDDFeaturesListView</td>
+            <td>List of GDD features</td>
+        </tr>
+        
+        <!-- Game Asset Templates -->
+        <tr class="active">
+            <td>projects/games/asset_list.html</td>
+            <td>Active</td>
+            <td>GameAssetListView</td>
+            <td>List of game assets</td>
+        </tr>
+        <tr class="active">
+            <td>projects/games/asset_form.html</td>
+            <td>Active</td>
+            <td>GameAssetCreateView, GameAssetUpdateView</td>
+            <td>Create/edit game asset</td>
+        </tr>
+        <tr class="active">
+            <td>projects/games/asset_detail.html</td>
+            <td>Active</td>
+            <td>GameAssetDetailView</td>
+            <td>Game asset details</td>
+        </tr>
+        
+        <!-- Game Task Templates -->
+        <tr class="active">
+            <td>projects/games/task_form.html</td>
+            <td>Active</td>
+            <td>GameTaskCreateView, GameTaskUpdateView</td>
+            <td>Create/edit game task</td>
+        </tr>
+        <tr class="active">
+            <td>projects/games/task_detail.html</td>
+            <td>Active</td>
+            <td>GameTaskDetailView</td>
+            <td>Game task details</td>
+        </tr>
+        <tr class="active">
+            <td>projects/games/task_confirm_delete.html</td>
+            <td>Active</td>
+            <td>GameTaskDeleteView</td>
+            <td>Confirm task deletion</td>
+        </tr>
+        <tr class="active">
+            <td>projects/games/task_kanban.html</td>
+            <td>Active</td>
+            <td>GameTaskKanbanView</td>
+            <td>Kanban board for game tasks</td>
+        </tr>
+        <tr class="active">
+            <td>projects/games/task_hybrid_form.html</td>
+            <td>Active</td>
+            <td>GameTaskHybridCreateView, GameTaskHybridUpdateView</td>
+            <td>Hybrid task form with section-specific fields</td>
+        </tr>
+        <tr class="active">
+            <td>projects/games/task_hybrid_detail.html</td>
+            <td>Active</td>
+            <td>GameTaskHybridDetailView</td>
+            <td>Hybrid task details with section-specific fields</td>
+        </tr>
+        
+        <!-- Unified Task Form Templates -->
+        <tr class="active">
+            <td>projects/unified_task_form.html</td>
+            <td>Active</td>
+            <td>Base template for task forms</td>
+            <td>Common structure for all task forms</td>
+        </tr>
+        <tr class="active">
+            <td>projects/game_task_form.html</td>
+            <td>Active</td>
+            <td>Game task form views</td>
+            <td>Game-specific task form</td>
+        </tr>
+        <tr class="active">
+            <td>projects/education_task_form.html</td>
+            <td>Active</td>
+            <td>Education task form views</td>
+            <td>Education-specific task form</td>
+        </tr>
+        <tr class="active">
+            <td>projects/social_media_task_form.html</td>
+            <td>Active</td>
+            <td>Social media task form views</td>
+            <td>Social media-specific task form</td>
+        </tr>
+        <tr class="active">
+            <td>projects/arcade_task_form.html</td>
+            <td>Active</td>
+            <td>Arcade task form views</td>
+            <td>Arcade-specific task form</td>
+        </tr>
+        <tr class="active">
+            <td>projects/theme_park_task_form.html</td>
+            <td>Active</td>
+            <td>Theme park task form views</td>
+            <td>Theme park-specific task form</td>
+        </tr>
+        <tr class="active">
+            <td>projects/r1d3_task_form.html</td>
+            <td>Active</td>
+            <td>R1D3 task form views</td>
+            <td>R1D3 general task form</td>
+        </tr>
+        
+        <!-- Task Dashboard Templates -->
+        <tr class="active">
+            <td>projects/all_tasks_dashboard.html</td>
+            <td>Active</td>
+            <td>AllTasksDashboardView</td>
+            <td>Main tasks dashboard</td>
+        </tr>
+        <tr class="active">
+            <td>projects/unified_task_dashboard.html</td>
+            <td>Active</td>
+            <td>Base template</td>
+            <td>Extended by section-specific dashboards</td>
+        </tr>
+        <tr class="active">
+            <td>projects/game_task_dashboard.html</td>
+            <td>Active</td>
+            <td>GameTaskDashboardView</td>
+            <td>Game development tasks</td>
+        </tr>
+        <tr class="active" style="background-color: #e6ffee;">
+            <td>projects/education_task_dashboard_enhanced.html</td>
+            <td>Active</td>
+            <td>EducationTasksView (education app)</td>
+            <td>Education tasks with batch update support</td>
+        </tr>
+        <tr class="active" style="background-color: #e6ffee;">
+            <td>education/task_dashboard_js.html</td>
+            <td>Active</td>
+            <td>Included in education_task_dashboard_enhanced.html</td>
+            <td>Custom JS for education batch update URL</td>
+        </tr>
+        <tr class="active">
+            <td>projects/social_media_task_dashboard.html</td>
+            <td>Active</td>
+            <td>SocialMediaTaskDashboardView</td>
+            <td>Social media tasks</td>
+        </tr>
+        <tr class="active">
+            <td>projects/arcade_task_dashboard.html</td>
+            <td>Active</td>
+            <td>ArcadeTaskDashboardView</td>
+            <td>Arcade tasks</td>
+        </tr>
+        <tr class="active">
+            <td>projects/theme_park_task_dashboard.html</td>
+            <td>Active</td>
+            <td>ThemeParkTaskDashboardView</td>
+            <td>Theme park tasks</td>
+        </tr>
+        <tr class="active">
+            <td>projects/r1d3_task_dashboard.html</td>
+            <td>Active</td>
+            <td>R1D3TaskDashboardView</td>
+            <td>General R1D3 tasks</td>
+        </tr>
+        
+        <!-- Debug Templates -->
+        <tr class="active">
+            <td>projects/debug_tasks.html</td>
+            <td>Active</td>
+            <td>DebugAllTasksView</td>
+            <td>Debug view for tasks</td>
+        </tr>
+        <tr class="active">
+            <td>projects/template_debug.html</td>
+            <td>Active</td>
+            <td>TemplateDebugView</td>
+            <td>Debug view for templates</td>
+        </tr>
+        <tr class="active">
+            <td>projects/debug_button.html</td>
+            <td>Active</td>
+            <td>DebugButtonView</td>
+            <td>Debug button for testing</td>
+        </tr>
+        <tr class="active">
+            <td>projects/template_identifier.html</td>
+            <td>Active</td>
+            <td>Included in other templates</td>
+            <td>Helps identify which template is being used</td>
+        </tr>
+        
+        <h2>Removed Templates</h2>
+    <table>
+        <tr>
+            <th>Template Path</th>
+            <th>Status</th>
+            <th>Previously Used By</th>
+            <th>Notes</th>
+        </tr>
+        <tr class="removed">
+            <td>projects/all_tasks_dashboard_test.html</td>
+            <td>Removed</td>
+            <td>None (Test template)</td>
+            <td>Test template with purple banner, not referenced by any view</td>
+        </tr>
+        <tr class="removed">
+            <td>projects/task_dashboard_basic.html</td>
+            <td>Removed</td>
+            <td>None</td>
+            <td>Basic task dashboard, not referenced by any view</td>
+        </tr>
+        <tr class="removed">
+            <td>projects/task_dashboard_new.html</td>
+            <td>Removed</td>
+            <td>None</td>
+            <td>New task dashboard with cyan banner, not referenced by any view</td>
+        </tr>
+        <tr class="removed">
+            <td>projects/general_task_dashboard.html</td>
+            <td>Removed</td>
+            <td>None</td>
+            <td>General task dashboard, not referenced by any view</td>
+        </tr>
+        <tr class="removed">
+            <td>projects/task_dashboard.html</td>
+            <td>Candidate for removal</td>
+            <td>Unknown</td>
+            <td>May be superseded by unified_task_dashboard.html, needs verification</td>
+        </tr>
+        <tr class="removed">
+            <td>projects/games/task_form_old.html</td>
+            <td>Candidate for removal</td>
+            <td>Unknown</td>
+            <td>Likely replaced by task_form.html or task_hybrid_form.html</td>
+        </tr>
+    </table>
+    
+    <h2>URL Conflicts</h2>
+    <table>
+        <tr>
+            <th>URL Path</th>
+            <th>Conflict</th>
+            <th>Resolution</th>
+        </tr>
+        <tr>
+            <td>/all-tasks/</td>
+            <td>Defined in both company_system/urls.py and core/urls.py</td>
+            <td>Resolved by changing core URL to /R1D3-tasks/</td>
+        </tr>
+    </table>
+    
+    <h2>Summary and Next Steps</h2>
+    
+    <h3>Template Structure Overview</h3>
+    <p>The R1D3 system uses a hierarchical template structure with several key patterns:</p>
+    <ul>
+        <li><strong>Base Templates:</strong> Templates like <code>unified_task_dashboard.html</code> and <code>unified_task_form.html</code> provide common structure and styling</li>
+        <li><strong>Section-Specific Templates:</strong> Each company section (Game, Education, Social Media, etc.) has specialized templates that extend the base templates</li>
+        <li><strong>Game-Specific Templates:</strong> The game development section has the most extensive template structure with specialized templates for GDDs, assets, and tasks</li>
+        <li><strong>Hybrid Templates:</strong> Templates like <code>task_hybrid_form.html</code> support the hybrid task management system with section-specific customizations</li>
+    </ul>
+    
+    <h3>URL Structure</h3>
+    <p>The URL structure follows these patterns:</p>
+    <ul>
+        <li><strong>Dashboard URLs:</strong> Section-specific dashboards at <code>/[section]/tasks/</code> (e.g., <code>/game/tasks/</code>)</li>
+        <li><strong>Game-Centric URLs:</strong> Game-related URLs use <code>/games/{game_id}/...</code> pattern</li>
+        <li><strong>GDD-Centric URLs:</strong> Some GDD operations use <code>/games/gdd/{gdd_id}/...</code> pattern</li>
+        <li><strong>Task URLs:</strong> Task operations use <code>/games/tasks/{id}/...</code> pattern</li>
+    </ul>
+    
+    <h3>Completed Cleanup Tasks</h3>
+    <ul>
+        <li>Removed unused templates: <code>all_tasks_dashboard_test.html</code>, <code>task_dashboard_basic.html</code>, <code>task_dashboard_new.html</code>, <code>general_task_dashboard.html</code></li>
+        <li>Fixed URL conflict between <code>/all-tasks/</code> in core and projects apps by changing core URL to <code>/R1D3-tasks/</code></li>
+        <li>Created comprehensive mapping of URLs, views, and templates</li>
+        <li>Documented template hierarchy and usage patterns</li>
+    </ul>
+    
+    <h3>Next Steps</h3>
+    <ul>
+        <li><strong>Verify Remaining Templates:</strong>
+            <ul>
+                <li>Check if <code>projects/task_dashboard.html</code> is still used or can be removed</li>
+                <li>Verify if <code>projects/games/task_form_old.html</code> can be safely removed</li>
+                <li>Look for other potential unused templates in the system</li>
+            </ul>
+        </li>
+        <li><strong>Ensure Template Consistency:</strong>
+            <ul>
+                <li>Verify that all section-specific templates follow the same design patterns</li>
+                <li>Check that all templates properly extend their base templates</li>
+                <li>Ensure consistent styling across all templates</li>
+            </ul>
+        </li>
+        <li><strong>URL Structure Improvements:</strong>
+            <ul>
+                <li>Review URL patterns for consistency and clarity</li>
+                <li>Ensure no remaining URL conflicts exist</li>
+                <li>Consider standardizing URL patterns across different sections</li>
+            </ul>
+        </li>
+        <li><strong>Documentation:</strong>
+            <ul>
+                <li>Keep this mapping document updated as changes are made</li>
+                <li>Add comments to template files indicating their purpose and usage</li>
+                <li>Document the template hierarchy in the codebase</li>
+            </ul>
+        </li>
+        <li><strong>Future Enhancements:</strong>
+            <ul>
+                <li>Consider further unification of templates where appropriate</li>
+                <li>Implement template fragment caching for performance improvements</li>
+                <li>Add automated tests to verify template rendering</li>
+            </ul>
+        </li>
+    </ul>
+</body>
+</html>

@@ -1,0 +1,564 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load task_filters %}
+
+{% block title %}All Tasks Dashboard | R1D3{% endblock %}
+
+{% block extra_css %}
+<style>
+  .task-badge {
+    font-size: 0.8rem;
+    padding: 0.35em 0.65em;
+  }
+  
+  .progress {
+    height: 10px;
+  }
+  
+  /* Progress bar percentage classes */
+  .progress-0 { width: 0%; }
+  .progress-5 { width: 5%; }
+  .progress-10 { width: 10%; }
+  .progress-15 { width: 15%; }
+  .progress-20 { width: 20%; }
+  .progress-25 { width: 25%; }
+  .progress-30 { width: 30%; }
+  .progress-35 { width: 35%; }
+  .progress-40 { width: 40%; }
+  .progress-45 { width: 45%; }
+  .progress-50 { width: 50%; }
+  .progress-55 { width: 55%; }
+  .progress-60 { width: 60%; }
+  .progress-65 { width: 65%; }
+  .progress-70 { width: 70%; }
+  .progress-75 { width: 75%; }
+  .progress-80 { width: 80%; }
+  .progress-85 { width: 85%; }
+  .progress-90 { width: 90%; }
+  .progress-95 { width: 95%; }
+  .progress-100 { width: 100%; }
+  
+  .badge-status-backlog {
+    background-color: #6c757d;
+  }
+  
+  .badge-status-to_do {
+    background-color: #0d6efd;
+  }
+  
+  .badge-status-in_progress {
+    background-color: #ffc107;
+    color: #212529;
+  }
+  
+  .badge-status-in_review {
+    background-color: #6f42c1;
+  }
+  
+  .badge-status-done {
+    background-color: #198754;
+  }
+  
+  .badge-status-blocked {
+    background-color: #dc3545;
+  }
+  
+  .badge-priority-low {
+    background-color: #20c997;
+  }
+  
+  .badge-priority-medium {
+    background-color: #0dcaf0;
+    color: #212529;
+  }
+  
+  .badge-priority-high {
+    background-color: #fd7e14;
+  }
+  
+  .badge-priority-critical {
+    background-color: #dc3545;
+  }
+  
+  .badge-section-r1d3 {
+    background-color: #0d6efd;
+  }
+  
+  .badge-section-game {
+    background-color: #6f42c1;
+  }
+  
+  .badge-section-education {
+    background-color: #198754;
+  }
+  
+  .badge-section-social_media {
+    background-color: #fd7e14;
+  }
+  
+  .badge-section-arcade {
+    background-color: #dc3545;
+  }
+  
+  .badge-section-theme_park {
+    background-color: #20c997;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="background-color: red; color: white; padding: 10px; margin: 10px; text-align: center;">
+  <h3>ALL_TASKS_DASHBOARD.HTML TEMPLATE IS BEING USED</h3>
+</div>
+<div class="container-fluid">
+<!-- Page Heading -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+  <h1 class="h3 mb-0 text-gray-800">
+    All Tasks Dashboard
+  </h1>
+  <div>
+    <a href="{% url 'all_tasks_newtask_direct' %}" class="btn btn-primary btn-icon-split" id="new-r1d3-task-btn">
+      <span class="icon text-white-50">
+        <i class="fas fa-plus"></i>
+      </span>
+      <span class="text">New R1D3 Task</span>
+    </a>
+    <div class="btn-group ml-2">
+      <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+        Create Task By Section
+      </button>
+      <ul class="dropdown-menu">
+        <li><a class="dropdown-item" href="{% url 'projects:r1d3_task_create' %}">R1D3 General</a></li>
+        <li><a class="dropdown-item" href="{% url 'projects:game_task_create' %}">Game Development</a></li>
+        <li><a class="dropdown-item" href="{% url 'projects:education_task_create' %}">Education</a></li>
+        <li><a class="dropdown-item" href="{% url 'projects:social_media_task_create' %}">Social Media</a></li>
+        <li><a class="dropdown-item" href="{% url 'projects:arcade_task_create' %}">Arcade</a></li>
+        <li><a class="dropdown-item" href="{% url 'projects:theme_park_task_create' %}">Theme Park</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Debug Section -->
+<div class="card shadow mb-4">
+  <div class="card-header py-3">
+    <h6 class="m-0 font-weight-bold text-primary">Debug Information</h6>
+  </div>
+  <div class="card-body">
+    <p>Total tasks: {{ tasks|length }}</p>
+    <ul>
+      {% for task in tasks %}
+        <li>{{ task.id }}: {{ task.title }} ({{ task|class_name }})</li>
+      {% empty %}
+        <li>No tasks found</li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+
+<!-- Content Row -->
+<div class="row">
+  <!-- Tasks by Status Card -->
+  <div class="col-xl-4 col-md-6 mb-4">
+    <div class="card border-left-primary shadow h-100 py-2">
+      <div class="card-body">
+        <div class="row no-gutters align-items-center">
+          <div class="col mr-2">
+            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+              Tasks by Status
+            </div>
+            <div class="mt-3">
+              {% for status_key, status_name in status_choices %}
+                <div class="mb-2">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="small">{{ status_name }}</span>
+                    <span class="small text-gray-800">
+                      {{ tasks_by_status|get_item:status_key|get_item:'count' }} / {{ total_tasks }}
+                      ({{ tasks_by_status|get_item:status_key|get_item:'percentage' }}%)
+                    </span>
+                  </div>
+                  <div class="progress">
+                    <div class="progress-bar badge-status-{{ status_key }} progress-{{ tasks_by_status|get_item:status_key|get_item:'percentage' }}" role="progressbar" aria-valuenow="{{ tasks_by_status|get_item:status_key|get_item:'percentage' }}" aria-valuemin="0" aria-valuemax="100"></div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tasks by Priority Card -->
+  <div class="col-xl-4 col-md-6 mb-4">
+    <div class="card border-left-warning shadow h-100 py-2">
+      <div class="card-body">
+        <div class="row no-gutters align-items-center">
+          <div class="col mr-2">
+            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+              Tasks by Priority
+            </div>
+            <div class="mt-3">
+              {% for priority_key, priority_name in priority_choices %}
+                <div class="mb-2">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="small">{{ priority_name }}</span>
+                    <span class="small text-gray-800">
+                      {{ tasks_by_priority|get_item:priority_key|get_item:'count' }} / {{ total_tasks }}
+                      ({{ tasks_by_priority|get_item:priority_key|get_item:'percentage' }}%)
+                    </span>
+                  </div>
+                  <div class="progress">
+                    <div class="progress-bar badge-priority-{{ priority_key }} progress-{{ tasks_by_priority|get_item:priority_key|get_item:'percentage' }}" role="progressbar" aria-valuenow="{{ tasks_by_priority|get_item:priority_key|get_item:'percentage' }}" aria-valuemin="0" aria-valuemax="100"></div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Task Summary Card -->
+  <div class="col-xl-4 col-md-6 mb-4">
+    <div class="card border-left-info shadow h-100 py-2">
+      <div class="card-body">
+        <div class="row no-gutters align-items-center">
+          <div class="col mr-2">
+            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+              Task Summary
+            </div>
+            <div class="mt-3">
+              <div class="mb-2">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <span class="small">Total Tasks</span>
+                  <span class="small text-gray-800">{{ total_tasks }}</span>
+                </div>
+              </div>
+              <div class="mb-2">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <span class="small">Completed</span>
+                  <span class="small text-gray-800">
+                    {{ tasks_by_status.done.count }} ({{ tasks_by_status.done.percentage }}%)
+                  </span>
+                </div>
+              </div>
+              <div class="mb-2">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <span class="small">In Progress</span>
+                  <span class="small text-gray-800">
+                    {{ tasks_by_status.in_progress.count }} ({{ tasks_by_status.in_progress.percentage }}%)
+                  </span>
+                </div>
+              </div>
+              <div class="mb-2">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <span class="small">Blocked</span>
+                  <span class="small text-gray-800">
+                    {{ tasks_by_status.blocked.count }} ({{ tasks_by_status.blocked.percentage }}%)
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Task List -->
+<div class="card shadow mb-4">
+  <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+    <h6 class="m-0 font-weight-bold text-primary">All Tasks</h6>
+    <div>
+      <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#filterModal">
+        <i class="fas fa-filter fa-sm"></i> Filter
+      </button>
+      <a href="{% url 'projects:all_tasks_dashboard' %}" class="btn btn-sm btn-outline-secondary">
+        <i class="fas fa-sync-alt fa-sm"></i> Clear Filters
+      </a>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Section</th>
+            <th>Status</th>
+            <th>Priority</th>
+            <th>Assigned To</th>
+            <th>Due Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Temporarily disabled tasks for testing -->
+          {% comment %}
+          {% for task in tasks %}
+          <tr>
+            <td>{{ task.title }}</td>
+            <td>
+              {% if task|class_name == 'R1D3Task' %}
+              <span class="badge rounded-pill badge-section-r1d3">
+                <i class="fas fa-building"></i> R1D3
+              </span>
+              {% elif task|class_name == 'GameDevelopmentTask' %}
+              <span class="badge rounded-pill badge-section-game">
+                <i class="fas fa-gamepad"></i> Game
+              </span>
+              {% elif task|class_name == 'EducationTask' %}
+              <span class="badge rounded-pill badge-section-education">
+                <i class="fas fa-graduation-cap"></i> Education
+              </span>
+              {% elif task|class_name == 'SocialMediaTask' %}
+              <span class="badge rounded-pill badge-section-social_media">
+                <i class="fas fa-hashtag"></i> Social Media
+              </span>
+              {% elif task|class_name == 'ArcadeTask' %}
+              <span class="badge rounded-pill badge-section-arcade">
+                <i class="fas fa-arcade"></i> Arcade
+              </span>
+              {% elif task|class_name == 'ThemeParkTask' %}
+              <span class="badge rounded-pill badge-section-theme_park">
+                <i class="fas fa-ferris-wheel"></i> Theme Park
+              </span>
+              {% endif %}
+            </td>
+            <td>
+              <span class="badge rounded-pill {% if task.status == 'todo' or task.status == 'to_do' %}badge-status-to_do{% else %}badge-status-{{ task.status }}{% endif %}">
+                {% if task.status == 'to_do' or task.status == 'todo' %}
+                <i class="fas fa-clipboard-list"></i>
+                {% elif task.status == 'in_progress' %}
+                <i class="fas fa-spinner"></i>
+                {% elif task.status == 'in_review' %}
+                <i class="fas fa-search"></i>
+                {% elif task.status == 'done' %}
+                <i class="fas fa-check"></i>
+                {% elif task.status == 'blocked' %}
+                <i class="fas fa-ban"></i>
+                {% else %}
+                <i class="fas fa-inbox"></i>
+                {% endif %}
+                {% if task.get_status_display %}{{ task.get_status_display }}{% else %}{{ task.status|title }}{% endif %}
+              </span>
+            </td>
+            <td>
+              <span class="badge rounded-pill badge-priority-{{ task.priority }}">
+                {% if task.priority == 'low' %}
+                <i class="fas fa-arrow-down"></i>
+                {% elif task.priority == 'medium' %}
+                <i class="fas fa-equals"></i>
+                {% elif task.priority == 'high' %}
+                <i class="fas fa-arrow-up"></i>
+                {% elif task.priority == 'critical' %}
+                <i class="fas fa-exclamation-triangle"></i>
+                {% endif %}
+                {{ task.get_priority_display }}
+              </span>
+            </td>
+            <td>
+              {% if task.assigned_to %}
+              <div class="d-flex align-items-center">
+                <div class="mr-2">
+                  <img class="rounded-circle" width="30" height="30" src="{% if task.assigned_to.profile.avatar %}{{ task.assigned_to.profile.avatar.url }}{% else %}{% static 'img/undraw_profile.svg' %}{% endif %}" alt="{{ task.assigned_to.username }}">
+                </div>
+                <div>{{ task.assigned_to.get_full_name|default:task.assigned_to.username }}</div>
+              </div>
+              {% else %}
+              <span class="text-muted">Unassigned</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if task.due_date %}
+              <div class="d-flex align-items-center">
+                <i class="fas fa-calendar-alt mr-1"></i>
+                <span class="{% if task.due_date < today and task.status != 'done' %}text-danger{% endif %}">
+                  {{ task.due_date|date:"M d, Y" }}
+                  {% if task.due_date < today and task.status != 'done' %}
+                  <span class="badge badge-danger ml-1">Overdue</span>
+                  {% endif %}
+                </span>
+              </div>
+              {% else %}
+              <span class="text-muted">No due date</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if task|class_name == 'R1D3Task' %}
+              <a href="{% url 'projects:r1d3_task_detail' task.id %}" class="btn btn-sm btn-primary">
+                <i class="fas fa-eye"></i>
+              </a>
+              <a href="{% url 'projects:r1d3_task_update' task.id %}" class="btn btn-sm btn-info">
+                <i class="fas fa-edit"></i>
+              </a>
+              {% elif task|class_name == 'GameDevelopmentTask' %}
+              <a href="{% url 'projects:game_task_detail' task.id %}" class="btn btn-sm btn-primary">
+                <i class="fas fa-eye"></i>
+              </a>
+              <a href="{% url 'projects:game_task_update' task.id %}" class="btn btn-sm btn-info">
+                <i class="fas fa-edit"></i>
+              </a>
+              {% elif task|class_name == 'EducationTask' %}
+              <a href="{% url 'projects:education_task_detail' task.id %}" class="btn btn-sm btn-primary">
+                <i class="fas fa-eye"></i>
+              </a>
+              <a href="{% url 'projects:education_task_update' task.id %}" class="btn btn-sm btn-info">
+                <i class="fas fa-edit"></i>
+              </a>
+              {% elif task|class_name == 'SocialMediaTask' %}
+              <a href="{% url 'projects:social_media_task_detail' task.id %}" class="btn btn-sm btn-primary">
+                <i class="fas fa-eye"></i>
+              </a>
+              <a href="{% url 'projects:social_media_task_update' task.id %}" class="btn btn-sm btn-info">
+                <i class="fas fa-edit"></i>
+              </a>
+              {% elif task|class_name == 'ArcadeTask' %}
+              <a href="{% url 'projects:arcade_task_detail' task.id %}" class="btn btn-sm btn-primary">
+                <i class="fas fa-eye"></i>
+              </a>
+              <a href="{% url 'projects:arcade_task_update' task.id %}" class="btn btn-sm btn-info">
+                <i class="fas fa-edit"></i>
+              </a>
+              {% elif task|class_name == 'ThemeParkTask' %}
+              <a href="{% url 'projects:theme_park_task_detail' task.id %}" class="btn btn-sm btn-primary">
+                <i class="fas fa-eye"></i>
+              </a>
+              <a href="{% url 'projects:theme_park_task_update' task.id %}" class="btn btn-sm btn-info">
+                <i class="fas fa-edit"></i>
+              </a>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="7" class="text-center">No tasks found</td>
+          </tr>
+          {% endfor %}
+          {% endcomment %}
+        </tbody>
+      </table>
+    </div>
+    
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <nav aria-label="Page navigation">
+      <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?page=1" aria-label="First">
+            <span aria-hidden="true">&laquo;&laquo;</span>
+          </a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+          </a>
+        </li>
+        {% endif %}
+        
+        {% for i in paginator.page_range %}
+          {% if page_obj.number == i %}
+          <li class="page-item active">
+            <span class="page-link">{{ i }}</span>
+          </li>
+          {% elif i > page_obj.number|add:'-3' and i < page_obj.number|add:'3' %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+          </li>
+          {% endif %}
+        {% endfor %}
+        
+        {% if page_obj.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+          </a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" href="?page={{ paginator.num_pages }}" aria-label="Last">
+            <span aria-hidden="true">&raquo;&raquo;</span>
+          </a>
+        </li>
+        {% endif %}
+      </ul>
+    </nav>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Filter Modal -->
+<div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="filterModalLabel">Filter Tasks</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="get">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="status" class="form-label">Status</label>
+            <select class="form-select" id="status" name="status">
+              <option value="">All Statuses</option>
+              {% for status_key, status_name in status_choices %}
+              <option value="{{ status_key }}" {% if request.GET.status == status_key %}selected{% endif %}>{{ status_name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="priority" class="form-label">Priority</label>
+            <select class="form-select" id="priority" name="priority">
+              <option value="">All Priorities</option>
+              {% for priority_key, priority_name in priority_choices %}
+              <option value="{{ priority_key }}" {% if request.GET.priority == priority_key %}selected{% endif %}>{{ priority_name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="assigned_to" class="form-label">Assigned To</label>
+            <select class="form-select" id="assigned_to" name="assigned_to">
+              <option value="">All Users</option>
+              {% for user in users %}
+              <option value="{{ user.id }}" {% if request.GET.assigned_to == user.id|stringformat:"i" %}selected{% endif %}>{{ user.get_full_name|default:user.username }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Apply Filters</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize DataTable
+    $('#dataTable').DataTable({
+      "paging": false,
+      "ordering": true,
+      "info": false,
+      "searching": true
+    });
+    
+    // Ensure the New R1D3 Task button navigates to the correct URL
+    const newR1D3TaskBtn = document.getElementById('new-r1d3-task-btn');
+    if (newR1D3TaskBtn) {
+      newR1D3TaskBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.location.href = '/all-tasks/newtask/';
+      });
+    }
+  });
+</script>
+
+{% include 'projects/template_identifier.html' %}
+{% endblock %}

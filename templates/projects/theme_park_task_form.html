@@ -1,0 +1,119 @@
+{% extends "projects/unified_task_form.html" %}
+{% load crispy_forms_filters %}
+
+{% block section_css %}
+<style>
+    .theme-park-badge {
+        background-color: #f6c23e;
+    }
+    .attraction-info {
+        border-left: 4px solid #f6c23e;
+        padding-left: 15px;
+    }
+    .area-info {
+        background-color: #f8f9fc;
+        border-radius: 5px;
+        padding: 10px;
+        margin-bottom: 15px;
+    }
+</style>
+{% endblock %}
+
+{% block form_title %}
+    {% if form.instance.id %}
+    <h1 class="h3 mb-4 text-gray-800">Update Theme Park Task</h1>
+    {% else %}
+    <h1 class="h3 mb-4 text-gray-800">Create New Theme Park Task</h1>
+    {% endif %}
+{% endblock %}
+
+{% block section_badge %}
+<span class="badge theme-park-badge rounded-pill">
+    <i class="fas fa-ticket-alt me-1"></i> Theme Park
+</span>
+{% endblock %}
+
+{% block section_specific_fields %}
+<div class="card mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">
+            <i class="fas fa-ticket-alt me-1"></i> Theme Park Details
+        </h6>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                {{ form.attraction_id|as_crispy_field }}
+            </div>
+            <div class="col-md-6">
+                {{ form.area|as_crispy_field }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                {{ form.maintenance_type|as_crispy_field }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block sidebar_content %}
+<div class="card mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">
+            <i class="fas fa-info-circle me-1"></i> Theme Park Information
+        </h6>
+    </div>
+    <div class="card-body">
+        <div class="attraction-info mb-3">
+            <h5>Attraction Types</h5>
+            <ul class="list-unstyled small">
+                <li><i class="fas fa-tram me-2"></i> Rides</li>
+                <li><i class="fas fa-theater-masks me-2"></i> Shows</li>
+                <li><i class="fas fa-store me-2"></i> Shops</li>
+                <li><i class="fas fa-utensils me-2"></i> Restaurants</li>
+                <li><i class="fas fa-map-signs me-2"></i> Walkthrough Attractions</li>
+            </ul>
+        </div>
+        
+        <div class="area-info">
+            <h5>Park Areas</h5>
+            <ul class="small">
+                <li><strong>Adventure Land:</strong> Exploration and thrill rides</li>
+                <li><strong>Fantasy World:</strong> Family-friendly attractions</li>
+                <li><strong>Sci-Fi Zone:</strong> Futuristic experiences</li>
+                <li><strong>Water Kingdom:</strong> Water-based attractions</li>
+                <li><strong>Main Street:</strong> Shopping and dining</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block section_js %}
+<script>
+    $(document).ready(function() {
+        // Initialize select2 for attraction dropdown
+        $('#id_attraction_id').select2({
+            placeholder: "Select an attraction",
+            allowClear: true,
+            width: '100%'
+        });
+        
+        // Initialize select2 for area dropdown
+        $('#id_area').select2({
+            placeholder: "Select area",
+            allowClear: true,
+            width: '100%'
+        });
+        
+        // Initialize select2 for maintenance type dropdown
+        $('#id_maintenance_type').select2({
+            placeholder: "Select maintenance type",
+            allowClear: true,
+            width: '100%'
+        });
+    });
+</script>
+{% endblock %}

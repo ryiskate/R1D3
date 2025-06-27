@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Test R1D3 Button | R1D3{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-12 text-center mt-5">
+      <h1>Test R1D3 Task Button</h1>
+      <p>This is a simple test page to check if the R1D3 task creation button works correctly.</p>
+      
+      <div class="mt-4">
+        <a href="/projects/all-tasks/newtask/" class="btn btn-primary btn-icon-split">
+          <i class="fas fa-plus mr-2"></i> New R1D3 Task (All Tasks)
+        </a>
+      </div>
+      
+      <div class="mt-4">
+        <a href="{% url 'projects:r1d3_task_create' %}" class="btn btn-secondary btn-lg">
+          <i class="fas fa-plus mr-2"></i> New R1D3 Task (Original)
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,193 +1,127 @@
 from django.shortcuts import render, get_object_or_404
-from django.views.generic import View
+from django.views.generic import View, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.utils.decorators import method_decorator
-from django.db.models import Q
+from django.urls import reverse
+from .task_models import GameDevelopmentTask
+from .task_forms import GameDevelopmentTaskForm
+from .game_models import GameTask, GameMilestone  # Keep for backwards compatibility during transition
+from .forms import GameTaskForm  # Keep for backwards compatibility during transition
 import json
 
-from .game_models import GameTask, GameProject
-
-class GameTaskStatusUpdateView(LoginRequiredMixin, View):
+class GameTaskStatusUpdateView(LoginRequiredMixin, UpdateView):
     """
-    Update task status via AJAX
+    Update game development task status via AJAX
     """
+    model = GameDevelopmentTask
+    form_class = GameDevelopmentTaskForm
+    template_name = 'projects/game_task_form.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['game'] = getattr(self.object, 'game', None)
+        return context
+    
+    def get_success_url(self):
+        return JsonResponse({'status': 'success'})
+    
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        if hasattr(self.object, 'game') and self.object.game:
+            form.fields['milestone'].queryset = GameMilestone.objects.filter(game=self.object.game)
+        return form
+    
     @method_decorator(require_POST)
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
     
-    def post(self, request, pk):
-        task = get_object_or_404(GameTask, pk=pk)
-        
-        # Check if user has permission to update this task
-        if not (request.user.is_staff or 
-                request.user == task.assigned_to or 
-                request.user == task.game.lead_developer or
-                request.user == task.game.lead_designer or
-                request.user == task.game.lead_artist or
-                request.user in task.game.team_members.all()):
-            return JsonResponse({
-                'success': False,
-                'message': 'You do not have permission to update this task'
-            }, status=403)
-        
-        # Update task status
-        if 'status' in request.POST:
-            old_status = task.status
-            new_status = request.POST.get('status')
-            
-            # Validate status
-            valid_statuses = [status[0] for status in GameTask.STATUS_CHOICES]
-            if new_status not in valid_statuses:
-                return JsonResponse({
-                    'success': False,
-                    'message': 'Invalid status'
-                }, status=400)
-            
-            task.status = new_status
-            task.save()
-            
-            # Return success response
-            return JsonResponse({
-                'success': True,
-                'message': f'Task status updated from {old_status} to {new_status}',
-                'task_id': task.id,
-                'new_status': new_status
-            })
-        
-        # If we get here, no valid update parameters were provided
+    def form_valid(self, form):
+        form.instance.status = self.request.POST.get('status')
+        form.save()
+        return self.get_success_url()
+    
+    def form_invalid(self, form):
         return JsonResponse({
-            'success': False,
-            'message': 'No valid update parameters provided'
+            'status': 'error', 
+            'errors': form.errors.as_json()
         }, status=400)
 
 
-class GameTaskHoursUpdateView(LoginRequiredMixin, View):
+class GameTaskHoursUpdateView(LoginRequiredMixin, UpdateView):
     """
-    Update task actual hours via AJAX
+    Update game development task actual hours via AJAX
     """
+    model = GameDevelopmentTask
+    form_class = GameDevelopmentTaskForm
+    template_name = 'projects/game_task_form.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['game'] = getattr(self.object, 'game', None)
+        return context
+    
+    def get_success_url(self):
+        return JsonResponse({'status': 'success'})
+    
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        if hasattr(self.object, 'game') and self.object.game:
+            form.fields['milestone'].queryset = GameMilestone.objects.filter(game=self.object.game)
+        return form
+    
     @method_decorator(require_POST)
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
     
-    def post(self, request, pk):
-        task = get_object_or_404(GameTask, pk=pk)
-        
-        # Check if user has permission to update this task
-        if not (request.user.is_staff or 
-                request.user == task.assigned_to or 
-                request.user == task.game.lead_developer or
-                request.user == task.game.lead_designer or
-                request.user == task.game.lead_artist or
-                request.user in task.game.team_members.all()):
-            return JsonResponse({
-                'success': False,
-                'message': 'You do not have permission to update this task'
-            }, status=403)
-        
-        # Update task hours
-        if 'actual_hours' in request.POST:
-            try:
-                actual_hours = float(request.POST.get('actual_hours'))
-                if actual_hours < 0:
-                    raise ValueError("Hours cannot be negative")
-                
-                task.actual_hours = actual_hours
-                task.save()
-                
-                # Return success response
-                return JsonResponse({
-                    'success': True,
-                    'message': f'Task hours updated to {actual_hours}',
-                    'task_id': task.id,
-                    'actual_hours': actual_hours
-                })
-            except ValueError as e:
-                return JsonResponse({
-                    'success': False,
-                    'message': f'Invalid hours value: {str(e)}'
-                }, status=400)
-        
-        # If we get here, no valid update parameters were provided
+    def form_valid(self, form):
+        form.instance.actual_hours = self.request.POST.get('actual_hours')
+        form.save()
+        return self.get_success_url()
+    
+    def form_invalid(self, form):
         return JsonResponse({
-            'success': False,
-            'message': 'No valid update parameters provided'
+            'status': 'error', 
+            'errors': form.errors.as_json()
         }, status=400)
 
 
-class GameTaskBatchUpdateView(LoginRequiredMixin, View):
+class GameTaskBatchUpdateView(LoginRequiredMixin, UpdateView):
     """
-    Update multiple tasks at once via AJAX
+    Update multiple game development tasks at once via AJAX
     """
+    model = GameDevelopmentTask
+    form_class = GameDevelopmentTaskForm
+    template_name = 'projects/game_task_form.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['game'] = getattr(self.object, 'game', None)
+        return context
+    
+    def get_success_url(self):
+        return JsonResponse({'status': 'success'})
+    
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        if hasattr(self.object, 'game') and self.object.game:
+            form.fields['milestone'].queryset = GameMilestone.objects.filter(game=self.object.game)
+        return form
+    
     @method_decorator(require_POST)
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
     
-    def post(self, request):
-        try:
-            # Parse JSON data from request body
-            data = json.loads(request.body)
-            task_ids = data.get('task_ids', [])
-            status = data.get('status')
-            
-            if not task_ids:
-                return JsonResponse({
-                    'success': False,
-                    'message': 'No tasks specified'
-                }, status=400)
-            
-            if not status:
-                return JsonResponse({
-                    'success': False,
-                    'message': 'No status specified'
-                }, status=400)
-            
-            # Validate status
-            valid_statuses = [status_choice[0] for status_choice in GameTask.STATUS_CHOICES]
-            if status not in valid_statuses:
-                return JsonResponse({
-                    'success': False,
-                    'message': 'Invalid status'
-                }, status=400)
-            
-            # Get tasks and check permissions
-            tasks = GameTask.objects.filter(id__in=task_ids)
-            
-            # Filter to only tasks the user can update
-            if not request.user.is_staff:
-                tasks = tasks.filter(
-                    Q(assigned_to=request.user) | 
-                    Q(game__lead_developer=request.user) |
-                    Q(game__lead_designer=request.user) |
-                    Q(game__lead_artist=request.user) |
-                    Q(game__team_members=request.user)
-                ).distinct()
-            
-            if not tasks:
-                return JsonResponse({
-                    'success': False,
-                    'message': 'No tasks found or you do not have permission to update them'
-                }, status=403)
-            
-            # Update tasks
-            updated_count = tasks.update(status=status)
-            
-            # Return success response
-            return JsonResponse({
-                'success': True,
-                'message': f'Updated {updated_count} tasks to {status}',
-                'updated_count': updated_count,
-                'new_status': status
-            })
-            
-        except json.JSONDecodeError:
-            return JsonResponse({
-                'success': False,
-                'message': 'Invalid JSON data'
-            }, status=400)
-        except Exception as e:
-            return JsonResponse({
-                'success': False,
-                'message': f'Error updating tasks: {str(e)}'
-            }, status=500)
+    def form_valid(self, form):
+        task_ids = json.loads(self.request.POST.get('task_ids'))
+        status = self.request.POST.get('status')
+        
+        GameDevelopmentTask.objects.filter(id__in=task_ids).update(status=status)
+        return self.get_success_url()
+    
+    def form_invalid(self, form):
+        return JsonResponse({
+            'status': 'error', 
+            'errors': form.errors.as_json()
+        }, status=400)

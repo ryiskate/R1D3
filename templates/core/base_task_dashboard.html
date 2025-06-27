@@ -170,34 +170,34 @@
         <div class="col-12">
             <div class="card shadow mb-4">
                 <div class="card-header py-3 d-flex justify-content-between align-items-center">
-                    <h6 class="m-0 font-weight-bold text-primary">Tasks by Company Section</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">Company Filter</h6>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         {% for section in section_stats %}
-                        <div class="col-md-4 col-lg-3 mb-3">
+                        <div class="col-md-2 mb-2">
                             <div class="card h-100">
-                                <div class="card-body">
-                                    <h5 class="card-title">
+                                <div class="card-body p-2 text-center">
+                                    <div class="d-flex align-items-center justify-content-center mb-1">
                                         {% if section.section_name == 'game_development' %}
-                                            <i class="fas fa-gamepad text-primary me-2"></i>
+                                            <i class="fas fa-gamepad text-primary me-1"></i>
                                         {% elif section.section_name == 'education' %}
-                                            <i class="fas fa-graduation-cap text-success me-2"></i>
+                                            <i class="fas fa-graduation-cap text-success me-1"></i>
                                         {% elif section.section_name == 'arcade' %}
-                                            <i class="fas fa-arcade text-danger me-2"></i>
+                                            <i class="fas fa-arcade text-danger me-1"></i>
                                         {% elif section.section_name == 'marketing' %}
-                                            <i class="fas fa-bullhorn text-info me-2"></i>
+                                            <i class="fas fa-bullhorn text-info me-1"></i>
                                         {% elif section.section_name == 'research' %}
-                                            <i class="fas fa-flask text-warning me-2"></i>
+                                            <i class="fas fa-flask text-warning me-1"></i>
                                         {% else %}
-                                            <i class="fas fa-cogs text-secondary me-2"></i>
+                                            <i class="fas fa-cogs text-secondary me-1"></i>
                                         {% endif %}
-                                        {{ section.section_name|title }}
-                                    </h5>
-                                    <p class="card-text">
-                                        <span class="badge bg-primary">{{ section.count }} Tasks</span>
-                                    </p>
-                                    <a href="?company_section={{ section.section_name }}" class="btn btn-sm btn-outline-primary">View Tasks</a>
+                                        <span class="fw-bold">{{ section.section_name|title }}</span>
+                                    </div>
+                                    <span class="badge bg-primary mb-1">{{ section.count }} Tasks</span>
+                                    <div>
+                                        <a href="?company_section={{ section.section_name }}" class="btn btn-sm btn-outline-primary btn-block">View Tasks</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -220,7 +220,7 @@
                 {% endif %}
             </h6>
             <div>
-                <a href="{% block table_new_task_url %}{% url 'games:task_create_hybrid' %}?section=r1d3{% endblock %}" class="btn btn-sm btn-primary">
+                <a href="{% block table_new_task_url %}{% url 'projects:r1d3_task_create' %}{% endblock %}" class="btn btn-sm btn-primary">
                     <i class="fas fa-plus-circle me-1"></i> {% block table_new_task_text %}New Task{% endblock %}
                 </a>
                 <button type="button" class="btn btn-sm btn-outline-secondary ms-2" data-bs-toggle="modal" data-bs-target="#filterModal">
@@ -259,7 +259,7 @@
                                 <input type="checkbox" class="form-check-input task-checkbox" data-task-id="{{ task.id }}">
                             </td>
                             <td>
-                                <a href="{% block task_detail_url %}{% url 'games:task_detail_hybrid' task.id %}{% endblock %}">{{ task.title }}</a>
+                                <a href="{% block task_detail_url %}{% url 'projects:r1d3_task_detail' task.id %}{% endblock %}">{{ task.title }}</a>
                                 {% if task.is_overdue %}
                                 <span class="badge bg-danger ms-1">Overdue</span>
                                 {% endif %}
@@ -304,7 +304,7 @@
                             </td>
                             <td class="action-column">
                                 <div class="btn-group">
-                                    <a href="{% block task_edit_url %}{% url 'games:task_update_hybrid' task.id %}{% endblock %}" class="btn btn-sm btn-outline-primary" title="Edit">
+                                    <a href="{% block task_edit_url %}{% url 'projects:r1d3_task_update' task.id %}{% endblock %}" class="btn btn-sm btn-outline-primary" title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     <a href="{% block task_delete_url %}{% url 'games:task_delete' task.id %}{% endblock %}" class="btn btn-sm btn-outline-danger" title="Delete">

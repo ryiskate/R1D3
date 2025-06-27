@@ -336,7 +336,7 @@ class GameTask(TimeStampedModel):
         ('other', 'Other'),
     ]
     
-    game = models.ForeignKey(GameProject, on_delete=models.CASCADE, related_name='tasks')
+    game = models.ForeignKey(GameProject, on_delete=models.CASCADE, null=True, blank=True, verbose_name='Associated Game', help_text='Required for game development tasks, leave empty for other sections')
     milestone = models.ForeignKey(GameMilestone, on_delete=models.SET_NULL, null=True, blank=True, related_name='tasks')
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)

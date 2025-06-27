@@ -5,29 +5,37 @@ from django.db.models import Count, Q, Sum, Case, When, IntegerField
 from django.utils import timezone
 from datetime import timedelta
 
-from .game_models import GameProject, GameTask, GameMilestone, GDDFeature
+from .game_models import GameProject, GameMilestone, GDDFeature
+from .task_models import GameDevelopmentTask
 
 class GameTaskDashboardView(LoginRequiredMixin, View):
     """
     Comprehensive task management dashboard for game tasks
     """
-    template_name = 'projects/task_dashboard.html'
+    template_name = 'projects/game_task_dashboard.html'
     
     def get(self, request, game_id=None):
         context = {}
         
-        # Get game if specified
+        # Get game if specified in URL or query parameter
         if game_id:
+            # Game ID from URL parameter
             game = get_object_or_404(GameProject, pk=game_id)
             context['game'] = game
-            tasks = GameTask.objects.filter(game=game)
+            tasks = GameDevelopmentTask.objects.filter(game=game)
+        elif request.GET.get('game'):
+            # Game ID from query parameter
+            game_id = request.GET.get('game')
+            game = get_object_or_404(GameProject, pk=game_id)
+            context['game'] = game
+            tasks = GameDevelopmentTask.objects.filter(game=game)
         else:
             # If no game specified, show all tasks the user has access to
             if request.user.is_staff:
-                tasks = GameTask.objects.all()
+                tasks = GameDevelopmentTask.objects.all()
             else:
                 # Get tasks from games where user is a team member or lead
-                tasks = GameTask.objects.filter(
+                tasks = GameDevelopmentTask.objects.filter(
                     Q(game__team_members=request.user) | 
                     Q(game__lead_developer=request.user) | 
                     Q(game__lead_designer=request.user) |
@@ -136,19 +144,20 @@ class GameTaskDashboardView(LoginRequiredMixin, View):
         # Add task status counts for filters
         context['status_counts'] = {
             status[0]: tasks.filter(status=status[0]).count() 
-            for status in GameTask.STATUS_CHOICES
+            for status in GameDevelopmentTask.STATUS_CHOICES
         }
         
         # Add task type counts for filters
+        task_types = set(tasks.values_list('task_type', flat=True).distinct())
         context['type_counts'] = {
-            task_type[0]: tasks.filter(task_type=task_type[0]).count() 
-            for task_type in GameTask.TASK_TYPE_CHOICES
+            task_type: tasks.filter(task_type=task_type).count() 
+            for task_type in task_types if task_type
         }
         
         # Add priority counts for filters
         context['priority_counts'] = {
             priority[0]: tasks.filter(priority=priority[0]).count() 
-            for priority in GameTask.PRIORITY_CHOICES
+            for priority in GameDevelopmentTask.PRIORITY_CHOICES
         }
         
         # Add tasks to context
@@ -156,5 +165,20 @@ class GameTaskDashboardView(LoginRequiredMixin, View):
         
         # Add today's date for template comparison
         context['today'] = timezone.now().date()
+        
+        # Add batch update URL to context
+        context['batch_update_url'] = 'games:game_task_batch_update'
+        
+        # Add all games to context for the game projects filter section
+        if request.user.is_staff:
+            context['games'] = GameProject.objects.all()
+        else:
+            # Only show games where user is a team member or lead
+            context['games'] = GameProject.objects.filter(
+                Q(team_members=request.user) | 
+                Q(lead_developer=request.user) | 
+                Q(lead_designer=request.user) |
+                Q(lead_artist=request.user)
+            ).distinct()
         
         return render(request, self.template_name, context)

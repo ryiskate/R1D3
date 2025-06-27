@@ -1,19 +1,20 @@
 {% extends 'core/base_task_dashboard.html' %}
 {% load static %}
 {% load project_extras %}
+{% load task_filters %}
 
 {% block dashboard_title %}R1D3 Tasks{% endblock %}
 
 {% block dashboard_heading %}R1D3 Tasks{% endblock %}
 
-{% block new_task_url %}{% url 'games:task_create_hybrid' %}?section=r1d3{% endblock %}
+{% block new_task_url %}{% url 'core:r1d3_task_create' %}{% endblock %}
 
 {% block new_task_text %}New R1D3 Task{% endblock %}
 
 {% block clear_filters_url %}{% url 'core:global_task_dashboard' %}{% endblock %}
 
 {% block header_buttons %}
-<a href="{% url 'games:task_create_hybrid' %}?section=r1d3" class="btn btn-primary">
+<a href="{% url 'core:r1d3_task_create' %}" class="btn btn-primary">
     <i class="fas fa-plus-circle me-1"></i> New R1D3 Task
 </a>
 <button type="button" class="btn btn-outline-secondary ms-2" data-bs-toggle="modal" data-bs-target="#filterModal">
@@ -25,6 +26,7 @@
 {% endblock %}
 
 {% block content %}
+<!-- Debug banner removed -->
 <div class="container-fluid py-4">
     <!-- Header -->
     <div class="row mb-4">
@@ -32,7 +34,7 @@
             <h1>R1D3 Tasks</h1>
         </div>
         <div class="col-md-4 text-end">
-            <a href="{% url 'games:task_create_hybrid' %}?section=r1d3" class="btn btn-primary">
+            <a href="{% url 'core:r1d3_task_create' %}" class="btn btn-primary">
                 <i class="fas fa-plus-circle me-1"></i> New R1D3 Task
             </a>
             <button type="button" class="btn btn-outline-secondary ms-2" data-bs-toggle="modal" data-bs-target="#filterModal">
@@ -107,35 +109,35 @@
     <div class="row mb-4">
         <div class="col-12">
             <div class="card shadow mb-4">
-                <div class="card-header py-3 d-flex justify-content-between align-items-center">
-                    <h6 class="m-0 font-weight-bold text-primary">Tasks by Company Section</h6>
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Company Filter</h6>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         {% for section in section_stats %}
-                        <div class="col-md-4 col-lg-3 mb-3">
+                        <div class="col-md-2 mb-2">
                             <div class="card h-100">
-                                <div class="card-body">
-                                    <h5 class="card-title">
+                                <div class="card-body p-2 text-center">
+                                    <div class="d-flex align-items-center justify-content-center mb-1">
                                         {% if section.section_name == 'game_development' %}
-                                            <i class="fas fa-gamepad text-primary me-2"></i>
+                                            <i class="fas fa-gamepad text-primary me-1"></i>
                                         {% elif section.section_name == 'education' %}
-                                            <i class="fas fa-graduation-cap text-success me-2"></i>
+                                            <i class="fas fa-graduation-cap text-success me-1"></i>
                                         {% elif section.section_name == 'arcade' %}
-                                            <i class="fas fa-arcade text-danger me-2"></i>
+                                            <i class="fas fa-arcade text-danger me-1"></i>
                                         {% elif section.section_name == 'marketing' %}
-                                            <i class="fas fa-bullhorn text-info me-2"></i>
+                                            <i class="fas fa-bullhorn text-info me-1"></i>
                                         {% elif section.section_name == 'research' %}
-                                            <i class="fas fa-flask text-warning me-2"></i>
+                                            <i class="fas fa-flask text-warning me-1"></i>
                                         {% else %}
-                                            <i class="fas fa-cogs text-secondary me-2"></i>
+                                            <i class="fas fa-cogs text-secondary me-1"></i>
                                         {% endif %}
-                                        {{ section.section_name|title }}
-                                    </h5>
-                                    <p class="card-text">
-                                        <span class="badge bg-primary">{{ section.count }} Tasks</span>
-                                    </p>
-                                    <a href="?company_section={{ section.section_name }}" class="btn btn-sm btn-outline-primary">View Tasks</a>
+                                        <span class="fw-bold">{{ section.section_name|title }}</span>
+                                    </div>
+                                    <span class="badge bg-primary mb-1">{{ section.count }} Tasks</span>
+                                    <div>
+                                        <a href="?company_section={{ section.section_name }}" class="btn btn-sm btn-outline-primary btn-block">View Tasks</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -182,37 +184,58 @@
                         </tr>
                     </thead>
                     <tbody>
+
                         {% for task in tasks %}
                         <tr class="task-row" data-task-id="{{ task.id }}" data-status="{{ task.status }}">
                             <td>
                                 <input type="checkbox" class="form-check-input task-checkbox" data-task-id="{{ task.id }}">
                             </td>
                             <td>
-                                <a href="{% url 'games:task_detail_hybrid' task.id %}">{{ task.title }}</a>
-                                {% if task.is_overdue %}
-                                <span class="badge bg-danger ms-1">Overdue</span>
+                                <a href="{% url 'projects:r1d3_task_detail' task.id %}" class="text-decoration-none">
+                                    <strong>{{ task.title }}</strong>
+                                    <div class="small text-muted">ID: {{ task.id }}</div>
+                                </a>
+                            </td>
+                            <td>
+                                {% if task|class_name == 'R1D3Task' %}
+                                <span class="badge bg-primary">R1D3</span>
+                                {% elif task|class_name == 'GameDevelopmentTask' %}
+                                <span class="badge bg-success">Game Development</span>
+                                {% elif task|class_name == 'EducationTask' %}
+                                <span class="badge bg-info">Education</span>
+                                {% elif task|class_name == 'SocialMediaTask' %}
+                                <span class="badge bg-warning">Social Media</span>
+                                {% elif task|class_name == 'ArcadeTask' %}
+                                <span class="badge bg-danger">Arcade</span>
+                                {% elif task|class_name == 'ThemeParkTask' %}
+                                <span class="badge bg-secondary">Theme Park</span>
+                                {% elif task|class_name == 'GameTask' %}
+                                    {% if task.company_section == 'game_development' %}
+                                    <span class="badge bg-success">Game Development</span>
+                                    {% elif task.company_section == 'education' %}
+                                    <span class="badge bg-info">Education</span>
+                                    {% elif task.company_section == 'social_media' %}
+                                    <span class="badge bg-warning">Social Media</span>
+                                    {% elif task.company_section == 'arcade' %}
+                                    <span class="badge bg-danger">Arcade</span>
+                                    {% elif task.company_section == 'theme_park' %}
+                                    <span class="badge bg-secondary">Theme Park</span>
+                                    {% else %}
+                                    <span class="badge bg-dark">{{ task.company_section|title }}</span>
+                                    {% endif %}
+                                {% else %}
+                                <span class="badge bg-dark">{{ task|class_name }}</span>
                                 {% endif %}
                             </td>
                             <td>
-                                <span class="badge section-badge 
-                                    {% if task.company_section == 'game_development' %}bg-primary
-                                    {% elif task.company_section == 'education' %}bg-success
-                                    {% elif task.company_section == 'arcade' %}bg-danger
-                                    {% elif task.company_section == 'marketing' %}bg-info
-                                    {% elif task.company_section == 'research' %}bg-warning
-                                    {% else %}bg-secondary{% endif %}">
-                                    {{ task.company_section|title }}
-                                </span>
-                            </td>
-                            <td>
                                 <span class="badge status-badge 
-                                    {% if task.status == 'to_do' %}bg-primary
+                                    {% if task.status == 'to_do' or task.status == 'todo' %}bg-primary
                                     {% elif task.status == 'in_progress' %}bg-warning
                                     {% elif task.status == 'review' %}bg-info
                                     {% elif task.status == 'done' %}bg-success
                                     {% elif task.status == 'blocked' %}bg-danger
                                     {% else %}bg-secondary{% endif %}">
-                                    {{ task.get_status_display }}
+                                    {% if task.get_status_display %}{{ task.get_status_display }}{% else %}{{ task.status|title }}{% endif %}
                                 </span>
                             </td>
                             <td>
@@ -239,7 +262,7 @@
                             </td>
                             <td class="text-center">
                                 <div class="btn-group">
-                                    <a href="{% url 'games:task_update_hybrid' task.id %}" class="btn btn-sm btn-outline-primary" title="Edit">
+                                    <a href="{% url 'projects:r1d3_task_update' task.id %}" class="btn btn-sm btn-outline-primary" title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     <a href="{% url 'games:task_delete' task.id %}" class="btn btn-sm btn-outline-danger" title="Delete">
@@ -259,7 +282,7 @@
                                         Clear Filters
                                     </a>
                                     {% else %}
-                                    <a href="{% url 'games:task_create_hybrid' %}" class="btn btn-sm btn-primary">
+                                    <a href="{% url 'projects:r1d3_task_create' %}" class="btn btn-sm btn-primary">
                                         Create Your First Task
                                     </a>
                                     {% endif %}
@@ -285,51 +308,61 @@
                 </div>
                 <div class="modal-body">
                     <form method="get" action="{% url 'core:global_task_dashboard' %}">
-                        <div class="mb-3">
-                            <label for="company_section" class="form-label">Company Section</label>
-                            <select class="form-select" id="company_section" name="company_section">
-                                <option value="">All Sections</option>
-                                <option value="system" {% if request.GET.company_section == 'system' %}selected{% endif %}>System</option>
-                                <option value="game_development" {% if request.GET.company_section == 'game_development' %}selected{% endif %}>Game Development</option>
-                                <option value="education" {% if request.GET.company_section == 'education' %}selected{% endif %}>Education</option>
-                                <option value="arcade" {% if request.GET.company_section == 'arcade' %}selected{% endif %}>Arcade</option>
-                                <option value="marketing" {% if request.GET.company_section == 'marketing' %}selected{% endif %}>Marketing</option>
-                                <option value="research" {% if request.GET.company_section == 'research' %}selected{% endif %}>Research</option>
-                            </select>
+                        <div class="mb-3 row align-items-center">
+                            <label for="company_section" class="col-sm-4 col-form-label">Company Filter</label>
+                            <div class="col-sm-8">
+                                <select class="form-select form-select-sm" id="company_section" name="company_section">
+                                    <option value="">All</option>
+                                    <option value="system" {% if request.GET.company_section == 'system' %}selected{% endif %}>System</option>
+                                    <option value="game_development" {% if request.GET.company_section == 'game_development' %}selected{% endif %}>Game Dev</option>
+                                    <option value="education" {% if request.GET.company_section == 'education' %}selected{% endif %}>Education</option>
+                                    <option value="arcade" {% if request.GET.company_section == 'arcade' %}selected{% endif %}>Arcade</option>
+                                    <option value="marketing" {% if request.GET.company_section == 'marketing' %}selected{% endif %}>Marketing</option>
+                                    <option value="research" {% if request.GET.company_section == 'research' %}selected{% endif %}>Research</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="status" class="form-label">Status</label>
-                            <select class="form-select" id="status" name="status">
-                                <option value="">All Statuses</option>
-                                <option value="to_do" {% if request.GET.status == 'to_do' %}selected{% endif %}>To Do</option>
-                                <option value="in_progress" {% if request.GET.status == 'in_progress' %}selected{% endif %}>In Progress</option>
-                                <option value="review" {% if request.GET.status == 'review' %}selected{% endif %}>Review</option>
-                                <option value="done" {% if request.GET.status == 'done' %}selected{% endif %}>Done</option>
-                                <option value="blocked" {% if request.GET.status == 'blocked' %}selected{% endif %}>Blocked</option>
-                            </select>
+                        <div class="mb-3 row align-items-center">
+                            <label for="status" class="col-sm-4 col-form-label">Status</label>
+                            <div class="col-sm-8">
+                                <select class="form-select form-select-sm" id="status" name="status">
+                                    <option value="">All</option>
+                                    <option value="to_do" {% if request.GET.status == 'to_do' %}selected{% endif %}>To Do</option>
+                                    <option value="in_progress" {% if request.GET.status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                                    <option value="review" {% if request.GET.status == 'review' %}selected{% endif %}>Review</option>
+                                    <option value="done" {% if request.GET.status == 'done' %}selected{% endif %}>Done</option>
+                                    <option value="blocked" {% if request.GET.status == 'blocked' %}selected{% endif %}>Blocked</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="priority" class="form-label">Priority</label>
-                            <select class="form-select" id="priority" name="priority">
-                                <option value="">All Priorities</option>
-                                <option value="high" {% if request.GET.priority == 'high' %}selected{% endif %}>High</option>
-                                <option value="medium" {% if request.GET.priority == 'medium' %}selected{% endif %}>Medium</option>
-                                <option value="low" {% if request.GET.priority == 'low' %}selected{% endif %}>Low</option>
-                            </select>
+                        <div class="mb-3 row align-items-center">
+                            <label for="priority" class="col-sm-4 col-form-label">Priority</label>
+                            <div class="col-sm-8">
+                                <select class="form-select form-select-sm" id="priority" name="priority">
+                                    <option value="">All</option>
+                                    <option value="high" {% if request.GET.priority == 'high' %}selected{% endif %}>High</option>
+                                    <option value="medium" {% if request.GET.priority == 'medium' %}selected{% endif %}>Medium</option>
+                                    <option value="low" {% if request.GET.priority == 'low' %}selected{% endif %}>Low</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="assigned_to" class="form-label">Assigned To</label>
-                            <select class="form-select" id="assigned_to" name="assigned_to">
-                                <option value="">All Users</option>
-                                <option value="unassigned" {% if request.GET.assigned_to == 'unassigned' %}selected{% endif %}>Unassigned</option>
-                                {% for user in users %}
-                                <option value="{{ user.id }}" {% if request.GET.assigned_to == user.id|stringformat:"s" %}selected{% endif %}>{{ user.username }}</option>
-                                {% endfor %}
-                            </select>
+                        <div class="mb-3 row align-items-center">
+                            <label for="assigned_to" class="col-sm-4 col-form-label">Assigned To</label>
+                            <div class="col-sm-8">
+                                <select class="form-select form-select-sm" id="assigned_to" name="assigned_to">
+                                    <option value="">All</option>
+                                    <option value="unassigned" {% if request.GET.assigned_to == 'unassigned' %}selected{% endif %}>Unassigned</option>
+                                    {% for user in users %}
+                                    <option value="{{ user.id }}" {% if request.GET.assigned_to == user.id|stringformat:"s" %}selected{% endif %}>{{ user.username }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="search" class="form-label">Search</label>
-                            <input type="text" class="form-control" id="search" name="search" value="{{ request.GET.search|default:'' }}" placeholder="Search by title or description">
+                        <div class="mb-3 row align-items-center">
+                            <label for="search" class="col-sm-4 col-form-label">Search</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control form-control-sm" id="search" name="search" value="{{ request.GET.search|default:'' }}" placeholder="Title or description">
+                            </div>
                         </div>
                         <div class="text-end">
                             <a href="{% url 'core:global_task_dashboard' %}" class="btn btn-outline-secondary me-2">Clear</a>
@@ -384,4 +417,5 @@
 
 {% block task_dashboard_js %}
 <script src="{% static 'js/global_task_manager.js' %}"></script>
+{% include 'projects/template_identifier.html' %}
 {% endblock %}

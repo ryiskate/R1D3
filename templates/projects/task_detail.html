@@ -11,8 +11,10 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{% url 'games:dashboard' %}">Dashboard</a></li>
+                    {% if task.game %}
                     <li class="breadcrumb-item"><a href="{% url 'games:game_detail' task.game.id %}">{{ task.game.title }}</a></li>
                     <li class="breadcrumb-item"><a href="{% url 'games:task_list' task.game.id %}">Tasks</a></li>
+                    {% endif %}
                     <li class="breadcrumb-item active">{{ task.title }}</li>
                 </ol>
             </nav>
@@ -247,33 +249,37 @@
                 </div>
                 <div class="card-body">
                     <div class="list-group">
-                        {% for related_task in task.game.tasks.all|slice:":5" %}
-                            {% if related_task != task %}
-                            <a href="{% url 'games:task_detail' related_task.id %}" class="list-group-item list-group-item-action">
-                                <div class="d-flex w-100 justify-content-between">
-                                    <h6 class="mb-1">{{ related_task.title }}</h6>
-                                    <small>
-                                        {% if related_task.status == 'backlog' %}
-                                        <span class="badge bg-secondary">Backlog</span>
-                                        {% elif related_task.status == 'to_do' %}
-                                        <span class="badge bg-primary">To Do</span>
-                                        {% elif related_task.status == 'in_progress' %}
-                                        <span class="badge bg-warning">In Progress</span>
-                                        {% elif related_task.status == 'in_review' %}
-                                        <span class="badge bg-info">In Review</span>
-                                        {% elif related_task.status == 'done' %}
-                                        <span class="badge bg-success">Done</span>
-                                        {% elif related_task.status == 'blocked' %}
-                                        <span class="badge bg-danger">Blocked</span>
-                                        {% endif %}
-                                    </small>
-                                </div>
-                                <small>{{ related_task.task_type|title }}</small>
-                            </a>
-                            {% endif %}
-                        {% empty %}
-                            <div class="list-group-item">No related tasks found</div>
-                        {% endfor %}
+                        {% if task.game %}
+                            {% for related_task in task.game.tasks.all|slice:":5" %}
+                                {% if related_task != task %}
+                                <a href="{% url 'games:task_detail' related_task.id %}" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">{{ related_task.title }}</h6>
+                                        <small>
+                                            {% if related_task.status == 'backlog' %}
+                                            <span class="badge bg-secondary">Backlog</span>
+                                            {% elif related_task.status == 'to_do' %}
+                                            <span class="badge bg-primary">To Do</span>
+                                            {% elif related_task.status == 'in_progress' %}
+                                            <span class="badge bg-warning">In Progress</span>
+                                            {% elif related_task.status == 'in_review' %}
+                                            <span class="badge bg-info">In Review</span>
+                                            {% elif related_task.status == 'done' %}
+                                            <span class="badge bg-success">Done</span>
+                                            {% elif related_task.status == 'blocked' %}
+                                            <span class="badge bg-danger">Blocked</span>
+                                            {% endif %}
+                                        </small>
+                                    </div>
+                                    <small>{{ related_task.task_type|title }}</small>
+                                </a>
+                                {% endif %}
+                            {% empty %}
+                                <div class="list-group-item">No related tasks found</div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="list-group-item">No game associated with this task</div>
+                        {% endif %}
                     </div>
                 </div>
             </div>

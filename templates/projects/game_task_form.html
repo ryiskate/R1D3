@@ -1,0 +1,135 @@
+{% extends "projects/unified_task_form.html" %}
+{% load crispy_forms_filters %}
+
+{% block section_css %}
+<style>
+    .game-badge {
+        background-color: #1cc88a;
+    }
+    .game-info {
+        border-left: 4px solid #1cc88a;
+        padding-left: 15px;
+    }
+    .milestone-info {
+        background-color: #f8f9fc;
+        border-radius: 5px;
+        padding: 10px;
+        margin-bottom: 15px;
+    }
+</style>
+{% endblock %}
+
+{% block form_title %}
+    {% if form.instance.id %}
+    <h1 class="h3 mb-4 text-gray-800">Update Game Development Task</h1>
+    {% else %}
+    <h1 class="h3 mb-4 text-gray-800">Create New Game Development Task</h1>
+    {% endif %}
+{% endblock %}
+
+{% block section_badge %}
+<span class="badge game-badge rounded-pill">
+    <i class="fas fa-gamepad me-1"></i> Game Development
+</span>
+{% endblock %}
+
+{% block section_specific_fields %}
+<div class="card mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">
+            <i class="fas fa-gamepad me-1"></i> Game Details
+        </h6>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                {{ form.game|as_crispy_field }}
+            </div>
+            <div class="col-md-6">
+                {{ form.milestone|as_crispy_field }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                {{ form.gdd_section|as_crispy_field }}
+            </div>
+            <div class="col-md-6">
+                {{ form.platform|as_crispy_field }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                {{ form.feature_id|as_crispy_field }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block sidebar_content %}
+<div class="card mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">
+            <i class="fas fa-info-circle me-1"></i> Game Development Information
+        </h6>
+    </div>
+    <div class="card-body">
+        {% if game %}
+        <div class="game-info mb-3">
+            <h5>{{ game.title }}</h5>
+            <p class="small">{{ game.description|truncatechars:150 }}</p>
+            <div class="d-flex justify-content-between">
+                <span class="badge bg-info">{{ game.genre }}</span>
+                <span class="badge bg-secondary">{{ game.status }}</span>
+            </div>
+        </div>
+        {% endif %}
+        
+        <div class="milestone-info">
+            <h5>Development Phases</h5>
+            <ul class="small">
+                <li><strong>Pre-production:</strong> Concept, design document</li>
+                <li><strong>Production:</strong> Asset creation, programming</li>
+                <li><strong>Testing:</strong> QA, bug fixing</li>
+                <li><strong>Release:</strong> Distribution, marketing</li>
+                <li><strong>Post-release:</strong> Updates, DLC</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block section_js %}
+<script>
+    $(document).ready(function() {
+        // Initialize select2 for game dropdown
+        $('#id_game').select2({
+            placeholder: "Select a game",
+            allowClear: true,
+            width: '100%'
+        });
+        
+        // Initialize select2 for milestone dropdown
+        $('#id_milestone').select2({
+            placeholder: "Select milestone",
+            allowClear: true,
+            width: '100%'
+        });
+        
+        // Initialize select2 for GDD section dropdown
+        $('#id_gdd_section').select2({
+            placeholder: "Select GDD section",
+            allowClear: true,
+            width: '100%'
+        });
+        
+        // Initialize select2 for platform dropdown
+        $('#id_platform').select2({
+            placeholder: "Select platform",
+            allowClear: true,
+            tags: true,
+            width: '100%'
+        });
+    });
+</script>
+{% endblock %}

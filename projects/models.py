@@ -2,7 +2,10 @@ from django.db import models
 from django.contrib.auth.models import User
 from core.models import TimeStampedModel
 from strategy.models import Goal, Objective
+from .game_models import GameTask, GameProject, GameMilestone, GDDSection
 
+# Make these models available at the package level
+__all__ = ['GameTask', 'GameProject', 'GameMilestone', 'GDDSection']
 
 class Project(TimeStampedModel):
     """

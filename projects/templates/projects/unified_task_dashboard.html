@@ -1,0 +1,412 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ section_name }} Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+  .task-card {
+    margin-bottom: 1rem;
+  }
+  .status-badge {
+    border-radius: 50px;
+    padding: 0.35em 0.65em;
+    font-size: 0.75em;
+  }
+  .priority-badge {
+    border-radius: 50px;
+    padding: 0.35em 0.65em;
+    font-size: 0.75em;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="background-color: green; color: white; padding: 10px; margin: 10px; text-align: center;">
+  <h3>UNIFIED_TASK_DASHBOARD.HTML TEMPLATE IS BEING USED</h3>
+</div>
+<div class="container-fluid">
+  <!-- Page Heading -->
+  <div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">{{ section_name }} Dashboard</h1>
+    <div>
+      <a href="#" class="btn btn-primary btn-icon-split" data-toggle="modal" data-target="#filterModal">
+        <span class="icon text-white-50">
+          <i class="fas fa-filter"></i>
+        </span>
+        <span class="text">Filter</span>
+      </a>
+      <a href="#" class="btn btn-success btn-icon-split" data-toggle="modal" data-target="#batchUpdateModal">
+        <span class="icon text-white-50">
+          <i class="fas fa-tasks"></i>
+        </span>
+        <span class="text">Batch Update</span>
+      </a>
+      <a href="?{% if game %}game={{ game.id }}{% endif %}" class="btn btn-secondary btn-icon-split">
+        <span class="icon text-white-50">
+          <i class="fas fa-undo"></i>
+        </span>
+        <span class="text">Clear Filters</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Task Statistics Cards -->
+  <div class="row">
+    <!-- Total Tasks Card -->
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card border-left-primary shadow h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Tasks</div>
+              <div class="h5 mb-0 font-weight-bold text-gray-800">{{ task_stats.total }}</div>
+            </div>
+            <div class="col-auto">
+              <i class="fas fa-tasks fa-2x text-gray-300"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Completion Rate Card -->
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card border-left-success shadow h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Completion Rate</div>
+              <div class="row no-gutters align-items-center">
+                <div class="col-auto">
+                  <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{{ task_stats.completion_rate }}%</div>
+                </div>
+                <div class="col">
+                  <div class="progress progress-sm mr-2">
+                    <div class="progress-bar bg-success progress-{{ task_stats.completion_rate|default:'0' }}" role="progressbar" 
+                         aria-valuenow="{{ task_stats.completion_rate }}" aria-valuemin="0" aria-valuemax="100">
+                      <span class="sr-only">{{ task_stats.completion_rate }}% Complete</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-auto">
+              <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hours Card -->
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card border-left-info shadow h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Hours (Est/Actual)</div>
+              <div class="h5 mb-0 font-weight-bold text-gray-800">{{ task_stats.estimated_hours }} / {{ task_stats.actual_hours }}</div>
+            </div>
+            <div class="col-auto">
+              <i class="fas fa-clock fa-2x text-gray-300"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overdue Tasks Card -->
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card border-left-warning shadow h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Overdue Tasks</div>
+              <div class="h5 mb-0 font-weight-bold text-gray-800">{{ overdue_tasks|length }}</div>
+            </div>
+            <div class="col-auto">
+              <i class="fas fa-exclamation-triangle fa-2x text-gray-300"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Task List Section -->
+  <div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+      <h6 class="m-0 font-weight-bold text-primary">Tasks</h6>
+      <div class="dropdown no-arrow">
+        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+        </a>
+        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+          <div class="dropdown-header">Actions:</div>
+          <a class="dropdown-item" href="{% url 'projects:game_task_create' %}">Create New Task</a>
+          <a class="dropdown-item" href="#" data-toggle="modal" data-target="#batchUpdateModal">Batch Update</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="#" data-toggle="modal" data-target="#filterModal">Filter Tasks</a>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-bordered" id="taskTable" width="100%" cellspacing="0">
+          <thead>
+            <tr>
+              <th><input type="checkbox" id="selectAll"></th>
+              <th>Title</th>
+              <th>Status</th>
+              <th>Priority</th>
+              <th>Due Date</th>
+              <th>Assigned To</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for task in tasks %}
+            <tr>
+              <td><input type="checkbox" class="task-checkbox" value="{{ task.id }}"></td>
+              <td>{{ task.title }}</td>
+              <td>
+                <span class="badge status-badge 
+                  {% if task.status == 'done' %}bg-success text-white{% endif %}
+                  {% if task.status == 'in_progress' %}bg-primary text-white{% endif %}
+                  {% if task.status == 'to_do' %}bg-info text-white{% endif %}
+                  {% if task.status == 'backlog' %}bg-secondary text-white{% endif %}
+                  {% if task.status == 'blocked' %}bg-danger text-white{% endif %}
+                  {% if task.status == 'in_review' %}bg-warning text-dark{% endif %}
+                ">
+                  {{ task.get_status_display }}
+                </span>
+              </td>
+              <td>
+                <span class="badge priority-badge
+                  {% if task.priority == 'high' %}bg-danger text-white{% endif %}
+                  {% if task.priority == 'medium' %}bg-warning text-dark{% endif %}
+                  {% if task.priority == 'low' %}bg-info text-white{% endif %}
+                ">
+                  {{ task.get_priority_display }}
+                </span>
+              </td>
+              <td>
+                {% if task.due_date %}
+                  {% if task.due_date < today and task.status != 'done' %}
+                    <span class="text-danger">{{ task.due_date }}</span>
+                  {% else %}
+                    {{ task.due_date }}
+                  {% endif %}
+                {% else %}
+                  <span class="text-muted">No date</span>
+                {% endif %}
+              </td>
+              <td>{{ task.assigned_to.get_full_name|default:task.assigned_to.username }}</td>
+              <td>
+                <a href="{% url 'projects:game_task_detail' task.id %}" class="btn btn-info btn-sm">
+                  <i class="fas fa-eye"></i>
+                </a>
+                <a href="{% url 'projects:game_task_update' task.id %}" class="btn btn-primary btn-sm">
+                  <i class="fas fa-edit"></i>
+                </a>
+                <a href="{% url 'projects:game_task_delete' task.id %}" class="btn btn-danger btn-sm">
+                  <i class="fas fa-trash"></i>
+                </a>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="7" class="text-center">No tasks found</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Filter Modal -->
+<div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="filterModalLabel">Filter Tasks</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+          
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="filterForm" method="get">
+          {% if game %}
+          <input type="hidden" name="game" value="{{ game.id }}">
+          {% endif %}
+          
+          <div class="form-group">
+            <label for="status">Status</label>
+            <select class="form-control" id="status" name="status">
+              <option value="">All Statuses</option>
+              <option value="backlog" {% if request.GET.status == 'backlog' %}selected{% endif %}>Backlog</option>
+              <option value="to_do" {% if request.GET.status == 'to_do' %}selected{% endif %}>To Do</option>
+              <option value="in_progress" {% if request.GET.status == 'in_progress' %}selected{% endif %}>In Progress</option>
+              <option value="in_review" {% if request.GET.status == 'in_review' %}selected{% endif %}>In Review</option>
+              <option value="done" {% if request.GET.status == 'done' %}selected{% endif %}>Done</option>
+              <option value="blocked" {% if request.GET.status == 'blocked' %}selected{% endif %}>Blocked</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="priority">Priority</label>
+            <select class="form-control" id="priority" name="priority">
+              <option value="">All Priorities</option>
+              <option value="low" {% if request.GET.priority == 'low' %}selected{% endif %}>Low</option>
+              <option value="medium" {% if request.GET.priority == 'medium' %}selected{% endif %}>Medium</option>
+              <option value="high" {% if request.GET.priority == 'high' %}selected{% endif %}>High</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="assigned_to">Assigned To</label>
+            <select class="form-control" id="assigned_to" name="assigned_to">
+              <option value="">Anyone</option>
+              <option value="me" {% if request.GET.assigned_to == 'me' %}selected{% endif %}>Me</option>
+              <option value="unassigned" {% if request.GET.assigned_to == 'unassigned' %}selected{% endif %}>Unassigned</option>
+            </select>
+          </div>
+          
+          {% if games %}
+          <div class="form-group">
+            <label for="game"><i class="fas fa-gamepad"></i> Game Project</label>
+            <select class="form-control" id="game" name="game">
+              <option value="">All Games</option>
+              {% for game_project in games %}
+              <option value="{{ game_project.id }}" {% if game and game.id == game_project.id %}selected{% endif %}>{{ game_project.title }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          {% endif %}
+          
+          <div class="form-group">
+            <label for="due_date">Due Date</label>
+            <select class="form-control" id="due_date" name="due_date">
+              <option value="">Any Date</option>
+              <option value="today" {% if request.GET.due_date == 'today' %}selected{% endif %}>Today</option>
+              <option value="this_week" {% if request.GET.due_date == 'this_week' %}selected{% endif %}>This Week</option>
+              <option value="overdue" {% if request.GET.due_date == 'overdue' %}selected{% endif %}>Overdue</option>
+              <option value="no_date" {% if request.GET.due_date == 'no_date' %}selected{% endif %}>No Due Date</option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onclick="document.getElementById('filterForm').submit()">Apply Filters</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Batch Update Modal -->
+<div class="modal fade" id="batchUpdateModal" tabindex="-1"  aria-labelledby="batchUpdateModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="batchUpdateModalLabel">Batch Update Tasks</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+          
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="batchUpdateForm">
+          <div class="form-group">
+            <label for="batchStatus">Status</label>
+            <select class="form-control" id="batchStatus" name="status">
+              <option value="">No Change</option>
+              <option value="backlog">Backlog</option>
+              <option value="to_do">To Do</option>
+              <option value="in_progress">In Progress</option>
+              <option value="in_review">In Review</option>
+              <option value="done">Done</option>
+              <option value="blocked">Blocked</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="batchPriority">Priority</label>
+            <select class="form-control" id="batchPriority" name="priority">
+              <option value="">No Change</option>
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="batchAssignedTo">Assigned To</label>
+            <select class="form-control" id="batchAssignedTo" name="assigned_to">
+              <option value="">No Change</option>
+              <option value="me">Me</option>
+              <option value="unassigned">Unassigned</option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="batchUpdateButton">Update Selected Tasks</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  $(document).ready(function() {
+    // Select all checkbox functionality
+    $('#selectAll').change(function() {
+      $('.task-checkbox').prop('checked', $(this).prop('checked'));
+    });
+    
+    // Batch update functionality
+    $('#batchUpdateButton').click(function() {
+      const selectedTasks = [];
+      $('.task-checkbox:checked').each(function() {
+        selectedTasks.push($(this).val());
+      });
+      
+      if (selectedTasks.length === 0) {
+        alert('Please select at least one task to update.');
+        return;
+      }
+      
+      const formData = {
+        task_ids: selectedTasks,
+        status: $('#batchStatus').val(),
+        priority: $('#batchPriority').val(),
+        assigned_to: $('#batchAssignedTo').val()
+      };
+      
+      $.ajax({
+        url: '{% url batch_update_url %}',
+        type: 'POST',
+        data: JSON.stringify(formData),
+        contentType: 'application/json',
+        headers: {
+          'X-CSRFToken': '{{ csrf_token }}'
+        },
+        success: function(response) {
+          location.reload();
+        },
+        error: function(error) {
+          console.error('Error updating tasks:', error);
+          alert('An error occurred while updating tasks. Please try again.');
+        }
+      });
+    });
+  });
+</script>
+
+{% include 'projects/template_identifier.html' %}
+{% endblock %}

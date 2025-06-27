@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Template Debug | R1D3{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <h1 class="h3 mb-4 text-gray-800">Template Debug Information</h1>
+  
+  <div class="card shadow mb-4">
+    <div class="card-header py-3 bg-primary text-white">
+      <h6 class="m-0 font-weight-bold">Dashboard Template Information</h6>
+    </div>
+    <div class="card-body">
+      <div class="alert alert-info">
+        <h4>All Tasks Dashboard Template</h4>
+        <p><strong>Template name:</strong> {{ debug_info.dashboard_template }}</p>
+        <p><strong>View class:</strong> {{ debug_info.dashboard_view }}</p>
+      </div>
+    </div>
+  </div>
+  
+  <div class="card shadow mb-4">
+    <div class="card-header py-3">
+      <h6 class="m-0 font-weight-bold text-primary">Template Directories</h6>
+    </div>
+    <div class="card-body">
+      <ul>
+        {% for dir in debug_info.template_dirs %}
+          <li>{{ dir }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  
+  <div class="card shadow mb-4">
+    <div class="card-header py-3">
+      <h6 class="m-0 font-weight-bold text-primary">Available Templates (first 50)</h6>
+    </div>
+    <div class="card-body">
+      <ul>
+        {% for template in debug_info.all_templates %}
+          <li>{{ template }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  
+  <div class="card shadow mb-4">
+    <div class="card-header py-3">
+      <h6 class="m-0 font-weight-bold text-primary">App Templates (first 50)</h6>
+    </div>
+    <div class="card-body">
+      <ul>
+        {% for template in debug_info.app_templates %}
+          <li>{{ template }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  
+  <div class="card shadow mb-4">
+    <div class="card-header py-3">
+      <h6 class="m-0 font-weight-bold text-primary">Template Loaders</h6>
+    </div>
+    <div class="card-body">
+      <pre>{{ debug_info.template_loaders }}</pre>
+    </div>
+  </div>
+</div>
+{% endblock %}

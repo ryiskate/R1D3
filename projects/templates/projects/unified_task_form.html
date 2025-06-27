@@ -1,0 +1,247 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+  {% if is_update %}
+    Update {{ section_name|default:"Task" }}
+  {% else %}
+    Create New {{ section_name|default:"Task" }}
+  {% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  .task-form-container {
+    background-color: #fff;
+    border-radius: 0.35rem;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+  }
+  
+  .form-section {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e3e6f0;
+  }
+  
+  .form-section:last-child {
+    border-bottom: none;
+  }
+  
+  .form-section-title {
+    color: #4e73df;
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+  
+  .priority-high {
+    color: #e74a3b;
+  }
+  
+  .priority-medium {
+    color: #f6c23e;
+  }
+  
+  .priority-low {
+    color: #36b9cc;
+  }
+  
+  .status-badge {
+    padding: 0.35em 0.65em;
+    border-radius: 50px;
+    font-size: 0.75em;
+  }
+  
+  /* Section-specific styling can be added in child templates */
+  {% block section_css %}{% endblock %}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <!-- Page Heading -->
+  <div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">
+      {% if is_update %}
+        Update {{ section_name|default:"Task" }}
+      {% else %}
+        Create New {{ section_name|default:"Task" }}
+      {% endif %}
+    </h1>
+    
+    {% block task_actions %}
+    <div>
+      {% if is_update %}
+        <a href="{% url 'projects:task_detail' object.id %}" class="btn btn-info btn-icon-split">
+          <span class="icon text-white-50">
+            <i class="fas fa-eye"></i>
+          </span>
+          <span class="text">View Task</span>
+        </a>
+      {% endif %}
+      
+      <a href="javascript:history.back()" class="btn btn-secondary btn-icon-split">
+        <span class="icon text-white-50">
+          <i class="fas fa-arrow-left"></i>
+        </span>
+        <span class="text">Back</span>
+      </a>
+    </div>
+    {% endblock %}
+  </div>
+
+  <!-- Task Form -->
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+          <h6 class="m-0 font-weight-bold text-primary">
+            {% if is_update %}
+              Update {{ section_name|default:"Task" }}
+            {% else %}
+              Create New {{ section_name|default:"Task" }}
+            {% endif %}
+          </h6>
+        </div>
+        <div class="card-body">
+          <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            {% block form_content %}
+            <div class="form-section">
+              <h5 class="form-section-title">Basic Information</h5>
+              <div class="row">
+                <div class="col-md-12">
+                  {{ form.title|as_crispy_field }}
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12">
+                  {{ form.description|as_crispy_field }}
+                </div>
+              </div>
+            </div>
+            
+            <div class="form-section">
+              <h5 class="form-section-title">Task Details</h5>
+              <div class="row">
+                <div class="col-md-6">
+                  {{ form.status|as_crispy_field }}
+                </div>
+                <div class="col-md-6">
+                  {{ form.priority|as_crispy_field }}
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  {{ form.assigned_to|as_crispy_field }}
+                </div>
+                <div class="col-md-6">
+                  {{ form.due_date|as_crispy_field }}
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  {{ form.estimated_hours|as_crispy_field }}
+                </div>
+                <div class="col-md-6">
+                  {{ form.actual_hours|as_crispy_field }}
+                </div>
+              </div>
+            </div>
+            
+            {% block section_specific_fields %}
+            <!-- Section-specific fields will be added here in child templates -->
+            {% endblock %}
+            
+            {% if form.attachments %}
+            <div class="form-section">
+              <h5 class="form-section-title">Additional Information</h5>
+              <div class="row">
+                <div class="col-md-12">
+                  {{ form.attachments|as_crispy_field }}
+                </div>
+              </div>
+            </div>
+            {% endif %}
+            {% endblock %}
+            
+            <div class="text-right">
+              <button type="submit" class="btn btn-primary btn-icon-split">
+                <span class="icon text-white-50">
+                  <i class="fas fa-save"></i>
+                </span>
+                <span class="text">
+                  {% if is_update %}
+                    Update {{ section_name|default:"Task" }}
+                  {% else %}
+                    Create {{ section_name|default:"Task" }}
+                  {% endif %}
+                </span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-lg-4">
+      {% block sidebar %}
+      <div class="card shadow mb-4">
+        <div class="card-header py-3">
+          <h6 class="m-0 font-weight-bold text-primary">Task Information</h6>
+        </div>
+        <div class="card-body">
+          <p>Fill out the form with the task details. Required fields are marked with an asterisk (*).</p>
+          
+          <h6 class="font-weight-bold mt-3">Priority Levels:</h6>
+          <ul class="list-unstyled">
+            <li><i class="fas fa-circle priority-high mr-2"></i> High - Urgent tasks that need immediate attention</li>
+            <li><i class="fas fa-circle priority-medium mr-2"></i> Medium - Important tasks to be completed soon</li>
+            <li><i class="fas fa-circle priority-low mr-2"></i> Low - Tasks that can be addressed later</li>
+          </ul>
+          
+          <h6 class="font-weight-bold mt-3">Status Options:</h6>
+          <ul class="list-unstyled">
+            <li><span class="status-badge bg-secondary text-white">Backlog</span> - Not yet started</li>
+            <li><span class="status-badge bg-info text-white">To Do</span> - Ready to be worked on</li>
+            <li><span class="status-badge bg-primary text-white">In Progress</span> - Currently being worked on</li>
+            <li><span class="status-badge bg-warning text-dark">In Review</span> - Completed and awaiting review</li>
+            <li><span class="status-badge bg-success text-white">Done</span> - Completed and approved</li>
+            <li><span class="status-badge bg-danger text-white">Blocked</span> - Cannot proceed due to an issue</li>
+          </ul>
+          
+          {% block sidebar_additional %}
+          <!-- Additional sidebar content can be added in child templates -->
+          {% endblock %}
+        </div>
+      </div>
+      {% endblock %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  $(document).ready(function() {
+    // Initialize date picker for due_date field
+    $('#id_due_date').datepicker({
+      format: 'yyyy-mm-dd',
+      autoclose: true,
+      todayHighlight: true
+    });
+    
+    // Initialize select2 for assigned_to field
+    $('#id_assigned_to').select2({
+      placeholder: 'Select a user',
+      allowClear: true,
+      theme: 'bootstrap4'
+    });
+    
+    {% block section_js %}
+    // Section-specific JavaScript can be added in child templates
+    {% endblock %}
+  });
+</script>
+{% endblock %}

@@ -1,5 +1,5 @@
 from django import forms
-from .models import Project, Milestone, Task, Risk
+from .models import Project, Milestone, Task, Risk, GameTask, GameMilestone, GDDSection
 
 
 class ProjectForm(forms.ModelForm):
@@ -48,3 +48,37 @@ class RiskForm(forms.ModelForm):
             'description': forms.Textarea(attrs={'rows': 3}),
             'mitigation_plan': forms.Textarea(attrs={'rows': 3}),
         }
+
+
+class GameTaskForm(forms.ModelForm):
+    class Meta:
+        model = GameTask
+        fields = [
+            'title', 'description', 'status', 'priority', 
+            'assigned_to', 'due_date', 'estimated_hours', 
+            'actual_hours', 'milestone', 'company_section',
+            'gdd_section', 'feature_id', 'platform',
+            'course_id', 'learning_objective', 'target_audience',
+            'machine_id', 'location', 'maintenance_type',
+            'campaign_id', 'channel', 'target_metrics',
+            'research_area', 'experiment_id', 'hypothesis'
+        ]
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 3}),
+            'due_date': forms.DateInput(attrs={'type': 'date'}),
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Set up milestone queryset based on game association
+        if hasattr(self.instance, 'game') and self.instance.game:
+            self.fields['milestone'].queryset = GameMilestone.objects.filter(game=self.instance.game)
+        else:
+            self.fields['milestone'].queryset = GameMilestone.objects.none()
+            
+        # Set up GDD section queryset
+        self.fields['gdd_section'].queryset = GDDSection.objects.all()
+        
+        # Set date input format
+        self.fields['due_date'].input_formats = ['%Y-%m-%d']

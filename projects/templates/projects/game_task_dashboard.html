@@ -1,0 +1,394 @@
+{% extends "projects/unified_task_dashboard.html" %}
+{% load static %}
+
+{% block title %}Game Development Tasks{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+  .milestone-card {
+    margin-bottom: 1.5rem;
+  }
+  .milestone-progress {
+    height: 10px;
+    border-radius: 5px;
+  }
+  .game-badge {
+    background-color: #4e73df;
+    color: white;
+    border-radius: 50px;
+    padding: 0.35em 0.65em;
+    font-size: 0.75em;
+  }
+  .milestone-badge {
+    background-color: #1cc88a;
+    color: white;
+    border-radius: 50px;
+    padding: 0.35em 0.65em;
+    font-size: 0.75em;
+  }
+  .badge-status-to_do { background-color: #e2e3e5; color: #41464b; }
+  .badge-status-in_progress { background-color: #cfe2ff; color: #084298; }
+  .badge-status-in_review { background-color: #fff3cd; color: #664d03; }
+  .badge-status-done { background-color: #d1e7dd; color: #0f5132; }
+  .badge-status-blocked { background-color: #f8d7da; color: #842029; }
+  
+  .badge-priority-low { 
+    background-color: #e9ecef; 
+    color: #6c757d; 
+  }
+  .badge-priority-medium { 
+    background-color: #fff3cd; 
+    color: #664d03; 
+  }
+  .badge-priority-high { 
+    background-color: #f8d7da; 
+    color: #842029; 
+  }
+  .badge-priority-critical { 
+    background-color: #dc3545; 
+    color: #fff; 
+  }
+  
+  .task-checkbox {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .table th {
+    border: none;
+  }
+</style>
+{% endblock %}
+
+{% block modals %}
+{{ block.super }}
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <!-- Page Heading -->
+  <div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Game Development Tasks</h1>
+    <div>
+      <a href="{% url 'games:task_create' %}" class="btn btn-primary btn-icon-split">
+        <span class="icon text-white-50">
+          <i class="fas fa-plus"></i>
+        </span>
+        <span class="text">New Task</span>
+      </a>
+      <a href="#" class="btn btn-info btn-icon-split" data-bs-toggle="modal" data-bs-target="#filterModal">
+        <span class="icon text-white-50">
+          <i class="fas fa-filter"></i>
+        </span>
+        <span class="text">Filter</span>
+      </a>
+      <a href="#" class="btn btn-success btn-icon-split" data-bs-toggle="modal" data-bs-target="#batchUpdateModal" id="batchUpdateBtn" disabled>
+        <span class="icon text-white-50">
+          <i class="fas fa-tasks"></i>
+        </span>
+        <span class="text">Batch Update</span>
+      </a>
+      <a href="?{% if game %}game={{ game.id }}{% endif %}" class="btn btn-secondary btn-icon-split">
+        <span class="icon text-white-50">
+          <i class="fas fa-undo"></i>
+        </span>
+        <span class="text">Clear Filters</span>
+      </a>
+    </div>
+  </div>
+  
+  <!-- Game filtering now integrated into the filter modal -->
+
+  <!-- Content Row - Task Stats -->
+  <div class="row">
+    <!-- To Do Tasks Card -->
+    <div class="col-xl-2 col-md-6 mb-4">
+      <div class="card border-left-secondary shadow h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">To Do</div>
+              <div class="h5 mb-0 font-weight-bold text-gray-800">{{ status_counts.to_do|default:0 }}</div>
+            </div>
+            <div class="col-auto">
+              <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+            </div>
+          </div>
+          <div class="progress mt-3" role="progressbar" aria-label="To Do Tasks">
+            <div class="progress-bar bg-secondary" data-width="{{ status_counts.to_do_percent|default:'0%' }}" aria-valuenow="{{ status_counts.to_do|default:0 }}" aria-valuemin="0" aria-valuemax="{{ tasks.count }}" style="width: {{ status_counts.to_do_percent|default:'0%' }}">
+              {{ status_counts.to_do_percent|default:'0%' }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- In Progress Tasks Card -->
+    <div class="col-xl-2 col-md-6 mb-4">
+      <div class="card border-left-primary shadow h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">In Progress</div>
+              <div class="h5 mb-0 font-weight-bold text-gray-800">{{ status_counts.in_progress|default:0 }}</div>
+            </div>
+            <div class="col-auto">
+              <i class="fas fa-spinner fa-2x text-gray-300"></i>
+            </div>
+          </div>
+          <div class="progress mt-3" role="progressbar" aria-label="In Progress Tasks">
+            <div class="progress-bar bg-primary" data-width="{{ status_counts.in_progress_percent|default:'0%' }}" aria-valuenow="{{ status_counts.in_progress|default:0 }}" aria-valuemin="0" aria-valuemax="{{ tasks.count }}" style="width: {{ status_counts.in_progress_percent|default:'0%' }}">
+              {{ status_counts.in_progress_percent|default:'0%' }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- In Review Tasks Card -->
+    <div class="col-xl-2 col-md-6 mb-4">
+      <div class="card border-left-warning shadow h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">In Review</div>
+              <div class="h5 mb-0 font-weight-bold text-gray-800">{{ status_counts.in_review|default:0 }}</div>
+            </div>
+            <div class="col-auto">
+              <i class="fas fa-search fa-2x text-gray-300"></i>
+            </div>
+          </div>
+          <div class="progress mt-3" role="progressbar" aria-label="In Review Tasks">
+            <div class="progress-bar bg-warning" data-width="{{ status_counts.in_review_percent|default:'0%' }}" aria-valuenow="{{ status_counts.in_review|default:0 }}" aria-valuemin="0" aria-valuemax="{{ tasks.count }}" style="width: {{ status_counts.in_review_percent|default:'0%' }}">
+              {{ status_counts.in_review_percent|default:'0%' }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Done Tasks Card -->
+    <div class="col-xl-2 col-md-6 mb-4">
+      <div class="card border-left-success shadow h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Done</div>
+              <div class="h5 mb-0 font-weight-bold text-gray-800">{{ status_counts.done|default:0 }}</div>
+            </div>
+            <div class="col-auto">
+              <i class="fas fa-check fa-2x text-gray-300"></i>
+            </div>
+          </div>
+          <div class="progress mt-3" role="progressbar" aria-label="Done Tasks">
+            <div class="progress-bar bg-success" data-width="{{ status_counts.done_percent|default:'0%' }}" aria-valuenow="{{ status_counts.done|default:0 }}" aria-valuemin="0" aria-valuemax="{{ tasks.count }}" style="width: {{ status_counts.done_percent|default:'0%' }}">
+              {{ status_counts.done_percent|default:'0%' }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Backlog Tasks Card -->
+    <div class="col-xl-2 col-md-6 mb-4">
+      <div class="card border-left-dark shadow h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-dark text-uppercase mb-1">Backlog</div>
+              <div class="h5 mb-0 font-weight-bold text-gray-800">{{ status_counts.backlog|default:0 }}</div>
+            </div>
+            <div class="col-auto">
+              <i class="fas fa-list fa-2x text-gray-300"></i>
+            </div>
+          </div>
+          <div class="progress mt-3" role="progressbar" aria-label="Backlog Tasks">
+            <div class="progress-bar bg-dark" data-width="{{ status_counts.backlog_percent|default:'0%' }}" aria-valuenow="{{ status_counts.backlog|default:0 }}" aria-valuemin="0" aria-valuemax="{{ tasks.count }}" style="width: {{ status_counts.backlog_percent|default:'0%' }}">
+              {{ status_counts.backlog_percent|default:'0%' }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content Row - Task List -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+          <h6 class="m-0 font-weight-bold text-primary">
+            {% if game %}
+              {{ game.title }} - Tasks
+            {% else %}
+              Game Development Tasks
+            {% endif %}
+          </h6>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table" id="taskTable" width="100%" cellspacing="0">
+              <thead>
+                <tr>
+                  <th width="30px">
+                    <input type="checkbox" id="selectAllTasks" class="task-checkbox">
+                  </th>
+                  <th>Title</th>
+                  <th>Status</th>
+                  <th>Priority</th>
+                  {% if not game %}<th>Game</th>{% endif %}
+                  <th>Assigned To</th>
+                  <th>Due Date</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for task in tasks %}
+                <tr>
+                  <td>
+                    <input type="checkbox" class="task-checkbox" value="{{ task.id }}">
+                  </td>
+                  <td>
+                    <a href="{% url 'games:task_detail' task.id %}">{{ task.title }}</a>
+                  </td>
+                  <td>
+                    <span class="badge badge-pill {% if task.status == 'todo' %}badge-status-to_do{% else %}badge-status-{{ task.status }}{% endif %}">
+                      {% if task.status == 'to_do' or task.status == 'todo' %}
+                        <i class="fas fa-clipboard-list"></i>
+                      {% elif task.status == 'in_progress' %}
+                        <i class="fas fa-spinner"></i>
+                      {% elif task.status == 'in_review' %}
+                        <i class="fas fa-search"></i>
+                      {% elif task.status == 'done' %}
+                        <i class="fas fa-check"></i>
+                      {% elif task.status == 'blocked' %}
+                        <i class="fas fa-ban"></i>
+                      {% endif %}
+                      {% if task.get_status_display %}{{ task.get_status_display }}{% else %}{{ task.status|title }}{% endif %}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="badge badge-pill badge-priority-{{ task.priority }}">
+                      {% if task.priority == 'critical' %}
+                        <i class="fas fa-exclamation-triangle"></i>
+                      {% elif task.priority == 'high' %}
+                        <i class="fas fa-arrow-up"></i>
+                      {% elif task.priority == 'medium' %}
+                        <i class="fas fa-equals"></i>
+                      {% elif task.priority == 'low' %}
+                        <i class="fas fa-arrow-down"></i>
+                      {% endif %}
+                      {{ task.get_priority_display }}
+                    </span>
+                  </td>
+                  {% if not game %}
+                  <td>
+                    {% if task.game %}
+                      <span class="badge badge-pill game-badge">
+                        <i class="fas fa-gamepad"></i> {{ task.game.title }}
+                      </span>
+                    {% else %}
+                      <span class="badge badge-pill badge-secondary">General</span>
+                    {% endif %}
+                  </td>
+                  {% endif %}
+                  <td>
+                    {% if task.assigned_to %}
+                      <span class="badge badge-pill badge-light">
+                        <i class="fas fa-user"></i> {{ task.assigned_to.username }}
+                      </span>
+                    {% else %}
+                      <span class="badge badge-pill badge-secondary">Unassigned</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if task.due_date %}
+                      <span class="badge badge-pill {% if task.due_date < today %}badge-danger{% elif task.due_date == today %}badge-warning{% else %}badge-info{% endif %}">
+                        <i class="fas fa-calendar"></i> {{ task.due_date|date:"M d, Y" }}
+                      </span>
+                    {% else %}
+                      <span class="badge badge-pill badge-secondary">No due date</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <a href="{% url 'games:task_update' task.id %}" class="btn btn-sm btn-circle btn-primary">
+                      <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="{% url 'games:task_delete' task.id %}" class="btn btn-sm btn-circle btn-danger">
+                      <i class="fas fa-trash"></i>
+                    </a>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="{% if not game %}8{% else %}7{% endif %}" class="text-center">No tasks found.</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Game Selection section moved above -->
+
+  <!-- Task Statistics Cards -->
+  {% comment %}{{ block.super }}{% endcomment %}
+
+  <!-- Milestones Section (if game is selected) -->
+  {% if game and milestones %}
+  <div class="row">
+    <div class="col-12">
+      <div class="card shadow mb-4">
+        <div class="card-header py-3">
+          <h6 class="m-0 font-weight-bold text-primary">Milestones</h6>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            {% for milestone in milestones %}
+            <div class="col-lg-6">
+              <div class="card milestone-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                  <h6 class="font-weight-bold m-0">{{ milestone.name }}</h6>
+                  <span class="badge {% if milestone.due_date < today %}bg-danger{% else %}bg-info{% endif %} text-white">
+                    Due: {{ milestone.due_date }}
+                  </span>
+                </div>
+                <div class="card-body">
+                  <div class="mb-2">
+                    <div class="text-xs font-weight-bold text-primary mb-1">
+                      Progress: {{ milestone.completed_tasks }} / {{ milestone.total_tasks }} tasks ({{ milestone.progress }}%)
+                    </div>
+                    <div class="progress milestone-progress mb-4">
+                      <div class="progress-bar" style="width:{{ milestone.progress }}%" aria-valuenow="{{ milestone.progress }}" aria-valuemin="0" aria-valuemax="100">
+                        {{ milestone.progress }}%
+                      </div>
+                    </div>
+                  </div>
+                  <a href="?game={{ game.id }}&milestone={{ milestone.id }}" class="btn btn-sm btn-primary">
+                    View Tasks
+                  </a>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+  $(document).ready(function() {
+    // Game-specific JavaScript can go here
+  });
+</script>
+{% endblock %}

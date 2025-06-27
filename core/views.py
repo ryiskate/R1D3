@@ -1,12 +1,25 @@
-from django.shortcuts import render, HttpResponse
-from django.views.generic import TemplateView, View
+from django.shortcuts import render, HttpResponse, redirect
+from django.views.generic import TemplateView, View, CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count, Q, F
+from django.urls import reverse_lazy
+from django.contrib import messages
 from datetime import date, timedelta
 
-# Import game models for dashboard stats
+# Import task models for dashboard stats
 try:
-    from projects.game_models import GameProject, GameTask
+    from projects.task_models import (
+        R1D3Task, GameDevelopmentTask, EducationTask,
+        SocialMediaTask, ArcadeTask, ThemeParkTask
+    )
+    from projects.game_models import GameTask
+    TASK_MODELS_AVAILABLE = True
+except ImportError:
+    TASK_MODELS_AVAILABLE = False
+
+# Import game project models for dashboard stats
+try:
+    from projects.game_models import GameProject
     GAME_MODELS_AVAILABLE = True
 except ImportError:
     GAME_MODELS_AVAILABLE = False
@@ -66,60 +79,139 @@ class GlobalTaskDashboardView(LoginRequiredMixin, View):
         due_date_filter = request.GET.get('due_date', '')
         search_query = request.GET.get('search', '')
         
-        # Start with all tasks
-        tasks = GameTask.objects.all()
+        # Get all tasks from all task models
+        r1d3_tasks = list(R1D3Task.objects.all())
+        print(f"R1D3Task count: {len(r1d3_tasks)}")
         
-        # Apply filters
-        if status_filter:
-            tasks = tasks.filter(status=status_filter)
+        game_tasks = list(GameDevelopmentTask.objects.all())
+        print(f"GameDevelopmentTask count: {len(game_tasks)}")
         
-        if priority_filter:
-            tasks = tasks.filter(priority=priority_filter)
+        education_tasks = list(EducationTask.objects.all())
+        print(f"EducationTask count: {len(education_tasks)}")
         
+        social_media_tasks = list(SocialMediaTask.objects.all())
+        print(f"SocialMediaTask count: {len(social_media_tasks)}")
+        
+        arcade_tasks = list(ArcadeTask.objects.all())
+        print(f"ArcadeTask count: {len(arcade_tasks)}")
+        
+        theme_park_tasks = list(ThemeParkTask.objects.all())
+        print(f"ThemeParkTask count: {len(theme_park_tasks)}")
+        
+        # Get tasks from the old GameTask model
+        old_game_tasks = list(GameTask.objects.all())
+        print(f"Old GameTask count: {len(old_game_tasks)}")
+        
+        # Combine all tasks into a single list
+        all_tasks = r1d3_tasks + game_tasks + education_tasks + social_media_tasks + arcade_tasks + theme_park_tasks + old_game_tasks
+        print(f"Total tasks before filtering: {len(all_tasks)}")
+        
+        # Sort tasks by created_at (newest first)
+        tasks = sorted(all_tasks, key=lambda x: x.created_at, reverse=True)
+        
+        # Apply filters - since we're working with a Python list, we need to filter manually
+        filtered_tasks = tasks
+        print(f"Tasks before filtering: {len(filtered_tasks)}")
+        
+        # Filter by status
+        if status_filter and status_filter != 'all':
+            filtered_tasks = [task for task in filtered_tasks if task.status == status_filter]
+            print(f"Tasks after status filter '{status_filter}': {len(filtered_tasks)}")
+        
+        # Filter by priority
+        if priority_filter and priority_filter != 'all':
+            filtered_tasks = [task for task in filtered_tasks if task.priority == priority_filter]
+            print(f"Tasks after priority filter '{priority_filter}': {len(filtered_tasks)}")
+        
+        # Filter by assigned_to
         if assigned_filter == 'me':
-            tasks = tasks.filter(assigned_to=request.user)
+            filtered_tasks = [task for task in filtered_tasks if task.assigned_to == request.user]
+            print(f"Tasks after assigned_to filter 'me': {len(filtered_tasks)}")
         elif assigned_filter == 'unassigned':
-            tasks = tasks.filter(assigned_to__isnull=True)
+            filtered_tasks = [task for task in filtered_tasks if task.assigned_to is None]
+            print(f"Tasks after assigned_to filter 'unassigned': {len(filtered_tasks)}")
         
+        # For company section, we need to check the task type
         if company_section_filter:
-            tasks = tasks.filter(company_section=company_section_filter)
+            print(f"Applying company section filter: '{company_section_filter}'")
+            if company_section_filter == 'game_development':
+                filtered_tasks = [task for task in filtered_tasks if isinstance(task, GameDevelopmentTask) or 
+                                 (isinstance(task, GameTask) and task.company_section == 'game_development')]
+                print(f"Tasks after company section filter 'game_development': {len(filtered_tasks)}")
+            elif company_section_filter == 'education':
+                filtered_tasks = [task for task in filtered_tasks if isinstance(task, EducationTask) or 
+                                 (isinstance(task, GameTask) and task.company_section == 'education')]
+                print(f"Tasks after company section filter 'education': {len(filtered_tasks)}")
+            elif company_section_filter == 'social_media':
+                filtered_tasks = [task for task in filtered_tasks if isinstance(task, SocialMediaTask) or 
+                                 (isinstance(task, GameTask) and task.company_section == 'social_media')]
+                print(f"Tasks after company section filter 'social_media': {len(filtered_tasks)}")
+            elif company_section_filter == 'arcade':
+                filtered_tasks = [task for task in filtered_tasks if isinstance(task, ArcadeTask) or 
+                                 (isinstance(task, GameTask) and task.company_section == 'arcade')]
+                print(f"Tasks after company section filter 'arcade': {len(filtered_tasks)}")
+            elif company_section_filter == 'theme_park':
+                filtered_tasks = [task for task in filtered_tasks if isinstance(task, ThemeParkTask) or 
+                                 (isinstance(task, GameTask) and task.company_section == 'theme_park')]
+                print(f"Tasks after company section filter 'theme_park': {len(filtered_tasks)}")
+            elif company_section_filter == 'r1d3':
+                filtered_tasks = [task for task in filtered_tasks if isinstance(task, R1D3Task)]
+                print(f"Tasks after company section filter 'r1d3': {len(filtered_tasks)}")
         
+        today = date.today()
         if due_date_filter == 'overdue':
-            tasks = tasks.filter(due_date__lt=date.today(), status__in=['to_do', 'in_progress', 'blocked'])
+            filtered_tasks = [task for task in filtered_tasks if task.due_date and task.due_date < today and task.status in ['to_do', 'in_progress', 'blocked']]
+            print(f"Tasks after due_date filter 'overdue': {len(filtered_tasks)}")
         elif due_date_filter == 'today':
-            tasks = tasks.filter(due_date=date.today())
+            filtered_tasks = [task for task in filtered_tasks if task.due_date and task.due_date == today]
+            print(f"Tasks after due_date filter 'today': {len(filtered_tasks)}")
         elif due_date_filter == 'this_week':
-            today = date.today()
             end_of_week = today + timedelta(days=(6 - today.weekday()))
-            tasks = tasks.filter(due_date__range=[today, end_of_week])
+            filtered_tasks = [task for task in filtered_tasks if task.due_date and today <= task.due_date <= end_of_week]
+            print(f"Tasks after due_date filter 'this_week': {len(filtered_tasks)}")
         
         if search_query:
-            tasks = tasks.filter(Q(title__icontains=search_query) | Q(description__icontains=search_query))
+            filtered_tasks = [task for task in filtered_tasks if 
+                             search_query.lower() in task.title.lower() or 
+                             (task.description and search_query.lower() in task.description.lower())]
+            print(f"Tasks after search query '{search_query}': {len(filtered_tasks)}")
+            
+        # Update tasks with filtered results
+        tasks = filtered_tasks
         
-        # Get task statistics
+        # Calculate task statistics from the combined task list
+        today = date.today()
         task_stats = {
-            'total': GameTask.objects.count(),
-            'to_do': GameTask.objects.filter(status='to_do').count(),
-            'in_progress': GameTask.objects.filter(status='in_progress').count(),
-            'in_review': GameTask.objects.filter(status='in_review').count(),
-            'done': GameTask.objects.filter(status='done').count(),
-            'backlog': GameTask.objects.filter(status='backlog').count(),
-            'blocked': GameTask.objects.filter(status='blocked').count(),
-            'overdue': GameTask.objects.filter(due_date__lt=date.today(), status__in=['to_do', 'in_progress', 'blocked']).count(),
+            'total': len(all_tasks),
+            'to_do': len([t for t in all_tasks if t.status == 'to_do']),
+            'in_progress': len([t for t in all_tasks if t.status == 'in_progress']),
+            'in_review': len([t for t in all_tasks if t.status == 'in_review']),
+            'done': len([t for t in all_tasks if t.status == 'done']),
+            'backlog': len([t for t in all_tasks if t.status == 'backlog']),
+            'blocked': len([t for t in all_tasks if t.status == 'blocked']),
+            'overdue': len([t for t in all_tasks if t.due_date and t.due_date < today and t.status in ['to_do', 'in_progress', 'blocked']]),
         }
         
-        # Get tasks by company section
-        section_stats = GameTask.objects.values('company_section').annotate(
-            count=Count('id'),
-            section_name=F('company_section')
-        ).order_by('company_section')
+        # Calculate section statistics
+        # Count GameTask objects by company section
+        game_dev_count = len(game_tasks) + len([t for t in old_game_tasks if t.company_section == 'game_development'])
+        education_count = len(education_tasks) + len([t for t in old_game_tasks if t.company_section == 'education'])
+        social_media_count = len(social_media_tasks) + len([t for t in old_game_tasks if t.company_section == 'social_media'])
+        arcade_count = len(arcade_tasks) + len([t for t in old_game_tasks if t.company_section == 'arcade'])
+        theme_park_count = len(theme_park_tasks) + len([t for t in old_game_tasks if t.company_section == 'theme_park'])
+        
+        section_stats = [
+            {'section_name': 'r1d3', 'count': len(r1d3_tasks)},
+            {'section_name': 'game_development', 'count': game_dev_count},
+            {'section_name': 'education', 'count': education_count},
+            {'section_name': 'social_media', 'count': social_media_count},
+            {'section_name': 'arcade', 'count': arcade_count},
+            {'section_name': 'theme_park', 'count': theme_park_count},
+        ]
         
         # Get recent and upcoming tasks
-        recent_tasks = GameTask.objects.filter(status='done').order_by('-updated_at')[:5]
-        upcoming_tasks = GameTask.objects.filter(
-            due_date__gte=date.today(),
-            status__in=['to_do', 'in_progress']
-        ).order_by('due_date')[:5]
+        recent_tasks = sorted([t for t in all_tasks if t.status == 'done'], key=lambda x: x.updated_at, reverse=True)[:5]
+        upcoming_tasks = sorted([t for t in all_tasks if t.due_date and t.due_date >= today and t.status in ['to_do', 'in_progress']], key=lambda x: x.due_date)[:5]
         
         context = {
             'tasks': tasks,
@@ -229,3 +321,38 @@ class SocialMediaTaskDashboardView(LoginRequiredMixin, View):
         }
         
         return render(request, self.template_name, context)
+
+
+class R1D3TaskCreateView(LoginRequiredMixin, CreateView):
+    """
+    Create a new R1D3 task from the global task dashboard.
+    This view uses the R1D3Task model and form from the projects app.
+    """
+    template_name = 'projects/r1d3_task_form.html'
+    login_url = '/'  # Redirect to home if not logged in
+    
+    def get_form_class(self):
+        # Import here to avoid circular imports
+        from projects.task_forms import R1D3TaskForm
+        return R1D3TaskForm
+    
+    def get_model(self):
+        # Import here to avoid circular imports
+        from projects.task_models import R1D3Task
+        return R1D3Task
+    
+    def form_valid(self, form):
+        # Set the created_by field to the current user
+        form.instance.created_by = self.request.user
+        messages.success(self.request, f"R1D3 Task '{form.instance.title}' created successfully!")
+        return super().form_valid(form)
+    
+    def get_success_url(self):
+        # Redirect back to the global task dashboard
+        return reverse_lazy('core:global_task_dashboard')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['section_name'] = "R1D3 Task"
+        context['is_create'] = True
+        return context

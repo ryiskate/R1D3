@@ -5,7 +5,7 @@
 
 {% block dashboard_heading %}{% if game %}{{ game.title }} Tasks{% else %}Game Development Tasks{% endif %}{% endblock %}
 
-{% block new_task_url %}{% url 'games:task_create_hybrid' %}?section=game_development{% endblock %}
+{% block new_task_url %}{% if game %}{% url 'games:task_create' game.id %}{% else %}{% url 'games:task_create' %}{% endif %}{% endblock %}
 {% block new_task_text %}New Game Task{% endblock %}
 
 {% block clear_filters_url %}{% url 'games:task_dashboard' %}{% endblock %}
@@ -114,7 +114,7 @@
                                 <input type="checkbox" class="form-check-input task-checkbox" data-task-id="{{ task.id }}">
                             </td>
                             <td>
-                                <a href="{% url 'games:task_detail_hybrid' task.id %}">{{ task.title }}</a>
+                                <a href="{% url 'projects:game_task_detail' task.id %}">{{ task.title }}</a>
                                 {% if task.is_overdue %}
                                 <span class="badge bg-danger ms-1">Overdue</span>
                                 {% endif %}
@@ -169,7 +169,7 @@
                             </td>
                             <td class="text-center">
                                 <div class="btn-group">
-                                    <a href="{% url 'games:task_update_hybrid' task.id %}" class="btn btn-sm btn-outline-primary" title="Edit">
+                                    <a href="{% url 'projects:game_task_update' task.id %}" class="btn btn-sm btn-outline-primary" title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     <a href="{% url 'games:task_delete' task.id %}" class="btn btn-sm btn-outline-danger" title="Delete">

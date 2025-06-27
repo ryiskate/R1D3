@@ -1,0 +1,119 @@
+{% extends "projects/unified_task_form.html" %}
+{% load crispy_forms_filters %}
+
+{% block section_css %}
+<style>
+    .arcade-badge {
+        background-color: #e74a3b;
+    }
+    .machine-info {
+        border-left: 4px solid #e74a3b;
+        padding-left: 15px;
+    }
+    .maintenance-info {
+        background-color: #f8f9fc;
+        border-radius: 5px;
+        padding: 10px;
+        margin-bottom: 15px;
+    }
+</style>
+{% endblock %}
+
+{% block form_title %}
+    {% if form.instance.id %}
+    <h1 class="h3 mb-4 text-gray-800">Update Arcade Task</h1>
+    {% else %}
+    <h1 class="h3 mb-4 text-gray-800">Create New Arcade Task</h1>
+    {% endif %}
+{% endblock %}
+
+{% block section_badge %}
+<span class="badge arcade-badge rounded-pill">
+    <i class="fas fa-archway me-1"></i> Arcade
+</span>
+{% endblock %}
+
+{% block section_specific_fields %}
+<div class="card mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">
+            <i class="fas fa-archway me-1"></i> Arcade Details
+        </h6>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                {{ form.machine_id|as_crispy_field }}
+            </div>
+            <div class="col-md-6">
+                {{ form.location|as_crispy_field }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                {{ form.maintenance_type|as_crispy_field }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block sidebar_content %}
+<div class="card mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">
+            <i class="fas fa-info-circle me-1"></i> Arcade Maintenance Information
+        </h6>
+    </div>
+    <div class="card-body">
+        <div class="machine-info mb-3">
+            <h5>Maintenance Types</h5>
+            <ul class="list-unstyled small">
+                <li><i class="fas fa-tools me-2"></i> Routine Maintenance</li>
+                <li><i class="fas fa-exclamation-triangle me-2"></i> Repair</li>
+                <li><i class="fas fa-sync me-2"></i> Software Update</li>
+                <li><i class="fas fa-microchip me-2"></i> Hardware Upgrade</li>
+                <li><i class="fas fa-clipboard-check me-2"></i> Inspection</li>
+            </ul>
+        </div>
+        
+        <div class="maintenance-info">
+            <h5>Maintenance Schedule</h5>
+            <ul class="small">
+                <li><strong>Daily:</strong> Basic cleaning, visual inspection</li>
+                <li><strong>Weekly:</strong> Coin mechanism check, control test</li>
+                <li><strong>Monthly:</strong> Deep cleaning, software updates</li>
+                <li><strong>Quarterly:</strong> Full hardware inspection</li>
+                <li><strong>Yearly:</strong> Major overhaul, parts replacement</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block section_js %}
+<script>
+    $(document).ready(function() {
+        // Initialize select2 for machine dropdown
+        $('#id_machine_id').select2({
+            placeholder: "Select a machine",
+            allowClear: true,
+            width: '100%'
+        });
+        
+        // Initialize select2 for location dropdown
+        $('#id_location').select2({
+            placeholder: "Select location",
+            allowClear: true,
+            width: '100%'
+        });
+        
+        // Initialize select2 for maintenance type dropdown
+        $('#id_maintenance_type').select2({
+            placeholder: "Select maintenance type",
+            allowClear: true,
+            width: '100%'
+        });
+    });
+</script>
+{% endblock %}

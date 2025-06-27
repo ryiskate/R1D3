@@ -1,0 +1,101 @@
+{% extends "projects/unified_task_form.html" %}
+{% load crispy_forms_filters %}
+
+{% block section_css %}
+<style>
+    .r1d3-badge {
+        background-color: #36b9cc;
+    }
+    .department-info {
+        border-left: 4px solid #36b9cc;
+        padding-left: 15px;
+    }
+    .project-info {
+        background-color: #f8f9fc;
+        border-radius: 5px;
+        padding: 10px;
+        margin-bottom: 15px;
+    }
+</style>
+{% endblock %}
+
+{% block form_title %}
+    {% if form.instance.id %}
+    <h1 class="h3 mb-4 text-gray-800">Update R1D3 Task</h1>
+    {% else %}
+    <h1 class="h3 mb-4 text-gray-800">Create New R1D3 Task</h1>
+    {% endif %}
+{% endblock %}
+
+{% block section_badge %}
+<span class="badge r1d3-badge rounded-pill">
+    <i class="fas fa-building me-1"></i> R1D3 General
+</span>
+{% endblock %}
+
+{% block section_specific_fields %}
+<div class="card mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">
+            <i class="fas fa-building me-1"></i> R1D3 Details
+        </h6>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-12">
+                {{ form.department|as_crispy_field }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block sidebar_content %}
+<div class="card mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">
+            <i class="fas fa-info-circle me-1"></i> R1D3 Company Information
+        </h6>
+    </div>
+    <div class="card-body">
+        <div class="department-info mb-3">
+            <h5>Departments</h5>
+            <ul class="list-unstyled small">
+                <li><i class="fas fa-gamepad me-2"></i> Game Development</li>
+                <li><i class="fas fa-graduation-cap me-2"></i> Education</li>
+                <li><i class="fas fa-hashtag me-2"></i> Social Media</li>
+                <li><i class="fas fa-archway me-2"></i> Arcade</li>
+                <li><i class="fas fa-ticket-alt me-2"></i> Theme Park</li>
+                <li><i class="fas fa-cogs me-2"></i> Operations</li>
+                <li><i class="fas fa-chart-line me-2"></i> Marketing</li>
+                <li><i class="fas fa-money-bill-wave me-2"></i> Finance</li>
+                <li><i class="fas fa-users me-2"></i> Human Resources</li>
+            </ul>
+        </div>
+        
+        <div class="project-info">
+            <h5>Project Management Tips</h5>
+            <ul class="small">
+                <li><strong>Clear Objectives:</strong> Define specific goals</li>
+                <li><strong>Regular Updates:</strong> Keep stakeholders informed</li>
+                <li><strong>Resource Allocation:</strong> Assign appropriate resources</li>
+                <li><strong>Timeline Management:</strong> Set realistic deadlines</li>
+                <li><strong>Risk Assessment:</strong> Identify potential issues early</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block section_js %}
+<script>
+    $(document).ready(function() {
+        // Initialize select2 for department dropdown
+        $('#id_department').select2({
+            placeholder: "Select department",
+            allowClear: true,
+            width: '100%'
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,397 @@
+{% extends "projects/unified_task_dashboard.html" %}
+{% load static %}
+
+{% block title %}Social Media Tasks Dashboard{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+  .channel-badge {
+    border-radius: 50px;
+    padding: 0.35em 0.65em;
+    font-size: 0.75em;
+  }
+  .channel-facebook {
+    background-color: #3b5998;
+    color: white;
+  }
+  .channel-twitter {
+    background-color: #1da1f2;
+    color: white;
+  }
+  .channel-instagram {
+    background-color: #c32aa3;
+    color: white;
+  }
+  .channel-youtube {
+    background-color: #ff0000;
+    color: white;
+  }
+  .channel-tiktok {
+    background-color: #000000;
+    color: white;
+  }
+  .channel-linkedin {
+    background-color: #0a66c2;
+    color: white;
+  }
+  .campaign-badge {
+    background-color: #f6c23e;
+    color: #333;
+    border-radius: 50px;
+    padding: 0.35em 0.65em;
+    font-size: 0.75em;
+  }
+  .metrics-card {
+    border-left: 0.25rem solid #1cc88a;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <!-- Page Heading -->
+  <div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">
+      Social Media Tasks Dashboard
+    </h1>
+    <div>
+      <a href="{% url 'projects:social_media_task_create' %}" class="btn btn-primary btn-icon-split">
+        <span class="icon text-white-50">
+          <i class="fas fa-plus"></i>
+        </span>
+        <span class="text">New Task</span>
+      </a>
+      <a href="#" class="btn btn-info btn-icon-split" data-toggle="modal" data-target="#filterModal">
+        <span class="icon text-white-50">
+          <i class="fas fa-filter"></i>
+        </span>
+        <span class="text">Filter</span>
+      </a>
+      <a href="#" class="btn btn-success btn-icon-split" data-toggle="modal" data-target="#batchUpdateModal">
+        <span class="icon text-white-50">
+          <i class="fas fa-tasks"></i>
+        </span>
+        <span class="text">Batch Update</span>
+      </a>
+      <a href="?" class="btn btn-secondary btn-icon-split">
+        <span class="icon text-white-50">
+          <i class="fas fa-undo"></i>
+        </span>
+        <span class="text">Clear Filters</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Task Statistics Cards -->
+  <div class="row">
+    <!-- Total Tasks Card -->
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card border-left-primary shadow h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Tasks</div>
+              <div class="h5 mb-0 font-weight-bold text-gray-800">{{ task_stats.total }}</div>
+            </div>
+            <div class="col-auto">
+              <i class="fas fa-hashtag fa-2x text-gray-300"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Completion Rate Card -->
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card border-left-success shadow h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Completion Rate</div>
+              <div class="row no-gutters align-items-center">
+                <div class="col-auto">
+                  <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{{ task_stats.completion_rate }}%</div>
+                </div>
+                <div class="col">
+                  <div class="progress progress-sm mr-2">
+                    <div class="progress-bar bg-success" role="progressbar" 
+                         style="width: {{ task_stats.completion_rate }}%" 
+                         aria-valuenow="{{ task_stats.completion_rate }}" aria-valuemin="0" aria-valuemax="100">
+                      <span class="sr-only">{{ task_stats.completion_rate }}% Complete</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-auto">
+              <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hours Card -->
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card border-left-info shadow h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Hours (Est/Actual)</div>
+              <div class="h5 mb-0 font-weight-bold text-gray-800">{{ task_stats.estimated_hours }} / {{ task_stats.actual_hours }}</div>
+            </div>
+            <div class="col-auto">
+              <i class="fas fa-clock fa-2x text-gray-300"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overdue Tasks Card -->
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card border-left-warning shadow h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Overdue Tasks</div>
+              <div class="h5 mb-0 font-weight-bold text-gray-800">{{ overdue_tasks|length }}</div>
+            </div>
+            <div class="col-auto">
+              <i class="fas fa-exclamation-triangle fa-2x text-gray-300"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Social Media Channel Breakdown -->
+  <div class="row">
+    <div class="col-xl-8 col-lg-7">
+      <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+          <h6 class="m-0 font-weight-bold text-primary">Tasks by Channel</h6>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-bordered" width="100%" cellspacing="0">
+              <thead>
+                <tr>
+                  <th>Channel</th>
+                  <th>Total Tasks</th>
+                  <th>Completed</th>
+                  <th>Progress</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for channel, count in channel_stats.items %}
+                <tr>
+                  <td>
+                    <span class="channel-badge channel-{{ channel|lower }}">
+                      <i class="fab fa-{{ channel|lower }}"></i> {{ channel }}
+                    </span>
+                  </td>
+                  <td>{{ count.total }}</td>
+                  <td>{{ count.completed }}</td>
+                  <td>
+                    <div class="progress">
+                      <div class="progress-bar bg-success" role="progressbar" 
+                           style="width: {{ count.percentage }}%" 
+                           aria-valuenow="{{ count.percentage }}" aria-valuemin="0" aria-valuemax="100">
+                        {{ count.percentage }}%
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="4" class="text-center">No channel data available</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-4 col-lg-5">
+      <div class="card shadow mb-4">
+        <div class="card-header py-3">
+          <h6 class="m-0 font-weight-bold text-primary">Active Campaigns</h6>
+        </div>
+        <div class="card-body">
+          <div class="chart-pie pt-4">
+            <ul class="list-group">
+              {% for campaign, count in campaigns.items %}
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                {{ campaign }}
+                <span class="badge bg-primary rounded-pill">{{ count }}</span>
+              </li>
+              {% empty %}
+              <li class="list-group-item">No campaign data available</li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Task List Section -->
+  <div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+      <h6 class="m-0 font-weight-bold text-primary">Social Media Tasks</h6>
+      <div class="dropdown no-arrow">
+        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+        </a>
+        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+          <div class="dropdown-header">Actions:</div>
+          <a class="dropdown-item" href="{% url 'projects:social_media_task_create' %}">Create New Task</a>
+          <a class="dropdown-item" href="#" data-toggle="modal" data-target="#batchUpdateModal">Batch Update</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="#" data-toggle="modal" data-target="#filterModal">Filter Tasks</a>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-bordered" id="taskTable" width="100%" cellspacing="0">
+          <thead>
+            <tr>
+              <th><input type="checkbox" id="selectAll"></th>
+              <th>Title</th>
+              <th>Channel</th>
+              <th>Campaign</th>
+              <th>Status</th>
+              <th>Priority</th>
+              <th>Due Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for task in tasks %}
+            <tr>
+              <td><input type="checkbox" class="task-checkbox" value="{{ task.id }}"></td>
+              <td>{{ task.title }}</td>
+              <td>
+                {% if task.channel %}
+                <span class="channel-badge channel-{{ task.channel|lower }}">
+                  <i class="fab fa-{{ task.channel|lower }}"></i> {{ task.channel }}
+                </span>
+                {% else %}
+                <span class="text-muted">N/A</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if task.campaign_id %}
+                <span class="campaign-badge">{{ task.campaign_id }}</span>
+                {% else %}
+                <span class="text-muted">N/A</span>
+                {% endif %}
+              </td>
+              <td>
+                <span class="badge status-badge 
+                  {% if task.status == 'done' %}bg-success text-white{% endif %}
+                  {% if task.status == 'in_progress' %}bg-primary text-white{% endif %}
+                  {% if task.status == 'to_do' %}bg-info text-white{% endif %}
+                  {% if task.status == 'backlog' %}bg-secondary text-white{% endif %}
+                  {% if task.status == 'blocked' %}bg-danger text-white{% endif %}
+                  {% if task.status == 'in_review' %}bg-warning text-dark{% endif %}
+                ">
+                  {{ task.get_status_display }}
+                </span>
+              </td>
+              <td>
+                <span class="badge priority-badge
+                  {% if task.priority == 'high' %}bg-danger text-white{% endif %}
+                  {% if task.priority == 'medium' %}bg-warning text-dark{% endif %}
+                  {% if task.priority == 'low' %}bg-info text-white{% endif %}
+                ">
+                  {{ task.get_priority_display }}
+                </span>
+              </td>
+              <td>
+                {% if task.due_date %}
+                  {% if task.due_date < today and task.status != 'done' %}
+                    <span class="text-danger">{{ task.due_date }}</span>
+                  {% else %}
+                    {{ task.due_date }}
+                  {% endif %}
+                {% else %}
+                  <span class="text-muted">No date</span>
+                {% endif %}
+              </td>
+              <td>
+                <a href="{% url 'projects:social_media_task_detail' task.id %}" class="btn btn-info btn-sm">
+                  <i class="fas fa-eye"></i>
+                </a>
+                <a href="{% url 'projects:social_media_task_update' task.id %}" class="btn btn-primary btn-sm">
+                  <i class="fas fa-edit"></i>
+                </a>
+                <a href="{% url 'projects:social_media_task_delete' task.id %}" class="btn btn-danger btn-sm">
+                  <i class="fas fa-trash"></i>
+                </a>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="8" class="text-center">No tasks found</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+  $(document).ready(function() {
+    // Social media-specific JavaScript can go here
+    
+    // Update batch update URL for social media tasks
+    $('#batchUpdateButton').click(function() {
+      const selectedTasks = [];
+      $('.task-checkbox:checked').each(function() {
+        selectedTasks.push($(this).val());
+      });
+      
+      if (selectedTasks.length === 0) {
+        alert('Please select at least one task to update.');
+        return;
+      }
+      
+      const formData = {
+        task_ids: selectedTasks,
+        status: $('#batchStatus').val(),
+        priority: $('#batchPriority').val(),
+        assigned_to: $('#batchAssignedTo').val()
+      };
+      
+      $.ajax({
+        url: '{% url "projects:social_media_task_batch_update" %}',
+        type: 'POST',
+        data: JSON.stringify(formData),
+        contentType: 'application/json',
+        headers: {
+          'X-CSRFToken': '{{ csrf_token }}'
+        },
+        success: function(response) {
+          location.reload();
+        },
+        error: function(error) {
+          console.error('Error updating tasks:', error);
+          alert('An error occurred while updating tasks. Please try again.');
+        }
+      });
+    });
+  });
+</script>
+{% endblock %}

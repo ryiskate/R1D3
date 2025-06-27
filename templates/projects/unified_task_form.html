@@ -1,0 +1,294 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% load crispy_forms_filters %}
+{% load static %}
+
+{% block extra_css %}
+<link href="{% static 'vendor/select2/css/select2.min.css' %}" rel="stylesheet">
+<link href="{% static 'vendor/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}" rel="stylesheet">
+<link href="{% static 'vendor/bootstrap-datepicker/css/bootstrap-datepicker.min.css' %}" rel="stylesheet">
+<style>
+    .task-form-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 1.5rem;
+    }
+    .priority-high {
+        color: #e74a3b;
+    }
+    .priority-medium {
+        color: #f6c23e;
+    }
+    .priority-low {
+        color: #36b9cc;
+    }
+    .status-badge {
+        font-size: 0.85rem;
+        padding: 0.35rem 0.65rem;
+    }
+    .status-not-started {
+        background-color: #858796;
+    }
+    .status-in-progress {
+        background-color: #4e73df;
+    }
+    .status-review {
+        background-color: #f6c23e;
+    }
+    .status-done {
+        background-color: #1cc88a;
+    }
+    .status-blocked {
+        background-color: #e74a3b;
+    }
+    .section-badge {
+        font-size: 0.85rem;
+        padding: 0.35rem 0.65rem;
+    }
+    .form-section {
+        margin-bottom: 2rem;
+    }
+    .sidebar-info {
+        font-size: 0.9rem;
+    }
+    .sidebar-info h5 {
+        font-size: 1rem;
+        font-weight: 600;
+    }
+    .sidebar-info ul {
+        padding-left: 1.2rem;
+    }
+    .task-form-card {
+        margin-bottom: 1.5rem;
+    }
+
+    .task-form-section {
+        margin-bottom: 1rem;
+    }
+    
+    .task-priority-info,
+    .task-status-info {
+        margin-bottom: 1rem;
+        padding-left: 1.2rem;
+    }
+</style>
+{% block section_css %}{% endblock %}
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid task-form-container">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        {% block form_title %}
+        <h1 class="h3 mb-0 text-gray-800">
+            {% if form.instance.id %}
+            Update Task
+            {% else %}
+            Create New Task
+            {% endif %}
+        </h1>
+        {% endblock %}
+        <div>
+            {% block section_badge %}
+            <span class="badge bg-primary rounded-pill">
+                <i class="fas fa-tasks me-1"></i> Task
+            </span>
+            {% endblock %}
+        </div>
+    </div>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Basic Information -->
+                <div class="card mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="fas fa-info-circle me-1"></i> Basic Information
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-12">
+                                {{ form.title|as_crispy_field }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                {{ form.description|as_crispy_field }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ form.status|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.priority|as_crispy_field }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ form.assigned_to|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.due_date|as_crispy_field }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Section-specific fields -->
+                {% block section_specific_fields %}
+                <!-- This block will be overridden by section-specific templates -->
+                {% endblock %}
+                
+                <!-- Additional Information -->
+                <div class="card mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="fas fa-clock me-1"></i> Time Tracking
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ form.estimated_hours|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.actual_hours|as_crispy_field }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i>
+                        {% if form.instance.id %}
+                        Update Task
+                        {% else %}
+                        Create Task
+                        {% endif %}
+                    </button>
+                    <a href="javascript:history.back()" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-1"></i> Back
+                    </a>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <!-- Sidebar Information -->
+                <div class="card mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="fas fa-question-circle me-1"></i> Task Priority Guide
+                        </h6>
+                    </div>
+                    <div class="card-body sidebar-info">
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                <span class="badge bg-danger rounded-pill">
+                                    <i class="fas fa-exclamation-circle"></i> High
+                                </span>
+                                <p class="small mt-1">Critical tasks that require immediate attention and have significant impact.</p>
+                            </li>
+                            <li class="mb-2">
+                                <span class="badge bg-warning rounded-pill">
+                                    <i class="fas fa-exclamation"></i> Medium
+                                </span>
+                                <p class="small mt-1">Important tasks that should be completed soon but aren't critical.</p>
+                            </li>
+                            <li>
+                                <span class="badge bg-info rounded-pill">
+                                    <i class="fas fa-info-circle"></i> Low
+                                </span>
+                                <p class="small mt-1">Tasks that can be addressed when time permits.</p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="fas fa-tasks me-1"></i> Task Status Guide
+                        </h6>
+                    </div>
+                    <div class="card-body sidebar-info">
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                <span class="badge bg-secondary rounded-pill">
+                                    <i class="fas fa-hourglass-start"></i> Not Started
+                                </span>
+                                <p class="small mt-1">Task has been created but work has not begun.</p>
+                            </li>
+                            <li class="mb-2">
+                                <span class="badge bg-primary rounded-pill">
+                                    <i class="fas fa-spinner"></i> In Progress
+                                </span>
+                                <p class="small mt-1">Work on the task has started and is ongoing.</p>
+                            </li>
+                            <li class="mb-2">
+                                <span class="badge bg-warning rounded-pill">
+                                    <i class="fas fa-search"></i> Review
+                                </span>
+                                <p class="small mt-1">Task is complete and awaiting review or approval.</p>
+                            </li>
+                            <li class="mb-2">
+                                <span class="badge bg-success rounded-pill">
+                                    <i class="fas fa-check"></i> Done
+                                </span>
+                                <p class="small mt-1">Task has been completed and approved.</p>
+                            </li>
+                            <li>
+                                <span class="badge bg-danger rounded-pill">
+                                    <i class="fas fa-ban"></i> Blocked
+                                </span>
+                                <p class="small mt-1">Task cannot proceed due to dependencies or issues.</p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                {% block sidebar_content %}
+                <!-- This block will be overridden by section-specific templates -->
+                {% endblock %}
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'vendor/select2/js/select2.min.js' %}"></script>
+<script src="{% static 'vendor/bootstrap-datepicker/js/bootstrap-datepicker.min.js' %}"></script>
+<script>
+    $(document).ready(function() {
+        // Initialize select2 for dropdowns
+        $('#id_assigned_to').select2({
+            placeholder: "Select user(s)",
+            allowClear: true,
+            width: '100%'
+        });
+        
+        $('#id_status').select2({
+            minimumResultsForSearch: Infinity,
+            width: '100%'
+        });
+        
+        $('#id_priority').select2({
+            minimumResultsForSearch: Infinity,
+            width: '100%'
+        });
+        
+        // Initialize datepicker
+        $('#id_due_date').datepicker({
+            format: 'yyyy-mm-dd',
+            autoclose: true,
+            todayHighlight: true
+        });
+    });
+</script>
+{% block section_js %}{% endblock %}
+{% endblock %}

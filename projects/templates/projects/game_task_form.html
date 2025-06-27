@@ -1,0 +1,145 @@
+{% extends "projects/unified_task_form.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+  {% if is_update %}
+    Update Game Development Task
+  {% else %}
+    Create New Game Development Task
+  {% endif %}
+{% endblock %}
+
+{% block section_css %}
+.milestone-badge {
+  background-color: #4e73df;
+  color: white;
+  border-radius: 50px;
+  padding: 0.35em 0.65em;
+  font-size: 0.75em;
+}
+
+.feature-badge {
+  background-color: #1cc88a;
+  color: white;
+  border-radius: 50px;
+  padding: 0.35em 0.65em;
+  font-size: 0.75em;
+}
+
+.game-badge {
+  background-color: #e74a3b;
+  color: white;
+  border-radius: 50px;
+  padding: 0.35em 0.65em;
+  font-size: 0.75em;
+}
+{% endblock %}
+
+{% block task_actions %}
+<div>
+  {% if is_update %}
+    <a href="{% url 'projects:game_task_detail' object.id %}" class="btn btn-info btn-icon-split">
+      <span class="icon text-white-50">
+        <i class="fas fa-eye"></i>
+      </span>
+      <span class="text">View Task</span>
+    </a>
+  {% endif %}
+  
+  <a href="{% url 'projects:game_task_dashboard' %}{% if game %}?game={{ game.id }}{% endif %}" class="btn btn-secondary btn-icon-split">
+    <span class="icon text-white-50">
+      <i class="fas fa-arrow-left"></i>
+    </span>
+    <span class="text">Back to Dashboard</span>
+  </a>
+</div>
+{% endblock %}
+
+{% block section_specific_fields %}
+<div class="form-section">
+  <h5 class="form-section-title">Game Development Details</h5>
+  <div class="row">
+    <div class="col-md-6">
+      {{ form.milestone|as_crispy_field }}
+    </div>
+    <div class="col-md-6">
+      {{ form.feature_id|as_crispy_field }}
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      {{ form.task_type|as_crispy_field }}
+    </div>
+    <div class="col-md-6">
+      {{ form.platform|as_crispy_field }}
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      {{ form.technical_requirements|as_crispy_field }}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block sidebar_additional %}
+<div class="mt-4">
+  <h6 class="font-weight-bold">Game Information:</h6>
+  {% if game %}
+    <div class="card bg-light mb-3">
+      <div class="card-body">
+        <h5 class="card-title">{{ game.title }}</h5>
+        <p class="card-text">
+          <small class="text-muted">
+            <strong>Genre:</strong> {{ game.genre }}<br>
+            <strong>Platform:</strong> {{ game.platform }}<br>
+            <strong>Status:</strong> {{ game.get_status_display }}
+          </small>
+        </p>
+        <div class="progress mb-2">
+          <div class="progress-bar" role="progressbar" style="width: {{ game.completion_percentage }}%;" 
+               aria-valuenow="{{ game.completion_percentage }}" aria-valuemin="0" aria-valuemax="100">
+            {{ game.completion_percentage }}%
+          </div>
+        </div>
+      </div>
+    </div>
+  {% else %}
+    <p>No game selected.</p>
+  {% endif %}
+  
+  <h6 class="font-weight-bold mt-3">Task Types:</h6>
+  <ul class="list-unstyled">
+    <li><i class="fas fa-code mr-2"></i> Programming</li>
+    <li><i class="fas fa-paint-brush mr-2"></i> Art</li>
+    <li><i class="fas fa-music mr-2"></i> Audio</li>
+    <li><i class="fas fa-book mr-2"></i> Design</li>
+    <li><i class="fas fa-bug mr-2"></i> QA</li>
+  </ul>
+</div>
+{% endblock %}
+
+{% block section_js %}
+// Initialize select2 for milestone field
+$('#id_milestone').select2({
+  placeholder: 'Select a milestone',
+  allowClear: true,
+  theme: 'bootstrap4'
+});
+
+// Initialize select2 for task_type field
+$('#id_task_type').select2({
+  placeholder: 'Select a task type',
+  allowClear: true,
+  theme: 'bootstrap4'
+});
+
+// Initialize select2 for platform field
+$('#id_platform').select2({
+  placeholder: 'Select platforms',
+  allowClear: true,
+  multiple: true,
+  theme: 'bootstrap4'
+});
+{% endblock %}

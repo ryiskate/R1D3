@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Debug Sidebar | R1D3{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-12">
+      <h1>Debug Sidebar Navigation</h1>
+      <p class="mb-4">This page helps debug the sidebar navigation issues.</p>
+      
+      <div class="card shadow mb-4">
+        <div class="card-header py-3">
+          <h6 class="m-0 font-weight-bold text-primary">Current URL Information</h6>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-info" id="urlInfo">
+            Loading URL information...
+          </div>
+          
+          <h5>Test Links</h5>
+          <div class="mb-3">
+            <a href="/games/" class="btn btn-primary me-2">
+              <span class="badge bg-success rounded-pill me-1">Correct</span> Game Dashboard (/games/)
+            </a>
+            <a href="/games/dashboard/" class="btn btn-danger me-2">
+              <span class="badge bg-danger rounded-pill me-1">Wrong</span> Game Dashboard (/games/dashboard/)
+            </a>
+            <a href="{% url 'games:dashboard' %}" class="btn btn-success">
+              <span class="badge bg-success rounded-pill me-1">Template</span> {% verbatim %}{% url 'games:dashboard' %}{% endverbatim %}
+            </a>
+          </div>
+          
+          <h5>Sidebar Cache Test</h5>
+          <button id="clearCacheBtn" class="btn btn-warning">
+            <i class="fas fa-broom me-1"></i> Clear Browser Cache
+          </button>
+          <button id="reloadPageBtn" class="btn btn-info ms-2">
+            <i class="fas fa-sync me-1"></i> Reload Page (Bypass Cache)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Display current URL information
+    const urlInfo = document.getElementById('urlInfo');
+    urlInfo.innerHTML = `
+      <p><strong>Current Path:</strong> ${window.location.pathname}</p>
+      <p><strong>Full URL:</strong> ${window.location.href}</p>
+      <p><strong>Timestamp:</strong> ${new Date().toLocaleString()}</p>
+    `;
+    
+    // Clear cache button
+    document.getElementById('clearCacheBtn').addEventListener('click', function() {
+      if (window.caches) {
+        caches.keys().then(function(names) {
+          for (let name of names) {
+            caches.delete(name);
+          }
+          urlInfo.innerHTML += `<p class="text-success"><strong>Cache cleared at:</strong> ${new Date().toLocaleString()}</p>`;
+        });
+      } else {
+        urlInfo.innerHTML += `<p class="text-warning"><strong>Cache API not available</strong></p>`;
+      }
+    });
+    
+    // Reload page button
+    document.getElementById('reloadPageBtn').addEventListener('click', function() {
+      location.reload(true); // true forces reload from server, not cache
+    });
+  });
+</script>
+{% endblock %}

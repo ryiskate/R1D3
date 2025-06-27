@@ -65,7 +65,15 @@
                 });
                 
                 // Send AJAX request to update tasks
-                fetch('{% block batch_update_url %}{% url "games:game_batch_task_update" %}{% endblock %}', {
+                // Get batch update URL from data attribute
+                const batchUpdateUrl = document.getElementById('taskTable').getAttribute('data-batch-update-url');
+                
+                if (!batchUpdateUrl) {
+                    showToast('Error', 'Batch update URL not defined. Please add data-batch-update-url attribute to the task table.', 'danger');
+                    return;
+                }
+                
+                fetch(batchUpdateUrl, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
