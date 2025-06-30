@@ -187,3 +187,10 @@ if not DEBUG:
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = 'DENY'
+
+# Import Backblaze B2 storage settings
+try:
+    from .backblaze_settings import *
+except ImportError:
+    # If Backblaze settings are not available, use default file storage
+    pass
