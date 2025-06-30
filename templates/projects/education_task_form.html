@@ -1,0 +1,86 @@
+{% extends 'projects/unified_task_form.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% if form.instance.id %}Edit{% else %}Create{% endif %} Education Task | R1D3{% endblock %}
+
+{% block form_title %}
+    <div class="d-flex align-items-center">
+        <i class="fas fa-graduation-cap text-success me-2"></i>
+        <h1 class="h3 mb-0">{% if form.instance.id %}Edit{% else %}Create{% endif %} Education Task</h1>
+    </div>
+{% endblock %}
+
+{% block breadcrumbs %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'core:dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'education:tasks' %}">Education Tasks</a></li>
+            <li class="breadcrumb-item active">{% if form.instance.id %}Edit{% else %}Create{% endif %} Task</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block section_specific_fields %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-graduation-cap me-1"></i>
+                Education Details
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form.course_id|as_crispy_field }}
+                </div>
+                <div class="col-md-6">
+                    {{ form.target_audience|as_crispy_field }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    {{ form.learning_objective|as_crispy_field }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block sidebar_content %}
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0"><i class="fas fa-info-circle me-1"></i> Education Task Information</h5>
+        </div>
+        <div class="card-body">
+            <p><strong>Course ID:</strong> The unique identifier for the course this task is associated with.</p>
+            <p><strong>Learning Objective:</strong> The specific learning goal this task aims to achieve.</p>
+            <p><strong>Target Audience:</strong> The intended audience for this educational content.</p>
+        </div>
+    </div>
+    
+    {% include "projects/partials/task_priority_guide.html" %}
+    {% include "projects/partials/task_status_guide.html" %}
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+    <script>
+        $(document).ready(function() {
+            // Initialize select2 for course selection
+            $('#id_course_id').select2({
+                placeholder: "Select a course",
+                allowClear: true,
+                theme: "bootstrap-5"
+            });
+            
+            // Initialize select2 for target audience
+            $('#id_target_audience').select2({
+                placeholder: "Select target audience",
+                allowClear: true,
+                theme: "bootstrap-5",
+                tags: true
+            });
+        });
+    </script>
+{% endblock %}

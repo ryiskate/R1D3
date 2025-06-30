@@ -4,9 +4,6 @@
 {% load static %}
 
 {% block extra_css %}
-<link href="{% static 'vendor/select2/css/select2.min.css' %}" rel="stylesheet">
-<link href="{% static 'vendor/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}" rel="stylesheet">
-<link href="{% static 'vendor/bootstrap-datepicker/css/bootstrap-datepicker.min.css' %}" rel="stylesheet">
 <style>
     .task-form-container {
         max-width: 1200px;
@@ -256,13 +253,30 @@
                 {% endblock %}
             </div>
         </div>
+        
+        <!-- Form Submission Buttons -->
+        <div class="row mt-4 mb-3">
+            <div class="col-12 d-flex justify-content-end">
+                {% block cancel_button %}
+                <a href="javascript:history.back()" class="btn btn-secondary me-2">
+                    <i class="fas fa-times me-1"></i> Cancel
+                </a>
+                {% endblock %}
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-1"></i>
+                    {% if form.instance.id %}
+                        Update Task
+                    {% else %}
+                        Create Task
+                    {% endif %}
+                </button>
+            </div>
+        </div>
     </form>
 </div>
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'vendor/select2/js/select2.min.js' %}"></script>
-<script src="{% static 'vendor/bootstrap-datepicker/js/bootstrap-datepicker.min.js' %}"></script>
 <script>
     $(document).ready(function() {
         // Initialize select2 for dropdowns

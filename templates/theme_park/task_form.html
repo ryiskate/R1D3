@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ title }} | R1D3{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0 text-gray-800">{{ title }}</h1>
+        <a href="{% url 'theme_park:tasks' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Tasks
+        </a>
+    </div>
+
+    <div class="row">
+        <!-- Main Form Column -->
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">Task Information</h6>
+                    <span class="badge bg-primary rounded-pill">
+                        <i class="fas fa-ferris-wheel me-1"></i> Theme Park
+                    </span>
+                </div>
+                <div class="card-body">
+                    <form method="post" id="taskForm">
+                        {% csrf_token %}
+                        
+                        <!-- Basic Information Section -->
+                        <div class="mb-4">
+                            <h5 class="text-dark">Basic Information</h5>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    {{ form.title|as_crispy_field }}
+                                </div>
+                                <div class="col-md-12">
+                                    {{ form.description|as_crispy_field }}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Task Details Section -->
+                        <div class="mb-4">
+                            <h5 class="text-dark">Task Details</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    {{ form.status|as_crispy_field }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form.priority|as_crispy_field }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form.due_date|as_crispy_field }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form.assigned_to|as_crispy_field }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form.estimated_hours|as_crispy_field }}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Theme Park Specific Fields -->
+                        <div class="mb-4">
+                            <h5 class="text-dark">Theme Park Information</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    {{ form.attraction_id|as_crispy_field }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form.zone|as_crispy_field }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form.task_type|as_crispy_field }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form.safety_priority|as_crispy_field }}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i> {{ submit_text|default:"Save" }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sidebar Column -->
+        <div class="col-lg-4">
+            <!-- Task Priority Info Card -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Task Priority Guide</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-2">
+                        <span class="badge bg-danger rounded-pill"><i class="fas fa-exclamation-circle"></i> Critical</span>
+                        <small class="text-muted ms-2">Urgent tasks requiring immediate attention</small>
+                    </div>
+                    <div class="mb-2">
+                        <span class="badge bg-warning rounded-pill"><i class="fas fa-arrow-up"></i> High</span>
+                        <small class="text-muted ms-2">Important tasks to be completed soon</small>
+                    </div>
+                    <div class="mb-2">
+                        <span class="badge bg-primary rounded-pill"><i class="fas fa-equals"></i> Medium</span>
+                        <small class="text-muted ms-2">Standard priority tasks</small>
+                    </div>
+                    <div class="mb-2">
+                        <span class="badge bg-secondary rounded-pill"><i class="fas fa-arrow-down"></i> Low</span>
+                        <small class="text-muted ms-2">Tasks that can be addressed later</small>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Theme Park Info Card -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Theme Park Information</h6>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2"><strong>Task Types:</strong></p>
+                    <ul class="small text-muted mb-3">
+                        <li>Maintenance - Regular upkeep of attractions</li>
+                        <li>Safety Check - Required safety inspections</li>
+                        <li>Upgrade - Improvements to existing attractions</li>
+                        <li>Staff Training - Employee training tasks</li>
+                        <li>Guest Experience - Enhancing visitor experience</li>
+                    </ul>
+                    
+                    <p class="mb-2"><strong>Safety Priority Levels:</strong></p>
+                    <ul class="small text-muted">
+                        <li>Critical - Immediate safety concern</li>
+                        <li>High - Important safety issue</li>
+                        <li>Standard - Regular safety check</li>
+                        <li>Low - Minor safety consideration</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Initialize Select2 for dropdown fields
+        $('#id_assigned_to').select2({
+            placeholder: 'Select a user',
+            allowClear: true,
+            theme: 'bootstrap4'
+        });
+        
+        // Initialize datepicker for due date
+        $('#id_due_date').datepicker({
+            format: 'yyyy-mm-dd',
+            autoclose: true,
+            todayHighlight: true
+        });
+    });
+</script>
+{% endblock extra_js %}

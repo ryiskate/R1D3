@@ -1,0 +1,254 @@
+{% extends 'indie_news/indie_news_base.html' %}
+{% load static %}
+
+{% block title %}{{ tool.name }} - Indie Development Tool{% endblock %}
+
+{% block indie_content %}
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-tools text-primary"></i>
+            Indie Development Tool Detail
+        </h1>
+        <div>
+            <a href="{% url 'indie_news:tool_list' %}" class="btn btn-sm btn-secondary shadow-sm">
+                <i class="fas fa-arrow-left fa-sm text-white-50"></i> Back to Tools
+            </a>
+            <a href="{% url 'indie_news:tool_update' tool.pk %}" class="btn btn-sm btn-primary shadow-sm">
+                <i class="fas fa-edit fa-sm text-white-50"></i> Edit Tool
+            </a>
+            <a href="{% url 'indie_news:tool_delete' tool.pk %}" class="btn btn-sm btn-danger shadow-sm">
+                <i class="fas fa-trash fa-sm text-white-50"></i> Delete Tool
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Tool Details Card -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Tool Details</h6>
+                    <div>
+                        {% if tool.tool_type == 'engine' %}
+                            <span class="badge badge-primary">Game Engine</span>
+                        {% elif tool.tool_type == 'graphics' %}
+                            <span class="badge badge-success">Graphics Tool</span>
+                        {% elif tool.tool_type == 'audio' %}
+                            <span class="badge badge-info">Audio Tool</span>
+                        {% elif tool.tool_type == 'modeling' %}
+                            <span class="badge badge-warning">3D Modeling</span>
+                        {% elif tool.tool_type == 'animation' %}
+                            <span class="badge badge-danger">Animation Tool</span>
+                        {% elif tool.tool_type == 'level_design' %}
+                            <span class="badge badge-secondary">Level Design</span>
+                        {% elif tool.tool_type == 'version_control' %}
+                            <span class="badge badge-dark">Version Control</span>
+                        {% elif tool.tool_type == 'productivity' %}
+                            <span class="badge badge-light">Productivity</span>
+                        {% else %}
+                            <span class="badge badge-info">Other Tool</span>
+                        {% endif %}
+                        
+                        {% if tool.pricing_model == 'free' %}
+                            <span class="badge badge-success">Free</span>
+                        {% elif tool.pricing_model == 'freemium' %}
+                            <span class="badge badge-info">Freemium</span>
+                        {% elif tool.pricing_model == 'subscription' %}
+                            <span class="badge badge-primary">Subscription</span>
+                        {% elif tool.pricing_model == 'one_time' %}
+                            <span class="badge badge-warning">One-time Purchase</span>
+                        {% elif tool.pricing_model == 'open_source' %}
+                            <span class="badge badge-secondary">Open Source</span>
+                        {% else %}
+                            <span class="badge badge-dark">Other</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h4 class="font-weight-bold">{{ tool.name }}</h4>
+                    
+                    <div class="mb-4">
+                        {{ tool.description|linebreaks }}
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p>
+                                <i class="fas fa-tag mr-2 text-primary"></i>
+                                <strong>Tool Type:</strong> {{ tool.get_tool_type_display }}
+                            </p>
+                            <p>
+                                <i class="fas fa-dollar-sign mr-2 text-primary"></i>
+                                <strong>Pricing Model:</strong> {{ tool.get_pricing_model_display }}
+                            </p>
+                            <p>
+                                <i class="fas fa-globe mr-2 text-primary"></i>
+                                <strong>Website:</strong> 
+                                {% if tool.website %}
+                                    <a href="{{ tool.website }}" target="_blank">{{ tool.website }}</a>
+                                {% else %}
+                                    <span class="text-muted">Not available</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p>
+                                <i class="fas fa-desktop mr-2 text-primary"></i>
+                                <strong>Platform Support:</strong>
+                            </p>
+                            <div class="mb-3">
+                                {% for platform in tool.platform_support.split %}
+                                    <span class="badge badge-pill badge-secondary">{{ platform }}</span>
+                                {% empty %}
+                                    <span class="text-muted">Not specified</span>
+                                {% endfor %}
+                            </div>
+                            
+                            {% if tool.review_score %}
+                                <div class="d-flex align-items-center">
+                                    <strong class="mr-2">Rating:</strong>
+                                    <div class="star-rating">
+                                        {% for i in "12345" %}
+                                            {% if forloop.counter <= tool.review_score %}
+                                                <i class="fas fa-star text-warning"></i>
+                                            {% elif forloop.counter <= tool.review_score|add:"0.5" %}
+                                                <i class="fas fa-star-half-alt text-warning"></i>
+                                            {% else %}
+                                                <i class="far fa-star text-warning"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                        <span class="ml-2">{{ tool.review_score }}/5</span>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    {% if tool.review_url %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Tool Review:</strong> We've reviewed this tool! 
+                            <a href="{{ tool.review_url }}" target="_blank" class="btn btn-sm btn-info ml-2">
+                                <i class="fas fa-external-link-alt"></i> Read Review
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Tool Features Card -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Key Features</h6>
+                </div>
+                <div class="card-body">
+                    {% if tool.key_features %}
+                        <ul class="list-group">
+                            {% for feature in tool.key_features.split %}
+                                <li class="list-group-item">
+                                    <i class="fas fa-check-circle text-success mr-2"></i>
+                                    {{ feature }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted">No key features have been added for this tool.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <!-- Links Card -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Links & Resources</h6>
+                </div>
+                <div class="card-body">
+                    {% if tool.website %}
+                        <a href="{{ tool.website }}" target="_blank" class="btn btn-block btn-outline-primary mb-2">
+                            <i class="fas fa-globe"></i> Official Website
+                        </a>
+                    {% endif %}
+                    
+                    {% if tool.documentation_url %}
+                        <a href="{{ tool.documentation_url }}" target="_blank" class="btn btn-block btn-outline-info mb-2">
+                            <i class="fas fa-book"></i> Documentation
+                        </a>
+                    {% endif %}
+                    
+                    {% if tool.download_url %}
+                        <a href="{{ tool.download_url }}" target="_blank" class="btn btn-block btn-outline-success mb-2">
+                            <i class="fas fa-download"></i> Download
+                        </a>
+                    {% endif %}
+                    
+                    {% if tool.review_url %}
+                        <a href="{{ tool.review_url }}" target="_blank" class="btn btn-block btn-outline-warning mb-2">
+                            <i class="fas fa-star"></i> Our Review
+                        </a>
+                    {% endif %}
+                    
+                    <hr>
+                    
+                    <p><strong>Added by:</strong> {{ tool.added_by.get_full_name|default:tool.added_by.username }}</p>
+                    <p><strong>Added on:</strong> {{ tool.added_on|date:"F j, Y" }}</p>
+                    <p><strong>Last updated:</strong> {{ tool.updated_on|date:"F j, Y" }}</p>
+                </div>
+            </div>
+            
+            <!-- Related Tasks Card -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Related Tasks</h6>
+                </div>
+                <div class="card-body">
+                    {% with related_tasks=tool.indienewstask_set.all %}
+                        {% if related_tasks %}
+                            <ul class="list-group">
+                                {% for task in related_tasks %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <a href="{% url 'indie_news:task_detail' task.pk %}">{{ task.title }}</a>
+                                        <span class="badge badge-primary badge-pill">{{ task.get_status_display }}</span>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p class="text-muted">No related tasks found.</p>
+                            <a href="{% url 'indie_news:task_create' %}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-plus"></i> Create Task
+                            </a>
+                        {% endif %}
+                    {% endwith %}
+                </div>
+            </div>
+            
+            <!-- Similar Tools Card -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Similar Tools</h6>
+                </div>
+                <div class="card-body">
+                    {% with similar_tools=tool.get_similar_tools %}
+                        {% if similar_tools %}
+                            <ul class="list-group">
+                                {% for similar_tool in similar_tools %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <a href="{% url 'indie_news:tool_detail' similar_tool.pk %}">{{ similar_tool.name }}</a>
+                                        <span class="badge badge-pill badge-{{ similar_tool.get_tool_type_color }}">
+                                            {{ similar_tool.get_tool_type_display }}
+                                        </span>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p class="text-muted">No similar tools found.</p>
+                        {% endif %}
+                    {% endwith %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock indie_content %}

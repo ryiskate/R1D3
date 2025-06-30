@@ -1,0 +1,108 @@
+{% extends 'indie_news/indie_news_base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block title %}{% if form.instance.pk %}Edit{% else %}Add{% endif %} Indie Development Tool{% endblock %}
+
+{% block indie_content %}
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-tools text-primary"></i>
+            {% if form.instance.pk %}Edit{% else %}Add{% endif %} Indie Development Tool
+        </h1>
+        <a href="{% url 'indie_news:tool_list' %}" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm">
+            <i class="fas fa-arrow-left fa-sm text-white-50"></i> Back to Tools
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Tool Information</h6>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {% crispy form %}
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Help</h6>
+                </div>
+                <div class="card-body">
+                    <h5>Tool Types</h5>
+                    <p>Select the most appropriate category for this development tool:</p>
+                    <ul class="mb-4">
+                        <li><strong>Game Engine</strong> - Complete game development environments (Unity, Godot, etc.)</li>
+                        <li><strong>Graphics Tool</strong> - 2D art, pixel art, and image editing tools</li>
+                        <li><strong>Audio Tool</strong> - Sound effects, music creation, and audio editing</li>
+                        <li><strong>3D Modeling</strong> - 3D asset creation and modeling tools</li>
+                        <li><strong>Animation Tool</strong> - Character and object animation software</li>
+                        <li><strong>Level Design</strong> - Tools specifically for creating game levels</li>
+                        <li><strong>Version Control</strong> - Code and asset version management</li>
+                        <li><strong>Productivity</strong> - Project management, documentation, and workflow tools</li>
+                    </ul>
+                    
+                    <h5>Pricing Models</h5>
+                    <p>Select the pricing model that best describes how this tool is offered:</p>
+                    <ul class="mb-4">
+                        <li><strong>Free</strong> - Completely free to use with no limitations</li>
+                        <li><strong>Freemium</strong> - Free with paid premium features or tiers</li>
+                        <li><strong>Subscription</strong> - Recurring payment (monthly/yearly)</li>
+                        <li><strong>One-time Purchase</strong> - Single payment for perpetual license</li>
+                        <li><strong>Open Source</strong> - Free and open source software</li>
+                    </ul>
+                    
+                    <h5>Platform Support</h5>
+                    <p>Enter all platforms that this tool supports, separated by commas:</p>
+                    <ul class="mb-4">
+                        <li><strong>Windows</strong> - Microsoft Windows support</li>
+                        <li><strong>macOS</strong> - Apple macOS support</li>
+                        <li><strong>Linux</strong> - Linux distributions support</li>
+                        <li><strong>Web</strong> - Browser-based tools</li>
+                        <li><strong>iOS</strong> - iPhone/iPad support</li>
+                        <li><strong>Android</strong> - Android device support</li>
+                    </ul>
+                    
+                    <h5>Key Features</h5>
+                    <p>Enter the most important features of this tool, one per line. These will be displayed as bullet points.</p>
+                    
+                    <h5>Review Score</h5>
+                    <p>If you've reviewed this tool, enter a score from 1.0 to 5.0. Leave blank if not reviewed yet.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock indie_content %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Initialize select2 for dropdown fields
+        $('.select2').select2({
+            theme: 'bootstrap4',
+            tags: true,
+            tokenSeparators: [',']
+        });
+        
+        // Format the key features field as a textarea
+        if ($('#id_key_features').length) {
+            $('#id_key_features').attr('rows', '5');
+            $('#id_key_features').attr('placeholder', 'Enter one feature per line');
+        }
+        
+        // Format the platform support field
+        if ($('#id_platform_support').length) {
+            $('#id_platform_support').attr('placeholder', 'e.g., Windows, macOS, Linux');
+        }
+    });
+</script>
+{% endblock %}

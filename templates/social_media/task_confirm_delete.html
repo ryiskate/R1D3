@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Delete Social Media Task | R1D3{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Delete Social Media Task</h1>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-6 mx-auto">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-danger">Confirm Deletion</h6>
+                </div>
+                <div class="card-body">
+                    <p class="mb-4">Are you sure you want to delete the following task?</p>
+                    
+                    <div class="alert alert-warning">
+                        <h5>{{ object.title }}</h5>
+                        <p><strong>Status:</strong> {{ object.get_status_display }}</p>
+                        <p><strong>Due Date:</strong> {{ object.due_date|default:"No due date" }}</p>
+                        {% if object.description %}
+                        <p><strong>Description:</strong> {{ object.description|truncatechars:100 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <p class="text-danger"><strong>Warning:</strong> This action cannot be undone.</p>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Delete Task
+                            </button>
+                            <a href="{% url 'social_media:task_detail' object.id %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

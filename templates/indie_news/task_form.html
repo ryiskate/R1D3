@@ -1,0 +1,91 @@
+{% extends 'indie_news/indie_news_base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block title %}{% if form.instance.pk %}Edit{% else %}Create{% endif %} Indie News Task{% endblock %}
+
+{% block indie_content %}
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-newspaper text-primary"></i>
+            {% if form.instance.pk %}Edit{% else %}Create{% endif %} Indie News Task
+        </h1>
+        <a href="{% url 'indie_news:task_list' %}" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm">
+            <i class="fas fa-arrow-left fa-sm text-white-50"></i> Back to Tasks
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Task Information</h6>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {% crispy form %}
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Help</h6>
+                </div>
+                <div class="card-body">
+                    <h5>Article Types</h5>
+                    <ul class="mb-4">
+                        <li><strong>Game Review</strong> - Critical analysis of a released indie game</li>
+                        <li><strong>Game Preview</strong> - First impressions of an upcoming indie game</li>
+                        <li><strong>Developer Interview</strong> - Q&A with indie developers</li>
+                        <li><strong>Feature Article</strong> - In-depth analysis of indie game trends</li>
+                        <li><strong>News Article</strong> - Breaking news about indie games</li>
+                        <li><strong>Opinion Piece</strong> - Editorial content about indie gaming</li>
+                        <li><strong>Game Guide</strong> - Walkthrough or tips for indie games</li>
+                    </ul>
+                    
+                    <h5>Task Status</h5>
+                    <ul class="mb-4">
+                        <li><span class="badge badge-secondary">Backlog</span> - Not yet scheduled</li>
+                        <li><span class="badge badge-info">To Do</span> - Ready to be worked on</li>
+                        <li><span class="badge badge-primary">In Progress</span> - Currently being worked on</li>
+                        <li><span class="badge badge-warning">In Review</span> - Ready for editorial review</li>
+                        <li><span class="badge badge-success">Done</span> - Completed and published</li>
+                        <li><span class="badge badge-danger">Blocked</span> - Cannot proceed due to an issue</li>
+                    </ul>
+                    
+                    <h5>Task Priority</h5>
+                    <ul>
+                        <li><span class="badge badge-light">Low</span> - Can wait</li>
+                        <li><span class="badge badge-info">Medium</span> - Standard priority</li>
+                        <li><span class="badge badge-warning">High</span> - Important</li>
+                        <li><span class="badge badge-danger">Critical</span> - Urgent attention required</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock indie_content %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Initialize select2 for dropdown fields
+        $('.select2').select2({
+            theme: 'bootstrap4',
+        });
+        
+        // Initialize datepicker for date fields
+        $('input[type="date"]').datepicker({
+            format: 'yyyy-mm-dd',
+            autoclose: true,
+            todayHighlight: true
+        });
+    });
+</script>
+{% endblock %}

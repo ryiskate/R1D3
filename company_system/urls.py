@@ -14,7 +14,7 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     path('', include('core.urls')),
     path('strategy/', include('strategy.urls')),
-    path('projects/', include('projects.urls')),
+    # Project functionality has been moved to specific apps
     path('games/', include('projects.game_urls')),
     # Debug URL patterns
     path('debug-tasks/', DebugAllTasksView.as_view(), name='debug_all_tasks'),
@@ -25,6 +25,7 @@ urlpatterns = [
     path('social-media/', include('social_media.urls', namespace='social_media')),
     path('arcade/', include('arcade.urls', namespace='arcade')),
     path('theme-park/', include('theme_park.urls', namespace='theme_park')),
+    path('indie-news/', include('indie_news.urls', namespace='indie_news')),
     # The following paths may not be implemented yet
     # path('resources/', include('resources.urls')),
     # path('docs/', include('docs.urls')),

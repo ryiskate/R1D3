@@ -170,7 +170,7 @@
             <h1>Arcade Tasks</h1>
         </div>
         <div class="col-md-4 text-end">
-            <a href="{% url 'projects:arcade_task_create' %}" class="btn btn-primary">
+            <a href="{% url 'arcade:task_create' %}" class="btn btn-primary">
                 <i class="fas fa-plus-circle me-1"></i> New Arcade Task
             </a>
             <button type="button" class="btn btn-outline-primary ms-2" data-bs-toggle="modal" data-bs-target="#filterModal">
@@ -282,7 +282,7 @@
                 <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#batchUpdateModal">
                     <i class="fas fa-tasks me-1"></i> Batch Update
                 </button>
-                <a href="{% url 'projects:arcade_task_create' %}" class="btn btn-sm btn-primary">
+                <a href="{% url 'arcade:task_create' %}" class="btn btn-sm btn-primary">
                     <i class="fas fa-plus-circle me-1"></i> New Task
                 </a>
             </div>
@@ -312,7 +312,7 @@
                                 <input type="checkbox" class="form-check-input task-checkbox" value="{{ task.id }}" data-task-id="{{ task.id }}">
                             </td>
                             <td>
-                                <a href="{% url 'projects:arcade_task_detail' task.id %}">{{ task.title }}</a>
+                                <a href="{% url 'arcade:task_detail' task.id %}">{{ task.title }}</a>
                                 {% if task.is_overdue %}
                                 <span class="badge bg-danger ms-1">Overdue</span>
                                 {% endif %}
@@ -383,20 +383,18 @@
                             </td>
                             <td>
                                 <div class="btn-group">
-                                    <a href="{% url 'projects:arcade_task_update' task.id %}" class="btn btn-sm btn-icon-split btn-outline-primary">
+                                    <a href="{% url 'arcade:task_update' task.id %}" class="btn btn-sm btn-icon-split btn-outline-primary">
                                         <span class="icon"><i class="fas fa-edit"></i></span>
                                         <span class="text">Edit</span>
                                     </a>
-                                    <a href="{% url 'projects:arcade_task_detail' task.id %}" class="btn btn-sm btn-icon-split btn-outline-info">
+                                    <a href="{% url 'arcade:task_detail' task.id %}" class="btn btn-sm btn-icon-split btn-outline-info">
                                         <span class="icon"><i class="fas fa-eye"></i></span>
                                         <span class="text">View</span>
                                     </a>
-                                    {% if task.status != 'done' %}
-                                    <a href="{% url 'projects:arcade_task_update' task.id %}?mark_done=true" class="btn btn-sm btn-icon-split btn-outline-success">
-                                        <span class="icon"><i class="fas fa-check"></i></span>
-                                        <span class="text">Done</span>
+                                    <a href="{% url 'arcade:task_delete' task.id %}" class="btn btn-sm btn-icon-split btn-outline-danger">
+                                        <span class="icon"><i class="fas fa-trash"></i></span>
+                                        <span class="text">Delete</span>
                                     </a>
-                                    {% endif %}
                                 </div>
                             </td>
                         </tr>
@@ -645,7 +643,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="addTaskForm" action="{% url 'projects:arcade_task_create' %}" method="post">{% csrf_token %}
+                <form id="addTaskForm" action="{% url 'arcade:task_create' %}" method="post">{% csrf_token %}
                     <input type="hidden" name="company_section" value="arcade">
                     <div class="row mb-3">
                         <div class="col-md-6">
@@ -771,7 +769,7 @@
         });
         
         // Initialize batch update URL for JavaScript functionality
-        window.batchUpdateUrl = "{% url 'games:batch_update_tasks' %}";
+        window.batchUpdateUrl = "{% url 'arcade:task_batch_update' %}";
         
         // Initialize filter form submission
         document.getElementById('applyFiltersBtn').addEventListener('click', function() {

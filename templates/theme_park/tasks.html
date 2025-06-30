@@ -3,324 +3,471 @@
 
 {% block title %}Theme Park Tasks | R1D3{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* Theme Park specific styles */
+    .badge-theme-park {
+        background-color: #8e44ad;
+        color: white;
+    }
+    
+    .text-purple {
+        color: #8e44ad;
+    }
+    
+    .bg-purple {
+        background-color: #8e44ad;
+    }
+    
+    /* Status count cards */
+    .status-count-card {
+        border-radius: 0.5rem;
+        border: none;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        transition: transform 0.2s;
+        overflow: hidden;
+    }
+    
+    .status-count-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .status-count-card .card-body {
+        padding: 1rem;
+    }
+    
+    .status-count-card h2 {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 0;
+    }
+    
+    .status-count-card .status-label {
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+    
+    /* Status indicators */
+    .status-indicator {
+        width: 4px;
+        height: 100%;
+        position: absolute;
+        left: 0;
+        top: 0;
+    }
+    
+    .status-indicator.todo {
+        background-color: #4e73df; /* Primary blue */
+    }
+    
+    .status-indicator.in-progress {
+        background-color: #f6c23e; /* Warning yellow */
+    }
+    
+    .status-indicator.in-review {
+        background-color: #6f42c1; /* Purple */
+    }
+    
+    .status-indicator.done {
+        background-color: #1cc88a; /* Success green */
+    }
+    
+    .status-indicator.backlog {
+        background-color: #858796; /* Secondary gray */
+    }
+    
+    /* Company filter cards styling */
+    .company-filter-card {
+        transition: all 0.3s ease;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        padding: 1rem;
+        text-align: center;
+        background-color: #fff;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        margin-bottom: 1rem;
+    }
+    
+    .company-filter-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+    
+    .company-filter-card.active {
+        border: 2px solid #8e44ad;
+        background-color: rgba(142, 68, 173, 0.1);
+    }
+    
+    .company-filter-card .task-count {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        border-radius: 0.25rem;
+        background-color: #4e73df;
+        color: white;
+        margin-top: 0.5rem;
+    }
+    
+    .company-filter-card .company-icon {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    /* Badge Styling */
+    .status-badge, .priority-badge, .section-badge {
+        font-size: 0.8rem;
+        padding: 0.35em 0.65em;
+        font-weight: 600;
+        border-radius: 0.25rem;
+    }
+    
+    /* Table styling */
+    .task-table {
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    
+    .task-table th {
+        background-color: #f8f9fc;
+        border-bottom: 2px solid #e3e6f0;
+        font-weight: 700;
+        color: #4e73df;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        letter-spacing: 0.05em;
+    }
+    
+    .task-table td {
+        vertical-align: middle;
+        border-top: 1px solid #e3e6f0;
+    }
+    
+    /* Avatar circle styling */
+    .avatar-circle {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+    }
+    
+    /* Action buttons */
+    .action-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 4px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 0.25rem;
+        color: #fff;
+    }
+    
+    .action-btn.edit {
+        background-color: #4e73df;
+    }
+    
+    .action-btn.delete {
+        background-color: #e74a3b;
+    }
+    
+    /* Progress Bar Styling */
+    .progress {
+        height: 0.5rem;
+        border-radius: 0.25rem;
+        margin-top: 0.5rem;
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+    
+    /* Action buttons styling */
+    .btn-icon-split {
+        display: inline-flex;
+        align-items: center;
+    }
+    
+    .btn-icon-split .icon {
+        background: rgba(0, 0, 0, 0.15);
+        padding: 0.375rem 0.75rem;
+        display: inline-block;
+        border-radius: 0.25rem 0 0 0.25rem;
+    }
+    
+    .btn-icon-split .text {
+        padding: 0.375rem 0.75rem;
+        display: inline-block;
+        border-radius: 0 0.25rem 0.25rem 0;
+    }
+    
+    /* DataTables styling */
+    .dataTables_wrapper .dataTables_length, 
+    .dataTables_wrapper .dataTables_filter {
+        margin-bottom: 1rem;
+    }
+    
+    .dataTables_wrapper .dataTables_info, 
+    .dataTables_wrapper .dataTables_paginate {
+        margin-top: 1rem;
+    }
+    .avatar-circle {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+    
+    /* Custom Colors */
+    .bg-purple {
+        background-color: #8e44ad;
+        color: white;
+    }
+    
+    .text-purple {
+        color: #8e44ad;
+    }
+    
+    .btn-purple {
+        background-color: #8e44ad;
+        border-color: #8e44ad;
+        color: white;
+    }
+    
+    .btn-purple:hover {
+        background-color: #7d3c98;
+        border-color: #7d3c98;
+        color: white;
+    }
+    
+    .btn-outline-purple {
+        color: #8e44ad;
+        border-color: #8e44ad;
+    }
+    
+    .btn-outline-purple:hover {
+        background-color: #8e44ad;
+        color: white;
+    }
+    
+    .border-left-purple {
+        border-left-color: #8e44ad;
+    }
+    
+    /* Action Button Styling */
+    .btn-icon-split {
+        display: inline-flex;
+        align-items: center;
+    }
+    
+    .btn-icon-split .icon {
+        background: rgba(0, 0, 0, 0.15);
+        display: inline-block;
+        padding: 0.375rem 0.75rem;
+        border-radius: 0.25rem 0 0 0.25rem;
+    }
+    
+    .btn-icon-split .text {
+        display: inline-block;
+        padding: 0.375rem 0.75rem;
+        border-radius: 0 0.25rem 0.25rem 0;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container-fluid">
-    <h1 class="h3 mb-4 text-gray-800">Theme Park Tasks</h1>
-    
-    <!-- Tasks Controls -->
-    <div class="card shadow mb-4">
-        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-            <h6 class="m-0 font-weight-bold text-primary">Task Management</h6>
-            <div class="dropdown no-arrow">
-                <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
-                </a>
-                <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                    <div class="dropdown-header">Task Actions:</div>
-                    <a class="dropdown-item" href="#"><i class="fas fa-file-export fa-sm fa-fw mr-2 text-gray-400"></i>Export Tasks</a>
-                    <a class="dropdown-item" href="#"><i class="fas fa-file-import fa-sm fa-fw mr-2 text-gray-400"></i>Import Tasks</a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="#"><i class="fas fa-cog fa-sm fa-fw mr-2 text-gray-400"></i>Task Settings</a>
-                </div>
-            </div>
-        </div>
-        <div class="card-body">
-            <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addTaskModal">
-                <i class="fas fa-plus"></i> Add New Task
-            </button>
-            
-            <div class="btn-group mb-3 ml-2">
-                <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                    Filter by Status
+    <!-- Header with title and action buttons -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Theme Park Tasks</h1>
+        <div>
+            <a href="{% url 'theme_park:newtask' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-1"></i> New Theme Park Task
+            </a>
+            <div class="dropdown d-inline-block ms-2">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="filterBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-filter me-1"></i> Filters
                 </button>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="#">All Statuses</a></li>
-                    <li><a class="dropdown-item" href="#">To Do</a></li>
-                    <li><a class="dropdown-item" href="#">In Progress</a></li>
-                    <li><a class="dropdown-item" href="#">Under Review</a></li>
-                    <li><a class="dropdown-item" href="#">Completed</a></li>
-                </ul>
-            </div>
-            
-            <div class="btn-group mb-3 ml-2">
-                <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                    Filter by Priority
-                </button>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="#">All Priorities</a></li>
-                    <li><a class="dropdown-item" href="#">Low</a></li>
-                    <li><a class="dropdown-item" href="#">Medium</a></li>
-                    <li><a class="dropdown-item" href="#">High</a></li>
-                    <li><a class="dropdown-item" href="#">Critical</a></li>
-                </ul>
-            </div>
-            
-            <div class="btn-group mb-3 ml-2">
-                <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                    Filter by Area
-                </button>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="#">All Areas</a></li>
-                    <li><a class="dropdown-item" href="#">Future Zone</a></li>
-                    <li><a class="dropdown-item" href="#">Adventure Land</a></li>
-                    <li><a class="dropdown-item" href="#">Fantasy Kingdom</a></li>
-                    <li><a class="dropdown-item" href="#">Frontier Land</a></li>
-                    <li><a class="dropdown-item" href="#">Spooky Hollow</a></li>
-                    <li><a class="dropdown-item" href="#">Thrill Zone</a></li>
-                    <li><a class="dropdown-item" href="#">Water Park</a></li>
-                    <li><a class="dropdown-item" href="#">Main Street</a></li>
-                </ul>
-            </div>
-            
-            <div class="btn-group mb-3 ml-2">
-                <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                    Filter by Assignee
-                </button>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="#">All Assignees</a></li>
-                    <li><a class="dropdown-item" href="#">Unassigned</a></li>
-                    <li><a class="dropdown-item" href="#">My Tasks</a></li>
+                <ul class="dropdown-menu" aria-labelledby="filterBtn">
+                    <li><a class="dropdown-item" href="#">Status</a></li>
+                    <li><a class="dropdown-item" href="#">Priority</a></li>
+                    <li><a class="dropdown-item" href="#">Assigned To</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" href="#">John Smith</a></li>
-                    <li><a class="dropdown-item" href="#">Sarah Johnson</a></li>
-                    <li><a class="dropdown-item" href="#">Michael Williams</a></li>
+                    <li><a class="dropdown-item" href="#">Clear Filters</a></li>
                 </ul>
             </div>
+            <button id="batchActionBtn" class="btn btn-outline-primary ms-2" disabled>
+                <i class="fas fa-tasks me-1"></i> Batch Update
+            </button>
         </div>
     </div>
     
-    <!-- Tasks Summary Cards -->
-    <div class="row">
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
+    <!-- Status Count Cards -->
+    <div class="row mb-4">
+        <!-- To Do Card -->
+        <div class="col-md-2">
+            <div class="card status-count-card position-relative">
+                <div class="status-indicator todo"></div>
                 <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                Total Tasks</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">42</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-tasks fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
+                    <h2>{{ task_stats.to_do|default:"29" }}</h2>
+                    <div class="status-label text-muted">To Do</div>
                 </div>
             </div>
         </div>
-
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-warning shadow h-100 py-2">
+        
+        <!-- In Progress Card -->
+        <div class="col-md-2">
+            <div class="card status-count-card position-relative">
+                <div class="status-indicator in-progress"></div>
                 <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                In Progress</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">15</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-spinner fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
+                    <h2>{{ task_stats.in_progress|default:"1" }}</h2>
+                    <div class="status-label text-muted">In Progress</div>
                 </div>
             </div>
         </div>
-
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-danger shadow h-100 py-2">
+        
+        <!-- In Review Card -->
+        <div class="col-md-2">
+            <div class="card status-count-card position-relative">
+                <div class="status-indicator in-review"></div>
                 <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
-                                Overdue</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">3</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-exclamation-circle fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
+                    <h2>{{ task_stats.in_review|default:"0" }}</h2>
+                    <div class="status-label text-muted">In Review</div>
                 </div>
             </div>
         </div>
-
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-success shadow h-100 py-2">
+        
+        <!-- Done Card -->
+        <div class="col-md-2">
+            <div class="card status-count-card position-relative">
+                <div class="status-indicator done"></div>
                 <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                Completed (This Week)</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">18</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
+                    <h2>{{ task_stats.done|default:"1" }}</h2>
+                    <div class="status-label text-muted">Done</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Backlog Card -->
+        <div class="col-md-2">
+            <div class="card status-count-card position-relative">
+                <div class="status-indicator backlog"></div>
+                <div class="card-body">
+                    <h2>{{ task_stats.backlog|default:"2" }}</h2>
+                    <div class="status-label text-muted">Backlog</div>
                 </div>
             </div>
         </div>
     </div>
     
-    <!-- Tasks Table -->
+
+    
+    <!-- Theme Park Tasks Table Section -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Task List</h6>
+            <h6 class="m-0 font-weight-bold text-purple">Theme Park Tasks</h6>
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-bordered" id="tasksTable" width="100%" cellspacing="0">
+                <table class="table task-table" id="taskTable" width="100%" cellspacing="0">
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            <th width="30px">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="selectAllTasks">
+                                </div>
+                            </th>
                             <th>Title</th>
-                            <th>Area</th>
-                            <th>Assignee</th>
-                            <th>Due Date</th>
-                            <th>Priority</th>
                             <th>Status</th>
+                            <th>Priority</th>
+                            <th>Assigned To</th>
+                            <th>Due Date</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
+                        {% for task in theme_park_tasks %}
                         <tr>
-                            <td>TP-T001</td>
-                            <td>Replace safety signage on Cosmic Orbiter</td>
-                            <td>Future Zone</td>
-                            <td>Sarah Johnson</td>
-                            <td>May 15, 2024</td>
-                            <td><span class="badge bg-danger">High</span></td>
-                            <td><span class="badge bg-warning">In Progress</span></td>
                             <td>
-                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
-                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
-                                <a href="#" class="btn btn-sm btn-success"><i class="fas fa-check"></i></a>
+                                <div class="form-check">
+                                    <input class="form-check-input task-checkbox" type="checkbox" value="{{ task.id }}" id="task-{{ task.id }}" data-task-id="{{ task.id }}">
+                                </div>
+                            </td>
+                            <td>
+                                <a href="{% url 'theme_park:task_detail' task.id %}" class="text-decoration-none">
+                                    {{ task.title }}
+                                </a>
+                                <div class="small text-muted">ID: {{ task.id }}</div>
+                            </td>
+                            <td>
+                                {% if task.status == 'to_do' %}
+                                <span class="badge bg-primary rounded-pill"><i class="fas fa-clipboard-list me-1"></i> To Do</span>
+                                {% elif task.status == 'in_progress' %}
+                                <span class="badge bg-warning text-dark rounded-pill"><i class="fas fa-spinner me-1"></i> In Progress</span>
+                                {% elif task.status == 'in_review' %}
+                                <span class="badge bg-info rounded-pill"><i class="fas fa-search me-1"></i> In Review</span>
+                                {% elif task.status == 'done' %}
+                                <span class="badge bg-success rounded-pill"><i class="fas fa-check me-1"></i> Done</span>
+                                {% elif task.status == 'backlog' %}
+                                <span class="badge bg-secondary rounded-pill"><i class="fas fa-archive me-1"></i> Backlog</span>
+                                {% elif task.status == 'blocked' %}
+                                <span class="badge bg-danger rounded-pill"><i class="fas fa-ban me-1"></i> Blocked</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if task.priority == 'high' %}
+                                <span class="badge bg-danger rounded-pill"><i class="fas fa-arrow-up me-1"></i> High</span>
+                                {% elif task.priority == 'medium' %}
+                                <span class="badge bg-warning text-dark rounded-pill"><i class="fas fa-equals me-1"></i> Medium</span>
+                                {% elif task.priority == 'low' %}
+                                <span class="badge bg-success rounded-pill"><i class="fas fa-arrow-down me-1"></i> Low</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if task.assigned_to %}
+                                <span class="avatar-circle bg-primary text-white" data-bs-toggle="tooltip" title="{{ task.assigned_to.get_full_name|default:task.assigned_to.username }}">
+                                    {{ task.assigned_to.get_full_name|default:task.assigned_to.username|slice:":1"|upper }}
+                                </span>
+                                <span class="ms-1 d-none d-md-inline-block">{{ task.assigned_to.get_full_name|default:task.assigned_to.username }}</span>
+                                {% else %}
+                                <span class="text-muted"><i class="fas fa-user-slash me-1"></i> Unassigned</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if task.due_date %}
+                                <span {% if task.due_date|date:'Y-m-d' < now|date:'Y-m-d' %}class="text-danger"{% endif %}>
+                                    <i class="fas fa-calendar-alt me-1"></i> {{ task.due_date|date:"M d, Y" }}
+                                </span>
+                                {% else %}
+                                <span class="text-muted"><i class="fas fa-calendar-times me-1"></i> No due date</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{% url 'theme_park:task_update' task.id %}" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'theme_park:task_detail' task.id %}" class="btn btn-sm btn-outline-info" data-bs-toggle="tooltip" title="View">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{% url 'theme_park:task_delete' task.id %}" class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
                             </td>
                         </tr>
+                        {% empty %}
                         <tr>
-                            <td>TP-T002</td>
-                            <td>Update queue line entertainment for Jungle River Adventure</td>
-                            <td>Adventure Land</td>
-                            <td>Michael Williams</td>
-                            <td>June 1, 2024</td>
-                            <td><span class="badge bg-warning">Medium</span></td>
-                            <td><span class="badge bg-primary">To Do</span></td>
-                            <td>
-                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
-                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
-                                <a href="#" class="btn btn-sm btn-success"><i class="fas fa-check"></i></a>
+                            <td colspan="7" class="text-center py-4">
+                                <div class="text-muted">
+                                    <i class="fas fa-info-circle me-2"></i> No theme park tasks found
+                                </div>
                             </td>
                         </tr>
-                        <tr>
-                            <td>TP-T003</td>
-                            <td>Inspect and repair animatronics in Enchanted Castle Tour</td>
-                            <td>Fantasy Kingdom</td>
-                            <td>David Lee</td>
-                            <td>May 10, 2024</td>
-                            <td><span class="badge bg-danger">High</span></td>
-                            <td><span class="badge bg-danger">Overdue</span></td>
-                            <td>
-                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
-                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
-                                <a href="#" class="btn btn-sm btn-success"><i class="fas fa-check"></i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>TP-T004</td>
-                            <td>Restock merchandise at Wild West Roundup gift shop</td>
-                            <td>Frontier Land</td>
-                            <td>Emily Chen</td>
-                            <td>May 20, 2024</td>
-                            <td><span class="badge bg-info">Low</span></td>
-                            <td><span class="badge bg-warning">In Progress</span></td>
-                            <td>
-                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
-                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
-                                <a href="#" class="btn btn-sm btn-success"><i class="fas fa-check"></i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>TP-T005</td>
-                            <td>Update special effects in Haunted Mansion</td>
-                            <td>Spooky Hollow</td>
-                            <td>John Smith</td>
-                            <td>May 30, 2024</td>
-                            <td><span class="badge bg-warning">Medium</span></td>
-                            <td><span class="badge bg-warning">In Progress</span></td>
-                            <td>
-                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
-                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
-                                <a href="#" class="btn btn-sm btn-success"><i class="fas fa-check"></i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>TP-T006</td>
-                            <td>Repair hydraulic system on Mega Drop Tower</td>
-                            <td>Thrill Zone</td>
-                            <td>Sarah Johnson</td>
-                            <td>May 12, 2024</td>
-                            <td><span class="badge bg-danger">Critical</span></td>
-                            <td><span class="badge bg-danger">Overdue</span></td>
-                            <td>
-                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
-                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
-                                <a href="#" class="btn btn-sm btn-success"><i class="fas fa-check"></i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>TP-T007</td>
-                            <td>Clean and test water filtration system at Wave Pool</td>
-                            <td>Water Park</td>
-                            <td>Robert Taylor</td>
-                            <td>May 18, 2024</td>
-                            <td><span class="badge bg-danger">High</span></td>
-                            <td><span class="badge bg-warning">In Progress</span></td>
-                            <td>
-                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
-                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
-                                <a href="#" class="btn btn-sm btn-success"><i class="fas fa-check"></i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>TP-T008</td>
-                            <td>Prepare costumes for Main Street Parade</td>
-                            <td>Main Street</td>
-                            <td>Jessica Martinez</td>
-                            <td>May 25, 2024</td>
-                            <td><span class="badge bg-warning">Medium</span></td>
-                            <td><span class="badge bg-primary">To Do</span></td>
-                            <td>
-                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
-                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
-                                <a href="#" class="btn btn-sm btn-success"><i class="fas fa-check"></i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>TP-T009</td>
-                            <td>Install new VR headsets for Space Explorer VR</td>
-                            <td>Future Zone</td>
-                            <td>Amanda Wilson</td>
-                            <td>June 5, 2024</td>
-                            <td><span class="badge bg-danger">High</span></td>
-                            <td><span class="badge bg-primary">To Do</span></td>
-                            <td>
-                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
-                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
-                                <a href="#" class="btn btn-sm btn-success"><i class="fas fa-check"></i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>TP-T010</td>
-                            <td>Replace worn safety belts on Fairy Tale Carousel</td>
-                            <td>Fantasy Kingdom</td>
-                            <td>David Lee</td>
-                            <td>May 8, 2024</td>
-                            <td><span class="badge bg-danger">Critical</span></td>
-                            <td><span class="badge bg-danger">Overdue</span></td>
-                            <td>
-                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
-                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
-                                <a href="#" class="btn btn-sm btn-success"><i class="fas fa-check"></i></a>
-                            </td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
@@ -345,18 +492,12 @@
                     
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <label for="taskArea" class="form-label">Area</label>
-                            <select class="form-select" id="taskArea" required>
-                                <option value="" selected disabled>Select Area</option>
-                                <option value="future_zone">Future Zone</option>
-                                <option value="adventure_land">Adventure Land</option>
-                                <option value="fantasy_kingdom">Fantasy Kingdom</option>
-                                <option value="frontier_land">Frontier Land</option>
-                                <option value="spooky_hollow">Spooky Hollow</option>
-                                <option value="thrill_zone">Thrill Zone</option>
-                                <option value="water_park">Water Park</option>
-                                <option value="main_street">Main Street</option>
-                                <option value="all_areas">All Areas</option>
+                            <label for="taskZone" class="form-label">Zone</label>
+                            <select class="form-select" id="taskZone" required>
+                                <option value="" selected disabled>Select Zone</option>
+                                {% for zone in zones %}
+                                <option value="{{ zone.id }}">{{ zone.title }}</option>
+                                {% endfor %}
                             </select>
                         </div>
                         <div class="col-md-6">
@@ -478,12 +619,294 @@
         </div>
     </div>
 </div>
-{% endblock %}
+
+<!-- Batch Update Modal -->
+<div class="modal fade" id="batchUpdateModal" tabindex="-1" aria-labelledby="batchUpdateModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title" id="batchUpdateModalLabel">
+                    <i class="fas fa-tasks me-2 text-primary"></i>Batch Update Theme Park Tasks
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="batchUpdateForm">
+                    {% csrf_token %}
+                    <input type="hidden" id="selectedTaskIds" name="task_ids" value="">
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <span id="selectedTasksCount">0</span> tasks selected for batch update
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="batchStatus" class="form-label">Status</label>
+                        <select class="form-select select2" id="batchStatus" name="status">
+                            <option value="">No change</option>
+                            <option value="to_do">To Do</option>
+                            <option value="in_progress">In Progress</option>
+                            <option value="in_review">In Review</option>
+                            <option value="done">Done</option>
+                            <option value="backlog">Backlog</option>
+                            <option value="blocked">Blocked</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="batchPriority" class="form-label">Priority</label>
+                        <select class="form-select select2" id="batchPriority" name="priority">
+                            <option value="">No change</option>
+                            <option value="critical">Critical</option>
+                            <option value="high">High</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="batchZone" class="form-label">Zone</label>
+                        <select class="form-select select2" id="batchZone" name="zone">
+                            <option value="">No change</option>
+                            {% for zone in zones %}
+                            <option value="{{ zone.id }}">{{ zone.title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="batchAssignee" class="form-label">Assignee</label>
+                        <select class="form-select select2" id="batchAssignee" name="assigned_to">
+                            <option value="">No change</option>
+                            <option value="none">Unassign</option>
+                            {% for user in users %}
+                            <option value="{{ user.id }}">{{ user.get_full_name|default:user.username }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="batchDueDate" class="form-label">Due Date</label>
+                        <input type="date" class="form-control" id="batchDueDate" name="due_date">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Cancel
+                </button>
+                <button type="button" class="btn btn-primary" id="applyBatchUpdate">
+                    <i class="fas fa-check me-1"></i>Apply Changes
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 {% block extra_js %}
 <script>
     $(document).ready(function() {
-        $('#tasksTable').DataTable();
+        // Initialize DataTable
+        $('#taskTable').DataTable({
+            "order": [], // Disable initial sorting
+            "pageLength": 10,
+            "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+            "language": {
+                "emptyTable": "No theme park tasks found",
+                "info": "Showing _START_ to _END_ of _TOTAL_ tasks",
+                "infoEmpty": "Showing 0 to 0 of 0 tasks",
+                "lengthMenu": "Show _MENU_ tasks per page"
+            },
+            "columnDefs": [
+                { "orderable": false, "targets": [0, 6] } // Disable sorting on checkbox and actions columns
+            ]
+        });
+        
+        // Initialize tooltips
+        function initTooltips() {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl, {
+                    boundary: document.body
+                });
+            });
+        }
+        
+        // Initialize tooltips on page load
+        initTooltips();
+        
+        // Select all checkbox
+        $('#selectAllTasks').change(function() {
+            $('.task-checkbox').prop('checked', $(this).prop('checked'));
+            updateBatchActionButton();
+        });
+        
+        // Individual task checkbox
+        $('.task-checkbox').change(function() {
+            updateBatchActionButton();
+            
+            // Update select all checkbox state
+            var allChecked = $('.task-checkbox:checked').length === $('.task-checkbox').length;
+            $('#selectAllTasks').prop('checked', allChecked && $('.task-checkbox').length > 0);
+        });
+
+        // Update batch action button state
+        function updateBatchActionButton() {
+            var checkedCount = $('.task-checkbox:checked').length;
+            $('#batchActionBtn').prop('disabled', checkedCount === 0);
+            
+            // Update button text to show count
+            if (checkedCount > 0) {
+                $('#batchActionBtn').html('<i class="fas fa-tasks me-1"></i> Batch Update (' + checkedCount + ')');
+            } else {
+                $('#batchActionBtn').html('<i class="fas fa-tasks me-1"></i> Batch Update');
+            }
+        }
+
+        // Batch action button click
+        $('#batchActionBtn').click(function() {
+            if ($('.task-checkbox:checked').length === 0) {
+                return;
+            }
+            
+            // Get selected task IDs
+            var selectedTaskIds = [];
+            $('.task-checkbox:checked').each(function() {
+                selectedTaskIds.push($(this).data('task-id'));
+            });
+            
+            // Reset batch update form when modal is hidden
+            $('#batchUpdateModal').on('hidden.bs.modal', function() {
+                $('#batchUpdateForm').trigger('reset');
+            });
+            
+            // Show batch update modal
+            $('#batchUpdateModal').modal('show');
+            
+            // Store selected task IDs in hidden input
+            $('#selectedTaskIds').val(JSON.stringify(selectedTaskIds));
+        });
+        
+        // Apply batch update
+        $('#applyBatchUpdate').click(function() {
+            var selectedTaskIds = JSON.parse($('#selectedTaskIds').val());
+            var status = $('#batchStatus').val();
+            var priority = $('#batchPriority').val();
+            var zone = $('#batchZone').val();
+            var assignee = $('#batchAssignee').val();
+            var dueDate = $('#batchDueDate').val();
+            
+            // Check if any field is selected for update
+            if (!status && !priority && !zone && !assignee && !dueDate) {
+                alert('Please select at least one field to update');
+                return;
+            }
+            
+            // Prepare data for AJAX request
+            var data = {
+                task_ids: selectedTaskIds,
+                status: status,
+                priority: priority,
+                zone: zone,
+                assigned_to: assignee,
+                due_date: dueDate
+            };
+            
+            // Send AJAX request
+            $.ajax({
+                url: '{% url "theme_park:task_batch_update" %}',
+                type: 'POST',
+                data: JSON.stringify(data),
+                contentType: 'application/json',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                success: function(response) {
+                    // Close modal
+                    $('#batchUpdateModal').modal('hide');
+                    
+                    // Show success message
+                    showToast('Success', response.message, 'success');
+                    
+                    // Reload page after short delay
+                    setTimeout(function() {
+                        location.reload();
+                    }, 1500);
+                },
+                error: function(xhr) {
+                    var errorMessage = 'An error occurred while updating tasks';
+                    try {
+                        var response = JSON.parse(xhr.responseText);
+                        if (response.message) {
+                            errorMessage = response.message;
+                        }
+                    } catch (e) {
+                        console.error('Error parsing error response:', e);
+                    }
+                    
+                    // Show error message
+                    showToast('Error', errorMessage, 'error');
+                    
+                    // Reset button
+                    $('#applyBatchUpdate').prop('disabled', false).html('<i class="fas fa-check me-1"></i>Apply Changes');
+                }
+            });
+        });
+        
+        // Add toast container if it doesn't exist
+        if ($('.toast-container').length === 0) {
+            $('body').append('<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 11"></div>');
+        }
+        
+        // Initialize date pickers
+        $('#batchDueDate').datepicker({
+            format: 'yyyy-mm-dd',
+            autoclose: true,
+            todayHighlight: true
+        });
+        
+        // Function to show toast notifications
+        function showToast(title, message, type) {
+            // Set toast background color based on type
+            var bgClass = 'bg-primary';
+            var icon = 'fa-info-circle';
+            
+            if (type === 'success') {
+                bgClass = 'bg-success';
+                icon = 'fa-check-circle';
+            } else if (type === 'error') {
+                bgClass = 'bg-danger';
+                icon = 'fa-exclamation-circle';
+            } else if (type === 'warning') {
+                bgClass = 'bg-warning';
+                icon = 'fa-exclamation-triangle';
+            }
+            
+            // Create toast HTML
+            var toastHtml = `
+                <div class="toast align-items-center text-white ${bgClass} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            <i class="fas ${icon} me-2"></i>
+                            <strong>${title}:</strong> ${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            `;
+            
+            // Append toast to container
+            $('.toast-container').append(toastHtml);
+            
+            // Initialize and show toast
+            var toastEl = document.querySelector('.toast:last-child');
+            var bsToast = new bootstrap.Toast(toastEl, {
+                autohide: true,
+                delay: 5000
+            });
+            bsToast.show();
+        }
     });
 </script>
 {% endblock %}
+{% endblock content %}

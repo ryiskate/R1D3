@@ -6,6 +6,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/task_dashboard.css' %}">
+<link rel="stylesheet" href="{% static 'css/task_buttons.css' %}">
 <style>
     /* Task Card Styling */
     .task-card {
@@ -220,7 +221,7 @@
                 {% endif %}
             </h6>
             <div>
-                <a href="{% block table_new_task_url %}{% url 'projects:r1d3_task_create' %}{% endblock %}" class="btn btn-sm btn-primary">
+                <a href="{% block table_new_task_url %}{% url 'core:r1d3_task_create' %}{% endblock %}" class="btn btn-sm btn-primary">
                     <i class="fas fa-plus-circle me-1"></i> {% block table_new_task_text %}New Task{% endblock %}
                 </a>
                 <button type="button" class="btn btn-sm btn-outline-secondary ms-2" data-bs-toggle="modal" data-bs-target="#filterModal">
@@ -259,7 +260,7 @@
                                 <input type="checkbox" class="form-check-input task-checkbox" data-task-id="{{ task.id }}">
                             </td>
                             <td>
-                                <a href="{% block task_detail_url %}{% url 'projects:r1d3_task_detail' task.id %}{% endblock %}">{{ task.title }}</a>
+                                <a href="{% block task_detail_url %}{% url 'core:r1d3_task_detail' task.id %}{% endblock %}">{{ task.title }}</a>
                                 {% if task.is_overdue %}
                                 <span class="badge bg-danger ms-1">Overdue</span>
                                 {% endif %}
@@ -304,10 +305,10 @@
                             </td>
                             <td class="action-column">
                                 <div class="btn-group">
-                                    <a href="{% block task_edit_url %}{% url 'projects:r1d3_task_update' task.id %}{% endblock %}" class="btn btn-sm btn-outline-primary" title="Edit">
+                                    <a href="{% block task_edit_url %}{% url 'core:r1d3_task_update' task.id %}{% endblock %}" class="btn btn-sm btn-outline-primary" data-task-id="{{ task.id }}" title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <a href="{% block task_delete_url %}{% url 'games:task_delete' task.id %}{% endblock %}" class="btn btn-sm btn-outline-danger" title="Delete">
+                                    <a href="{% block task_delete_url %}{% url 'core:r1d3_task_delete' task.id %}{% endblock %}" class="btn btn-sm btn-outline-danger" data-task-id="{{ task.id }}" title="Delete">
                                         <i class="fas fa-trash"></i>
                                     </a>
                                 </div>
@@ -345,6 +346,7 @@
 {% endblock content %}
 
 {% block extra_js %}
+<script src="{% static 'js/task_delete_handler.js' %}"></script>
 {% block task_dashboard_js %}
 {% include "core/task_dashboard_js.html" %}
 {% endblock task_dashboard_js %}

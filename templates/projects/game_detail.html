@@ -274,7 +274,7 @@
                         <a href="{% url 'games:task_kanban' game.id %}" class="btn btn-sm btn-outline-secondary me-2">
                             <i class="bi bi-kanban"></i> Kanban Board
                         </a>
-                        <a href="{% url 'games:task_list' game.id %}" class="btn btn-sm btn-outline-primary">
+                        <a href="{% url 'games:game_task_dashboard' game_id=game.id %}" class="btn btn-sm btn-outline-primary">
                             <i class="bi bi-list-task"></i> View All Tasks
                         </a>
                     </div>

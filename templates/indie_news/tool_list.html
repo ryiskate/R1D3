@@ -1,0 +1,271 @@
+{% extends 'indie_news/indie_news_base.html' %}
+{% load static %}
+
+{% block title %}Indie Tools{% endblock %}
+
+{% block extra_css %}
+<style>
+    .tool-card {
+        height: 100%;
+        transition: transform 0.2s;
+    }
+    .tool-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    }
+    .tool-logo {
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #f8f9fc;
+        border-bottom: 1px solid #e3e6f0;
+    }
+    .tool-logo img {
+        max-height: 60px;
+        max-width: 80%;
+    }
+    
+    .badge-tool-engine { background-color: #4e73df; }
+    .badge-tool-modeling { background-color: #1cc88a; }
+    .badge-tool-audio { background-color: #36b9cc; }
+    .badge-tool-animation { background-color: #f6c23e; }
+    .badge-tool-vfx { background-color: #e74a3b; }
+    .badge-tool-level_design { background-color: #6f42c1; }
+    .badge-tool-scripting { background-color: #5a5c69; }
+    .badge-tool-other { background-color: #858796; }
+    
+    .badge-pricing-free { background-color: #28a745; }
+    .badge-pricing-freemium { background-color: #17a2b8; }
+    .badge-pricing-subscription { background-color: #fd7e14; }
+    .badge-pricing-one_time { background-color: #6c757d; }
+    .badge-pricing-open_source { background-color: #6f42c1; }
+    
+    .filter-card {
+        border-left: 4px solid #e74a3b;
+    }
+    
+    .platform-icon {
+        font-size: 1.2rem;
+        margin-right: 5px;
+    }
+    
+    .fa-windows { color: #0078d7; }
+    .fa-apple { color: #555555; }
+    .fa-linux { color: #dd4814; }
+    .fa-chrome { color: #4285f4; }
+    .fa-mobile-alt { color: #a4c639; }
+</style>
+{% endblock %}
+
+{% block indie_content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-tools text-danger"></i>
+            Indie Tools
+        </h1>
+        <div>
+            <a href="{% url 'indie_news:tool_create' %}" class="btn btn-sm btn-danger shadow-sm">
+                <i class="fas fa-plus fa-sm text-white-50"></i> Add New Tool
+            </a>
+            <a href="{% url 'indie_news:dashboard' %}" class="btn btn-sm btn-secondary shadow-sm">
+                <i class="fas fa-arrow-left fa-sm text-white-50"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Filters Card -->
+    <div class="card shadow mb-4 filter-card">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-danger">Filters</h6>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row">
+                <div class="col-md-3 mb-3">
+                    <label for="tool_type">Tool Type</label>
+                    <select name="tool_type" id="tool_type" class="form-control">
+                        <option value="">All Types</option>
+                        <option value="engine" {% if request.GET.tool_type == 'engine' %}selected{% endif %}>Game Engine</option>
+                        <option value="modeling" {% if request.GET.tool_type == 'modeling' %}selected{% endif %}>3D Modeling</option>
+                        <option value="audio" {% if request.GET.tool_type == 'audio' %}selected{% endif %}>Audio</option>
+                        <option value="animation" {% if request.GET.tool_type == 'animation' %}selected{% endif %}>Animation</option>
+                        <option value="vfx" {% if request.GET.tool_type == 'vfx' %}selected{% endif %}>Visual Effects</option>
+                        <option value="level_design" {% if request.GET.tool_type == 'level_design' %}selected{% endif %}>Level Design</option>
+                        <option value="scripting" {% if request.GET.tool_type == 'scripting' %}selected{% endif %}>Scripting/Coding</option>
+                        <option value="other" {% if request.GET.tool_type == 'other' %}selected{% endif %}>Other</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="pricing_model">Pricing Model</label>
+                    <select name="pricing_model" id="pricing_model" class="form-control">
+                        <option value="">All Pricing Models</option>
+                        <option value="free" {% if request.GET.pricing_model == 'free' %}selected{% endif %}>Free</option>
+                        <option value="freemium" {% if request.GET.pricing_model == 'freemium' %}selected{% endif %}>Freemium</option>
+                        <option value="subscription" {% if request.GET.pricing_model == 'subscription' %}selected{% endif %}>Subscription</option>
+                        <option value="one_time" {% if request.GET.pricing_model == 'one_time' %}selected{% endif %}>One-time Purchase</option>
+                        <option value="open_source" {% if request.GET.pricing_model == 'open_source' %}selected{% endif %}>Open Source</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="platform">Platform</label>
+                    <select name="platform" id="platform" class="form-control">
+                        <option value="">All Platforms</option>
+                        <option value="windows" {% if request.GET.platform == 'windows' %}selected{% endif %}>Windows</option>
+                        <option value="mac" {% if request.GET.platform == 'mac' %}selected{% endif %}>macOS</option>
+                        <option value="linux" {% if request.GET.platform == 'linux' %}selected{% endif %}>Linux</option>
+                        <option value="web" {% if request.GET.platform == 'web' %}selected{% endif %}>Web-based</option>
+                        <option value="mobile" {% if request.GET.platform == 'mobile' %}selected{% endif %}>Mobile</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="search">Search</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="search" name="search" 
+                               placeholder="Search tools..." value="{{ request.GET.search|default:'' }}">
+                        <div class="input-group-append">
+                            <button class="btn btn-danger" type="submit">
+                                <i class="fas fa-search fa-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tools Grid -->
+    <div class="row">
+        {% for tool in tools %}
+        <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+            <div class="card shadow tool-card">
+                <div class="tool-logo">
+                    {% if tool.logo %}
+                        <img src="{{ tool.logo.url }}" alt="{{ tool.name }} logo">
+                    {% else %}
+                        <i class="fas fa-tools fa-3x text-secondary"></i>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ tool.name }}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">{{ tool.developer }}</h6>
+                    
+                    <div class="mb-2">
+                        <span class="badge badge-pill badge-tool-{{ tool.tool_type }}">
+                            {{ tool.get_tool_type_display }}
+                        </span>
+                        <span class="badge badge-pill badge-pricing-{{ tool.pricing_model }}">
+                            {{ tool.get_pricing_model_display }}
+                        </span>
+                    </div>
+                    
+                    <p class="card-text small">{{ tool.description|truncatechars:100 }}</p>
+                    
+                    <div class="mb-3">
+                        {% if 'windows' in tool.platforms %}
+                            <i class="fab fa-windows platform-icon" title="Windows"></i>
+                        {% endif %}
+                        {% if 'mac' in tool.platforms %}
+                            <i class="fab fa-apple platform-icon" title="macOS"></i>
+                        {% endif %}
+                        {% if 'linux' in tool.platforms %}
+                            <i class="fab fa-linux platform-icon" title="Linux"></i>
+                        {% endif %}
+                        {% if 'web' in tool.platforms %}
+                            <i class="fab fa-chrome platform-icon" title="Web"></i>
+                        {% endif %}
+                        {% if 'mobile' in tool.platforms %}
+                            <i class="fas fa-mobile-alt platform-icon" title="Mobile"></i>
+                        {% endif %}
+                    </div>
+                    
+                    {% if tool.review_score %}
+                        <div class="mb-3">
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= tool.review_score %}
+                                    <i class="fas fa-star text-warning"></i>
+                                {% elif forloop.counter <= tool.review_score|add:"0.5" %}
+                                    <i class="fas fa-star-half-alt text-warning"></i>
+                                {% else %}
+                                    <i class="far fa-star text-warning"></i>
+                                {% endif %}
+                            {% endfor %}
+                            <span class="ml-1 small text-muted">{{ tool.review_score }}/5</span>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="text-center">
+                        <a href="{% url 'indie_news:tool_detail' tool.pk %}" class="btn btn-sm btn-outline-danger">View Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> No tools found matching your criteria.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div class="d-flex justify-content-center mt-4">
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="First">
+                            <span aria-hidden="true">&laquo;&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+                
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                        <li class="page-item active">
+                            <a class="page-link" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ num }}</a>
+                        </li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ num }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Last">
+                            <span aria-hidden="true">&raquo;&raquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+{% endblock indie_content %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Auto-submit form when filters change
+        $('#tool_type, #pricing_model, #platform').change(function() {
+            $(this).closest('form').submit();
+        });
+    });
+</script>
+{% endblock %}

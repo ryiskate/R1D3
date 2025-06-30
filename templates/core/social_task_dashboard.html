@@ -6,7 +6,7 @@
 
 {% block dashboard_heading %}Social Media Tasks{% endblock %}
 
-{% block new_task_url %}{% url 'projects:social_media_task_create' %}{% endblock %}
+{% block new_task_url %}{% url 'social_media:task_create' %}{% endblock %}
 {% block new_task_text %}New Social Media Task{% endblock %}
 
 {% block additional_css %}
@@ -196,7 +196,7 @@
                                 <input type="checkbox" class="form-check-input task-checkbox" data-task-id="{{ task.id }}">
                             </td>
                             <td>
-                                <a href="{% url 'projects:social_media_task_detail' task.id %}" class="task-title-link">
+                                <a href="{% url 'social_media:task_detail' task.id %}" class="task-title-link">
                                     {{ task.title }}
                                 </a>
                                 <div class="small text-muted">
@@ -255,7 +255,7 @@
                             </td>
                             <td class="text-center">
                                 <div class="btn-group">
-                                    <a href="{% url 'projects:social_media_task_update' task.id %}" class="btn btn-sm btn-outline-primary" title="Edit">
+                                    <a href="{% url 'social_media:task_update' task.id %}" class="btn btn-sm btn-outline-primary" title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     <a href="{% url 'games:task_delete' task.id %}" class="btn btn-sm btn-outline-danger" title="Delete">
@@ -270,7 +270,7 @@
                                 <div class="text-muted">
                                     <i class="fas fa-tasks fa-2x mb-3"></i>
                                     <p>No social media tasks found.</p>
-                                    <a href="{% url 'projects:social_media_task_create' %}" class="btn btn-sm btn-primary">
+                                    <a href="{% url 'social_media:task_create' %}" class="btn btn-sm btn-primary">
                                         <i class="fas fa-plus-circle me-1"></i> Create a Social Media Task
                                     </a>
                                 </div>

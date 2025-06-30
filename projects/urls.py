@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from . import game_views, game_task_views, education_task_views, social_media_task_views, arcade_task_views, theme_park_task_views, r1d3_task_views, test_views, unified_r1d3_task_forms
+from . import game_views, game_task_views, education_task_views, social_media_task_views, theme_park_task_views, r1d3_task_views, test_views, unified_r1d3_task_forms
 # Import the unified task views
 from . import unified_task_views
 # Import the unified task forms
@@ -29,22 +29,13 @@ urlpatterns = [
     path('social-media/tasks/status-update/', social_media_task_views.SocialMediaTaskStatusUpdateView.as_view(), name='social_media_task_status_update'),
     path('social-media/tasks/hours-update/', social_media_task_views.SocialMediaTaskHoursUpdateView.as_view(), name='social_media_task_hours_update'),
     
-    # Arcade Task URLs
-    path('arcade/tasks/', unified_task_views.ArcadeTaskDashboardView.as_view(), name='arcade_task_dashboard'),
-    path('arcade/tasks/create/', unified_task_forms.ArcadeTaskCreateView.as_view(), name='arcade_task_create'),
-    path('arcade/tasks/<int:pk>/', arcade_task_views.ArcadeTaskDetailView.as_view(), name='arcade_task_detail'),
-    path('arcade/tasks/<int:pk>/update/', unified_task_forms.ArcadeTaskUpdateView.as_view(), name='arcade_task_update'),
-    path('arcade/tasks/<int:pk>/delete/', arcade_task_views.ArcadeTaskDeleteView.as_view(), name='arcade_task_delete'),
-    path('arcade/tasks/batch-update/', arcade_task_views.ArcadeTaskBatchUpdateView.as_view(), name='arcade_task_batch_update'),
-    path('arcade/tasks/status-update/', arcade_task_views.ArcadeTaskStatusUpdateView.as_view(), name='arcade_task_status_update'),
-    path('arcade/tasks/hours-update/', arcade_task_views.ArcadeTaskHoursUpdateView.as_view(), name='arcade_task_hours_update'),
     
-    # Theme Park Task URLs
+    # Theme Park Task URLs - Redirecting to theme_park app
     path('theme-park/tasks/', unified_task_views.ThemeParkTaskDashboardView.as_view(), name='theme_park_task_dashboard'),
     path('theme-park/tasks/create/', unified_task_forms.ThemeParkTaskCreateView.as_view(), name='theme_park_task_create'),
-    path('theme-park/tasks/<int:pk>/', theme_park_task_views.ThemeParkTaskDetailView.as_view(), name='theme_park_task_detail'),
+    # Detail view moved to theme_park app
     path('theme-park/tasks/<int:pk>/update/', unified_task_forms.ThemeParkTaskUpdateView.as_view(), name='theme_park_task_update'),
-    path('theme-park/tasks/<int:pk>/delete/', theme_park_task_views.ThemeParkTaskDeleteView.as_view(), name='theme_park_task_delete'),
+    # Delete view moved to theme_park app
     path('theme-park/tasks/batch-update/', theme_park_task_views.ThemeParkTaskBatchUpdateView.as_view(), name='theme_park_task_batch_update'),
     path('theme-park/tasks/status-update/', theme_park_task_views.ThemeParkTaskStatusUpdateView.as_view(), name='theme_park_task_status_update'),
     path('theme-park/tasks/hours-update/', theme_park_task_views.ThemeParkTaskHoursUpdateView.as_view(), name='theme_park_task_hours_update'),

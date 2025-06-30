@@ -1,0 +1,247 @@
+{% extends 'indie_news/indie_news_base.html' %}
+{% load static %}
+
+{% block title %}Indie Games{% endblock %}
+
+{% block extra_css %}
+<style>
+    .game-card {
+        height: 100%;
+        transition: transform 0.2s;
+    }
+    .game-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    }
+    .game-card .card-img-top {
+        height: 180px;
+        object-fit: cover;
+    }
+    .game-card .badge-platform {
+        background-color: #6c757d;
+    }
+    .game-card .badge-genre {
+        background-color: #17a2b8;
+    }
+    .game-score {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #4e73df;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.2rem;
+    }
+    .filter-card {
+        border-left: 4px solid #1cc88a;
+    }
+</style>
+{% endblock %}
+
+{% block indie_content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-gamepad text-success"></i>
+            Indie Games
+        </h1>
+        <div>
+            <a href="{% url 'indie_news:game_create' %}" class="btn btn-sm btn-success shadow-sm">
+                <i class="fas fa-plus fa-sm text-white-50"></i> Add New Game
+            </a>
+            <a href="{% url 'indie_news:dashboard' %}" class="btn btn-sm btn-secondary shadow-sm">
+                <i class="fas fa-arrow-left fa-sm text-white-50"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Filters Card -->
+    <div class="card shadow mb-4 filter-card">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-success">Filters</h6>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row">
+                <div class="col-md-3 mb-3">
+                    <label for="platform">Platform</label>
+                    <select name="platform" id="platform" class="form-control">
+                        <option value="">All Platforms</option>
+                        <option value="PC" {% if request.GET.platform == 'PC' %}selected{% endif %}>PC</option>
+                        <option value="Mac" {% if request.GET.platform == 'Mac' %}selected{% endif %}>Mac</option>
+                        <option value="Linux" {% if request.GET.platform == 'Linux' %}selected{% endif %}>Linux</option>
+                        <option value="Switch" {% if request.GET.platform == 'Switch' %}selected{% endif %}>Nintendo Switch</option>
+                        <option value="PS4" {% if request.GET.platform == 'PS4' %}selected{% endif %}>PlayStation 4</option>
+                        <option value="PS5" {% if request.GET.platform == 'PS5' %}selected{% endif %}>PlayStation 5</option>
+                        <option value="Xbox" {% if request.GET.platform == 'Xbox' %}selected{% endif %}>Xbox</option>
+                        <option value="Mobile" {% if request.GET.platform == 'Mobile' %}selected{% endif %}>Mobile</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="genre">Genre</label>
+                    <select name="genre" id="genre" class="form-control">
+                        <option value="">All Genres</option>
+                        <option value="Action" {% if request.GET.genre == 'Action' %}selected{% endif %}>Action</option>
+                        <option value="Adventure" {% if request.GET.genre == 'Adventure' %}selected{% endif %}>Adventure</option>
+                        <option value="RPG" {% if request.GET.genre == 'RPG' %}selected{% endif %}>RPG</option>
+                        <option value="Strategy" {% if request.GET.genre == 'Strategy' %}selected{% endif %}>Strategy</option>
+                        <option value="Simulation" {% if request.GET.genre == 'Simulation' %}selected{% endif %}>Simulation</option>
+                        <option value="Puzzle" {% if request.GET.genre == 'Puzzle' %}selected{% endif %}>Puzzle</option>
+                        <option value="Platformer" {% if request.GET.genre == 'Platformer' %}selected{% endif %}>Platformer</option>
+                        <option value="Racing" {% if request.GET.genre == 'Racing' %}selected{% endif %}>Racing</option>
+                        <option value="Sports" {% if request.GET.genre == 'Sports' %}selected{% endif %}>Sports</option>
+                        <option value="Horror" {% if request.GET.genre == 'Horror' %}selected{% endif %}>Horror</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="release_year">Release Year</label>
+                    <select name="release_year" id="release_year" class="form-control">
+                        <option value="">All Years</option>
+                        {% for year in release_years %}
+                            <option value="{{ year }}" {% if request.GET.release_year == year|stringformat:"i" %}selected{% endif %}>{{ year }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="search">Search</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="search" name="search" 
+                               placeholder="Search games..." value="{{ request.GET.search|default:'' }}">
+                        <div class="input-group-append">
+                            <button class="btn btn-success" type="submit">
+                                <i class="fas fa-search fa-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Games Grid -->
+    <div class="row">
+        {% for game in games %}
+        <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+            <div class="card shadow game-card">
+                {% if game.cover_image %}
+                    <img src="{{ game.cover_image.url }}" class="card-img-top" alt="{{ game.title }}">
+                {% else %}
+                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center">
+                        <i class="fas fa-gamepad fa-3x text-secondary"></i>
+                    </div>
+                {% endif %}
+                
+                {% if game.review_score %}
+                    <div class="game-score">{{ game.review_score }}</div>
+                {% endif %}
+                
+                <div class="card-body">
+                    <h5 class="card-title">{{ game.title }}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">{{ game.developer }}</h6>
+                    <p class="card-text small">{{ game.description|truncatechars:100 }}</p>
+                    
+                    <div class="mb-2">
+                        {% for platform in game.platforms.split|slice:":3" %}
+                            <span class="badge badge-pill badge-platform">{{ platform }}</span>
+                        {% endfor %}
+                        {% if game.platforms.split|length > 3 %}
+                            <span class="badge badge-pill badge-secondary">+{{ game.platforms.split|length|add:"-3" }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        {% for genre in game.genres.split|slice:":2" %}
+                            <span class="badge badge-pill badge-genre">{{ genre }}</span>
+                        {% endfor %}
+                        {% if game.genres.split|length > 2 %}
+                            <span class="badge badge-pill badge-info">+{{ game.genres.split|length|add:"-2" }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            {% if game.release_date %}
+                                Released: {{ game.release_date|date:"Y-m-d" }}
+                            {% else %}
+                                Coming soon
+                            {% endif %}
+                        </small>
+                        <a href="{% url 'indie_news:game_detail' game.pk %}" class="btn btn-sm btn-outline-success">Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> No games found matching your criteria.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div class="d-flex justify-content-center mt-4">
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="First">
+                            <span aria-hidden="true">&laquo;&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+                
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                        <li class="page-item active">
+                            <a class="page-link" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ num }}</a>
+                        </li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ num }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Last">
+                            <span aria-hidden="true">&raquo;&raquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+{% endblock indie_content %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Auto-submit form when filters change
+        $('#platform, #genre, #release_year').change(function() {
+            $(this).closest('form').submit();
+        });
+    });
+</script>
+{% endblock %}

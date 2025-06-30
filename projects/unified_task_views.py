@@ -197,8 +197,10 @@ class UnifiedTaskDashboardView(LoginRequiredMixin, View):
 
 # Specialized dashboard views for each task type
 class GameTaskDashboardView(UnifiedTaskDashboardView):
-    """Game development task dashboard"""
-    template_name = 'projects/game_task_dashboard.html'
+    """
+    Game development task dashboard
+    """
+    template_name = 'projects/task_dashboard.html'
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -216,12 +218,42 @@ class GameTaskDashboardView(UnifiedTaskDashboardView):
             Q(game__lead_artist=user)
         )
     
+    def get(self, request, *args, **kwargs):
+        # Check if game_id is in the URL path parameters
+        game_id = kwargs.get('game_id')
+        if game_id:
+            # Add game_id to the request.GET for the parent class to use
+            request.GET = request.GET.copy()
+            request.GET['game'] = str(game_id)
+            
+            # Get the game object and add it to the context
+            try:
+                game = GameProject.objects.get(id=game_id)
+                self.game = game
+            except GameProject.DoesNotExist:
+                self.game = None
+        else:
+            self.game = None
+            
+        return super().get(request, *args, **kwargs)
+        
     def get_section_specific_context(self, request, tasks):
         """Game-specific context data"""
         context = {}
         
-        # Get game if specified
+        # Get game if specified from URL path or query parameter
         game_id = request.GET.get('game')
+        
+        # Add the game to the context if we have it from get() method
+        if hasattr(self, 'game') and self.game:
+            context['game'] = self.game
+            game_id = self.game.id
+        elif game_id:
+            try:
+                context['game'] = GameProject.objects.get(id=game_id)
+            except GameProject.DoesNotExist:
+                pass
+        
         if game_id:
             # Get milestones for the game
             context['milestones'] = GameMilestone.objects.filter(game_id=game_id).order_by('due_date')
@@ -238,47 +270,58 @@ class GameTaskDashboardView(UnifiedTaskDashboardView):
         return context
 
 
-class EducationTaskDashboardView(View):  # Temporarily removed LoginRequiredMixin for debugging
+class EducationTaskDashboardView(UnifiedTaskDashboardView):
     """Education task dashboard"""
-    template_name = 'education/test_tasks.html'
+    template_name = 'education/tasks.html'
     
-    def get(self, request, *args, **kwargs):
-        print("DEBUG: EducationTaskDashboardView is being called")
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.task_model = EducationTask
+        self.section_name = "Education Tasks"
         
-        # Get all education tasks directly
-        tasks = EducationTask.objects.all()
-        print(f"DEBUG: Total education tasks in database: {tasks.count()}")
+    def get_section_specific_context(self, request, tasks):
+        """Education-specific context data"""
+        context = {}
         
-        # Create simple context with tasks
-        context = {
-            'tasks': tasks,
-            'task_stats': {
-                'to_do': tasks.filter(status='to_do').count(),
-                'in_progress': tasks.filter(status='in_progress').count(),
-                'in_review': tasks.filter(status='in_review').count(),
-                'done': tasks.filter(status='done').count(),
-                'backlog': tasks.filter(status='backlog').count(),
-            },
-            'section_name': 'Education Tasks'
-        }
+        # Get unique course IDs for filtering
+        course_ids = EducationTask.objects.values_list('course_id', flat=True).distinct()
+        context['course_ids'] = course_ids
+        
+        # Get unique target audiences for filtering
+        target_audiences = EducationTask.objects.values_list('target_audience', flat=True).distinct()
+        context['target_audiences'] = target_audiences
         
         # Print debug info
+        print(f"DEBUG: EducationTaskDashboardView is being called")
+        print(f"DEBUG: Total education tasks in database: {tasks.count()}")
         for task in tasks[:3]:
             print(f"DEBUG: Task {task.id}: {task.title} (Status: {task.status})")
-        print(f"DEBUG: Context task count: {len(context['tasks'])}")
-        print(f"DEBUG: Context stats: {context['task_stats']}")
         
-        return render(request, self.template_name, context)
+        return context
 
 
 class SocialMediaTaskDashboardView(UnifiedTaskDashboardView):
     """Social media task dashboard"""
-    template_name = 'projects/social_media_task_dashboard.html'
+    template_name = 'social_media/tasks.html'
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.task_model = SocialMediaTask
         self.section_name = "Social Media Tasks"
+        
+    def get_section_specific_context(self, request, tasks):
+        """Social Media-specific context data"""
+        context = {}
+        
+        # Get unique campaign IDs for filtering
+        campaign_ids = SocialMediaTask.objects.values_list('campaign_id', flat=True).distinct()
+        context['campaign_ids'] = campaign_ids
+        
+        # Get unique channels for filtering
+        channels = SocialMediaTask.objects.values_list('channel', flat=True).distinct()
+        context['channels'] = channels
+        
+        return context
 
 
 class ArcadeTaskDashboardView(UnifiedTaskDashboardView):

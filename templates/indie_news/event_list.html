@@ -1,0 +1,387 @@
+{% extends 'indie_news/indie_news_base.html' %}
+{% load static %}
+
+{% block title %}Indie Events{% endblock %}
+
+{% block extra_css %}
+<style>
+    .event-card {
+        height: 100%;
+        transition: transform 0.2s;
+    }
+    .event-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    }
+    .event-date {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #f6c23e;
+    }
+    .event-month {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+    }
+    .event-day {
+        font-size: 1.5rem;
+        line-height: 1;
+    }
+    .event-type-conference { border-left: 4px solid #4e73df; }
+    .event-type-showcase { border-left: 4px solid #1cc88a; }
+    .event-type-competition { border-left: 4px solid #e74a3b; }
+    .event-type-awards { border-left: 4px solid #f6c23e; }
+    .event-type-meetup { border-left: 4px solid #36b9cc; }
+    .event-type-jam { border-left: 4px solid #858796; }
+    .event-type-expo { border-left: 4px solid #5a5c69; }
+    .event-type-other { border-left: 4px solid #f8f9fc; }
+    
+    .badge-event-conference { background-color: #4e73df; }
+    .badge-event-showcase { background-color: #1cc88a; }
+    .badge-event-competition { background-color: #e74a3b; }
+    .badge-event-awards { background-color: #f6c23e; }
+    .badge-event-meetup { background-color: #36b9cc; }
+    .badge-event-jam { background-color: #858796; }
+    .badge-event-expo { background-color: #5a5c69; }
+    .badge-event-other { background-color: #f8f9fc; color: #5a5c69; }
+    
+    .filter-card {
+        border-left: 4px solid #f6c23e;
+    }
+    
+    .calendar-view .event-item {
+        margin-bottom: 10px;
+        padding: 10px;
+        border-radius: 5px;
+    }
+    
+    .calendar-view .event-item:hover {
+        background-color: rgba(246, 194, 62, 0.1);
+    }
+    
+    .calendar-day {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #f6c23e;
+        color: white;
+        border-radius: 50%;
+        font-weight: bold;
+    }
+    
+    .calendar-day-past {
+        background-color: #858796;
+    }
+    
+    .calendar-day-today {
+        background-color: #e74a3b;
+    }
+    
+    .view-toggle .btn {
+        border-radius: 0;
+    }
+    
+    .view-toggle .btn:first-child {
+        border-top-left-radius: 0.35rem;
+        border-bottom-left-radius: 0.35rem;
+    }
+    
+    .view-toggle .btn:last-child {
+        border-top-right-radius: 0.35rem;
+        border-bottom-right-radius: 0.35rem;
+    }
+</style>
+{% endblock %}
+
+{% block indie_content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-calendar-alt text-warning"></i>
+            Indie Events
+        </h1>
+        <div>
+            <div class="btn-group view-toggle mr-2" role="group" aria-label="View Toggle">
+                <button type="button" class="btn btn-outline-warning active" id="cardViewBtn">
+                    <i class="fas fa-th-large"></i> Card View
+                </button>
+                <button type="button" class="btn btn-outline-warning" id="calendarViewBtn">
+                    <i class="fas fa-calendar-alt"></i> Calendar View
+                </button>
+            </div>
+            <a href="{% url 'indie_news:event_create' %}" class="btn btn-sm btn-warning shadow-sm">
+                <i class="fas fa-plus fa-sm text-white-50"></i> Add New Event
+            </a>
+            <a href="{% url 'indie_news:dashboard' %}" class="btn btn-sm btn-secondary shadow-sm">
+                <i class="fas fa-arrow-left fa-sm text-white-50"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Filters Card -->
+    <div class="card shadow mb-4 filter-card">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-warning">Filters</h6>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row">
+                <div class="col-md-3 mb-3">
+                    <label for="event_type">Event Type</label>
+                    <select name="event_type" id="event_type" class="form-control">
+                        <option value="">All Types</option>
+                        <option value="conference" {% if request.GET.event_type == 'conference' %}selected{% endif %}>Conference</option>
+                        <option value="showcase" {% if request.GET.event_type == 'showcase' %}selected{% endif %}>Game Showcase</option>
+                        <option value="competition" {% if request.GET.event_type == 'competition' %}selected{% endif %}>Competition</option>
+                        <option value="awards" {% if request.GET.event_type == 'awards' %}selected{% endif %}>Awards Ceremony</option>
+                        <option value="meetup" {% if request.GET.event_type == 'meetup' %}selected{% endif %}>Developer Meetup</option>
+                        <option value="jam" {% if request.GET.event_type == 'jam' %}selected{% endif %}>Game Jam</option>
+                        <option value="expo" {% if request.GET.event_type == 'expo' %}selected{% endif %}>Expo/Convention</option>
+                        <option value="other" {% if request.GET.event_type == 'other' %}selected{% endif %}>Other</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="time_frame">Time Frame</label>
+                    <select name="time_frame" id="time_frame" class="form-control">
+                        <option value="">All Events</option>
+                        <option value="upcoming" {% if request.GET.time_frame == 'upcoming' %}selected{% endif %}>Upcoming Events</option>
+                        <option value="past" {% if request.GET.time_frame == 'past' %}selected{% endif %}>Past Events</option>
+                        <option value="this_month" {% if request.GET.time_frame == 'this_month' %}selected{% endif %}>This Month</option>
+                        <option value="next_month" {% if request.GET.time_frame == 'next_month' %}selected{% endif %}>Next Month</option>
+                        <option value="this_year" {% if request.GET.time_frame == 'this_year' %}selected{% endif %}>This Year</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="format">Format</label>
+                    <select name="format" id="format" class="form-control">
+                        <option value="">All Formats</option>
+                        <option value="virtual" {% if request.GET.format == 'virtual' %}selected{% endif %}>Virtual Only</option>
+                        <option value="physical" {% if request.GET.format == 'physical' %}selected{% endif %}>Physical Only</option>
+                        <option value="free" {% if request.GET.format == 'free' %}selected{% endif %}>Free Events</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="search">Search</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="search" name="search" 
+                               placeholder="Search events..." value="{{ request.GET.search|default:'' }}">
+                        <div class="input-group-append">
+                            <button class="btn btn-warning" type="submit">
+                                <i class="fas fa-search fa-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Card View -->
+    <div id="cardView" class="row">
+        {% for event in events %}
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card shadow event-card event-type-{{ event.event_type }}">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-warning">{{ event.name }}</h6>
+                    <span class="badge badge-pill badge-event-{{ event.event_type }}">
+                        {{ event.get_event_type_display }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-auto">
+                            <div class="text-center">
+                                <div class="event-month">{{ event.start_date|date:"M" }}</div>
+                                <div class="event-day">{{ event.start_date|date:"d" }}</div>
+                                {% if event.start_date|date:"Y-m-d" != event.end_date|date:"Y-m-d" %}
+                                    <div class="small text-muted">to {{ event.end_date|date:"M d" }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col">
+                            <p class="card-text">{{ event.description|truncatechars:150 }}</p>
+                            <p class="mb-0">
+                                <i class="fas fa-map-marker-alt text-warning mr-1"></i>
+                                {% if event.is_virtual %}
+                                    <span class="text-info">Virtual Event</span>
+                                {% else %}
+                                    {{ event.location|truncatechars:30 }}
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            {% if event.is_virtual %}
+                                <span class="badge badge-info">Virtual</span>
+                            {% endif %}
+                            
+                            {% if event.is_free %}
+                                <span class="badge badge-success">Free</span>
+                            {% endif %}
+                            
+                            {% if event.is_covered %}
+                                <span class="badge badge-primary">Covered</span>
+                            {% endif %}
+                        </div>
+                        <a href="{% url 'indie_news:event_detail' event.pk %}" class="btn btn-sm btn-outline-warning">Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> No events found matching your criteria.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Calendar View -->
+    <div id="calendarView" class="calendar-view" style="display: none;">
+        <div class="card shadow mb-4">
+            <div class="card-body">
+                {% regroup events by start_date|date:"F Y" as events_by_month %}
+                
+                {% for month in events_by_month %}
+                    <h5 class="mb-3">{{ month.grouper }}</h5>
+                    
+                    {% for event in month.list %}
+                        <div class="event-item d-flex">
+                            <div class="mr-3">
+                                {% now "Y-m-d" as today %}
+                                {% if event.start_date|date:"Y-m-d" < today %}
+                                    <div class="calendar-day calendar-day-past">{{ event.start_date|date:"d" }}</div>
+                                {% elif event.start_date|date:"Y-m-d" == today %}
+                                    <div class="calendar-day calendar-day-today">{{ event.start_date|date:"d" }}</div>
+                                {% else %}
+                                    <div class="calendar-day">{{ event.start_date|date:"d" }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between">
+                                    <h6 class="mb-1">
+                                        <a href="{% url 'indie_news:event_detail' event.pk %}">{{ event.name }}</a>
+                                    </h6>
+                                    <span class="badge badge-pill badge-event-{{ event.event_type }}">
+                                        {{ event.get_event_type_display }}
+                                    </span>
+                                </div>
+                                <p class="mb-1 small">
+                                    <i class="fas fa-clock text-warning mr-1"></i>
+                                    {{ event.start_date|date:"g:i A" }}
+                                    {% if event.start_date|date:"Y-m-d" != event.end_date|date:"Y-m-d" %}
+                                        - {{ event.end_date|date:"M d, Y" }}
+                                    {% endif %}
+                                </p>
+                                <p class="mb-1 small">
+                                    <i class="fas fa-map-marker-alt text-warning mr-1"></i>
+                                    {% if event.is_virtual %}
+                                        <span class="text-info">Virtual Event</span>
+                                    {% else %}
+                                        {{ event.location|truncatechars:50 }}
+                                    {% endif %}
+                                </p>
+                                <div>
+                                    {% if event.is_virtual %}
+                                        <span class="badge badge-info">Virtual</span>
+                                    {% endif %}
+                                    
+                                    {% if event.is_free %}
+                                        <span class="badge badge-success">Free</span>
+                                    {% endif %}
+                                    
+                                    {% if event.is_covered %}
+                                        <span class="badge badge-primary">Covered</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                    {% endfor %}
+                {% empty %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> No events found matching your criteria.
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div class="d-flex justify-content-center mt-4">
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="First">
+                            <span aria-hidden="true">&laquo;&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+                
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                        <li class="page-item active">
+                            <a class="page-link" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ num }}</a>
+                        </li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ num }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Last">
+                            <span aria-hidden="true">&raquo;&raquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+{% endblock indie_content %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Auto-submit form when filters change
+        $('#event_type, #time_frame, #format').change(function() {
+            $(this).closest('form').submit();
+        });
+        
+        // View toggle
+        $('#cardViewBtn').click(function() {
+            $(this).addClass('active');
+            $('#calendarViewBtn').removeClass('active');
+            $('#cardView').show();
+            $('#calendarView').hide();
+        });
+        
+        $('#calendarViewBtn').click(function() {
+            $(this).addClass('active');
+            $('#cardViewBtn').removeClass('active');
+            $('#cardView').hide();
+            $('#calendarView').show();
+        });
+    });
+</script>
+{% endblock %}

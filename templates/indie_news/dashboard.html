@@ -1,0 +1,503 @@
+{% extends 'indie_news/indie_news_base.html' %}
+{% load static %}
+
+{% block title %}Indie News Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    .badge-status-backlog { background-color: #6c757d; }
+    .badge-status-to_do { background-color: #17a2b8; }
+    .badge-status-in_progress { background-color: #007bff; }
+    .badge-status-in_review { background-color: #ffc107; }
+    .badge-status-done { background-color: #28a745; }
+    .badge-status-blocked { background-color: #dc3545; }
+    
+    .badge-priority-low { background-color: #f8f9fa; color: #212529; }
+    .badge-priority-medium { background-color: #17a2b8; }
+    .badge-priority-high { background-color: #ffc107; }
+    .badge-priority-critical { background-color: #dc3545; }
+    
+    .card-indie-news { border-left: 4px solid #4e73df; }
+    .card-indie-games { border-left: 4px solid #1cc88a; }
+    .card-indie-events { border-left: 4px solid #f6c23e; }
+    .card-indie-tools { border-left: 4px solid #e74a3b; }
+</style>
+{% endblock %}
+
+{% block indie_content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-newspaper text-primary"></i>
+            Indie News Dashboard
+        </h1>
+        <div>
+            <a href="{% url 'indie_news:task_create' %}" class="btn btn-sm btn-primary shadow-sm">
+                <i class="fas fa-plus fa-sm text-white-50"></i> New Task
+            </a>
+            <div class="btn-group">
+                <button type="button" class="btn btn-sm btn-success shadow-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-plus fa-sm text-white-50"></i> Add New
+                </button>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="{% url 'indie_news:task_create' %}">
+                        <i class="fas fa-tasks fa-sm text-primary"></i> Task
+                    </a>
+                    <a class="dropdown-item" href="{% url 'indie_news:game_create' %}">
+                        <i class="fas fa-gamepad fa-sm text-success"></i> Game
+                    </a>
+                    <a class="dropdown-item" href="{% url 'indie_news:event_create' %}">
+                        <i class="fas fa-calendar-alt fa-sm text-warning"></i> Event
+                    </a>
+                    <a class="dropdown-item" href="{% url 'indie_news:tool_create' %}">
+                        <i class="fas fa-tools fa-sm text-danger"></i> Tool
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Row -->
+    <div class="row">
+        <!-- Tasks Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Tasks</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ task_count }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-tasks fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Games Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Games</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ game_count }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-gamepad fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Events Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Events</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ event_count }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-calendar-alt fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tools Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-danger shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                Tools</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ tool_count }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-tools fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Row -->
+    <div class="row">
+        <!-- Task Status Chart -->
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Task Status Overview</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-bar">
+                        <canvas id="taskStatusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Task Types Chart -->
+        <div class="col-xl-4 col-lg-5">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Article Types</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-pie pt-4 pb-2">
+                        <canvas id="articleTypesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Row -->
+    <div class="row">
+        <!-- Recent Tasks -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow mb-4 card-indie-news">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Recent Tasks</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-sm" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                    <th>Due Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for task in recent_tasks %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'indie_news:task_detail' task.pk %}">{{ task.title }}</a>
+                                        {% if task.is_overdue %}
+                                            <i class="fas fa-exclamation-circle text-danger" title="Overdue"></i>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if task.news_type %}
+                                            <span class="badge badge-pill badge-primary">{{ task.get_news_type_display }}</span>
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-pill badge-status-{{ task.status }}">
+                                            {{ task.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if task.due_date %}
+                                            {{ task.due_date|date:"Y-m-d" }}
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center">No tasks found.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-3 text-center">
+                        <a href="{% url 'indie_news:task_list' %}" class="btn btn-primary btn-sm">View All Tasks</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upcoming Events -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow mb-4 card-indie-events">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-warning">Upcoming Events</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-sm" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Event</th>
+                                    <th>Type</th>
+                                    <th>Date</th>
+                                    <th>Location</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for event in upcoming_events %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'indie_news:event_detail' event.pk %}">{{ event.name }}</a>
+                                        {% if event.is_virtual %}
+                                            <i class="fas fa-globe text-info" title="Virtual Event"></i>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-pill badge-warning">{{ event.get_event_type_display }}</span>
+                                    </td>
+                                    <td>{{ event.start_date|date:"Y-m-d" }}</td>
+                                    <td>
+                                        {% if event.is_virtual %}
+                                            <span class="text-info">Virtual</span>
+                                        {% else %}
+                                            {{ event.location|truncatechars:20 }}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center">No upcoming events found.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-3 text-center">
+                        <a href="{% url 'indie_news:event_list' %}" class="btn btn-warning btn-sm">View All Events</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Row -->
+    <div class="row">
+        <!-- Recent Games -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow mb-4 card-indie-games">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-success">Recent Games</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for game in recent_games %}
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100">
+                                {% if game.cover_image %}
+                                    <img src="{{ game.cover_image.url }}" class="card-img-top" alt="{{ game.title }}">
+                                {% endif %}
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ game.title }}</h5>
+                                    <h6 class="card-subtitle mb-2 text-muted">{{ game.developer }}</h6>
+                                    <p class="card-text small">{{ game.description|truncatechars:100 }}</p>
+                                </div>
+                                <div class="card-footer bg-transparent">
+                                    <a href="{% url 'indie_news:game_detail' game.pk %}" class="btn btn-success btn-sm">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="col-12 text-center">
+                            <p class="text-muted">No games found.</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="mt-3 text-center">
+                        <a href="{% url 'indie_news:game_list' %}" class="btn btn-success btn-sm">View All Games</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Tools -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow mb-4 card-indie-tools">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-danger">Recent Tools</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-sm" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Tool</th>
+                                    <th>Type</th>
+                                    <th>Pricing</th>
+                                    <th>Rating</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for tool in recent_tools %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'indie_news:tool_detail' tool.pk %}">{{ tool.name }}</a>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-pill badge-danger">{{ tool.get_tool_type_display }}</span>
+                                    </td>
+                                    <td>{{ tool.get_pricing_model_display }}</td>
+                                    <td>
+                                        {% if tool.review_score %}
+                                            <div class="small">
+                                                {% for i in "12345" %}
+                                                    {% if forloop.counter <= tool.review_score %}
+                                                        <i class="fas fa-star text-warning"></i>
+                                                    {% elif forloop.counter <= tool.review_score|add:"0.5" %}
+                                                        <i class="fas fa-star-half-alt text-warning"></i>
+                                                    {% else %}
+                                                        <i class="far fa-star text-warning"></i>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                        {% else %}
+                                            <span class="text-muted">Not rated</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center">No tools found.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-3 text-center">
+                        <a href="{% url 'indie_news:tool_list' %}" class="btn btn-danger btn-sm">View All Tools</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock indie_content %}
+
+{% block extra_js %}
+<script>
+    // Task Status Chart
+    var ctx = document.getElementById("taskStatusChart");
+    var taskStatusChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ["Backlog", "To Do", "In Progress", "In Review", "Done", "Blocked"],
+            datasets: [{
+                label: "Tasks",
+                backgroundColor: ["#6c757d", "#17a2b8", "#007bff", "#ffc107", "#28a745", "#dc3545"],
+                data: [
+                    {{ status_counts.backlog|default:0 }},
+                    {{ status_counts.to_do|default:0 }},
+                    {{ status_counts.in_progress|default:0 }},
+                    {{ status_counts.in_review|default:0 }},
+                    {{ status_counts.done|default:0 }},
+                    {{ status_counts.blocked|default:0 }}
+                ],
+            }],
+        },
+        options: {
+            maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    left: 10,
+                    right: 25,
+                    top: 25,
+                    bottom: 0
+                }
+            },
+            scales: {
+                xAxes: [{
+                    gridLines: {
+                        display: false,
+                        drawBorder: false
+                    },
+                    ticks: {
+                        maxTicksLimit: 6
+                    },
+                    maxBarThickness: 25,
+                }],
+                yAxes: [{
+                    ticks: {
+                        min: 0,
+                        maxTicksLimit: 5,
+                        padding: 10,
+                    },
+                    gridLines: {
+                        color: "rgb(234, 236, 244)",
+                        zeroLineColor: "rgb(234, 236, 244)",
+                        drawBorder: false,
+                        borderDash: [2],
+                        zeroLineBorderDash: [2]
+                    }
+                }],
+            },
+            legend: {
+                display: false
+            },
+            tooltips: {
+                titleMarginBottom: 10,
+                titleFontColor: '#6e707e',
+                titleFontSize: 14,
+                backgroundColor: "rgb(255,255,255)",
+                bodyFontColor: "#858796",
+                borderColor: '#dddfeb',
+                borderWidth: 1,
+                xPadding: 15,
+                yPadding: 15,
+                displayColors: false,
+                caretPadding: 10,
+            },
+        }
+    });
+
+    // Article Types Chart
+    var ctx2 = document.getElementById("articleTypesChart");
+    var articleTypesChart = new Chart(ctx2, {
+        type: 'doughnut',
+        data: {
+            labels: ["Review", "Preview", "Interview", "Feature", "News", "Opinion", "Guide"],
+            datasets: [{
+                data: [
+                    {{ news_type_counts.review|default:0 }},
+                    {{ news_type_counts.preview|default:0 }},
+                    {{ news_type_counts.interview|default:0 }},
+                    {{ news_type_counts.feature|default:0 }},
+                    {{ news_type_counts.news|default:0 }},
+                    {{ news_type_counts.opinion|default:0 }},
+                    {{ news_type_counts.guide|default:0 }}
+                ],
+                backgroundColor: ['#17a2b8', '#007bff', '#28a745', '#ffc107', '#6c757d', '#343a40', '#f8f9fa'],
+                hoverBackgroundColor: ['#138496', '#0069d9', '#218838', '#e0a800', '#5a6268', '#23272b', '#e2e6ea'],
+                hoverBorderColor: "rgba(234, 236, 244, 1)",
+            }],
+        },
+        options: {
+            maintainAspectRatio: false,
+            tooltips: {
+                backgroundColor: "rgb(255,255,255)",
+                bodyFontColor: "#858796",
+                borderColor: '#dddfeb',
+                borderWidth: 1,
+                xPadding: 15,
+                yPadding: 15,
+                displayColors: false,
+                caretPadding: 10,
+            },
+            legend: {
+                display: true,
+                position: 'bottom'
+            },
+            cutoutPercentage: 70,
+        },
+    });
+</script>
+{% endblock %}

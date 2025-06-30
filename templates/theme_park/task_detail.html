@@ -1,0 +1,287 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load project_extras %}
+
+{% block title %}{{ task.title }} - Theme Park Task Details{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'theme_park:dashboard' %}">Theme Park Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'theme_park:tasks' %}">Tasks</a></li>
+                    <li class="breadcrumb-item active">{{ task.title }}</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>{{ task.title }}</h1>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'theme_park:task_update' task.id %}" class="btn btn-primary">
+                <i class="bi bi-pencil"></i> Edit Task
+            </a>
+            <a href="{% url 'theme_park:task_delete' task.id %}" class="btn btn-danger ms-2">
+                <i class="bi bi-trash"></i> Delete
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Task Details -->
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header bg-purple text-white">
+                    <h5 class="card-title mb-0">Task Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h6 class="fw-bold">Description</h6>
+                        <div class="p-3 bg-light rounded">
+                            {% if task.description %}
+                            {{ task.description|linebreaks }}
+                            {% else %}
+                            <em>No description provided</em>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="fw-bold">Status</h6>
+                            <div class="mb-3">
+                                {% if task.status == 'backlog' %}
+                                <span class="badge bg-secondary">Backlog</span>
+                                {% elif task.status == 'to_do' %}
+                                <span class="badge bg-primary">To Do</span>
+                                {% elif task.status == 'in_progress' %}
+                                <span class="badge bg-warning">In Progress</span>
+                                {% elif task.status == 'in_review' %}
+                                <span class="badge bg-info">In Review</span>
+                                {% elif task.status == 'done' %}
+                                <span class="badge bg-success">Done</span>
+                                {% elif task.status == 'blocked' %}
+                                <span class="badge bg-danger">Blocked</span>
+                                {% endif %}
+                            </div>
+
+                            <h6 class="fw-bold">Priority</h6>
+                            <div class="mb-3">
+                                {% if task.priority == 'low' %}
+                                <span class="badge bg-success">Low</span>
+                                {% elif task.priority == 'medium' %}
+                                <span class="badge bg-warning">Medium</span>
+                                {% elif task.priority == 'high' %}
+                                <span class="badge bg-danger">High</span>
+                                {% elif task.priority == 'critical' %}
+                                <span class="badge bg-dark">Critical</span>
+                                {% endif %}
+                            </div>
+
+                            <h6 class="fw-bold">Task Type</h6>
+                            <div class="mb-3">
+                                {% if task.task_type %}
+                                <span class="badge bg-purple">{{ task.task_type|title }}</span>
+                                {% else %}
+                                <span class="badge bg-secondary">Other</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <h6 class="fw-bold">Assigned To</h6>
+                            <div class="mb-3">
+                                {% if task.assigned_to %}
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar avatar-sm me-2">
+                                        {% if task.assigned_to.profile.avatar %}
+                                        <img src="{{ task.assigned_to.profile.avatar.url }}" alt="Avatar" class="rounded-circle">
+                                        {% else %}
+                                        <div class="avatar-initials rounded-circle bg-primary text-white">
+                                            {{ task.assigned_to.get_initials }}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    <span>{{ task.assigned_to.get_full_name|default:task.assigned_to.username }}</span>
+                                </div>
+                                {% else %}
+                                <span class="text-muted">Unassigned</span>
+                                {% endif %}
+                            </div>
+
+                            <h6 class="fw-bold">Due Date</h6>
+                            <div class="mb-3">
+                                {% if task.due_date %}
+                                {{ task.due_date }}
+                                {% if task.due_date < today %}
+                                <span class="badge bg-danger ms-2">Overdue</span>
+                                {% elif task.due_date == today %}
+                                <span class="badge bg-warning ms-2">Today</span>
+                                {% endif %}
+                                {% else %}
+                                <span class="text-muted">No due date</span>
+                                {% endif %}
+                            </div>
+
+                            <h6 class="fw-bold">Zone</h6>
+                            <div class="mb-3">
+                                {% if task.zone %}
+                                <span class="badge bg-info">{{ task.zone }}</span>
+                                {% else %}
+                                <span class="text-muted">No zone specified</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <h6 class="fw-bold">Time Tracking</h6>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Estimated Hours:</span>
+                                    <span>{{ task.estimated_hours|default:"--" }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span>Actual Hours:</span>
+                                    <span>{{ task.actual_hours|default:"--" }}</span>
+                                </div>
+                                {% if task.estimated_hours and task.actual_hours %}
+                                <div class="progress mt-2" style="height: 10px;">
+                                    {% if task.actual_hours <= task.estimated_hours %}
+                                     <div class="progress-bar bg-success" role="progressbar"
+                                          style="width: 0%"
+                                          data-percentage="{{ task.actual_hours|div:task.estimated_hours|mul:100|floatformat:0 }}"
+                                          aria-valuenow="{{ task.actual_hours }}">
+                                    </div>
+                                    {% else %}
+                                     <div class="progress-bar bg-success" role="progressbar"
+                                          style="width: 100%"
+                                          aria-valuenow="{{ task.estimated_hours }}">
+                                     </div>
+                                     {% with overage=task.actual_hours|sub:task.estimated_hours %}
+                                    {% with percentage=overage|div:task.estimated_hours|mul:100 %}
+                                    <div class="progress-bar bg-danger" role="progressbar" 
+                                         style="width: 0%" 
+                                         data-percentage="{{ percentage|floatformat:0 }}"
+                                         aria-valuenow="{{ overage }}">
+                                    </div>
+
+                                    {% endwith %}
+                                    {% endwith %}
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="fw-bold">Created</h6>
+                            <div class="mb-3">
+                                {{ task.created_at|date:"F j, Y, g:i a" }}
+                            </div>
+                            <h6 class="fw-bold">Last Updated</h6>
+                            <div class="mb-3">
+                                {{ task.updated_at|date:"F j, Y, g:i a" }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header bg-purple text-white">
+                    <h5 class="card-title mb-0">Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'theme_park:task_status_update' task.id %}" class="mb-3">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Update Status</label>
+                            <select name="status" class="form-select" onchange="this.form.submit()">
+                                <option value="backlog" {% if task.status == 'backlog' %}selected{% endif %}>Backlog</option>
+                                <option value="to_do" {% if task.status == 'to_do' %}selected{% endif %}>To Do</option>
+                                <option value="in_progress" {% if task.status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                                <option value="in_review" {% if task.status == 'in_review' %}selected{% endif %}>In Review</option>
+                                <option value="done" {% if task.status == 'done' %}selected{% endif %}>Done</option>
+                                <option value="blocked" {% if task.status == 'blocked' %}selected{% endif %}>Blocked</option>
+                            </select>
+                        </div>
+                    </form>
+
+                    <form method="post" action="{% url 'theme_park:task_hours_update' task.id %}" class="mb-3">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Log Hours</label>
+                            <div class="input-group">
+                                <input type="number" name="actual_hours" class="form-control" step="0.25" min="0" value="{{ task.actual_hours|default:0 }}">
+                                <button type="submit" class="btn btn-purple">Update</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header bg-purple text-white">
+                    <h5 class="card-title mb-0">Attraction Information</h5>
+                </div>
+                <div class="card-body">
+                    {% if task.attraction_id %}
+                    <div class="mb-3">
+                        <h6 class="fw-bold">Attraction</h6>
+                        <p>{{ task.attraction_id }}</p>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No attraction associated with this task</p>
+                    {% endif %}
+                    
+                    {% if task.safety_priority %}
+                    <div class="mb-3">
+                        <h6 class="fw-bold">Safety Priority</h6>
+                        <span class="badge bg-danger">{{ task.safety_priority }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Set the width of progress bars after page load to avoid CSS lint errors
+    document.addEventListener('DOMContentLoaded', function() {
+        const progressBars = document.querySelectorAll('.progress-bar[data-percentage]');
+        progressBars.forEach(bar => {
+            bar.style.width = bar.dataset.percentage + '%';
+        });
+    });
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .bg-purple {
+        background-color: #8e44ad;
+    }
+    
+    .btn-purple {
+        background-color: #8e44ad;
+        color: white;
+    }
+    
+    .btn-purple:hover {
+        background-color: #7d3c98;
+        color: white;
+    }
+</style>
+{% endblock %}

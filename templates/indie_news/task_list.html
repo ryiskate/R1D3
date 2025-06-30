@@ -1,0 +1,751 @@
+{% extends 'indie_news/base_indie_task_dashboard.html' %}
+{% load static %}
+
+{% block dashboard_title %}{% endblock %}
+
+{% block dashboard_heading %}{% endblock %}
+
+{% block new_task_url %}{% url 'indie_news:task_create' %}{% endblock %}
+{% block new_task_text %}New News Task{% endblock %}
+
+{% block clear_filters_url %}{% url 'indie_news:task_list' %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Status badge styling */
+    .badge-status-backlog { background-color: #6c757d; }
+    .badge-status-to_do { background-color: #4e73df; }
+    .badge-status-in_progress { background-color: #f6c23e; }
+    .badge-status-in_review { background-color: #36b9cc; }
+    .badge-status-done { background-color: #1cc88a; }
+    .badge-status-blocked { background-color: #e74a3b; }
+    
+    /* Priority badge styling */
+    .badge-priority-low { background-color: #f8f9fa; color: #212529; }
+    .badge-priority-medium { background-color: #36b9cc; }
+    .badge-priority-high { background-color: #f6c23e; }
+    .badge-priority-critical { background-color: #e74a3b; }
+    
+    /* News type badge styling */
+    .badge-news-review { background-color: #36b9cc; }
+    .badge-news-preview { background-color: #4e73df; }
+    .badge-news-interview { background-color: #1cc88a; }
+    .badge-news-feature { background-color: #f6c23e; }
+    .badge-news-news { background-color: #6c757d; }
+    .badge-news-opinion { background-color: #fd7e14; }
+    .badge-news-guide { background-color: #20c997; }
+    
+    /* Company section cards */
+    .company-card {
+        transition: transform 0.2s;
+        cursor: pointer;
+        border-radius: 0.5rem;
+    }
+    .company-card:hover {
+        transform: translateY(-5px);
+    }
+    .company-card.active {
+        border: 2px solid #4e73df;
+    }
+    
+    /* Task table styling */
+    .task-table {
+        border-collapse: separate;
+        border-spacing: 0 5px;
+    }
+    
+    .task-table thead th {
+        border-bottom: none;
+        font-weight: 600;
+        color: #4e73df;
+        font-size: 0.85rem;
+    }
+    
+    .task-table tbody tr {
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        border-radius: 8px;
+        transition: transform 0.15s ease;
+    }
+    
+    .task-table tbody tr:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .task-table td {
+        padding: 12px 15px;
+        vertical-align: middle;
+    }
+    
+    /* Avatar styling */
+    .avatar-circle {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+    }
+    
+    /* Action buttons */
+    .btn-action {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        margin-right: 5px;
+        transition: all 0.2s;
+    }
+    
+    .btn-action:hover {
+        background-color: #f8f9fc;
+        transform: translateY(-2px);
+    }
+    
+    .task-table th {
+        text-transform: uppercase;
+    }
+    
+    .task-table .badge {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 10rem;
+    }
+    
+    /* Action buttons */
+    .btn-action {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.25rem;
+        margin-right: 0.25rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Alert Container for messages -->
+    <div id="alertContainer"></div>
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="h3 mb-0 text-gray-800"></div>
+        <div>
+            <a href="{% url 'indie_news:task_create' %}" class="btn btn-primary rounded-pill">
+                <i class="fas fa-plus me-1"></i> New News Task
+            </a>
+            <button class="btn btn-outline-secondary rounded-pill ms-2" id="filterToggleBtn">
+                <i class="fas fa-filter me-1"></i> Filters
+            </button>
+            <button class="btn btn-outline-primary rounded-pill ms-2" id="batchUpdateBtn" disabled>
+                <i class="fas fa-edit me-1"></i> Batch Update
+            </button>
+        </div>
+    </div>
+
+{% block stats_cards %}
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">To Do</div>
+                            <div class="h1 mb-0 font-weight-bold text-gray-800">{{ task_stats.to_do|default:0 }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">In Progress</div>
+                            <div class="h1 mb-0 font-weight-bold text-gray-800">{{ task_stats.in_progress|default:0 }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-spinner fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">In Review</div>
+                            <div class="h1 mb-0 font-weight-bold text-gray-800">{{ task_stats.in_review|default:0 }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-search fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Done</div>
+                            <div class="h1 mb-0 font-weight-bold text-gray-800">{{ task_stats.done|default:0 }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col">
+            <div class="card border-left-secondary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">Backlog</div>
+                            <div class="h1 mb-0 font-weight-bold text-gray-800">{{ task_stats.backlog|default:0 }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-list fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col">
+            <div class="card border-left-danger shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Blocked</div>
+                            <div class="h1 mb-0 font-weight-bold text-gray-800">{{ task_stats.blocked|default:0 }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-exclamation-triangle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+{% endblock %}
+
+<div class="container-fluid">
+    <!-- Alert Container for messages -->
+    <div id="alertContainer"></div>
+    
+    <div class="h3 mb-2 text-gray-800"></div>
+
+{% block task_table %}
+    <!-- Tasks Table Card -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">Indie News Tasks</h6>
+            <div>
+                <span class="badge bg-primary rounded-pill">{{ tasks|length }} tasks</span>
+                {% if current_filters %}
+                <a href="{% url 'indie_news:task_list' %}" class="btn btn-sm btn-outline-secondary ms-2">
+                    <i class="fas fa-times me-1"></i> Clear Filters
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover task-table" id="tasksTable">
+                    <thead>
+                        <tr>
+                            <th width="30">
+                                <input type="checkbox" class="form-check-input" id="selectAll">
+                            </th>
+                            <th>Title</th>
+                            <th>Status</th>
+                            <th>Priority</th>
+                            <th>Type</th>
+                            <th>Assigned To</th>
+                            <th>Due Date</th>
+                            <th>Created</th>
+                            <th class="action-column">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for task in tasks %}
+                        <tr>
+                            <td>
+                                <input type="checkbox" class="form-check-input task-checkbox" id="task{{ task.id }}" value="{{ task.id }}">
+                            </td>
+                            <td>
+                                <a href="{% url 'indie_news:task_detail' task.pk %}" class="fw-bold text-decoration-none">
+                                    {{ task.title }}
+                                </a>
+                                {% if task.description %}
+                                <div class="small text-muted text-truncate" style="max-width: 200px;">
+                                    {{ task.description|truncatechars:50 }}
+                                </div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge rounded-pill badge-status-{{ task.status }}">
+                                    {% if task.status == 'to_do' %}
+                                        <i class="fas fa-clipboard-list me-1"></i>
+                                    {% elif task.status == 'in_progress' %}
+                                        <i class="fas fa-spinner me-1"></i>
+                                    {% elif task.status == 'in_review' %}
+                                        <i class="fas fa-search me-1"></i>
+                                    {% elif task.status == 'done' %}
+                                        <i class="fas fa-check-circle me-1"></i>
+                                    {% elif task.status == 'blocked' %}
+                                        <i class="fas fa-exclamation-triangle me-1"></i>
+                                    {% elif task.status == 'backlog' %}
+                                        <i class="fas fa-list me-1"></i>
+                                    {% endif %}
+                                    {{ task.get_status_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge rounded-pill badge-priority-{{ task.priority }}">
+                                    {% if task.priority == 'critical' %}
+                                        <i class="fas fa-exclamation-circle me-1"></i>
+                                    {% elif task.priority == 'high' %}
+                                        <i class="fas fa-arrow-up me-1"></i>
+                                    {% elif task.priority == 'medium' %}
+                                        <i class="fas fa-equals me-1"></i>
+                                    {% elif task.priority == 'low' %}
+                                        <i class="fas fa-arrow-down me-1"></i>
+                                    {% endif %}
+                                    {{ task.get_priority_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge rounded-pill badge-news-{{ task.news_type }}">
+                                    <i class="fas fa-newspaper me-1"></i>
+                                    {{ task.get_news_type_display }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if task.assigned_to %}
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-circle me-2 bg-primary">
+                                        {{ task.assigned_to.username|make_list|first|upper }}
+                                    </div>
+                                    <div>{{ task.assigned_to.get_full_name|default:task.assigned_to.username }}</div>
+                                </div>
+                                {% else %}
+                                <span class="text-muted"><i class="fas fa-user-slash me-1"></i> Unassigned</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if task.due_date %}
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-calendar-alt me-2 {% if task.is_overdue %}text-danger{% else %}text-primary{% endif %}"></i>
+                                    <span class="{% if task.is_overdue %}text-danger fw-bold{% endif %}">
+                                        {{ task.due_date|date:"M d, Y" }}
+                                        {% if task.is_overdue %}
+                                            <span class="badge rounded-pill bg-danger ms-1">Overdue</span>
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                {% else %}
+                                <span class="text-muted"><i class="fas fa-calendar-times me-1"></i> No due date</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-clock me-2 text-secondary"></i>
+                                    {{ task.created_at|date:"M d, Y" }}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex">
+                                    <a href="{% url 'indie_news:task_detail' task.pk %}" class="btn btn-action btn-light" title="View">
+                                        <i class="fas fa-eye text-info"></i>
+                                    </a>
+                                    <a href="{% url 'indie_news:task_update' task.pk %}" class="btn btn-action btn-light" title="Edit">
+                                        <i class="fas fa-edit text-primary"></i>
+                                    </a>
+                                    <a href="{% url 'indie_news:task_delete' task.pk %}" class="btn btn-action btn-light" title="Delete">
+                                        <i class="fas fa-trash text-danger"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="9" class="text-center py-5">
+                                <div class="text-muted">
+                                    <div class="mb-4">
+                                        <i class="fas fa-tasks fa-4x text-gray-300"></i>
+                                    </div>
+                                    <h5>No tasks found</h5>
+                                    <p class="mb-4">There are no tasks matching your current filters.</p>
+                                    <a href="{% url 'indie_news:task_create' %}" class="btn btn-primary rounded-pill">
+                                        <i class="fas fa-plus me-1"></i> Create New Task
+                                    </a>
+                                    <a href="{% url 'indie_news:task_list' %}" class="btn btn-outline-secondary rounded-pill ms-2">
+                                        <i class="fas fa-times me-1"></i> Clear Filters
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination -->
+            {% if is_paginated %}
+            <div class="d-flex justify-content-between align-items-center mt-4">
+                <div class="text-muted">
+                    Showing {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ paginator.count }} tasks
+                </div>
+                <nav aria-label="Page navigation">
+                    <ul class="pagination pagination-sm mb-0">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                            <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item"><a class="page-link" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ num }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock task_table %}
+
+{% block batch_update_modal %}
+<!-- Batch Update Modal -->
+<div class="modal fade" id="batchUpdateModal" tabindex="-1" aria-labelledby="batchUpdateModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="batchUpdateModalLabel"><i class="fas fa-tasks me-2"></i>Batch Update Indie News Tasks</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="batchUpdateForm">
+                    <div class="alert alert-info d-flex align-items-center">
+                        <i class="fas fa-info-circle me-2 fs-5"></i>
+                        <div>
+                            <span id="selectedTasksCount" class="fw-bold">0</span> tasks selected for batch update
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="batchStatus" class="form-label"><i class="fas fa-tasks me-1"></i> Status</label>
+                        <select class="form-select" id="batchStatus" name="status">
+                            <option value="">No change</option>
+                            <option value="backlog">Backlog</option>
+                            <option value="to_do">To Do</option>
+                            <option value="in_progress">In Progress</option>
+                            <option value="in_review">In Review</option>
+                            <option value="done">Done</option>
+                            <option value="blocked">Blocked</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="batchPriority" class="form-label"><i class="fas fa-flag me-1"></i> Priority</label>
+                        <select class="form-select" id="batchPriority" name="priority">
+                            <option value="">No change</option>
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                            <option value="critical">Critical</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="batchAssignedTo" class="form-label"><i class="fas fa-user me-1"></i> Assigned To</label>
+                        <select class="form-select" id="batchAssignedTo" name="assigned_to">
+                            <option value="">No change</option>
+                            <option value="none">Unassign</option>
+                            {% for user in users %}
+                                <option value="{{ user.id }}">{{ user.get_full_name|default:user.username }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="batchDueDate" class="form-label"><i class="fas fa-calendar-alt me-1"></i> Due Date</label>
+                        <input type="date" class="form-control" id="batchDueDate" name="due_date">
+                    </div>
+                    <div class="mb-3">
+                        <label for="batchNewsType" class="form-label"><i class="fas fa-newspaper me-1"></i> Article Type</label>
+                        <select class="form-select" id="batchNewsType" name="news_type">
+                            <option value="">No change</option>
+                            <option value="review">Game Review</option>
+                            <option value="preview">Game Preview</option>
+                            <option value="interview">Developer Interview</option>
+                            <option value="feature">Feature Article</option>
+                            <option value="news">News Article</option>
+                            <option value="opinion">Opinion Piece</option>
+                            <option value="guide">Game Guide</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i> Cancel
+                </button>
+                <button type="button" class="btn btn-primary" id="batchUpdateSubmit">
+                    <i class="fas fa-save me-1"></i> Update Tasks
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% block task_dashboard_js %}
+<script>
+    $(document).ready(function() {
+        // Initialize DataTable with enhanced options
+        $('#tasksTable').DataTable({
+            "paging": false,  // Using Django's pagination instead
+            "info": false,
+            "responsive": true,
+            "stateSave": true,  // Remember user's sorting preferences
+            "language": {
+                "search": "<i class='fas fa-search me-1'></i> Quick Search:",
+                "zeroRecords": "<div class='text-center py-3'><i class='fas fa-filter fa-2x text-muted mb-2'></i><br>No matching tasks found</div>",
+                "emptyTable": "<div class='text-center py-3'><i class='fas fa-tasks fa-2x text-muted mb-2'></i><br>No tasks available</div>"
+            },
+            "order": [[3, "desc"]],  // Default sort by due date (newest first)
+            "columnDefs": [
+                { "orderable": false, "targets": [0, 8] },  // Checkbox and actions columns not sortable
+                { "width": "30px", "targets": 0 },  // Checkbox column width
+                { "responsivePriority": 1, "targets": [1, 2, 3] },  // Title, status, due date are high priority
+                { "width": "100px", "targets": 7 },  // Due date column width
+                { "width": "120px", "targets": 8 }   // Actions column width
+            ],
+            "drawCallback": function() {
+                // Re-initialize tooltips after table redraw
+                $('[data-bs-toggle="tooltip"]').tooltip();
+            }
+        });
+        
+        // Select All checkbox
+        $('#selectAll').change(function() {
+            $('.task-checkbox').prop('checked', $(this).prop('checked'));
+            updateBatchButton();
+            updateSelectedTasksCount();
+        });
+        
+        // Individual checkboxes
+        $(document).on('change', '.task-checkbox', function() {
+            updateBatchButton();
+            updateSelectedTasksCount();
+            
+            // Update selectAll checkbox state
+            var allChecked = $('.task-checkbox:checked').length === $('.task-checkbox').length;
+            $('#selectAll').prop('checked', allChecked);
+        });
+        
+        // Update batch button state
+        function updateBatchButton() {
+            var checkedCount = $('.task-checkbox:checked').length;
+            if (checkedCount > 0) {
+                $('#batchUpdateBtn').removeClass('disabled').prop('disabled', false);
+                $('#batchUpdateBtn').html('<i class="fas fa-edit me-1"></i> Update Selected (' + checkedCount + ')');
+            } else {
+                $('#batchUpdateBtn').addClass('disabled').prop('disabled', true);
+                $('#batchUpdateBtn').html('<i class="fas fa-edit me-1"></i> Update Selected');
+            }
+        }
+        
+        // Update selected tasks count in modal
+        function updateSelectedTasksCount() {
+            var checkedCount = $('.task-checkbox:checked').length;
+            $('#selectedTasksCount').text(checkedCount);
+        }
+        
+        // Open batch update modal
+        $('#batchUpdateBtn').click(function() {
+            updateSelectedTasksCount();
+            var modal = new bootstrap.Modal(document.getElementById('batchUpdateModal'));
+            modal.show();
+        });
+        
+        // Apply batch update
+        $('#batchUpdateSubmit').click(function() {
+            var selectedTasks = [];
+            $('.task-checkbox:checked').each(function() {
+                selectedTasks.push($(this).val());
+            });
+            
+            var formData = {
+                'task_ids': selectedTasks,
+                'status': $('#batchStatus').val(),
+                'priority': $('#batchPriority').val(),
+                'assigned_to': $('#batchAssignedTo').val(),
+                'due_date': $('#batchDueDate').val(),
+                'news_type': $('#batchNewsType').val()
+            };
+            
+            // Show loading spinner on button
+            $('#batchUpdateSubmit').html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Updating...').prop('disabled', true);
+            
+            $.ajax({
+                url: '{% url "indie_news:task_batch_update" %}',
+                type: 'POST',
+                data: formData,
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                success: function(response) {
+                    // Hide modal
+                    var batchModal = bootstrap.Modal.getInstance(document.getElementById('batchUpdateModal'));
+                    batchModal.hide();
+                    
+                    // Show success message with task count
+                    var taskCount = selectedTasks.length;
+                    var taskText = taskCount === 1 ? 'task' : 'tasks';
+                    var alertDiv = $('<div class="alert alert-success alert-dismissible fade show" role="alert"></div>');
+                    alertDiv.html(
+                        '<i class="fas fa-check-circle me-2"></i>' + response.message + ' <strong>' + taskCount + ' ' + taskText + '</strong> updated successfully.' + 
+                        '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>'
+                    );
+                    $('#alertContainer').append(alertDiv);
+                    
+                    // Reload page after a short delay to show updated data
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 1500);
+                },
+                error: function(xhr) {
+                    // Reset button state
+                    $('#batchUpdateSubmit').html('<i class="fas fa-save me-1"></i> Apply Updates').prop('disabled', false);
+                    
+                    // Show detailed error message
+                    var taskCount = selectedTasks.length;
+                    var taskText = taskCount === 1 ? 'task' : 'tasks';
+                    var errorMessage = xhr.responseJSON && xhr.responseJSON.error ? 
+                                      xhr.responseJSON.error : 
+                                      'An unknown error occurred while updating ' + taskCount + ' ' + taskText;
+                    
+                    var alertDiv = $('<div class="alert alert-danger alert-dismissible fade show" role="alert"></div>');
+                    alertDiv.html(
+                        '<i class="fas fa-exclamation-triangle me-2"></i><strong>Error:</strong> ' + 
+                        errorMessage + 
+                        '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>'
+                    );
+                    $('#alertContainer').append(alertDiv);
+                    
+                    // Show error in modal too
+                    $('#batchUpdateForm').prepend(
+                        '<div class="alert alert-danger mb-3">' +
+                        '<i class="fas fa-exclamation-triangle me-2"></i>' +
+                        'Failed to update tasks. Please try again.' +
+                        '</div>'
+                    );
+                    
+                    // Log the error for debugging
+                    console.error('Batch update error:', xhr);
+                }
+            });
+        });
+        
+        // Initialize on page load
+        updateBatchButton();
+        
+        // Calculate and set progress bar widths
+        $('.progress-bar-custom').each(function() {
+            var count = parseInt($(this).data('count')) || 0;
+            var total = parseInt($(this).data('total')) || 1;
+            var percentage = total > 0 ? Math.min(Math.round((count / total) * 100), 100) : 0;
+            $(this).css('width', percentage + '%');
+            $(this).attr('aria-valuenow', percentage);
+            $(this).attr('aria-valuemin', '0');
+            $(this).attr('aria-valuemax', '100');
+        });
+        
+        // Handle company filter cards
+        $('.company-card').click(function() {
+            var companyType = $(this).data('company-type');
+            var currentUrl = new URL(window.location.href);
+            
+            // Remove active class from all cards
+            $('.company-card').removeClass('active');
+            
+            // If clicking the already active filter or 'all', clear the filter
+            if ($(this).hasClass('active') || companyType === 'all') {
+                currentUrl.searchParams.delete('company_type');
+                $('#clearCompanyFilter').hide();
+            } else {
+                // Add active class to clicked card
+                $(this).addClass('active');
+                currentUrl.searchParams.set('company_type', companyType);
+                $('#clearCompanyFilter').show();
+            }
+            
+            // Redirect to the new URL
+            window.location.href = currentUrl.toString();
+        });
+        
+        // Show clear filter button if company filter is active
+        if (new URLSearchParams(window.location.search).has('company_type')) {
+            $('#clearCompanyFilter').show();
+            var activeCompany = new URLSearchParams(window.location.search).get('company_type');
+            $('.company-card[data-company-type="' + activeCompany + '"]').addClass('active');
+        } else {
+            $('#clearCompanyFilter').hide();
+        }
+    });
+</script>
+{% endblock task_dashboard_js %}
+{% endblock extra_js %}
+
+</div> <!-- End of container-fluid -->
+{% endblock content %}

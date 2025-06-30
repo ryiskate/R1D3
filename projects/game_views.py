@@ -776,15 +776,23 @@ class GameTaskDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     
     def test_func(self):
         # Only allow task deletion by staff or the task creator
-        return self.request.user.is_staff or self.get_object().assigned_to == self.request.user
+        task = self.get_object()
+        return self.request.user.is_staff or (task.assigned_to == self.request.user) or (task.created_by == self.request.user)
     
     def get_success_url(self):
         messages.success(self.request, f"Task '{self.object.title}' deleted successfully!")
-        return reverse_lazy('games:task_list', kwargs={'game_id': self.object.game.id})
+        # Redirect to the game task dashboard after deletion
+        if hasattr(self.object, 'game') and self.object.game:
+            return reverse_lazy('games:game_task_dashboard', kwargs={'game_id': self.object.game.id})
+        return reverse_lazy('games:task_dashboard')
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['game'] = self.object.game
+        # Safely add the game to context if it exists
+        if hasattr(self.object, 'game') and self.object.game:
+            context['game'] = self.object.game
+        else:
+            context['game'] = None
         context['today'] = date.today()
         return context
 
@@ -841,7 +849,7 @@ class GameTaskCreateView(LoginRequiredMixin, CreateView):
     
     def get_success_url(self):
         messages.success(self.request, f"Task '{self.object.title}' created successfully!")
-        return reverse_lazy('games:task_list', kwargs={'game_id': self.object.game.id})
+        return reverse_lazy('games:game_task_dashboard', kwargs={'game_id': self.object.game.id})
     
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -909,13 +917,21 @@ class GameTaskUpdateView(LoginRequiredMixin, UpdateView):
     
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        # Add game_id to form kwargs for filtering related fields
-        kwargs['game_id'] = self.object.game.id
+        # Add game_id to form kwargs for filtering related fields if game exists
+        if hasattr(self.object, 'game') and self.object.game:
+            kwargs['game_id'] = self.object.game.id
+        else:
+            # If no game is associated, set game_id to None
+            kwargs['game_id'] = None
         return kwargs
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['game'] = self.object.game
+        # Safely add the game to context if it exists
+        if hasattr(self.object, 'game') and self.object.game:
+            context['game'] = self.object.game
+        else:
+            context['game'] = None
         context['today'] = date.today()
         context['is_update'] = True
         return context

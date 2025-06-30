@@ -82,7 +82,7 @@ class SocialMediaTaskForm(BaseTaskForm):
     """
     class Meta(BaseTaskForm.Meta):
         model = SocialMediaTask
-        fields = BaseTaskForm.Meta.fields + ['campaign_id', 'channel', 'target_metrics']
+        fields = BaseTaskForm.Meta.fields + ['platform', 'campaign_id', 'channel', 'target_metrics', 'content_type']
 
 
 class ArcadeTaskForm(BaseTaskForm):

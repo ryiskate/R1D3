@@ -103,13 +103,21 @@ class GameTaskUpdateView(UnifiedTaskUpdateView):
     
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        # Add game_id to form kwargs for filtering related fields
-        kwargs['game_id'] = self.object.game.id
+        # Add game_id to form kwargs for filtering related fields if game exists
+        if hasattr(self.object, 'game') and self.object.game:
+            kwargs['game_id'] = self.object.game.id
+        else:
+            # If no game is associated, set game_id to None
+            kwargs['game_id'] = None
         return kwargs
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['game'] = self.object.game
+        # Safely add the game to context if it exists
+        if hasattr(self.object, 'game') and self.object.game:
+            context['game'] = self.object.game
+        else:
+            context['game'] = None
         return context
 
 

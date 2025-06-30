@@ -1,0 +1,106 @@
+{% extends 'indie_news/indie_news_base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block title %}{% if form.instance.pk %}Edit{% else %}Add{% endif %} Indie Event{% endblock %}
+
+{% block indie_content %}
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-calendar-alt text-primary"></i>
+            {% if form.instance.pk %}Edit{% else %}Add{% endif %} Indie Event
+        </h1>
+        <a href="{% url 'indie_news:event_list' %}" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm">
+            <i class="fas fa-arrow-left fa-sm text-white-50"></i> Back to Events
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Event Information</h6>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {% crispy form %}
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Help</h6>
+                </div>
+                <div class="card-body">
+                    <h5>Event Types</h5>
+                    <p>Select the type of event from the following options:</p>
+                    <ul class="mb-4">
+                        <li><strong>Conference</strong> - Industry conferences with talks and networking</li>
+                        <li><strong>Game Showcase</strong> - Events focused on showcasing indie games</li>
+                        <li><strong>Competition</strong> - Game competitions and contests</li>
+                        <li><strong>Awards Ceremony</strong> - Events recognizing achievements in indie games</li>
+                        <li><strong>Developer Meetup</strong> - Informal gatherings for developers</li>
+                        <li><strong>Game Jam</strong> - Time-limited game creation events</li>
+                        <li><strong>Expo/Convention</strong> - Large-scale exhibitions and conventions</li>
+                    </ul>
+                    
+                    <h5>Virtual Events</h5>
+                    <p>Check the "Virtual Event" box if the event is held online rather than at a physical location. For hybrid events (both physical and virtual), check this box and specify the physical location as well.</p>
+                    
+                    <h5>Coverage Information</h5>
+                    <p>If R1D3 has covered or plans to cover this event:</p>
+                    <ul>
+                        <li>Check the "Is Covered" box if coverage is complete</li>
+                        <li>Add the URL to the coverage article if available</li>
+                        <li>Create related tasks for event coverage planning</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock indie_content %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Initialize datepicker for date fields
+        $('input[type="date"]').datepicker({
+            format: 'yyyy-mm-dd',
+            autoclose: true,
+            todayHighlight: true
+        });
+        
+        // Toggle location field based on virtual event checkbox
+        $('#id_is_virtual').change(function() {
+            if($(this).is(':checked')) {
+                $('#div_id_location').addClass('text-muted');
+                $('#hint_id_location').text('Optional for virtual events, but recommended for hybrid events');
+            } else {
+                $('#div_id_location').removeClass('text-muted');
+                $('#hint_id_location').text('Required for physical events');
+            }
+        });
+        
+        // Trigger change event on page load to set initial state
+        $('#id_is_virtual').trigger('change');
+        
+        // Toggle coverage URL field based on is_covered checkbox
+        $('#id_is_covered').change(function() {
+            if($(this).is(':checked')) {
+                $('#div_id_coverage_url').show();
+            } else {
+                $('#div_id_coverage_url').hide();
+            }
+        });
+        
+        // Trigger change event on page load to set initial state
+        $('#id_is_covered').trigger('change');
+    });
+</script>
+{% endblock %}

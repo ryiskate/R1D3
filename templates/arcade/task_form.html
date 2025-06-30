@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% if is_create %}Create New Arcade Task{% else %}Edit Arcade Task{% endif %}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/task_form.css' %}">
+<style>
+    .card-header.bg-arcade {
+        background-color: #f6c23e;
+        color: #212529;
+    }
+    
+    .btn-arcade {
+        background-color: #f6c23e;
+        border-color: #f6c23e;
+        color: #212529;
+    }
+    
+    .btn-arcade:hover {
+        background-color: #e0b138;
+        border-color: #e0b138;
+        color: #212529;
+    }
+    
+    .text-arcade {
+        color: #f6c23e;
+    }
+    
+    .border-arcade {
+        border-color: #f6c23e !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'arcade:dashboard' %}">Arcade Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'arcade:tasks' %}">Tasks</a></li>
+                    <li class="breadcrumb-item active">{% if is_create %}Create New Task{% else %}Edit Task{% endif %}</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>{% if is_create %}Create New Arcade Task{% else %}Edit Arcade Task: {{ object.title }}{% endif %}</h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Main Form -->
+        <div class="col-md-8">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-arcade">
+                    <h5 class="card-title mb-0">Task Information</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-12">
+                                <h6 class="fw-bold border-bottom pb-2 mb-3">Basic Information</h6>
+                            </div>
+                            <div class="col-md-8">
+                                {{ form.title|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form.due_date|as_crispy_field }}
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-12">
+                                {{ form.description|as_crispy_field }}
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-12">
+                                <h6 class="fw-bold border-bottom pb-2 mb-3">Task Details</h6>
+                            </div>
+                            <div class="col-md-4">
+                                {{ form.status|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form.priority|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form.assigned_to|as_crispy_field }}
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-12">
+                                <h6 class="fw-bold border-bottom pb-2 mb-3">Arcade Machine Information</h6>
+                            </div>
+                            <div class="col-md-4">
+                                {{ form.machine_id|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form.location|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form.maintenance_type|as_crispy_field }}
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-12">
+                                <h6 class="fw-bold border-bottom pb-2 mb-3">Additional Information</h6>
+                            </div>
+                            <div class="col-md-4">
+                                {{ form.estimated_hours|as_crispy_field }}
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'arcade:tasks' %}" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-arcade">
+                                {% if is_create %}Create Task{% else %}Save Changes{% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="col-md-4">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-arcade">
+                    <h5 class="card-title mb-0">Arcade Task Help</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h6 class="fw-bold">Machine ID</h6>
+                        <p>Enter the unique identifier for the arcade machine. This should match the ID on the physical machine.</p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h6 class="fw-bold">Location</h6>
+                        <p>Specify the location of the arcade machine. This could be a venue name, area, or specific position within a venue.</p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h6 class="fw-bold">Maintenance Types</h6>
+                        <ul class="list-unstyled">
+                            <li><span class="badge bg-info">Repair</span> - Fix broken components</li>
+                            <li><span class="badge bg-success">Installation</span> - Set up new machines</li>
+                            <li><span class="badge bg-warning">Upgrade</span> - Enhance existing machines</li>
+                            <li><span class="badge bg-secondary">Inspection</span> - Routine checks</li>
+                            <li><span class="badge bg-light text-dark">Cleaning</span> - Clean machines</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h6 class="fw-bold">Status Guide</h6>
+                        <ul class="list-unstyled">
+                            <li><span class="badge bg-secondary">Backlog</span> - Not yet scheduled</li>
+                            <li><span class="badge bg-info">To Do</span> - Ready to start</li>
+                            <li><span class="badge bg-primary">In Progress</span> - Currently working on</li>
+                            <li><span class="badge bg-warning">In Review</span> - Needs verification</li>
+                            <li><span class="badge bg-success">Done</span> - Completed</li>
+                            <li><span class="badge bg-danger">Blocked</span> - Cannot proceed</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h6 class="fw-bold">Priority Guide</h6>
+                        <ul class="list-unstyled">
+                            <li><span class="badge bg-danger">Urgent</span> - Critical, do immediately</li>
+                            <li><span class="badge bg-warning">High</span> - Important, do soon</li>
+                            <li><span class="badge bg-info">Medium</span> - Standard priority</li>
+                            <li><span class="badge bg-success">Low</span> - Do when time permits</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Initialize date picker for due date field
+        $('#id_due_date').attr('type', 'date');
+        
+        // Initialize select2 for dropdowns
+        $('#id_assigned_to').select2({
+            placeholder: "Select a user",
+            allowClear: true
+        });
+        
+        $('#id_status, #id_priority, #id_maintenance_type').select2({
+            minimumResultsForSearch: Infinity
+        });
+    });
+</script>
+{% endblock %}

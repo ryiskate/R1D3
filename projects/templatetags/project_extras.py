@@ -1,4 +1,5 @@
 from django import template
+from datetime import date
 
 register = template.Library()
 
@@ -89,3 +90,68 @@ def percentage(value, total):
         return int((float(value) / float(total)) * 100)
     except (ValueError, ZeroDivisionError, TypeError):
         return 0
+        
+@register.filter
+def status_color(status):
+    """
+    Maps task status to appropriate Bootstrap color class
+    """
+    status_colors = {
+        'backlog': 'secondary',
+        'to_do': 'primary',
+        'in_progress': 'warning',
+        'in_review': 'info',
+        'done': 'success',
+        'blocked': 'danger',
+    }
+    return status_colors.get(status, 'secondary')
+
+@register.filter
+def status_icon(status):
+    """
+    Maps task status to appropriate FontAwesome icon
+    """
+    status_icons = {
+        'backlog': 'inbox',
+        'to_do': 'clipboard-list',
+        'in_progress': 'spinner',
+        'in_review': 'search',
+        'done': 'check-circle',
+        'blocked': 'ban',
+    }
+    return status_icons.get(status, 'question-circle')
+
+@register.filter
+def priority_color(priority):
+    """
+    Maps task priority to appropriate Bootstrap color class
+    """
+    priority_colors = {
+        'low': 'success',
+        'medium': 'warning',
+        'high': 'danger',
+        'critical': 'dark',
+    }
+    return priority_colors.get(priority, 'secondary')
+
+@register.filter
+def priority_icon(priority):
+    """
+    Maps task priority to appropriate FontAwesome icon
+    """
+    priority_icons = {
+        'low': 'arrow-down',
+        'medium': 'minus',
+        'high': 'arrow-up',
+        'critical': 'exclamation-triangle',
+    }
+    return priority_icons.get(priority, 'question-circle')
+
+@register.filter
+def is_past_due(due_date):
+    """
+    Checks if a due date is in the past
+    """
+    if not due_date:
+        return False
+    return due_date < date.today()

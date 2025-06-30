@@ -1,15 +1,18 @@
-from django.shortcuts import render
-from django.views.generic import TemplateView, ListView, View
+from django.shortcuts import render, redirect, get_object_or_404
+from django.views.generic import TemplateView, ListView, View, DetailView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count, Q
 from django.utils import timezone
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.utils.decorators import method_decorator
+from django.urls import reverse_lazy
 import json
 from datetime import date, timedelta
 
 from projects.game_models import GameTask
+from projects.task_models import SocialMediaTask
+from projects.task_forms import SocialMediaTaskForm
 from django.contrib.auth.models import User
 
 
@@ -53,7 +56,181 @@ class AnalyticsView(LoginRequiredMixin, TemplateView):
         return context
 
 
-@method_decorator(require_POST, name='dispatch')
+class SocialMediaTaskCreateView(LoginRequiredMixin, TemplateView):
+    """
+    View for creating new social media tasks using the object-oriented SocialMediaTask model
+    """
+    template_name = 'projects/social_media_task_form.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['active_department'] = 'social_media'
+        context['form'] = self.get_form()
+        context['is_update'] = False
+        context['section_name'] = 'Social Media Task'
+        return context
+        
+    def get_form(self):
+        from projects.task_forms import SocialMediaTaskForm
+        return SocialMediaTaskForm()
+        
+    def post(self, request, *args, **kwargs):
+        from django.shortcuts import redirect
+        from django.contrib import messages
+        from projects.task_forms import SocialMediaTaskForm
+        
+        form = SocialMediaTaskForm(request.POST, request.FILES)
+        if form.is_valid():
+            task = form.save(commit=False)
+            task.created_by = request.user
+            task.save()
+            messages.success(request, f"Social Media Task '{task.title}' created successfully!")
+            return redirect('social_media:tasks')
+        
+        context = self.get_context_data()
+        context['form'] = form
+        return render(request, self.template_name, context)
+
+
+class SocialMediaTaskDetailView(LoginRequiredMixin, DetailView):
+    """
+    View for displaying details of a specific social media task
+    """
+    model = SocialMediaTask
+    template_name = 'social_media/task_detail.html'
+    context_object_name = 'task'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['active_department'] = 'social_media'
+        context['today'] = date.today()
+        return context
+
+
+class SocialMediaTaskUpdateView(LoginRequiredMixin, TemplateView):
+    """
+    View for updating an existing social media task
+    """
+    template_name = 'projects/social_media_task_form.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['active_department'] = 'social_media'
+        context['section_name'] = 'Social Media Task'
+        
+        pk = self.kwargs.get('pk')
+        task = get_object_or_404(SocialMediaTask, pk=pk)
+        
+        from projects.task_forms import SocialMediaTaskForm
+        form = SocialMediaTaskForm(instance=task)
+        
+        context['form'] = form
+        context['task'] = task
+        context['is_update'] = True
+        
+        return context
+        
+    def post(self, request, pk, *args, **kwargs):
+        from django.shortcuts import redirect, get_object_or_404
+        from django.contrib import messages
+        from projects.task_models import SocialMediaTask
+        from projects.task_forms import SocialMediaTaskForm
+        
+        task = get_object_or_404(SocialMediaTask, pk=pk)
+        form = SocialMediaTaskForm(request.POST, request.FILES, instance=task)
+        
+        if form.is_valid():
+            updated_task = form.save()
+            messages.success(request, f"Social Media Task '{updated_task.title}' updated successfully!")
+            return redirect('social_media:tasks')
+        
+        context = self.get_context_data()
+        context['form'] = form
+        context['is_update'] = True
+        context['task'] = task
+        
+        return render(request, self.template_name, context)
+
+
+class SocialMediaTaskDeleteView(LoginRequiredMixin, DeleteView):
+    """
+    View for deleting a social media task
+    """
+    model = SocialMediaTask
+    template_name = 'social_media/task_confirm_delete.html'
+    success_url = reverse_lazy('social_media:tasks')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['active_department'] = 'social_media'
+        return context
+
+
+class SocialMediaTaskStatusUpdateView(LoginRequiredMixin, View):
+    """
+    View for updating the status of a social media task via AJAX
+    """
+    def post(self, request, pk, *args, **kwargs):
+        try:
+            task = get_object_or_404(SocialMediaTask, pk=pk)
+            data = json.loads(request.body)
+            
+            if 'status' in data:
+                task.status = data['status']
+                task.save(update_fields=['status'])
+                return JsonResponse({
+                    'success': True,
+                    'message': f'Status updated to {task.status}'
+                })
+            else:
+                return JsonResponse({
+                    'success': False,
+                    'message': 'No status provided'
+                }, status=400)
+                
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': f'Error: {str(e)}'
+            }, status=500)
+
+
+class SocialMediaTaskHoursUpdateView(LoginRequiredMixin, View):
+    """
+    View for updating the hours spent on a social media task via AJAX
+    """
+    def post(self, request, pk, *args, **kwargs):
+        try:
+            task = get_object_or_404(SocialMediaTask, pk=pk)
+            data = json.loads(request.body)
+            
+            if 'hours_spent' in data:
+                try:
+                    hours_spent = float(data['hours_spent'])
+                    task.hours_spent = hours_spent
+                    task.save(update_fields=['hours_spent'])
+                    return JsonResponse({
+                        'success': True,
+                        'message': f'Hours spent updated to {hours_spent}'
+                    })
+                except ValueError:
+                    return JsonResponse({
+                        'success': False,
+                        'message': 'Invalid hours value'
+                    }, status=400)
+            else:
+                return JsonResponse({
+                    'success': False,
+                    'message': 'No hours value provided'
+                }, status=400)
+                
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': f'Error: {str(e)}'
+            }, status=500)
+
+
 class SocialMediaTaskBatchUpdateView(LoginRequiredMixin, View):
     """
     View for handling batch updates to social media tasks via AJAX
@@ -123,13 +300,17 @@ class SocialMediaTaskBatchUpdateView(LoginRequiredMixin, View):
 
 class SocialMediaTasksView(LoginRequiredMixin, ListView):
     """View for displaying social media-specific tasks in a dashboard format"""
-    model = GameTask
-    template_name = 'projects/social_media_task_dashboard.html'
-    context_object_name = 'social_media_tasks'
+    model = SocialMediaTask
+    template_name = 'social_media/tasks.html'
+    context_object_name = 'tasks'
     
     def get_queryset(self):
-        # Filter tasks for social media section
-        queryset = GameTask.objects.filter(company_section='social_media')
+        # Get all social media tasks
+        queryset = SocialMediaTask.objects.all()
+        print(f"DEBUG: Found {queryset.count()} social media tasks")
+        # Print first 5 tasks for debugging
+        for task in queryset[:5]:
+            print(f"DEBUG: Task ID: {task.id}, Title: {task.title}, Status: {task.status}")
         
         # Apply filters from request parameters
         status = self.request.GET.get('status')
@@ -181,9 +362,10 @@ class SocialMediaTasksView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['active_department'] = 'social_media'
+        context['section_name'] = "Social Media Tasks"
         
         # Get all social media tasks for statistics
-        all_social_media_tasks = GameTask.objects.filter(company_section='social_media')
+        all_social_media_tasks = SocialMediaTask.objects.all()
         
         # Task statistics by status
         total_count = all_social_media_tasks.count()
@@ -221,7 +403,7 @@ class SocialMediaTasksView(LoginRequiredMixin, ListView):
         context['task_stats'] = task_stats
         
         # Get distinct campaigns from social media tasks
-        campaigns = all_social_media_tasks.values('campaign_id').annotate(
+        campaigns = SocialMediaTask.objects.values('campaign_id').annotate(
             count=Count('id')
         ).order_by('campaign_id')
         
@@ -236,14 +418,27 @@ class SocialMediaTasksView(LoginRequiredMixin, ListView):
                 })
         context['campaigns'] = formatted_campaigns
         
+        # Get distinct channels from social media tasks
+        channels = SocialMediaTask.objects.values('channel').annotate(
+            count=Count('id')
+        ).order_by('channel')
+        
+        # Format channels for template
+        formatted_channels = []
+        for channel in channels:
+            if channel['channel']:
+                formatted_channels.append({
+                    'id': channel['channel'],
+                    'title': channel['channel'],
+                    'count': channel['count']
+                })
+        context['channels'] = formatted_channels
+        
         # Get all users for assignment filter
         context['users'] = User.objects.filter(is_active=True).order_by('first_name', 'last_name')
         
         # Add today's date for due date comparisons
         context['today'] = date.today()
-        
-        # Count tasks by company section for navigation card
-        context['social_media_tasks_count'] = all_social_media_tasks.count()
         
         # Check if filters are applied
         context['current_filters'] = any([

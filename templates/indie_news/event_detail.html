@@ -1,0 +1,256 @@
+{% extends 'indie_news/indie_news_base.html' %}
+{% load static %}
+
+{% block title %}{{ event.name }} - Indie Event{% endblock %}
+
+{% block indie_content %}
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-calendar-alt text-primary"></i>
+            Indie Event Detail
+        </h1>
+        <div>
+            <a href="{% url 'indie_news:event_list' %}" class="btn btn-sm btn-secondary shadow-sm">
+                <i class="fas fa-arrow-left fa-sm text-white-50"></i> Back to Events
+            </a>
+            <a href="{% url 'indie_news:event_update' event.pk %}" class="btn btn-sm btn-primary shadow-sm">
+                <i class="fas fa-edit fa-sm text-white-50"></i> Edit Event
+            </a>
+            <a href="{% url 'indie_news:event_delete' event.pk %}" class="btn btn-sm btn-danger shadow-sm">
+                <i class="fas fa-trash fa-sm text-white-50"></i> Delete Event
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Event Details Card -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Event Details</h6>
+                    <div>
+                        {% if event.is_virtual %}
+                            <span class="badge badge-info">Virtual Event</span>
+                        {% endif %}
+                        
+                        {% if event.is_free %}
+                            <span class="badge badge-success">Free Entry</span>
+                        {% endif %}
+                        
+                        {% if event.event_type == 'conference' %}
+                            <span class="badge badge-primary">Conference</span>
+                        {% elif event.event_type == 'showcase' %}
+                            <span class="badge badge-warning">Game Showcase</span>
+                        {% elif event.event_type == 'competition' %}
+                            <span class="badge badge-danger">Competition</span>
+                        {% elif event.event_type == 'awards' %}
+                            <span class="badge badge-success">Awards Ceremony</span>
+                        {% elif event.event_type == 'meetup' %}
+                            <span class="badge badge-info">Developer Meetup</span>
+                        {% elif event.event_type == 'jam' %}
+                            <span class="badge badge-secondary">Game Jam</span>
+                        {% elif event.event_type == 'expo' %}
+                            <span class="badge badge-dark">Expo/Convention</span>
+                        {% else %}
+                            <span class="badge badge-light">Other</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h4 class="font-weight-bold">{{ event.name }}</h4>
+                    
+                    <div class="mb-4">
+                        {{ event.description|linebreaks }}
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p>
+                                <i class="far fa-calendar-alt mr-2 text-primary"></i>
+                                <strong>Start Date:</strong> {{ event.start_date|date:"F j, Y" }}
+                            </p>
+                            <p>
+                                <i class="far fa-calendar-check mr-2 text-primary"></i>
+                                <strong>End Date:</strong> {{ event.end_date|date:"F j, Y" }}
+                            </p>
+                            <p>
+                                <i class="fas fa-map-marker-alt mr-2 text-primary"></i>
+                                <strong>Location:</strong> {{ event.location }}
+                                {% if event.is_virtual %}
+                                    <span class="text-info">(Virtual)</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p>
+                                <i class="fas fa-tag mr-2 text-primary"></i>
+                                <strong>Event Type:</strong> {{ event.get_event_type_display }}
+                            </p>
+                            <p>
+                                <i class="fas fa-dollar-sign mr-2 text-primary"></i>
+                                <strong>Entry:</strong> 
+                                {% if event.is_free %}
+                                    <span class="text-success">Free</span>
+                                {% else %}
+                                    <span class="text-warning">Paid</span>
+                                {% endif %}
+                            </p>
+                            <p>
+                                <i class="fas fa-user mr-2 text-primary"></i>
+                                <strong>Added by:</strong> {{ event.added_by.get_full_name|default:event.added_by.username }}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    {% if event.is_covered %}
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle"></i>
+                            <strong>Coverage Status:</strong> This event has been covered by our team.
+                            {% if event.coverage_url %}
+                                <a href="{{ event.coverage_url }}" target="_blank" class="btn btn-sm btn-success ml-2">
+                                    <i class="fas fa-external-link-alt"></i> View Coverage
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <strong>Coverage Status:</strong> This event has not been covered yet.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <!-- Links Card -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Links & Resources</h6>
+                </div>
+                <div class="card-body">
+                    {% if event.website %}
+                        <a href="{{ event.website }}" target="_blank" class="btn btn-block btn-outline-primary mb-2">
+                            <i class="fas fa-globe"></i> Official Website
+                        </a>
+                    {% endif %}
+                    
+                    {% if event.ticket_url %}
+                        <a href="{{ event.ticket_url }}" target="_blank" class="btn btn-block btn-outline-success mb-2">
+                            <i class="fas fa-ticket-alt"></i> Get Tickets
+                        </a>
+                    {% endif %}
+                    
+                    {% if event.coverage_url %}
+                        <a href="{{ event.coverage_url }}" target="_blank" class="btn btn-block btn-outline-info mb-2">
+                            <i class="fas fa-newspaper"></i> Our Coverage
+                        </a>
+                    {% endif %}
+                    
+                    <hr>
+                    
+                    <!-- Calendar Add Buttons -->
+                    <div class="mb-3">
+                        <h6 class="font-weight-bold">Add to Calendar</h6>
+                        <div class="btn-group btn-block">
+                            <a href="#" class="btn btn-sm btn-outline-secondary">
+                                <i class="far fa-calendar-plus"></i> Google
+                            </a>
+                            <a href="#" class="btn btn-sm btn-outline-secondary">
+                                <i class="far fa-calendar-alt"></i> iCal
+                            </a>
+                            <a href="#" class="btn btn-sm btn-outline-secondary">
+                                <i class="fab fa-microsoft"></i> Outlook
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Event Countdown -->
+                    <div class="text-center mb-3">
+                        <h6 class="font-weight-bold">Event Countdown</h6>
+                        <div id="event-countdown" class="p-3 bg-light rounded">
+                            <div class="row">
+                                <div class="col-3">
+                                    <h4 id="days">--</h4>
+                                    <span>Days</span>
+                                </div>
+                                <div class="col-3">
+                                    <h4 id="hours">--</h4>
+                                    <span>Hours</span>
+                                </div>
+                                <div class="col-3">
+                                    <h4 id="minutes">--</h4>
+                                    <span>Mins</span>
+                                </div>
+                                <div class="col-3">
+                                    <h4 id="seconds">--</h4>
+                                    <span>Secs</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Related Tasks -->
+                    <h6 class="font-weight-bold">Related Tasks</h6>
+                    {% with related_tasks=event.indienewstask_set.all %}
+                        {% if related_tasks %}
+                            <ul class="list-group">
+                                {% for task in related_tasks %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <a href="{% url 'indie_news:task_detail' task.pk %}">{{ task.title }}</a>
+                                        <span class="badge badge-primary badge-pill">{{ task.get_status_display }}</span>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p class="text-muted">No related tasks found.</p>
+                            <a href="{% url 'indie_news:task_create' %}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-plus"></i> Create Coverage Task
+                            </a>
+                        {% endif %}
+                    {% endwith %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock indie_content %}
+
+{% block extra_js %}
+<script>
+    // Event countdown timer
+    $(document).ready(function() {
+        // Set the event date from the template
+        const eventDate = new Date("{{ event.start_date|date:'Y-m-d' }}").getTime();
+        
+        // Update the countdown every second
+        const countdownTimer = setInterval(function() {
+            // Get today's date and time
+            const now = new Date().getTime();
+            
+            // Find the distance between now and the event date
+            const distance = eventDate - now;
+            
+            // If the event has passed
+            if (distance < 0) {
+                clearInterval(countdownTimer);
+                $('#event-countdown').html('<div class="alert alert-info">This event has already started!</div>');
+                return;
+            }
+            
+            // Time calculations for days, hours, minutes and seconds
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            
+            // Display the result
+            $('#days').text(days);
+            $('#hours').text(hours);
+            $('#minutes').text(minutes);
+            $('#seconds').text(seconds);
+        }, 1000);
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,96 @@
+{% extends 'indie_news/indie_news_base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block title %}{% if form.instance.pk %}Edit{% else %}Add{% endif %} Indie Game{% endblock %}
+
+{% block indie_content %}
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-gamepad text-primary"></i>
+            {% if form.instance.pk %}Edit{% else %}Add{% endif %} Indie Game
+        </h1>
+        <a href="{% url 'indie_news:game_list' %}" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm">
+            <i class="fas fa-arrow-left fa-sm text-white-50"></i> Back to Games
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Game Information</h6>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {% crispy form %}
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Help</h6>
+                </div>
+                <div class="card-body">
+                    <h5>Game Platforms</h5>
+                    <p>Select all platforms that the game is available on. For multiple platforms, separate them with commas.</p>
+                    <ul class="mb-4">
+                        <li><strong>PC</strong> - Windows</li>
+                        <li><strong>Mac</strong> - macOS</li>
+                        <li><strong>Linux</strong> - Linux/SteamOS</li>
+                        <li><strong>Switch</strong> - Nintendo Switch</li>
+                        <li><strong>PS4/PS5</strong> - PlayStation consoles</li>
+                        <li><strong>Xbox</strong> - Xbox consoles</li>
+                        <li><strong>Mobile</strong> - iOS/Android</li>
+                        <li><strong>Web</strong> - Browser-based</li>
+                    </ul>
+                    
+                    <h5>Game Genres</h5>
+                    <p>Select all genres that apply to the game. For multiple genres, separate them with commas.</p>
+                    <ul class="mb-4">
+                        <li><strong>Action</strong> - Fast-paced gameplay with physical challenges</li>
+                        <li><strong>Adventure</strong> - Exploration and puzzle-solving</li>
+                        <li><strong>RPG</strong> - Role-playing games with character progression</li>
+                        <li><strong>Strategy</strong> - Planning and resource management</li>
+                        <li><strong>Simulation</strong> - Realistic simulation of activities</li>
+                        <li><strong>Puzzle</strong> - Logic and problem-solving</li>
+                        <li><strong>Platformer</strong> - Jumping between platforms</li>
+                        <li><strong>Racing</strong> - Vehicle racing games</li>
+                        <li><strong>Sports</strong> - Sports simulations</li>
+                        <li><strong>Horror</strong> - Fear-inducing games</li>
+                        <li><strong>Shooter</strong> - Games focused on shooting</li>
+                    </ul>
+                    
+                    <h5>Review Score</h5>
+                    <p>If you've reviewed this game, enter a score from 1.0 to 10.0. Leave blank if not reviewed yet.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock indie_content %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Initialize select2 for dropdown fields
+        $('.select2').select2({
+            theme: 'bootstrap4',
+            tags: true,
+            tokenSeparators: [',']
+        });
+        
+        // Initialize datepicker for date fields
+        $('input[type="date"]').datepicker({
+            format: 'yyyy-mm-dd',
+            autoclose: true,
+            todayHighlight: true
+        });
+    });
+</script>
+{% endblock %}

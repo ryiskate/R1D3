@@ -1,162 +1,155 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% load static %}
+{% load project_extras %}
 
 {% block title %}Education Tasks | R1D3{% endblock %}
 
 {% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/education_task_buttons.css' %}">
 <style>
-    /* Status Card Styles */
-    .status-card {
-        border-left: 4px solid;
-        border-radius: 4px;
-        padding: 15px;
-        margin-bottom: 20px;
-        background-color: white;
-        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+    /* Status Cards */
+    .border-left-primary {
+        border-left: 0.25rem solid #4e73df !important;
     }
-    .status-card h6 {
-        font-size: 0.8rem;
-        font-weight: bold;
-        text-transform: uppercase;
-        margin-bottom: 5px;
-        color: #5a5c69;
+    .border-left-success {
+        border-left: 0.25rem solid #1cc88a !important;
     }
-    .status-card h2 {
-        font-size: 1.8rem;
-        font-weight: bold;
-        margin: 0;
+    .border-left-warning {
+        border-left: 0.25rem solid #f6c23e !important;
     }
-    .status-card.to-do {
-        border-left-color: #4e73df;
+    .border-left-info {
+        border-left: 0.25rem solid #36b9cc !important;
     }
-    .status-card.in-progress {
-        border-left-color: #f6c23e;
-    }
-    .status-card.in-review {
-        border-left-color: #36b9cc;
-    }
-    .status-card.done {
-        border-left-color: #1cc88a;
-    }
-    .status-card.backlog {
-        border-left-color: #858796;
+    .border-left-secondary {
+        border-left: 0.25rem solid #858796 !important;
     }
     
-
+    /* Badge Styling */
+    .badge {
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    
+    /* Company Cards */
+    .company-card {
+        text-align: center;
+        margin-bottom: 1rem;
+        border-radius: 0.5rem;
+    }
+    
+    /* Table Styling */
+    .table-hover tbody tr:hover {
+        background-color: rgba(0, 0, 0, 0.075);
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 mb-0">Education Tasks</h1>
-        <div>
-            <a href="{% url 'education:task_create' %}" class="btn btn-primary rounded-pill">
-                <i class="fas fa-plus-circle me-1"></i> New Education Task
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Education Tasks</h1>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'education:task_create' %}" class="btn btn-primary btn-icon-split">
+                <span class="icon text-white-50">
+                    <i class="fas fa-plus"></i>
+                </span>
+                <span class="text">New Education Task</span>
             </a>
-            <button class="btn btn-outline-secondary rounded-pill ms-2" id="filtersBtn" data-bs-toggle="modal" data-bs-target="#filterModal">
-                <i class="fas fa-filter me-1"></i> Filters
+            <button type="button" class="btn btn-outline-secondary" id="filtersBtn">
+                <i class="fas fa-filter"></i> Filters
             </button>
-            <button class="btn btn-outline-primary rounded-pill ms-2" id="batchUpdateBtn">
-                <i class="fas fa-edit me-1"></i> Batch Update
+            <button type="button" class="btn btn-outline-primary" id="batchUpdateBtn">
+                <i class="fas fa-tasks"></i> Batch Update
             </button>
         </div>
     </div>
     
     <!-- Status Cards -->
-    <div class="row">
-        <!-- To Do Card -->
+    <div class="row mb-4">
+        <!-- To Do -->
         <div class="col">
-            <div class="status-card to-do">
-                <h6>To Do</h6>
-                <h2>{{ task_stats.to_do|default:0 }}</h2>
-                <div class="progress mt-2" style="height: 5px;">
-                    <div class="progress-bar bg-primary" role="progressbar" style="width: 100%;"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- In Progress Card -->
-        <div class="col">
-            <div class="status-card in-progress">
-                <h6>In Progress</h6>
-                <h2>{{ task_stats.in_progress|default:0 }}</h2>
-                <div class="progress mt-2" style="height: 5px;">
-                    <div class="progress-bar bg-warning" role="progressbar" style="width: 100%;"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- In Review Card -->
-        <div class="col">
-            <div class="status-card in-review">
-                <h6>In Review</h6>
-                <h2>{{ task_stats.in_review|default:0 }}</h2>
-                <div class="progress mt-2" style="height: 5px;">
-                    <div class="progress-bar bg-info" role="progressbar" style="width: 100%;"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Done Card -->
-        <div class="col">
-            <div class="status-card done">
-                <h6>Done</h6>
-                <h2>{{ task_stats.done|default:0 }}</h2>
-                <div class="progress mt-2" style="height: 5px;">
-                    <div class="progress-bar bg-success" role="progressbar" style="width: 100%;"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Backlog Card -->
-        <div class="col">
-            <div class="status-card backlog">
-                <h6>Backlog</h6>
-                <h2>{{ task_stats.backlog|default:0 }}</h2>
-                <div class="progress mt-2" style="height: 5px;">
-                    <div class="progress-bar bg-secondary" role="progressbar" style="width: 100%;"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-
-    <!-- Debug Information -->
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Debug Information</h6>
-                </div>
+            <div class="card border-left-primary shadow h-100 py-2">
                 <div class="card-body">
-                    <p><strong>Tasks count:</strong> {{ tasks|length }}</p>
-                    <p><strong>Task stats:</strong> {{ task_stats }}</p>
-                    {% if tasks %}
-                        <p><strong>First task:</strong> ID: {{ tasks.0.id }}, Title: {{ tasks.0.title }}, Status: {{ tasks.0.status }}</p>
-                    {% else %}
-                        <p><strong>No tasks found!</strong></p>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Education Tasks -->
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3 d-flex justify-content-between align-items-center">
-                    <h6 class="m-0 font-weight-bold text-primary">Education Tasks</h6>
-                    <div>
-                        <button class="btn btn-sm btn-outline-primary" id="clearFiltersBtn">
-                            <i class="fas fa-times me-1"></i> Clear Filters
-                        </button>
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">To Do</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ task_stats.to_do|default:0 }}</div>
+                        </div>
                     </div>
                 </div>
+            </div>
+        </div>
+        
+        <!-- In Progress -->
+        <div class="col">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">In Progress</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ task_stats.in_progress|default:0 }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- In Review -->
+        <div class="col">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">In Review</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ task_stats.in_review|default:0 }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Done -->
+        <div class="col">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Done</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ task_stats.done|default:0 }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Backlog -->
+        <div class="col">
+            <div class="card border-left-secondary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">Backlog</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ task_stats.backlog|default:0 }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Task Table -->
+    <div class="row">
+        <div class="col-12">
+            <h5 class="mb-3">Education Tasks</h5>
+        </div>
+        <div class="col-12">
+            <div class="card shadow mb-4">
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table" id="taskTable">
+                        <table class="table table-hover" id="taskTable">
                             <thead>
                                 <tr>
                                     <th width="30">
@@ -178,60 +171,53 @@
                                         <input type="checkbox" class="form-check-input task-checkbox" value="{{ task.id }}">
                                     </td>
                                     <td>
-                                        <a href="{% url 'education:task_detail' task.id %}" class="text-decoration-none text-dark">{{ task.title }}</a>
-                                        <br><small class="text-muted">ID: {{ task.id }}</small>
+                                        <a href="{% url 'education:task_detail' task.id %}">{{ task.title }}</a>
+                                        <div class="small text-muted">ID: {{ task.id }}</div>
                                     </td>
                                     <td>
                                         <span class="badge bg-info rounded-pill">Education</span>
                                     </td>
                                     <td>
-                                        {% if task.status == 'to_do' %}
-                                        <span class="badge bg-primary rounded-pill">To Do</span>
-                                        {% elif task.status == 'in_progress' %}
-                                        <span class="badge bg-warning rounded-pill">In Progress</span>
-                                        {% elif task.status == 'in_review' %}
-                                        <span class="badge bg-info rounded-pill">In Review</span>
-                                        {% elif task.status == 'done' %}
-                                        <span class="badge bg-success rounded-pill">Done</span>
-                                        {% elif task.status == 'backlog' %}
-                                        <span class="badge bg-secondary rounded-pill">Backlog</span>
-                                        {% elif task.status == 'blocked' %}
-                                        <span class="badge bg-danger rounded-pill">Blocked</span>
-                                        {% endif %}
+                                        <span class="badge bg-{{ task.status|task_status_color }} rounded-pill">
+                                            <i class="fas fa-clipboard-list me-1"></i>
+                                            {{ task.get_status_display }}
+                                        </span>
                                     </td>
                                     <td>
-                                        {% if task.priority == 'low' %}
-                                        <span class="badge bg-success rounded-pill">Low</span>
-                                        {% elif task.priority == 'medium' %}
-                                        <span class="badge bg-warning rounded-pill">Medium</span>
-                                        {% elif task.priority == 'high' %}
-                                        <span class="badge bg-danger rounded-pill">High</span>
-                                        {% elif task.priority == 'critical' %}
-                                        <span class="badge bg-dark rounded-pill">Critical</span>
-                                        {% endif %}
+                                        <span class="badge bg-{% if task.priority == 'high' %}danger{% elif task.priority == 'medium' %}warning{% else %}success{% endif %} rounded-pill">
+                                            <i class="fas fa-{% if task.priority == 'high' %}arrow-up{% elif task.priority == 'medium' %}minus{% else %}arrow-down{% endif %} me-1"></i>
+                                            {{ task.get_priority_display }}
+                                        </span>
                                     </td>
                                     <td>
                                         {% if task.assigned_to %}
                                         {{ task.assigned_to.get_full_name|default:task.assigned_to.username }}
                                         {% else %}
-                                        Unassigned
+                                        <span class="text-muted">Unassigned</span>
                                         {% endif %}
                                     </td>
                                     <td>
                                         {% if task.due_date %}
-                                        {{ task.due_date|date:"M d, Y" }}
+                                        <span class="{% if task.due_date < today %}text-danger{% endif %}">
+                                            <i class="fas fa-calendar-alt me-1"></i>
+                                            {{ task.due_date|date:"M d, Y" }}
+                                        </span>
                                         {% else %}
-                                        No due date
+                                        <span class="text-muted">No due date</span>
                                         {% endif %}
                                     </td>
                                     <td>
-                                        <a href="{% url 'education:task_update' task.id %}" class="btn btn-sm btn-outline-primary rounded-circle"><i class="fas fa-edit"></i></a>
-                                        <a href="{% url 'education:task_delete' task.id %}" class="btn btn-sm btn-outline-danger rounded-circle"><i class="fas fa-trash"></i></a>
+                                        <a href="{% url 'education:task_update' task.id %}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{% url 'education:task_delete' task.id %}" class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
                                     </td>
                                 </tr>
                                 {% empty %}
                                 <tr>
-                                    <td colspan="8" class="text-center">No education tasks found.</td>
+                                    <td colspan="8" class="text-center">No tasks found.</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -241,233 +227,50 @@
             </div>
         </div>
     </div>
-    </div>
 </div>
 
-<!-- Add Task Modal -->
-<div class="modal fade" id="addTaskModal" tabindex="-1" aria-labelledby="addTaskModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="addTaskModalLabel">Add New Task</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form>
-                    <div class="mb-3">
-                        <label for="taskName" class="form-label">Task Name</label>
-                        <input type="text" class="form-control" id="taskName" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="taskDescription" class="form-label">Description</label>
-                        <textarea class="form-control" id="taskDescription" rows="3" required></textarea>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label for="taskPriority" class="form-label">Priority</label>
-                            <select class="form-select" id="taskPriority" required>
-                                <option value="">Select Priority</option>
-                                <option value="critical">Critical</option>
-                                <option value="high">High</option>
-                                <option value="medium">Medium</option>
-                                <option value="low">Low</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="taskStatus" class="form-label">Status</label>
-                            <select class="form-select" id="taskStatus" required>
-                                <option value="">Select Status</option>
-                                <option value="to_do">To Do</option>
-                                <option value="in_progress">In Progress</option>
-                                <option value="in_review">In Review</option>
-                                <option value="done">Done</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label for="assignedTo" class="form-label">Assigned To</label>
-                            <select class="form-select" id="assignedTo" required>
-                                <option value="">Select Team Member</option>
-                                <option value="1">John Smith</option>
-                                <option value="2">Jane Doe</option>
-                                <option value="3">Robert Johnson</option>
-                                <option value="4">Sarah Williams</option>
-                                <option value="5">Michael Brown</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="dueDate" class="form-label">Due Date</label>
-                            <input type="date" class="form-control" id="dueDate" required>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary">Save Task</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Filter Modal -->
-<div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="filterModalLabel">Filter Education Tasks</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="filterForm">
-                    <div class="mb-3">
-                        <label for="filterStatus" class="form-label">Status</label>
-                        <select class="form-select" id="filterStatus" name="status">
-                            <option value="">All</option>
-                            <option value="todo">To Do</option>
-                            <option value="in_progress">In Progress</option>
-                            <option value="in_review">In Review</option>
-                            <option value="done">Done</option>
-                            <option value="backlog">Backlog</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="filterPriority" class="form-label">Priority</label>
-                        <select class="form-select" id="filterPriority" name="priority">
-                            <option value="">All</option>
-                            <option value="low">Low</option>
-                            <option value="medium">Medium</option>
-                            <option value="high">High</option>
-                            <option value="critical">Critical</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="filterAssignee" class="form-label">Assigned To</label>
-                        <select class="form-select" id="filterAssignee" name="assigned_to">
-                            <option value="">All</option>
-                            <option value="unassigned">Unassigned</option>
-                            <option value="1">John Doe</option>
-                            <option value="2">Jane Smith</option>
-                        </select>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="applyFiltersBtn">Apply Filters</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Batch Update Modal -->
-<div class="modal fade" id="batchUpdateModal" tabindex="-1" aria-labelledby="batchUpdateModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="batchUpdateModalLabel">Batch Update Tasks</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="batchUpdateForm">
-                    <div class="mb-3">
-                        <label for="batchStatus" class="form-label">Status</label>
-                        <select class="form-select" id="batchStatus" name="status">
-                            <option value="">No Change</option>
-                            <option value="todo">To Do</option>
-                            <option value="in_progress">In Progress</option>
-                            <option value="in_review">In Review</option>
-                            <option value="done">Done</option>
-                            <option value="backlog">Backlog</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="batchPriority" class="form-label">Priority</label>
-                        <select class="form-select" id="batchPriority" name="priority">
-                            <option value="">No Change</option>
-                            <option value="low">Low</option>
-                            <option value="medium">Medium</option>
-                            <option value="high">High</option>
-                            <option value="critical">Critical</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="batchAssignee" class="form-label">Assigned To</label>
-                        <select class="form-select" id="batchAssignee" name="assigned_to">
-                            <option value="">No Change</option>
-                            <option value="unassigned">Unassigned</option>
-                            <option value="1">John Doe</option>
-                            <option value="2">Jane Smith</option>
-                        </select>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="applyBatchUpdateBtn">Update Selected Tasks</button>
-            </div>
-        </div>
-    </div>
-</div>
-
+<!-- Delete Task Modal -->
+{% include "education/task_delete_modal.html" %}
 {% endblock %}
 
 {% block extra_js %}
+<script src="{% static 'js/education_task_delete_handler.js' %}"></script>
 <script>
     $(document).ready(function() {
         // Initialize DataTable
-        $('#educationTasksTable').DataTable();
+        $('#taskTable').DataTable({
+            "pageLength": 10,
+            "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]]
+        });
         
-        // Select all checkbox functionality
-        $('#selectAllTasks').change(function() {
+        // Select all tasks
+        $('#selectAllTasks').on('change', function() {
             $('.task-checkbox').prop('checked', $(this).prop('checked'));
             updateBatchButtonState();
         });
         
-        // Individual checkbox change
-        $('.task-checkbox').change(function() {
+        // Individual task selection
+        $('.task-checkbox').on('change', function() {
             updateBatchButtonState();
         });
         
-        // Update batch button state based on selections
+        // Update batch button state
         function updateBatchButtonState() {
-            var anyChecked = $('.task-checkbox:checked').length > 0;
-            $('#batchUpdateBtn').prop('disabled', !anyChecked);
+            var checkedCount = $('.task-checkbox:checked').length;
+            $('#batchUpdateBtn').prop('disabled', checkedCount === 0);
         }
         
         // Initialize batch button state
         updateBatchButtonState();
         
-        // Open filter modal
-        $('#filtersBtn').click(function() {
-            $('#filterModal').modal('show');
-        });
-        
-        // Open batch update modal
-        $('#batchUpdateBtn').click(function() {
+        // Batch update button click
+        $('#batchUpdateBtn').on('click', function() {
             $('#batchUpdateModal').modal('show');
         });
         
-        // Apply filters
-        $('#applyFiltersBtn').click(function() {
-            // In a real app, this would submit the form or use AJAX
-            $('#filterModal').modal('hide');
-            // Simulate filter applied message
-            alert('Filters applied!');
-        });
-        
-        // Apply batch updates
-        $('#applyBatchUpdateBtn').click(function() {
-            // In a real app, this would submit the form with selected task IDs
-            var selectedTasks = [];
-            $('.task-checkbox:checked').each(function() {
-                selectedTasks.push($(this).val());
-            });
-            
-            $('#batchUpdateModal').modal('hide');
-            // Simulate update message
-            alert('Updated ' + selectedTasks.length + ' tasks!');
+        // Filters button click
+        $('#filtersBtn').on('click', function() {
+            $('#filterModal').modal('show');
         });
     });
 </script>

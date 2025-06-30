@@ -1,0 +1,61 @@
+/**
+ * Task Buttons CSS
+ * 
+ * Enhanced styling for task action buttons (edit, delete)
+ */
+
+/* Enhanced delete button */
+.enhanced-delete-btn {
+    transition: all 0.2s ease-in-out;
+    position: relative;
+}
+
+.enhanced-delete-btn:hover {
+    background-color: #f8d7da;
+    border-color: #f5c2c7;
+    transform: scale(1.05);
+}
+
+.enhanced-delete-btn:active {
+    transform: scale(0.95);
+}
+
+/* Enhanced edit button */
+.enhanced-edit-btn {
+    transition: all 0.2s ease-in-out;
+    position: relative;
+}
+
+.enhanced-edit-btn:hover {
+    background-color: #cfe2ff;
+    border-color: #b6d4fe;
+    transform: scale(1.05);
+}
+
+.enhanced-edit-btn:active {
+    transform: scale(0.95);
+}
+
+/* URL corrected indicators */
+.enhanced-delete-btn[title="Delete (URL corrected)"],
+.enhanced-edit-btn[title="Edit (URL corrected)"] {
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+/* Add a subtle indicator for buttons with corrected URLs */
+.enhanced-delete-btn[title="Delete (URL corrected)"]:after,
+.enhanced-edit-btn[title="Edit (URL corrected)"]:after {
+    content: "✓";
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: #28a745;
+    color: white;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

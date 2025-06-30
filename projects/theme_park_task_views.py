@@ -131,7 +131,7 @@ class ThemeParkTaskDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteVie
     """
     model = ThemeParkTask
     template_name = 'projects/task_confirm_delete.html'
-    success_url = reverse_lazy('projects:theme_park_task_dashboard')
+    success_url = reverse_lazy('theme_park:tasks')
     
     def test_func(self):
         task = self.get_object()

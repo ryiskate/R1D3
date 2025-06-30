@@ -1,5 +1,5 @@
 from django.shortcuts import render, HttpResponse, redirect
-from django.views.generic import TemplateView, View, CreateView
+from django.views.generic import TemplateView, View, CreateView, UpdateView, DeleteView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count, Q, F
 from django.urls import reverse_lazy
@@ -355,4 +355,80 @@ class R1D3TaskCreateView(LoginRequiredMixin, CreateView):
         context = super().get_context_data(**kwargs)
         context['section_name'] = "R1D3 Task"
         context['is_create'] = True
+        return context
+
+
+class R1D3TaskUpdateView(LoginRequiredMixin, UpdateView):
+    """
+    Update an existing R1D3 task from the global task dashboard.
+    This view uses the R1D3Task model and form from the projects app.
+    """
+    template_name = 'projects/r1d3_task_form.html'
+    login_url = '/'  # Redirect to home if not logged in
+    
+    def get_form_class(self):
+        # Import here to avoid circular imports
+        from projects.task_forms import R1D3TaskForm
+        return R1D3TaskForm
+    
+    def get_queryset(self):
+        # Import here to avoid circular imports
+        from projects.task_models import R1D3Task
+        return R1D3Task.objects.all()
+    
+    def form_valid(self, form):
+        messages.success(self.request, f"R1D3 Task '{form.instance.title}' updated successfully!")
+        return super().form_valid(form)
+    
+    def get_success_url(self):
+        # Redirect back to the global task dashboard
+        return reverse_lazy('core:global_task_dashboard')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['section_name'] = "R1D3 Task"
+        context['is_update'] = True
+        return context
+
+
+class R1D3TaskDeleteView(LoginRequiredMixin, DeleteView):
+    """
+    Delete an existing R1D3 task from the global task dashboard.
+    This view uses the R1D3Task model from the projects app.
+    """
+    template_name = 'projects/task_confirm_delete.html'
+    login_url = '/'  # Redirect to home if not logged in
+    
+    def get_queryset(self):
+        # Import here to avoid circular imports
+        from projects.task_models import R1D3Task
+        return R1D3Task.objects.all()
+    
+    def get_success_url(self):
+        # Redirect back to the global task dashboard
+        messages.success(self.request, "R1D3 Task deleted successfully!")
+        return reverse_lazy('core:global_task_dashboard')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['section_name'] = "R1D3 Task"
+        return context
+
+
+class R1D3TaskDetailView(LoginRequiredMixin, DetailView):
+    """
+    View an existing R1D3 task from the global task dashboard.
+    This view uses the R1D3Task model from the projects app.
+    """
+    template_name = 'projects/r1d3_task_detail.html'
+    login_url = '/'  # Redirect to home if not logged in
+    
+    def get_queryset(self):
+        # Import here to avoid circular imports
+        from projects.task_models import R1D3Task
+        return R1D3Task.objects.all()
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['section_name'] = "R1D3 Task"
         return context

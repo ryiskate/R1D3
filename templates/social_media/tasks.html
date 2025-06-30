@@ -1,0 +1,383 @@
+{% extends 'core/base_task_dashboard.html' %}
+{% load static %}
+
+{% block title %}Social Media Tasks | R1D3{% endblock %}
+
+{% block dashboard_title %}Social Media Tasks{% endblock %}
+
+{% block dashboard_heading %}Social Media Tasks{% endblock %}
+
+{% block new_task_url %}{% url 'social_media:task_create' %}{% endblock %}
+{% block new_task_text %}New Social Media Task{% endblock %}
+
+{% block clear_filters_url %}{% url 'social_media:tasks' %}{% endblock %}
+
+{% block section_stats %}{% endblock %}
+
+{% block stats_cards %}
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-2">
+            <div class="card stats-card todo">
+                <div class="card-body">
+                    <h6 class="card-title">To Do</h6>
+                    <h2 class="mb-0">{{ task_stats.to_do|default:0 }}</h2>
+                    <div class="progress mt-2">
+                        <div class="progress-bar bg-primary" role="progressbar" style="width: 100%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-2">
+            <div class="card stats-card in-progress">
+                <div class="card-body">
+                    <h6 class="card-title">In Progress</h6>
+                    <h2 class="mb-0">{{ task_stats.in_progress|default:0 }}</h2>
+                    <div class="progress mt-2">
+                        <div class="progress-bar bg-warning" role="progressbar" style="width: 100%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-2">
+            <div class="card stats-card in-review">
+                <div class="card-body">
+                    <h6 class="card-title">In Review</h6>
+                    <h2 class="mb-0">{{ task_stats.in_review|default:0 }}</h2>
+                    <div class="progress mt-2">
+                        <div class="progress-bar bg-info" role="progressbar" style="width: 100%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-2">
+            <div class="card stats-card done">
+                <div class="card-body">
+                    <h6 class="card-title">Done</h6>
+                    <h2 class="mb-0">{{ task_stats.done|default:0 }}</h2>
+                    <div class="progress mt-2">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: 100%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-2">
+            <div class="card stats-card backlog">
+                <div class="card-body">
+                    <h6 class="card-title">Backlog</h6>
+                    <h2 class="mb-0">{{ task_stats.backlog|default:0 }}</h2>
+                    <div class="progress mt-2">
+                        <div class="progress-bar bg-secondary" role="progressbar" style="width: 100%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-2">
+            <div class="card stats-card total">
+                <div class="card-body">
+                    <h6 class="card-title">Total</h6>
+                    <h2 class="mb-0">{{ task_stats.total|default:0 }}</h2>
+                    <div class="progress mt-2">
+                        <div class="progress-bar bg-dark" role="progressbar" style="width: 100%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock stats_cards %}
+
+{% block task_filters %}
+    <!-- Social Media-specific filters -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Campaign Filter</h6>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        <a href="{% url 'social_media:tasks' %}" class="list-group-item list-group-item-action {% if not request.GET.campaign_id %}active{% endif %}">
+                            All Campaigns
+                        </a>
+                        {% for campaign_id in campaign_ids %}
+                            <a href="{% url 'social_media:tasks' %}?campaign_id={{ campaign_id }}" class="list-group-item list-group-item-action {% if request.GET.campaign_id == campaign_id %}active{% endif %}">
+                                {{ campaign_id }}
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Channel</h6>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        <a href="{% url 'social_media:tasks' %}" class="list-group-item list-group-item-action {% if not request.GET.channel %}active{% endif %}">
+                            All Channels
+                        </a>
+                        {% for channel in channels %}
+                            <a href="{% url 'social_media:tasks' %}?channel={{ channel }}" class="list-group-item list-group-item-action {% if request.GET.channel == channel %}active{% endif %}">
+                                {{ channel }}
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock task_filters %}
+
+{% block task_table %}
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">
+                Social Media Tasks
+                {% if current_filters %}
+                <span class="badge bg-info text-white ms-2">Filtered</span>
+                {% endif %}
+            </h6>
+            <div>
+                <a href="{% url 'social_media:tasks' %}" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-sync-alt me-1"></i> Reset
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover" id="taskTable">
+                    <thead>
+                        <tr>
+                            <th width="30">
+                                <input type="checkbox" class="form-check-input" id="selectAllTasks">
+                            </th>
+                            <th>Title</th>
+                            <th>Campaign</th>
+                            <th>Channel</th>
+                            <th>Status</th>
+                            <th>Priority</th>
+                            <th>Assigned To</th>
+                            <th>Due Date</th>
+                            <th class="action-column">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if tasks %}
+                            {% for task in tasks %}
+                            <tr>
+                                <td>
+                                    <input type="checkbox" class="form-check-input task-checkbox" value="{{ task.id }}">
+                                </td>
+                                <td>
+                                    <a href="{% url 'social_media:task_detail' task.id %}" class="text-decoration-none text-dark">{{ task.title }}</a>
+                                    <br><small class="text-muted">ID: {{ task.id }}</small>
+                                </td>
+                                <td>
+                                    {% if task.campaign_id %}
+                                    <span class="badge bg-info rounded-pill">{{ task.campaign_id }}</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary rounded-pill">No Campaign</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if task.channel %}
+                                    <span class="badge bg-primary rounded-pill">{{ task.channel }}</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary rounded-pill">No Channel</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if task.status == 'to_do' %}
+                                    <span class="badge bg-primary rounded-pill">To Do</span>
+                                    {% elif task.status == 'in_progress' %}
+                                    <span class="badge bg-warning rounded-pill">In Progress</span>
+                                    {% elif task.status == 'in_review' %}
+                                    <span class="badge bg-info rounded-pill">In Review</span>
+                                    {% elif task.status == 'done' %}
+                                    <span class="badge bg-success rounded-pill">Done</span>
+                                    {% elif task.status == 'backlog' %}
+                                    <span class="badge bg-secondary rounded-pill">Backlog</span>
+                                    {% elif task.status == 'blocked' %}
+                                    <span class="badge bg-danger rounded-pill">Blocked</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if task.priority == 'low' %}
+                                    <span class="badge bg-success rounded-pill">Low</span>
+                                    {% elif task.priority == 'medium' %}
+                                    <span class="badge bg-warning rounded-pill">Medium</span>
+                                    {% elif task.priority == 'high' %}
+                                    <span class="badge bg-danger rounded-pill">High</span>
+                                    {% elif task.priority == 'critical' %}
+                                    <span class="badge bg-dark rounded-pill">Critical</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if task.assigned_to %}
+                                    {{ task.assigned_to.get_full_name|default:task.assigned_to.username }}
+                                    {% else %}
+                                    Unassigned
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if task.due_date %}
+                                    {{ task.due_date|date:"M d, Y" }}
+                                    {% else %}
+                                    No due date
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'social_media:task_update' task.id %}" class="btn btn-sm btn-outline-primary rounded-circle"><i class="fas fa-edit"></i></a>
+                                    <a href="{% url 'social_media:task_delete' task.id %}" class="btn btn-sm btn-outline-danger rounded-circle"><i class="fas fa-trash"></i></a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="9" class="text-center">
+                                    <div class="py-4">
+                                        <i class="fas fa-tasks fa-3x text-muted mb-3"></i>
+                                        <h5>No social media tasks found</h5>
+                                        <p class="text-muted">Create a new task to get started</p>
+                                        <a href="{% url 'social_media:task_create' %}" class="btn btn-primary">
+                                            <i class="fas fa-plus me-1"></i> New Social Media Task
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock task_table %}
+
+{% block filter_modal %}
+    <!-- Social Media-specific Filter Modal -->
+    <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="filterModalLabel">Filter Social Media Tasks</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="filterForm" method="get" action="{% url 'social_media:tasks' %}">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="campaign_id" class="form-label">Campaign</label>
+                                <select class="form-select" id="campaign_id" name="campaign_id">
+                                    <option value="">All Campaigns</option>
+                                    {% for campaign_id in campaign_ids %}
+                                        <option value="{{ campaign_id }}" {% if request.GET.campaign_id == campaign_id %}selected{% endif %}>{{ campaign_id }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="channel" class="form-label">Channel</label>
+                                <select class="form-select" id="channel" name="channel">
+                                    <option value="">All Channels</option>
+                                    {% for channel in channels %}
+                                        <option value="{{ channel }}" {% if request.GET.channel == channel %}selected{% endif %}>{{ channel }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="status" class="form-label">Status</label>
+                                <select class="form-select" id="status" name="status">
+                                    <option value="">All Statuses</option>
+                                    <option value="to_do" {% if request.GET.status == 'to_do' %}selected{% endif %}>To Do</option>
+                                    <option value="in_progress" {% if request.GET.status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                                    <option value="in_review" {% if request.GET.status == 'in_review' %}selected{% endif %}>In Review</option>
+                                    <option value="done" {% if request.GET.status == 'done' %}selected{% endif %}>Done</option>
+                                    <option value="backlog" {% if request.GET.status == 'backlog' %}selected{% endif %}>Backlog</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="priority" class="form-label">Priority</label>
+                                <select class="form-select" id="priority" name="priority">
+                                    <option value="">All Priorities</option>
+                                    <option value="low" {% if request.GET.priority == 'low' %}selected{% endif %}>Low</option>
+                                    <option value="medium" {% if request.GET.priority == 'medium' %}selected{% endif %}>Medium</option>
+                                    <option value="high" {% if request.GET.priority == 'high' %}selected{% endif %}>High</option>
+                                    <option value="critical" {% if request.GET.priority == 'critical' %}selected{% endif %}>Critical</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="applyFiltersBtn">Apply Filters</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock filter_modal %}
+
+{% block task_dashboard_js %}
+<script>
+    $(document).ready(function() {
+        // Initialize DataTable only if there are tasks
+        // Using a JavaScript variable to check if tasks exist to avoid lint errors
+        var hasTasks = {% if tasks %}true{% else %}false{% endif %};
+        
+        if (hasTasks) {
+            $('#taskTable').DataTable({
+                "language": {
+                    "emptyTable": "No social media tasks found.",
+                    "info": "Showing _START_ to _END_ of _TOTAL_ tasks",
+                    "infoEmpty": "Showing 0 to 0 of 0 tasks",
+                    "search": "Search tasks:"
+                }
+            });
+        }
+        
+        // Apply filters
+        $('#applyFiltersBtn').click(function() {
+            $('#filterForm').submit();
+        });
+        
+        // Select all checkbox functionality
+        $('#selectAllTasks').change(function() {
+            $('.task-checkbox').prop('checked', $(this).prop('checked'));
+            updateBatchButtonState();
+        });
+        
+        // Individual checkbox change
+        $('.task-checkbox').change(function() {
+            updateBatchButtonState();
+        });
+        
+        // Update batch button state based on selections
+        function updateBatchButtonState() {
+            var anyChecked = $('.task-checkbox:checked').length > 0;
+            $('#batchUpdateBtn').prop('disabled', !anyChecked);
+        }
+        
+        // Initialize batch button state
+        updateBatchButtonState();
+        
+        // Open filter modal
+        $('#filtersBtn').click(function() {
+            $('#filterModal').modal('show');
+        });
+        
+        // Open batch update modal
+        $('#batchUpdateBtn').click(function() {
+            $('#batchUpdateModal').modal('show');
+        });
+    });
+</script>
+{% endblock task_dashboard_js %}

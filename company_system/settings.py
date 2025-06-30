@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'social_media.apps.SocialMediaConfig',
     'arcade.apps.ArcadeConfig',
     'theme_park.apps.ThemeParkConfig',
+    'indie_news',
     # Apps to be implemented later
     # 'resources.apps.ResourcesConfig',
     # 'docs.apps.DocsConfig',

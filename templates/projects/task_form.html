@@ -2,7 +2,7 @@
 {% load static %}
 {% load crispy_forms_tags %}
 
-{% block title %}{{ title }} - {{ game.title }}{% endblock %}
+{% block title %}{{ title }}{% if game %} - {{ game.title }}{% endif %}{% endblock %}
 
 {% block content %}
 <div class="container-fluid mt-4">
@@ -11,8 +11,12 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{% url 'games:dashboard' %}">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="{% url 'games:game_detail' game.id %}">{{ game.title }}</a></li>
-                    <li class="breadcrumb-item"><a href="{% url 'games:task_list' game.id %}">Tasks</a></li>
+                    {% if game and game.id %}
+                        <li class="breadcrumb-item"><a href="{% url 'games:game_detail' game.id %}">{{ game.title }}</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'games:game_task_dashboard' game_id=game.id %}">Tasks</a></li>
+                    {% else %}
+                        <li class="breadcrumb-item"><a href="{% url 'games:task_dashboard' %}">Game Tasks</a></li>
+                    {% endif %}
                     <li class="breadcrumb-item active">{{ title }}</li>
                 </ol>
             </nav>
@@ -79,7 +83,11 @@
                         </div>
                         
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                            <a href="{% url 'games:task_list' game.id %}" class="btn btn-secondary me-md-2">Cancel</a>
+                            {% if game and game.id %}
+                            <a href="{% url 'games:game_task_dashboard' game_id=game.id %}" class="btn btn-secondary me-md-2">Cancel</a>
+                            {% else %}
+                            <a href="{% url 'games:task_dashboard' %}" class="btn btn-secondary me-md-2">Cancel</a>
+                            {% endif %}
                             <button type="submit" class="btn btn-primary">{{ submit_text }}</button>
                         </div>
                     </form>

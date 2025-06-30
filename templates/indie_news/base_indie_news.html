@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block sidebar_content %}
+<!-- Indie News Sidebar -->
+<div class="sidebar-heading">
+    Indie News
+</div>
+
+<li class="nav-item">
+    <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'indie_news:dashboard' %}">
+        <i class="fas fa-fw fa-newspaper"></i>
+        <span>News Dashboard</span>
+    </a>
+</li>
+
+<li class="nav-item">
+    <a class="nav-link {% if request.resolver_match.url_name == 'task_list' %}active{% endif %}" href="{% url 'indie_news:task_list' %}">
+        <i class="fas fa-fw fa-tasks"></i>
+        <span>News Tasks</span>
+    </a>
+</li>
+
+<li class="nav-item">
+    <a class="nav-link {% if request.resolver_match.url_name == 'game_list' %}active{% endif %}" href="{% url 'indie_news:game_list' %}">
+        <i class="fas fa-fw fa-gamepad"></i>
+        <span>Indie Games</span>
+    </a>
+</li>
+
+<li class="nav-item">
+    <a class="nav-link {% if request.resolver_match.url_name == 'event_list' %}active{% endif %}" href="{% url 'indie_news:event_list' %}">
+        <i class="fas fa-fw fa-calendar-alt"></i>
+        <span>Events</span>
+    </a>
+</li>
+
+<li class="nav-item">
+    <a class="nav-link {% if request.resolver_match.url_name == 'tool_list' %}active{% endif %}" href="{% url 'indie_news:tool_list' %}">
+        <i class="fas fa-fw fa-tools"></i>
+        <span>Dev Tools</span>
+    </a>
+</li>
+{% endblock %}

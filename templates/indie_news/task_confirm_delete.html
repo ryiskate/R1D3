@@ -1,0 +1,106 @@
+{% extends 'indie_news/indie_news_base.html' %}
+
+{% block title %}Delete Indie News Task{% endblock %}
+
+{% block indie_content %}
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-newspaper text-primary"></i>
+            Delete Indie News Task
+        </h1>
+    </div>
+
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'indie_news:dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'indie_news:task_list' %}">Indie News Tasks</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'indie_news:task_detail' task.pk %}">{{ task.title }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Delete</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow mb-4 border-left-danger">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-danger">Confirm Deletion</h6>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Warning:</strong> This action cannot be undone.
+                    </div>
+                    
+                    <p>Are you sure you want to delete the following indie news task?</p>
+                    
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ task.title }}</h5>
+                            <p class="card-text">{{ task.description|truncatewords:50 }}</p>
+                            <p class="mb-0">
+                                <strong>Article Type:</strong> 
+                                {% if task.news_type %}
+                                    {{ task.get_news_type_display }}
+                                {% else %}
+                                    Not specified
+                                {% endif %}
+                            </p>
+                            <p class="mb-0">
+                                <strong>Game:</strong> {{ task.game_title|default:"Not specified" }}
+                            </p>
+                            <p class="mb-0">
+                                <strong>Status:</strong> {{ task.get_status_display }}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'indie_news:task_detail' task.pk %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Delete Task
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Task Information</h6>
+                </div>
+                <div class="card-body">
+                    <p>
+                        <strong>Created by:</strong> {{ task.created_by.get_full_name|default:task.created_by.username }}
+                    </p>
+                    <p>
+                        <strong>Created on:</strong> {{ task.created_at|date:"F j, Y" }}
+                    </p>
+                    <p>
+                        <strong>Assigned to:</strong> 
+                        {% if task.assigned_to %}
+                            {{ task.assigned_to.get_full_name|default:task.assigned_to.username }}
+                        {% else %}
+                            <span class="text-muted">Unassigned</span>
+                        {% endif %}
+                    </p>
+                    <p>
+                        <strong>Due date:</strong> 
+                        {% if task.due_date %}
+                            {{ task.due_date|date:"F j, Y" }}
+                        {% else %}
+                            <span class="text-muted">No due date</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock indie_content %}

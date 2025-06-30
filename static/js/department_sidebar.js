@@ -9,8 +9,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const currentPath = window.location.pathname;
     const sidebarContent = document.getElementById('sidebar-content');
     
-    // Don't modify the sidebar if we're on a debug page
-    if (currentPath.includes('/debug-')) {
+    console.log('Current path:', currentPath);
+    
+    // Don't modify the sidebar if we're on a debug page or indie news section
+    if (currentPath.includes('/debug-') || currentPath.includes('/indie-news') || currentPath.includes('/indie_news')) {
+        console.log('Skipping sidebar modification for special section');
         return;
     }
     
@@ -144,7 +147,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             <li class="nav-item">
                 <a class="nav-link" href="/theme-park/dashboard/">
-                    <i class="fas fa-fw fa-ferris-wheel"></i>
+                    <i class="fas fa-fw fa-mountain"></i>
                     <span>Theme Park Dashboard</span>
                 </a>
             </li>
@@ -157,24 +160,74 @@ document.addEventListener('DOMContentLoaded', function() {
             </li>
             
             <li class="nav-item">
-                <a class="nav-link" href="/theme-park/map/">
-                    <i class="fas fa-fw fa-map"></i>
-                    <span>Park Map</span>
-                </a>
-            </li>
-            
-            <li class="nav-item">
                 <a class="nav-link" href="/theme-park/tasks/">
                     <i class="fas fa-fw fa-tasks"></i>
                     <span>Theme Park Tasks</span>
                 </a>
             </li>
+            
+            <li class="nav-item">
+                <a class="nav-link" href="/theme-park/maintenance/">
+                    <i class="fas fa-fw fa-tools"></i>
+                    <span>Maintenance</span>
+                </a>
+            </li>
         `;
     }
     
-    // Update the sidebar content if the element exists
+    // Indie News Department
+    if (currentPath.includes('/indie-news') || currentPath.includes('/indie_news')) {
+        sidebarHTML = `
+            <div class="sidebar-heading">
+                Indie News
+            </div>
+            
+            <li class="nav-item">
+                <a class="nav-link ${currentPath === '/indie-news/' || currentPath === '/indie-news' ? 'active' : ''}" href="/indie-news/">
+                    <i class="fas fa-fw fa-newspaper"></i>
+                    <span>News Dashboard</span>
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link ${currentPath === '/indie-news/tasks/' ? 'active' : ''}" href="/indie-news/tasks/">
+                    <i class="fas fa-fw fa-tasks"></i>
+                    <span>News Tasks</span>
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link ${currentPath === '/indie-news/games/' ? 'active' : ''}" href="/indie-news/games/">
+                    <i class="fas fa-fw fa-gamepad"></i>
+                    <span>Indie Games</span>
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link ${currentPath === '/indie-news/events/' ? 'active' : ''}" href="/indie-news/events/">
+                    <i class="fas fa-fw fa-calendar-alt"></i>
+                    <span>Events</span>
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link ${currentPath === '/indie-news/tools/' ? 'active' : ''}" href="/indie-news/tools/">
+                    <i class="fas fa-fw fa-tools"></i>
+                    <span>Dev Tools</span>
+                </a>
+            </li>
+        `;
+    }
+    
+    // Update the sidebar content
+    console.log('Setting sidebar HTML for path:', currentPath);
+    console.log('Sidebar content element exists:', !!sidebarContent);
+    
     if (sidebarContent) {
         sidebarContent.innerHTML = sidebarHTML;
-        console.log("Sidebar updated with version 2 script at " + new Date().toLocaleTimeString());
+        console.log('Sidebar content updated');
+    } else {
+        console.error('Sidebar content element not found');
     }
+    console.log("Sidebar updated with version 2 script at " + new Date().toLocaleTimeString());
 });

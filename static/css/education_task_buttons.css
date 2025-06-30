@@ -1,0 +1,44 @@
+/**
+ * Education Task Buttons CSS
+ * 
+ * Enhanced styling for education task action buttons
+ */
+
+/* Enhanced delete button */
+.education-delete-btn {
+    transition: all 0.2s ease-in-out;
+    position: relative;
+}
+
+.education-delete-btn:hover {
+    background-color: #f8d7da;
+    border-color: #f5c2c7;
+    transform: scale(1.05);
+}
+
+.education-delete-btn:active {
+    transform: scale(0.95);
+}
+
+/* Add a subtle indicator for delete buttons with confirmation */
+.education-delete-btn:after {
+    content: "?";
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: #dc3545;
+    color: white;
+    border-radius: 50%;
+    width: 14px;
+    height: 14px;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.education-delete-btn:hover:after {
+    opacity: 1;
+}

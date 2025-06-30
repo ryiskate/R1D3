@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load project_extras %}
+
+{% block title %}{% if is_update %}Update{% else %}Create{% endif %} Social Media Task | R1D3{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            {% if is_update %}Update{% else %}Create{% endif %} Social Media Task
+        </h1>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        {% if is_update %}Update Task: {{ task.title }}{% else %}Create New Task{% endif %}
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <form method="post" class="task-form" action="{% if is_update %}{% url 'social_media:task_update' task.pk %}{% else %}{% url 'social_media:task_create' %}{% endif %}">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.title.id_for_label }}">Title</label>
+                                {{ form.title }}
+                                {% if form.title.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.title.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.status.id_for_label }}">Status</label>
+                                {{ form.status }}
+                                {% if form.status.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.status.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.priority.id_for_label }}">Priority</label>
+                                {{ form.priority }}
+                                {% if form.priority.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.priority.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.assigned_to.id_for_label }}">Assigned To</label>
+                                {{ form.assigned_to }}
+                                {% if form.assigned_to.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.assigned_to.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.due_date.id_for_label }}">Due Date</label>
+                                {{ form.due_date }}
+                                {% if form.due_date.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.due_date.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.estimated_hours.id_for_label }}">Estimated Hours</label>
+                                {{ form.estimated_hours }}
+                                {% if form.estimated_hours.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.estimated_hours.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.platform.id_for_label }}">Platform</label>
+                                {{ form.platform }}
+                                {% if form.platform.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.platform.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.content_type.id_for_label }}">Content Type</label>
+                                {{ form.content_type }}
+                                {% if form.content_type.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.content_type.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.campaign_id.id_for_label }}">Campaign</label>
+                                {{ form.campaign_id }}
+                                {% if form.campaign_id.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.campaign_id.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.channel.id_for_label }}">Channel</label>
+                                {{ form.channel }}
+                                {% if form.channel.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.channel.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label for="{{ form.description.id_for_label }}">Description</label>
+                                {{ form.description }}
+                                {% if form.description.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.description.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label for="{{ form.target_metrics.id_for_label }}">Target Metrics</label>
+                                {{ form.target_metrics }}
+                                {% if form.target_metrics.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.target_metrics.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">
+                                    {% if is_update %}Update{% else %}Create{% endif %} Task
+                                </button>
+                                <a href="{% url 'social_media:tasks' %}" class="btn btn-secondary">Cancel</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Add jQuery UI for datepicker -->
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        // Add Bootstrap classes to form fields
+        $('.task-form input[type="text"], .task-form input[type="number"], .task-form select, .task-form textarea').addClass('form-control');
+        
+        try {
+            // Initialize date picker for due date field
+            $('#{{ form.due_date.id_for_label }}').datepicker({
+                dateFormat: 'yy-mm-dd',
+                autoclose: true,
+                changeMonth: true,
+                changeYear: true
+            });
+        } catch (e) {
+            console.error('Error initializing datepicker:', e);
+            // Use a simple date input as fallback
+            $('#{{ form.due_date.id_for_label }}').attr('type', 'date');
+        }
+        
+        // Handle form submission
+        $('.task-form').on('submit', function(e) {
+            console.log('Form submitted');
+            return true; // Ensure form submits
+        });
+        
+        // Add click handler to submit button for direct submission
+        $('.task-form button[type="submit"]').on('click', function(e) {
+            console.log('Submit button clicked');
+            $(this).closest('form').submit();
+        });
+    });
+</script>
+{% endblock %}

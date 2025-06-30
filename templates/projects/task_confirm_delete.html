@@ -16,7 +16,7 @@
                     {% else %}
                     <li class="breadcrumb-item"><a href="{% url 'core:global_task_dashboard' %}">Tasks</a></li>
                     {% endif %}
-                    <li class="breadcrumb-item"><a href="{% if task.company_section == 'game_development' %}{% url 'projects:game_task_detail' task.id %}{% elif task.company_section == 'education' %}{% url 'projects:education_task_detail' task.id %}{% elif task.company_section == 'social_media' %}{% url 'projects:social_media_task_detail' task.id %}{% elif task.company_section == 'arcade' %}{% url 'projects:arcade_task_detail' task.id %}{% elif task.company_section == 'theme_park' %}{% url 'projects:theme_park_task_detail' task.id %}{% else %}{% url 'projects:r1d3_task_detail' task.id %}{% endif %}">{{ task.title }}</a></li>
+                    <li class="breadcrumb-item">{{ task.title }}</li>
                     <li class="breadcrumb-item active">Delete</li>
                 </ol>
             </nav>

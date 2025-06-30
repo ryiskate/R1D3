@@ -64,21 +64,7 @@ class SocialMediaTaskDashboardView(LoginRequiredMixin, ListView):
         return context
 
 
-class SocialMediaTaskCreateView(LoginRequiredMixin, CreateView):
-    """
-    Create a new social media task.
-    """
-    model = SocialMediaTask
-    form_class = SocialMediaTaskForm
-    template_name = 'projects/task_form.html'
-    
-    def form_valid(self, form):
-        form.instance.created_by = self.request.user
-        messages.success(self.request, 'Social media task created successfully!')
-        return super().form_valid(form)
-    
-    def get_success_url(self):
-        return reverse('projects:social_media_task_dashboard')
+# SocialMediaTaskCreateView is now implemented in unified_task_forms.py
 
 
 class SocialMediaTaskDetailView(LoginRequiredMixin, DetailView):
@@ -96,7 +82,7 @@ class SocialMediaTaskUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateV
     """
     model = SocialMediaTask
     form_class = SocialMediaTaskForm
-    template_name = 'projects/task_form.html'
+    template_name = 'projects/social_media_task_form.html'
     
     def test_func(self):
         task = self.get_object()

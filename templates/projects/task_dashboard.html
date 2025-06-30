@@ -1,14 +1,19 @@
 {% extends 'core/base_task_dashboard.html' %}
 {% load static %}
 
+{% block extra_css %}
+<!-- Additional CSS for task dashboard -->
+<link rel="stylesheet" href="{% static 'css/task_buttons.css' %}">
+{% endblock %}
+
 {% block dashboard_title %}{% if game %}{{ game.title }} Tasks{% else %}Game Development Tasks{% endif %}{% endblock %}
 
-{% block dashboard_heading %}{% if game %}{{ game.title }} Tasks{% else %}Game Development Tasks{% endif %}{% endblock %}
+{% block dashboard_heading %}{% if game %}{{ game.title }} Tasks{% else %}Verified Game Development Tasks{% endif %}{% endblock %}
 
 {% block new_task_url %}{% if game %}{% url 'games:task_create' game.id %}{% else %}{% url 'games:task_create' %}{% endif %}{% endblock %}
 {% block new_task_text %}New Game Task{% endblock %}
 
-{% block clear_filters_url %}{% url 'games:task_dashboard' %}{% endblock %}
+{% block clear_filters_url %}{% url 'games:dashboard' %}{% endblock %}
 
 {% block stats_cards %}
     <!-- Stats Cards -->
@@ -114,7 +119,7 @@
                                 <input type="checkbox" class="form-check-input task-checkbox" data-task-id="{{ task.id }}">
                             </td>
                             <td>
-                                <a href="{% url 'projects:game_task_detail' task.id %}">{{ task.title }}</a>
+                                <a href="{% url 'games:task_detail' task.id %}">{{ task.title }}</a>
                                 {% if task.is_overdue %}
                                 <span class="badge bg-danger ms-1">Overdue</span>
                                 {% endif %}
@@ -169,10 +174,10 @@
                             </td>
                             <td class="text-center">
                                 <div class="btn-group">
-                                    <a href="{% url 'projects:game_task_update' task.id %}" class="btn btn-sm btn-outline-primary" title="Edit">
+                                    <a href="{% url 'games:task_update' pk=task.id %}" class="btn btn-sm btn-outline-primary" data-task-id="{{ task.id }}" title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <a href="{% url 'games:task_delete' task.id %}" class="btn btn-sm btn-outline-danger" title="Delete">
+                                    <a href="{% url 'games:task_delete' pk=task.id %}" class="btn btn-sm btn-outline-danger" data-task-id="{{ task.id }}" title="Delete">
                                         <i class="fas fa-trash"></i>
                                     </a>
                                 </div>
@@ -353,6 +358,10 @@
 </div>
 {% endblock %}
 
+{% block extra_js %}
+<script src="{% static 'js/task_delete_handler.js' %}"></script>
+{% endblock %}
+
 {% block task_dashboard_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -420,7 +429,7 @@
                 });
                 
                 // Send AJAX request to update tasks
-                fetch('{% url "games:game_batch_task_update" %}', {
+                fetch('{% url "games:task_batch_update" %}', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

@@ -151,7 +151,7 @@
                     {% if game %}
                     <li class="breadcrumb-item"><a href="{% url 'games:game_detail' game.id %}">{{ game.title }}</a></li>
                     {% endif %}
-                    <li class="breadcrumb-item"><a href="{% url 'games:task_list' game.id %}">Tasks</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'games:game_task_dashboard' game_id=game.id %}">Tasks</a></li>
                     <li class="breadcrumb-item active">Kanban Board</li>
                 </ol>
             </nav>
@@ -173,7 +173,7 @@
             <a href="{% url 'games:task_create' game.id %}" class="btn btn-primary">
                 <i class="bi bi-plus-circle"></i> New Task
             </a>
-            <a href="{% url 'games:task_list' game.id %}" class="btn btn-outline-secondary ms-2">
+            <a href="{% url 'games:game_task_dashboard' game_id=game.id %}" class="btn btn-outline-secondary ms-2">
                 <i class="bi bi-list"></i> List View
             </a>
             {% endif %}

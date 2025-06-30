@@ -1,0 +1,91 @@
+{% extends 'core/base_task_dashboard.html' %}
+{% load static %}
+
+{% block dashboard_title %}{% if game %}{{ game.title }} Tasks{% else %}Game Development Tasks{% endif %}{% endblock %}
+
+{% block dashboard_heading %}{% if game %}{{ game.title }} Tasks{% else %}Game Development Tasks{% endif %}{% endblock %}
+
+{% block new_task_url %}{% if game %}{% url 'games:task_create' game.id %}{% else %}{% url 'games:task_create' %}{% endif %}{% endblock %}
+{% block new_task_text %}New Game Task{% endblock %}
+
+{% block clear_filters_url %}{% url 'games:task_dashboard' %}{% endblock %}
+
+{% block task_detail_url %}{% url 'games:task_detail' task.id %}{% endblock %}
+
+{% block task_edit_url %}{% url 'games:task_update' pk=task.id %}{% endblock %}
+
+{% block task_delete_url %}{% url 'games:task_delete' pk=task.id %}{% endblock %}
+
+{% block section_stats %}{% endblock %}
+
+{% block stats_cards %}
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-2">
+            <div class="card stats-card todo">
+                <div class="card-body">
+                    <h6 class="card-title">To Do</h6>
+                    <h2 class="mb-0">{{ task_stats.to_do }}</h2>
+                    <div class="progress mt-2">
+                        <div class="progress-bar bg-primary progress-bar-{% widthratio task_stats.to_do task_stats.total 100 %}" role="progressbar" aria-valuenow="{% widthratio task_stats.to_do task_stats.total 100 %}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card stats-card in-progress">
+                <div class="card-body">
+                    <h6 class="card-title">In Progress</h6>
+                    <h2 class="mb-0">{{ task_stats.in_progress }}</h2>
+                    <div class="progress mt-2">
+                        <div class="progress-bar bg-warning progress-bar-{% widthratio task_stats.in_progress task_stats.total 100 %}" role="progressbar" aria-valuenow="{% widthratio task_stats.in_progress task_stats.total 100 %}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card stats-card review">
+                <div class="card-body">
+                    <h6 class="card-title">In Review</h6>
+                    <h2 class="mb-0">{{ task_stats.in_review }}</h2>
+                    <div class="progress mt-2">
+                        <div class="progress-bar bg-purple progress-bar-{% widthratio task_stats.in_review task_stats.total 100 %}" role="progressbar" aria-valuenow="{% widthratio task_stats.in_review task_stats.total 100 %}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card stats-card completed">
+                <div class="card-body">
+                    <h6 class="card-title">Completed</h6>
+                    <h2 class="mb-0">{{ task_stats.done }}</h2>
+                    <div class="progress mt-2">
+                        <div class="progress-bar bg-success progress-bar-{% widthratio task_stats.done task_stats.total 100 %}" role="progressbar" aria-valuenow="{% widthratio task_stats.done task_stats.total 100 %}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card stats-card blocked">
+                <div class="card-body">
+                    <h6 class="card-title">Blocked</h6>
+                    <h2 class="mb-0">{{ task_stats.blocked }}</h2>
+                    <div class="progress mt-2">
+                        <div class="progress-bar bg-danger progress-bar-{% widthratio task_stats.blocked task_stats.total 100 %}" role="progressbar" aria-valuenow="{% widthratio task_stats.blocked task_stats.total 100 %}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card stats-card total">
+                <div class="card-body">
+                    <h6 class="card-title">Total</h6>
+                    <h2 class="mb-0">{{ task_stats.total }}</h2>
+                    <div class="progress mt-2">
+                        <div class="progress-bar bg-info progress-bar-100" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

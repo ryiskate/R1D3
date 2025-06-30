@@ -1,0 +1,168 @@
+{% extends 'indie_news/indie_news_base.html' %}
+{% load static %}
+
+{% block title %}{{ task.title }} - Indie News Task{% endblock %}
+
+{% block indie_content %}
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-newspaper text-primary"></i>
+            Indie News Task Detail
+        </h1>
+        <div>
+            <a href="{% url 'indie_news:task_list' %}" class="btn btn-sm btn-secondary shadow-sm">
+                <i class="fas fa-arrow-left fa-sm text-white-50"></i> Back to Tasks
+            </a>
+            <a href="{% url 'indie_news:task_update' task.pk %}" class="btn btn-sm btn-primary shadow-sm">
+                <i class="fas fa-edit fa-sm text-white-50"></i> Edit Task
+            </a>
+            <a href="{% url 'indie_news:task_delete' task.pk %}" class="btn btn-sm btn-danger shadow-sm">
+                <i class="fas fa-trash fa-sm text-white-50"></i> Delete Task
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Task Details Card -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Task Details</h6>
+                    <div>
+                        {% if task.is_overdue %}
+                            <span class="badge badge-danger">Overdue</span>
+                        {% endif %}
+                        
+                        {% if task.status == 'backlog' %}
+                            <span class="badge badge-secondary">Backlog</span>
+                        {% elif task.status == 'to_do' %}
+                            <span class="badge badge-info">To Do</span>
+                        {% elif task.status == 'in_progress' %}
+                            <span class="badge badge-primary">In Progress</span>
+                        {% elif task.status == 'in_review' %}
+                            <span class="badge badge-warning">In Review</span>
+                        {% elif task.status == 'done' %}
+                            <span class="badge badge-success">Done</span>
+                        {% elif task.status == 'blocked' %}
+                            <span class="badge badge-danger">Blocked</span>
+                        {% endif %}
+                        
+                        {% if task.priority == 'low' %}
+                            <span class="badge badge-light">Low Priority</span>
+                        {% elif task.priority == 'medium' %}
+                            <span class="badge badge-info">Medium Priority</span>
+                        {% elif task.priority == 'high' %}
+                            <span class="badge badge-warning">High Priority</span>
+                        {% elif task.priority == 'critical' %}
+                            <span class="badge badge-danger">Critical Priority</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h4 class="font-weight-bold">{{ task.title }}</h4>
+                    
+                    <div class="mb-4">
+                        {{ task.description|linebreaks }}
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p><strong>Created by:</strong> {{ task.created_by.get_full_name|default:task.created_by.username }}</p>
+                            <p><strong>Created on:</strong> {{ task.created_at|date:"F j, Y, g:i a" }}</p>
+                            <p><strong>Last updated:</strong> {{ task.updated_at|date:"F j, Y, g:i a" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p>
+                                <strong>Assigned to:</strong> 
+                                {% if task.assigned_to %}
+                                    {{ task.assigned_to.get_full_name|default:task.assigned_to.username }}
+                                {% else %}
+                                    <span class="text-muted">Unassigned</span>
+                                {% endif %}
+                            </p>
+                            <p>
+                                <strong>Due date:</strong> 
+                                {% if task.due_date %}
+                                    {{ task.due_date|date:"F j, Y" }}
+                                    {% if task.is_overdue %}
+                                        <span class="text-danger">(Overdue)</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="text-muted">No due date</span>
+                                {% endif %}
+                            </p>
+                            <p>
+                                <strong>Estimated hours:</strong> {{ task.estimated_hours }}
+                                {% if task.actual_hours %}
+                                    <span class="text-muted">(Actual: {{ task.actual_hours }})</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="progress mb-4">
+                        <div class="progress-bar bg-primary" role="progressbar" style="width: {{ task.get_completion_percentage }}%" aria-valuenow="{{ task.get_completion_percentage }}" aria-valuemin="0" aria-valuemax="100">
+                            {{ task.get_completion_percentage }}%
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <!-- Article Details Card -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Article Details</h6>
+                </div>
+                <div class="card-body">
+                    <p><strong>Article ID:</strong> {{ task.article_id|default:"Not assigned" }}</p>
+                    
+                    <p>
+                        <strong>Article Type:</strong> 
+                        {% if task.news_type == 'review' %}
+                            <span class="badge badge-info">Game Review</span>
+                        {% elif task.news_type == 'preview' %}
+                            <span class="badge badge-primary">Game Preview</span>
+                        {% elif task.news_type == 'interview' %}
+                            <span class="badge badge-success">Developer Interview</span>
+                        {% elif task.news_type == 'feature' %}
+                            <span class="badge badge-warning">Feature Article</span>
+                        {% elif task.news_type == 'news' %}
+                            <span class="badge badge-secondary">News Article</span>
+                        {% elif task.news_type == 'opinion' %}
+                            <span class="badge badge-dark">Opinion Piece</span>
+                        {% elif task.news_type == 'guide' %}
+                            <span class="badge badge-light">Game Guide</span>
+                        {% else %}
+                            <span class="text-muted">Not specified</span>
+                        {% endif %}
+                    </p>
+                    
+                    <p><strong>Developer:</strong> {{ task.developer|default:"Not specified" }}</p>
+                    <p><strong>Game Title:</strong> {{ task.game_title|default:"Not specified" }}</p>
+                    <p>
+                        <strong>Publish Date:</strong> 
+                        {% if task.publish_date %}
+                            {{ task.publish_date|date:"F j, Y" }}
+                        {% else %}
+                            <span class="text-muted">Not scheduled</span>
+                        {% endif %}
+                    </p>
+                    <p><strong>Word Count:</strong> {{ task.word_count|default:"0" }}</p>
+                    
+                    {% if task.tags %}
+                        <div class="mt-3">
+                            <strong>Tags:</strong><br>
+                            {% for tag in task.tags.split|slice:":10" %}
+                                <span class="badge badge-pill badge-primary">{{ tag }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock indie_content %}
