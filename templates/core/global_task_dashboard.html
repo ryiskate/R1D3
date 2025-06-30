@@ -191,7 +191,7 @@
                                 <input type="checkbox" class="form-check-input task-checkbox" data-task-id="{{ task.id }}">
                             </td>
                             <td>
-                                <a href="{% url 'core:r1d3_task_detail' task.id %}" class="text-decoration-none">
+                                <a href="{% url 'core:r1d3_task_detail' task.task_type task.id %}" class="text-decoration-none">
                                     <strong>{{ task.title }}</strong>
                                     <div class="small text-muted">ID: {{ task.id }}</div>
                                 </a>
@@ -262,10 +262,10 @@
                             </td>
                             <td class="text-center">
                                 <div class="btn-group">
-                                    <a href="{% url 'core:r1d3_task_update' task.id %}" class="btn btn-sm btn-outline-primary" title="Edit">
+                                    <a href="{% url 'core:r1d3_task_update' task.task_type task.id %}" class="btn btn-sm btn-outline-primary" title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <a href="{% url 'core:r1d3_task_delete' task.id %}" class="btn btn-sm btn-outline-danger" title="Delete">
+                                    <a href="{% url 'core:r1d3_task_delete' task.task_type task.id %}" class="btn btn-sm btn-outline-danger" title="Delete">
                                         <i class="fas fa-trash"></i>
                                     </a>
                                 </div>

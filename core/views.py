@@ -4,7 +4,14 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count, Q, F
 from django.urls import reverse_lazy
 from django.contrib import messages
+from django.http import Http404
 from datetime import date, timedelta
+
+# Import legacy views for backward compatibility
+from .legacy_views import R1D3TaskDetailLegacyView, R1D3TaskUpdateLegacyView, R1D3TaskDeleteLegacyView
+
+# Import model utilities
+from .model_utils import get_task_model_map, get_task_type_for_model
 
 # Import task models for dashboard stats
 try:
@@ -102,6 +109,28 @@ class GlobalTaskDashboardView(LoginRequiredMixin, View):
         old_game_tasks = list(GameTask.objects.all())
         print(f"Old GameTask count: {len(old_game_tasks)}")
         
+        # Add task_type information to each task
+        for task in r1d3_tasks:
+            task.task_type = 'r1d3'
+        
+        for task in game_tasks:
+            task.task_type = 'game_development'
+        
+        for task in education_tasks:
+            task.task_type = 'education'
+        
+        for task in social_media_tasks:
+            task.task_type = 'social_media'
+        
+        for task in arcade_tasks:
+            task.task_type = 'arcade'
+        
+        for task in theme_park_tasks:
+            task.task_type = 'theme_park'
+        
+        for task in old_game_tasks:
+            task.task_type = task.company_section if task.company_section else 'game_development'
+        
         # Combine all tasks into a single list
         all_tasks = r1d3_tasks + game_tasks + education_tasks + social_media_tasks + arcade_tasks + theme_park_tasks + old_game_tasks
         print(f"Total tasks before filtering: {len(all_tasks)}")
@@ -131,32 +160,12 @@ class GlobalTaskDashboardView(LoginRequiredMixin, View):
             filtered_tasks = [task for task in filtered_tasks if task.assigned_to is None]
             print(f"Tasks after assigned_to filter 'unassigned': {len(filtered_tasks)}")
         
-        # For company section, we need to check the task type
+        # For company section, we need to check the task_type attribute
         if company_section_filter:
             print(f"Applying company section filter: '{company_section_filter}'")
-            if company_section_filter == 'game_development':
-                filtered_tasks = [task for task in filtered_tasks if isinstance(task, GameDevelopmentTask) or 
-                                 (isinstance(task, GameTask) and task.company_section == 'game_development')]
-                print(f"Tasks after company section filter 'game_development': {len(filtered_tasks)}")
-            elif company_section_filter == 'education':
-                filtered_tasks = [task for task in filtered_tasks if isinstance(task, EducationTask) or 
-                                 (isinstance(task, GameTask) and task.company_section == 'education')]
-                print(f"Tasks after company section filter 'education': {len(filtered_tasks)}")
-            elif company_section_filter == 'social_media':
-                filtered_tasks = [task for task in filtered_tasks if isinstance(task, SocialMediaTask) or 
-                                 (isinstance(task, GameTask) and task.company_section == 'social_media')]
-                print(f"Tasks after company section filter 'social_media': {len(filtered_tasks)}")
-            elif company_section_filter == 'arcade':
-                filtered_tasks = [task for task in filtered_tasks if isinstance(task, ArcadeTask) or 
-                                 (isinstance(task, GameTask) and task.company_section == 'arcade')]
-                print(f"Tasks after company section filter 'arcade': {len(filtered_tasks)}")
-            elif company_section_filter == 'theme_park':
-                filtered_tasks = [task for task in filtered_tasks if isinstance(task, ThemeParkTask) or 
-                                 (isinstance(task, GameTask) and task.company_section == 'theme_park')]
-                print(f"Tasks after company section filter 'theme_park': {len(filtered_tasks)}")
-            elif company_section_filter == 'r1d3':
-                filtered_tasks = [task for task in filtered_tasks if isinstance(task, R1D3Task)]
-                print(f"Tasks after company section filter 'r1d3': {len(filtered_tasks)}")
+            # Use the task_type attribute we added to each task
+            filtered_tasks = [task for task in filtered_tasks if task.task_type == company_section_filter]
+            print(f"Tasks after company section filter '{company_section_filter}': {len(filtered_tasks)}")
         
         today = date.today()
         if due_date_filter == 'overdue':
@@ -360,24 +369,81 @@ class R1D3TaskCreateView(LoginRequiredMixin, CreateView):
 
 class R1D3TaskUpdateView(LoginRequiredMixin, UpdateView):
     """
-    Update an existing R1D3 task from the global task dashboard.
-    This view uses the R1D3Task model and form from the projects app.
+    Update an existing task from the global task dashboard.
+    This view uses the task_type parameter to determine which model to use.
     """
     template_name = 'projects/r1d3_task_form.html'
     login_url = '/'  # Redirect to home if not logged in
+    context_object_name = 'task'
     
-    def get_form_class(self):
-        # Import here to avoid circular imports
-        from projects.task_forms import R1D3TaskForm
-        return R1D3TaskForm
+    def get_object(self, queryset=None):
+        # Import task models here to avoid circular imports
+        from projects.task_models import (
+            R1D3Task, GameDevelopmentTask, EducationTask,
+            SocialMediaTask, ArcadeTask, ThemeParkTask
+        )
+        
+        task_id = self.kwargs.get('pk')
+        task_type = self.kwargs.get('task_type')
+        
+        # Map task_type to model
+        model_map = {
+            'r1d3': R1D3Task,
+            'game_development': GameDevelopmentTask,
+            'education': EducationTask,
+            'social_media': SocialMediaTask,
+            'arcade': ArcadeTask,
+            'theme_park': ThemeParkTask,
+        }
+        
+        # Get the appropriate model based on task_type
+        model = model_map.get(task_type)
+        if not model:
+            raise Http404(f"Invalid task type: {task_type}")
+        
+        try:
+            task = model.objects.get(pk=task_id)
+            # Set the appropriate form class and template based on task type
+            self._set_task_specifics(model.__name__)
+            return task
+        except model.DoesNotExist:
+            raise Http404(f"No {task_type} task found with ID {task_id}")
     
-    def get_queryset(self):
-        # Import here to avoid circular imports
-        from projects.task_models import R1D3Task
-        return R1D3Task.objects.all()
+    def _set_task_specifics(self, model_name):
+        # Set form class and template based on task type
+        if model_name == 'GameDevelopmentTask':
+            from projects.task_forms import GameDevelopmentTaskForm
+            self.form_class = GameDevelopmentTaskForm
+            self.template_name = 'projects/game_task_form.html'
+            self.section_name = 'Game Development Task'
+        elif model_name == 'EducationTask':
+            from projects.task_forms import EducationTaskForm
+            self.form_class = EducationTaskForm
+            self.template_name = 'projects/education_task_form.html'
+            self.section_name = 'Education Task'
+        elif model_name == 'SocialMediaTask':
+            from projects.task_forms import SocialMediaTaskForm
+            self.form_class = SocialMediaTaskForm
+            self.template_name = 'projects/social_media_task_form.html'
+            self.section_name = 'Social Media Task'
+        elif model_name == 'ArcadeTask':
+            from projects.task_forms import ArcadeTaskForm
+            self.form_class = ArcadeTaskForm
+            self.template_name = 'projects/arcade_task_form.html'
+            self.section_name = 'Arcade Task'
+        elif model_name == 'ThemeParkTask':
+            from projects.task_forms import ThemeParkTaskForm
+            self.form_class = ThemeParkTaskForm
+            self.template_name = 'projects/theme_park_task_form.html'
+            self.section_name = 'Theme Park Task'
+        else:  # Default to R1D3Task
+            from projects.task_forms import R1D3TaskForm
+            self.form_class = R1D3TaskForm
+            self.template_name = 'projects/r1d3_task_form.html'
+            self.section_name = 'R1D3 Task'
     
     def form_valid(self, form):
-        messages.success(self.request, f"R1D3 Task '{form.instance.title}' updated successfully!")
+        messages.success(self.request, f"Task '{form.instance.title}' updated successfully!")
         return super().form_valid(form)
     
     def get_success_url(self):
@@ -386,49 +452,168 @@ class R1D3TaskUpdateView(LoginRequiredMixin, UpdateView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['section_name'] = "R1D3 Task"
+        context['section_name'] = getattr(self, 'section_name', 'Task')
         context['is_update'] = True
         return context
 
 
 class R1D3TaskDeleteView(LoginRequiredMixin, DeleteView):
     """
-    Delete an existing R1D3 task from the global task dashboard.
-    This view uses the R1D3Task model from the projects app.
+    Delete an existing task from the global task dashboard.
+    This view uses the task_type parameter to determine which model to use.
     """
     template_name = 'projects/task_confirm_delete.html'
     login_url = '/'  # Redirect to home if not logged in
+    context_object_name = 'task'
     
-    def get_queryset(self):
-        # Import here to avoid circular imports
-        from projects.task_models import R1D3Task
-        return R1D3Task.objects.all()
+    def get_object(self, queryset=None):
+        # Import task models here to avoid circular imports
+        from projects.task_models import (
+            R1D3Task, GameDevelopmentTask, EducationTask,
+            SocialMediaTask, ArcadeTask, ThemeParkTask
+        )
+        
+        task_id = self.kwargs.get('pk')
+        task_type = self.kwargs.get('task_type')
+        
+        # Map task_type to model
+        model_map = {
+            'r1d3': R1D3Task,
+            'game_development': GameDevelopmentTask,
+            'education': EducationTask,
+            'social_media': SocialMediaTask,
+            'arcade': ArcadeTask,
+            'theme_park': ThemeParkTask,
+        }
+        
+        # Get the appropriate model based on task_type
+        model = model_map.get(task_type)
+        if not model:
+            raise Http404(f"Invalid task type: {task_type}")
+        
+        try:
+            task = model.objects.get(pk=task_id)
+            # Set the appropriate template and section name based on task type
+            self._set_task_specifics(model.__name__)
+            return task
+        except model.DoesNotExist:
+            raise Http404(f"No {task_type} task found with ID {task_id}")
+    
+    def _set_task_specifics(self, model_name):
+        # Set template and section name based on task type
+        if model_name == 'GameDevelopmentTask':
+            self.template_name = 'projects/task_confirm_delete.html'
+            self.section_name = 'Game Development Task'
+            self.active_department = 'game_dev'
+        elif model_name == 'EducationTask':
+            self.template_name = 'projects/task_confirm_delete.html'
+            self.section_name = 'Education Task'
+            self.active_department = 'education'
+        elif model_name == 'SocialMediaTask':
+            self.template_name = 'projects/task_confirm_delete.html'
+            self.section_name = 'Social Media Task'
+            self.active_department = 'social_media'
+        elif model_name == 'ArcadeTask':
+            self.template_name = 'arcade/task_confirm_delete.html'
+            self.section_name = 'Arcade Task'
+            self.active_department = 'arcade'
+        elif model_name == 'ThemeParkTask':
+            self.template_name = 'projects/task_confirm_delete.html'
+            self.section_name = 'Theme Park Task'
+            self.active_department = 'theme_park'
+        else:  # Default to R1D3Task
+            self.template_name = 'projects/task_confirm_delete.html'
+            self.section_name = 'R1D3 Task'
+            self.active_department = 'r1d3'
+    
+    def delete(self, request, *args, **kwargs):
+        task = self.get_object()
+        task_title = task.title  # Store the title before deletion
+        messages.success(request, f"{self.section_name} '{task_title}' deleted successfully!")
+        return super().delete(request, *args, **kwargs)
     
     def get_success_url(self):
         # Redirect back to the global task dashboard
-        messages.success(self.request, "R1D3 Task deleted successfully!")
         return reverse_lazy('core:global_task_dashboard')
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['section_name'] = "R1D3 Task"
+        context['section_name'] = getattr(self, 'section_name', 'Task')
+        context['active_department'] = getattr(self, 'active_department', 'r1d3')
         return context
 
 
 class R1D3TaskDetailView(LoginRequiredMixin, DetailView):
     """
-    View an existing R1D3 task from the global task dashboard.
-    This view uses the R1D3Task model from the projects app.
+    View an existing task from the global task dashboard.
+    This view uses the task_type parameter to determine which model to use.
     """
     template_name = 'projects/r1d3_task_detail.html'
     login_url = '/'  # Redirect to home if not logged in
+    context_object_name = 'task'
     
-    def get_queryset(self):
-        # Import here to avoid circular imports
-        from projects.task_models import R1D3Task
-        return R1D3Task.objects.all()
+    def get_object(self, queryset=None):
+        # Import task models here to avoid circular imports
+        from projects.task_models import (
+            R1D3Task, GameDevelopmentTask, EducationTask,
+            SocialMediaTask, ArcadeTask, ThemeParkTask
+        )
+        
+        task_id = self.kwargs.get('pk')
+        task_type = self.kwargs.get('task_type')
+        
+        # Map task_type to model
+        model_map = {
+            'r1d3': R1D3Task,
+            'game_development': GameDevelopmentTask,
+            'education': EducationTask,
+            'social_media': SocialMediaTask,
+            'arcade': ArcadeTask,
+            'theme_park': ThemeParkTask,
+        }
+        
+        # Get the appropriate model based on task_type
+        model = model_map.get(task_type)
+        if not model:
+            raise Http404(f"Invalid task type: {task_type}")
+        
+        try:
+            task = model.objects.get(pk=task_id)
+            # Set the appropriate template and section name based on task type
+            self._set_task_specifics(model.__name__)
+            return task
+        except model.DoesNotExist:
+            raise Http404(f"No {task_type} task found with ID {task_id}")
+    
+    def _set_task_specifics(self, model_name):
+        # Set template and section name based on task type
+        if model_name == 'GameDevelopmentTask':
+            self.template_name = 'projects/game_task_detail.html'
+            self.section_name = 'Game Development Task'
+            self.active_department = 'game_dev'
+        elif model_name == 'EducationTask':
+            self.template_name = 'projects/education_task_detail.html'
+            self.section_name = 'Education Task'
+            self.active_department = 'education'
+        elif model_name == 'SocialMediaTask':
+            self.template_name = 'projects/social_media_task_detail.html'
+            self.section_name = 'Social Media Task'
+            self.active_department = 'social_media'
+        elif model_name == 'ArcadeTask':
+            self.template_name = 'arcade/task_detail.html'
+            self.section_name = 'Arcade Task'
+            self.active_department = 'arcade'
+        elif model_name == 'ThemeParkTask':
+            self.template_name = 'projects/theme_park_task_detail.html'
+            self.section_name = 'Theme Park Task'
+            self.active_department = 'theme_park'
+        else:  # Default to R1D3Task
+            self.template_name = 'projects/r1d3_task_detail.html'
+            self.section_name = 'R1D3 Task'
+            self.active_department = 'r1d3'
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['section_name'] = "R1D3 Task"
+        context['section_name'] = getattr(self, 'section_name', 'Task')
+        context['active_department'] = getattr(self, 'active_department', 'r1d3')
         return context

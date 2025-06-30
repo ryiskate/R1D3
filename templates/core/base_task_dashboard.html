@@ -260,7 +260,7 @@
                                 <input type="checkbox" class="form-check-input task-checkbox" data-task-id="{{ task.id }}">
                             </td>
                             <td>
-                                <a href="{% block task_detail_url %}{% url 'core:r1d3_task_detail' task.id %}{% endblock %}">{{ task.title }}</a>
+                                <a href="{% block task_detail_url %}{% url 'core:r1d3_task_detail' task.task_type task.id %}{% endblock %}">{{ task.title }}</a>
                                 {% if task.is_overdue %}
                                 <span class="badge bg-danger ms-1">Overdue</span>
                                 {% endif %}
@@ -305,10 +305,10 @@
                             </td>
                             <td class="action-column">
                                 <div class="btn-group">
-                                    <a href="{% block task_edit_url %}{% url 'core:r1d3_task_update' task.id %}{% endblock %}" class="btn btn-sm btn-outline-primary" data-task-id="{{ task.id }}" title="Edit">
+                                    <a href="{% block task_edit_url %}{% url 'core:r1d3_task_update' task.task_type task.id %}{% endblock %}" class="btn btn-sm btn-outline-primary" data-task-id="{{ task.id }}" title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <a href="{% block task_delete_url %}{% url 'core:r1d3_task_delete' task.id %}{% endblock %}" class="btn btn-sm btn-outline-danger" data-task-id="{{ task.id }}" title="Delete">
+                                    <a href="{% block task_delete_url %}{% url 'core:r1d3_task_delete' task.task_type task.id %}{% endblock %}" class="btn btn-sm btn-outline-danger" data-task-id="{{ task.id }}" title="Delete">
                                         <i class="fas fa-trash"></i>
                                     </a>
                                 </div>
