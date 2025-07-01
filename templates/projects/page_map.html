@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>R1D3 Project Pages Map</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #2980b9;
+            margin-top: 30px;
+        }
+        h3 {
+            color: #3498db;
+            margin-top: 25px;
+        }
+        h4 {
+            color: #2c3e50;
+            margin-top: 20px;
+        }
+        ul {
+            padding-left: 25px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        code {
+            background-color: #f8f8f8;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: 'Courier New', Courier, monospace;
+            color: #e74c3c;
+        }
+        .template-hierarchy {
+            margin-bottom: 40px;
+        }
+        .url-structure {
+            margin-bottom: 40px;
+        }
+        .url-path {
+            font-weight: bold;
+            color: #16a085;
+        }
+        .view-name {
+            font-style: italic;
+            color: #8e44ad;
+        }
+        .template-name {
+            color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <h1>R1D3 Project Pages Map</h1>
+
+    <h2>Overview</h2>
+    <p>This document maps the template structure and relationships for the projects section of the R1D3 application.</p>
+
+    <div class="template-hierarchy">
+        <h2>Template Hierarchy</h2>
+
+        <h3>Base Templates</h3>
+        <ul>
+            <li><code>base.html</code> (root template)
+                <ul>
+                    <li><code>core/base_task_dashboard.html</code> (specialized dashboard base)</li>
+                    <li><code>projects/unified_task_form.html</code> (base for all task forms)</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h3>Task Management Templates</h3>
+        
+        <h4>General Task Templates</h4>
+        <ul>
+            <li><code>task_dashboard.html</code> (extends core/base_task_dashboard.html)</li>
+            <li><code>task_list.html</code> (extends base.html)</li>
+            <li><code>task_detail.html</code> (extends base.html)</li>
+            <li><code>task_form.html</code> (extends base.html)</li>
+            <li><code>task_kanban.html</code> (extends base.html)</li>
+            <li><code>task_confirm_delete.html</code> (extends base.html)</li>
+        </ul>
+
+        <h4>Specialized Task Templates</h4>
+        <p>All of these extend <code>projects/unified_task_form.html</code>:</p>
+        <ul>
+            <li><code>arcade_task_form.html</code></li>
+            <li><code>education_task_form.html</code></li>
+            <li><code>game_task_form.html</code></li>
+            <li><code>r1d3_task_form.html</code></li>
+            <li><code>social_media_task_form.html</code></li>
+            <li><code>theme_park_task_form.html</code></li>
+        </ul>
+
+        <h4>Task Dashboard Templates</h4>
+        <ul>
+            <li><code>game_task_dashboard.html</code> (extends core/base_task_dashboard.html)</li>
+            <li><code>social_media_task_dashboard.html</code> (extends base.html)</li>
+        </ul>
+
+        <h3>Game Management Templates</h3>
+        <ul>
+            <li><code>game_dashboard.html</code> (extends base.html)</li>
+            <li><code>game_list.html</code> (extends base.html)</li>
+            <li><code>game_detail.html</code> (extends base.html)</li>
+            <li><code>game_form.html</code> (extends base.html)</li>
+        </ul>
+
+        <h3>Asset Management Templates</h3>
+        <ul>
+            <li><code>asset_list.html</code> (extends base.html)</li>
+            <li><code>asset_detail.html</code> (extends base.html)</li>
+            <li><code>asset_form.html</code> (extends base.html)</li>
+        </ul>
+
+        <h3>Game Design Document (GDD) Templates</h3>
+        <ul>
+            <li><code>gdd_detail_simple.html</code> (extends base.html)</li>
+            <li><code>gdd_form.html</code> (extends base.html)</li>
+            <li><code>gdd_simple_create.html</code> (extends base.html)</li>
+            <li><code>gdd_structured_create.html</code> (extends base.html)</li>
+            <li><code>gdd_structured_form.html</code> (extends base.html)</li>
+            <li><code>gdd_upload.html</code> (extends base.html)</li>
+            <li><code>gdd_features_list.html</code> (extends base.html)</li>
+        </ul>
+
+        <h4>GDD Components (included in other templates)</h4>
+        <ul>
+            <li><code>gdd_detail_modals.html</code></li>
+            <li><code>gdd_feature_formset.html</code></li>
+            <li><code>gdd_section.html</code></li>
+            <li><code>gdd_subsection_formset.html</code></li>
+            <li><code>gdd_task_panel.html</code></li>
+        </ul>
+
+        <h3>Modal Components</h3>
+        <ul>
+            <li><code>social_media_task_modals.html</code></li>
+        </ul>
+
+        <h3>Partials</h3>
+        <ul>
+            <li><code>partials/task_priority_guide.html</code></li>
+            <li><code>partials/task_status_guide.html</code></li>
+        </ul>
+    </div>
+
+    <div class="url-structure">
+        <h2>URL Structure and Page Flow</h2>
+
+        <h3>Main Project Pages</h3>
+        <ul>
+            <li>Dashboard: <span class="url-path">/</span> → <span class="view-name">ProjectDashboardView</span> → <span class="template-name">projects/dashboard.html</span></li>
+            <li>Project List: <span class="url-path">/list/</span> → <span class="view-name">ProjectListView</span> → <span class="template-name">projects/project_list.html</span></li>
+            <li>Project Detail: <span class="url-path">/<int:pk>/</span> → <span class="view-name">ProjectDetailView</span> → <span class="template-name">projects/project_detail.html</span></li>
+            <li>Project Create: <span class="url-path">/create/</span> → <span class="view-name">ProjectCreateView</span> → <span class="template-name">projects/project_form.html</span></li>
+            <li>Project Update: <span class="url-path">/<int:pk>/update/</span> → <span class="view-name">ProjectUpdateView</span> → <span class="template-name">projects/project_form.html</span></li>
+        </ul>
+
+        <h3>Task Management</h3>
+        <ul>
+            <li>Task List: <span class="url-path">/tasks/</span> → <span class="view-name">TaskListView</span> → <span class="template-name">projects/task_dashboard.html</span></li>
+            <li>Task Detail: <span class="url-path">/tasks/<int:pk>/</span> → <span class="view-name">TaskDetailView</span> → <span class="template-name">projects/task_detail.html</span></li>
+            <li>Task Create: <span class="url-path">/tasks/create/</span> → <span class="view-name">TaskCreateView</span> → <span class="template-name">projects/task_form.html</span></li>
+            <li>Task Update: <span class="url-path">/tasks/<int:pk>/update/</span> → <span class="view-name">TaskUpdateView</span> → <span class="template-name">projects/task_form.html</span></li>
+            <li>Task Delete: <span class="url-path">/tasks/<int:pk>/delete/</span> → <span class="view-name">TaskDeleteView</span> → <span class="template-name">projects/task_confirm_delete.html</span></li>
+            <li>Task Kanban: <span class="url-path">/tasks/kanban/</span> → <span class="view-name">TaskKanbanView</span> → <span class="template-name">projects/task_kanban.html</span></li>
+        </ul>
+
+        <h3>Game Management</h3>
+        <ul>
+            <li>Game Dashboard: <span class="url-path">/games/</span> → <span class="view-name">GameDashboardView</span> → <span class="template-name">projects/game_dashboard.html</span></li>
+            <li>Game List: <span class="url-path">/games/list/</span> → <span class="view-name">GameProjectListView</span> → <span class="template-name">projects/game_list.html</span></li>
+            <li>Game Detail: <span class="url-path">/games/<int:pk>/</span> → <span class="view-name">GameProjectDetailView</span> → <span class="template-name">projects/game_detail.html</span></li>
+            <li>Game Create: <span class="url-path">/games/create/</span> → <span class="view-name">GameProjectCreateView</span> → <span class="template-name">projects/game_form.html</span></li>
+            <li>Game Update: <span class="url-path">/games/<int:pk>/update/</span> → <span class="view-name">GameProjectUpdateView</span> → <span class="template-name">projects/game_form.html</span></li>
+        </ul>
+    </div>
+</body>
+</html>
