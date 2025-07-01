@@ -1,6 +1,6 @@
 """
 Storage backends for the R1D3 system.
-Configures Backblaze B2 for media file storage.
+Configures Backblaze B2 for media file storage using boto3 and django-storages.
 """
 from django.conf import settings
 from storages.backends.s3boto3 import S3Boto3Storage
