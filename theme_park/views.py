@@ -224,9 +224,8 @@ class ThemeParkTaskCreateView(LoginRequiredMixin, CreateView):
     """View for creating new theme park tasks"""
     model = ThemeParkTask
     template_name = 'theme_park/task_form.html'
-    fields = ['title', 'description', 'status', 'priority', 'due_date', 
-              'assigned_to', 'estimated_hours', 'attraction_id', 'zone', 
-              'task_type', 'safety_priority']
+    from projects.task_forms import ThemeParkTaskForm
+    form_class = ThemeParkTaskForm
     success_url = reverse_lazy('theme_park:tasks')
     
     def form_valid(self, form):
@@ -260,9 +259,8 @@ class ThemeParkTaskUpdateView(LoginRequiredMixin, UpdateView):
     """View for updating theme park tasks"""
     model = ThemeParkTask
     template_name = 'theme_park/task_form.html'
-    fields = ['title', 'description', 'status', 'priority', 'due_date', 
-              'assigned_to', 'estimated_hours', 'attraction_id', 'zone', 
-              'task_type', 'safety_priority']
+    from projects.task_forms import ThemeParkTaskForm
+    form_class = ThemeParkTaskForm
     success_url = reverse_lazy('theme_park:tasks')
     
     def form_valid(self, form):

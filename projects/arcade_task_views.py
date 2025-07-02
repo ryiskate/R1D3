@@ -76,7 +76,7 @@ class ArcadeTaskCreateView(LoginRequiredMixin, CreateView):
     """
     model = ArcadeTask
     form_class = ArcadeTaskForm
-    template_name = 'projects/task_form.html'
+    template_name = 'projects/arcade_task_form.html'
     
     def form_valid(self, form):
         form.instance.created_by = self.request.user
@@ -102,7 +102,7 @@ class ArcadeTaskUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     """
     model = ArcadeTask
     form_class = ArcadeTaskForm
-    template_name = 'projects/task_form.html'
+    template_name = 'projects/arcade_task_form.html'
     
     def test_func(self):
         task = self.get_object()

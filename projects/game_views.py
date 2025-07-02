@@ -15,6 +15,7 @@ from .game_models import (
     GameProject, GameDesignDocument, GameAsset, GameMilestone, 
     GameTask, GameBuild, PlaytestSession, PlaytestFeedback, GameBug
 )
+from .models import Team
 from .game_forms import (GameProjectForm, GameDesignDocumentForm, GameAssetForm,
     GameTaskForm, GameMilestoneForm, GameBuildForm, PlaytestSessionForm,
     PlaytestFeedbackForm, GameBugForm
@@ -845,7 +846,7 @@ class GameTaskCreateView(LoginRequiredMixin, CreateView):
     """
     model = GameDevelopmentTask
     form_class = GameDevelopmentTaskForm
-    template_name = 'projects/task_form.html'
+    template_name = 'projects/game_task_form.html'
     
     def get_success_url(self):
         messages.success(self.request, f"Task '{self.object.title}' created successfully!")
@@ -869,6 +870,7 @@ class GameTaskCreateView(LoginRequiredMixin, CreateView):
         game_id = self.kwargs.get('game_id')
         context['game'] = get_object_or_404(GameProject, id=game_id)
         context['today'] = date.today()
+        context['teams'] = Team.objects.all().order_by('name')
         return context
 
 
@@ -909,7 +911,7 @@ class GameTaskUpdateView(LoginRequiredMixin, UpdateView):
     """
     model = GameDevelopmentTask
     form_class = GameDevelopmentTaskForm
-    template_name = 'projects/task_form.html'
+    template_name = 'projects/game_task_form.html'
     
     def get_success_url(self):
         messages.success(self.request, f"Task '{self.object.title}' updated successfully!")
@@ -934,6 +936,7 @@ class GameTaskUpdateView(LoginRequiredMixin, UpdateView):
             context['game'] = None
         context['today'] = date.today()
         context['is_update'] = True
+        context['teams'] = Team.objects.all().order_by('name')
         return context
 
 

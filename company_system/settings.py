@@ -164,6 +164,9 @@ ACCOUNT_USERNAME_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = True
 
+# Disable signup functionality - only admin can create accounts
+ACCOUNT_ADAPTER = 'core.adapters.NoNewUsersAccountAdapter'
+
 # Login/Logout URLs
 LOGIN_REDIRECT_URL = 'dashboard'
 LOGOUT_REDIRECT_URL = 'home'

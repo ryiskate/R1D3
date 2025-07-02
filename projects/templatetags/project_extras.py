@@ -152,6 +152,16 @@ def is_past_due(due_date):
     """
     Checks if a due date is in the past
     """
-    if not due_date:
-        return False
-    return due_date < date.today()
+    if due_date:
+        return due_date < date.today()
+    return False
+
+@register.filter
+def min_value(value, arg):
+    """
+    Returns the minimum of value and arg
+    """
+    try:
+        return min(float(value), float(arg))
+    except (ValueError, TypeError):
+        return value

@@ -137,9 +137,8 @@ class ArcadeTaskUpdateView(LoginRequiredMixin, UpdateView):
     """View for updating arcade tasks"""
     model = ArcadeTask
     template_name = 'arcade/task_form.html'
-    fields = ['title', 'description', 'status', 'priority', 'due_date', 
-              'assigned_to', 'estimated_hours', 'machine_id', 'location', 
-              'maintenance_type']
+    from projects.task_forms import ArcadeTaskForm
+    form_class = ArcadeTaskForm
     success_url = reverse_lazy('arcade:tasks')
     
     def form_valid(self, form):
@@ -255,8 +254,8 @@ class ArcadeTaskCreateView(LoginRequiredMixin, CreateView):
     """View for creating arcade tasks"""
     model = ArcadeTask
     template_name = 'arcade/task_form.html'
-    fields = ['title', 'description', 'status', 'priority', 'assigned_to', 'due_date', 
-              'estimated_hours', 'machine_id', 'location', 'maintenance_type']
+    from projects.task_forms import ArcadeTaskForm
+    form_class = ArcadeTaskForm
     success_url = reverse_lazy('arcade:tasks')
     
     def form_valid(self, form):

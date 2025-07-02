@@ -166,7 +166,7 @@ class ArcadeTaskCreateView(UnifiedTaskCreateView):
     form_class = ArcadeTaskForm
     section_name = "Arcade Task"
     success_url_name = "projects:arcade_task_dashboard"
-    template_name = "projects/arcade_task_form.html"
+    template_name = "arcade/task_form.html"
 
 
 class ArcadeTaskUpdateView(UnifiedTaskUpdateView):
@@ -175,7 +175,7 @@ class ArcadeTaskUpdateView(UnifiedTaskUpdateView):
     form_class = ArcadeTaskForm
     section_name = "Arcade Task"
     detail_url_name = "projects:arcade_task_detail"
-    template_name = "projects/arcade_task_form.html"
+    template_name = "arcade/task_form.html"
 
 
 # Theme Park Task Views
@@ -185,7 +185,7 @@ class ThemeParkTaskCreateView(UnifiedTaskCreateView):
     form_class = ThemeParkTaskForm
     section_name = "Theme Park Task"
     success_url_name = "projects:theme_park_task_dashboard"
-    template_name = "projects/theme_park_task_form.html"
+    template_name = "theme_park/task_form.html"
 
 
 class ThemeParkTaskUpdateView(UnifiedTaskUpdateView):
@@ -194,7 +194,7 @@ class ThemeParkTaskUpdateView(UnifiedTaskUpdateView):
     form_class = ThemeParkTaskForm
     section_name = "Theme Park Task"
     detail_url_name = "projects:theme_park_task_detail"
-    template_name = "projects/theme_park_task_form.html"
+    template_name = "theme_park/task_form.html"
 
 
 # R1D3 General Task Views

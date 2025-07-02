@@ -176,28 +176,16 @@
 {% endblock %}
 
 {% block extra_js %}
-<!-- Add jQuery UI for datepicker -->
-<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
-<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+<!-- Using native HTML5 date input instead of jQuery UI datepicker -->
 
 <script>
     $(document).ready(function() {
         // Add Bootstrap classes to form fields
         $('.task-form input[type="text"], .task-form input[type="number"], .task-form select, .task-form textarea').addClass('form-control');
         
-        try {
-            // Initialize date picker for due date field
-            $('#{{ form.due_date.id_for_label }}').datepicker({
-                dateFormat: 'yy-mm-dd',
-                autoclose: true,
-                changeMonth: true,
-                changeYear: true
-            });
-        } catch (e) {
-            console.error('Error initializing datepicker:', e);
-            // Use a simple date input as fallback
-            $('#{{ form.due_date.id_for_label }}').attr('type', 'date');
-        }
+        // Use native HTML5 date input instead of jQuery UI datepicker
+        // This ensures we don't get double calendar pickers
+        $('#{{ form.due_date.id_for_label }}').attr('type', 'date');
         
         // Handle form submission
         $('.task-form').on('submit', function(e) {

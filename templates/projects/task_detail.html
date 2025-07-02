@@ -129,6 +129,20 @@
                                 {% endif %}
                             </div>
 
+                            <h6 class="fw-bold">Team</h6>
+                            <div class="mb-3">
+                                {% if task.team %}
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-circle avatar-sm bg-info me-2">
+                                        {{ task.team.name|first|upper }}
+                                    </div>
+                                    <span>{{ task.team.name }}</span>
+                                </div>
+                                {% else %}
+                                <span class="text-muted">No team assigned</span>
+                                {% endif %}
+                            </div>
+
                             <h6 class="fw-bold">Due Date</h6>
                             <div class="mb-3">
                                 {% if task.due_date %}
@@ -155,45 +169,7 @@
                     </div>
 
                     <div class="row mt-3">
-                        <div class="col-md-6">
-                            <h6 class="fw-bold">Time Tracking</h6>
-                            <div class="mb-3">
-                                <div class="d-flex justify-content-between">
-                                    <span>Estimated Hours:</span>
-                                    <span>{{ task.estimated_hours|default:"--" }}</span>
-                                </div>
-                                <div class="d-flex justify-content-between">
-                                    <span>Actual Hours:</span>
-                                    <span>{{ task.actual_hours|default:"--" }}</span>
-                                </div>
-                                {% if task.estimated_hours and task.actual_hours %}
-                                <div class="progress mt-2" style="height: 10px;">
-                                    {% if task.actual_hours <= task.estimated_hours %}
-                                     <div class="progress-bar bg-success" role="progressbar"
-                                          style="width: 0%"
-                                          data-percentage="{{ task.actual_hours|div:task.estimated_hours|mul:100|floatformat:0 }}"
-                                          aria-valuenow="{{ task.actual_hours }}">
-                                    </div>
-                                    {% else %}
-                                     <div class="progress-bar bg-success" role="progressbar"
-                                          style="width: 100%"
-                                          aria-valuenow="{{ task.estimated_hours }}">
-                                     </div>
-                                     {% with overage=task.actual_hours|sub:task.estimated_hours %}
-                                    {% with percentage=overage|div:task.estimated_hours|mul:100 %}
-                                    <div class="progress-bar bg-danger" role="progressbar" 
-                                         style="width: 0%" 
-                                         data-percentage="{{ percentage|floatformat:0 }}"
-                                         aria-valuenow="{{ overage }}">
-                                    </div>
-
-                                    {% endwith %}
-                                    {% endwith %}
-                                    {% endif %}
-                                </div>
-                                {% endif %}
-                            </div>
-                        </div>
+                        <!-- Time tracking section removed as per requirements -->
                         <div class="col-md-6">
                             <h6 class="fw-bold">Created</h6>
                             <div class="mb-3">
@@ -205,6 +181,54 @@
                             </div>
                         </div>
                     </div>
+                    
+                    {% if task.has_additional_note %}
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <h6 class="fw-bold">Additional Note</h6>
+                            <div class="p-3 bg-light rounded">
+                                {{ task.additional_note_text|linebreaks }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if task.output %}
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <h6 class="fw-bold">Output</h6>
+                            <div class="p-3 bg-light rounded">
+                                {{ task.output|linebreaks }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if task.has_subtasks %}
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <h6 class="fw-bold">Subtasks</h6>
+                            <div class="list-group">
+                                {% for subtask in subtasks %}
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        {% if subtask.is_completed %}
+                                        <i class="fas fa-check-circle text-success me-2"></i>
+                                        <span class="text-decoration-line-through">{{ subtask.title }}</span>
+                                        {% else %}
+                                        <i class="far fa-circle text-secondary me-2"></i>
+                                        <span>{{ subtask.title }}</span>
+                                        {% endif %}
+                                    </div>
+                                    <span class="badge bg-light text-dark">{{ subtask.created_at|date:"M d, Y" }}</span>
+                                </div>
+                                {% empty %}
+                                <div class="list-group-item">No subtasks defined</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>

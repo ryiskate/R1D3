@@ -69,12 +69,8 @@
 {% block extra_js %}
 <script>
     $(document).ready(function() {
-        // Initialize datepicker for date fields
-        $('input[type="date"]').datepicker({
-            format: 'yyyy-mm-dd',
-            autoclose: true,
-            todayHighlight: true
-        });
+        // Using native HTML5 date input instead of Bootstrap datepicker
+        // This prevents the double calendar issue
         
         // Toggle location field based on virtual event checkbox
         $('#id_is_virtual').change(function() {

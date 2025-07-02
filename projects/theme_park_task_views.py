@@ -82,7 +82,7 @@ class ThemeParkTaskCreateView(LoginRequiredMixin, CreateView):
     """
     model = ThemeParkTask
     form_class = ThemeParkTaskForm
-    template_name = 'projects/task_form.html'
+    template_name = 'projects/theme_park_task_form.html'
     
     def form_valid(self, form):
         form.instance.created_by = self.request.user
@@ -108,7 +108,7 @@ class ThemeParkTaskUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateVie
     """
     model = ThemeParkTask
     form_class = ThemeParkTaskForm
-    template_name = 'projects/task_form.html'
+    template_name = 'projects/theme_park_task_form.html'
     
     def test_func(self):
         task = self.get_object()

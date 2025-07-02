@@ -56,8 +56,88 @@
                                 <div class="col-md-6">
                                     {{ form.assigned_to|as_crispy_field }}
                                 </div>
-                                <div class="col-md-6">
-                                    {{ form.estimated_hours|as_crispy_field }}
+                            </div>
+                        </div>
+                        
+                        <!-- Additional Information -->
+                        <div class="row">
+                            <div class="col-12">
+                                {{ form.has_additional_note|as_crispy_field }}
+                            </div>
+                        </div>
+                        
+                        <div class="row {% if not form.instance.has_additional_note %}d-none{% endif %}" id="additional-note-container">
+                            <div class="col-12">
+                                {{ form.additional_note_text|as_crispy_field }}
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                {{ form.output|as_crispy_field }}
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                {{ form.has_subtasks|as_crispy_field }}
+                            </div>
+                        </div>
+                        
+                        <div class="row {% if not form.instance.has_subtasks %}d-none{% endif %}" id="subtasks-container">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header bg-light">
+                                        <h5 class="mb-0">Subtasks</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="subtasks-formset">
+                                            <div class="subtask-form-template">
+                                                <div class="row mb-2 subtask-row">
+                                                    <div class="col-1">
+                                                        <div class="form-check">
+                                                            <input type="checkbox" class="form-check-input subtask-completed">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-10">
+                                                        <input type="text" class="form-control subtask-title" placeholder="Enter subtask">
+                                                    </div>
+                                                    <div class="col-1">
+                                                        <button type="button" class="btn btn-sm btn-danger remove-subtask">
+                                                            <i class="fas fa-times"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div id="subtasks-list">
+                                                <!-- Existing subtasks will be displayed here when editing -->
+                                                {% if subtasks %}
+                                                    {% for subtask in subtasks %}
+                                                    <div class="row mb-2 subtask-row" id="subtask-{{ subtask.id }}">
+                                                        <div class="col-1">
+                                                            <div class="form-check">
+                                                                <input type="checkbox" class="form-check-input subtask-completed" {% if subtask.is_completed %}checked{% endif %}>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-10">
+                                                            <input type="text" class="form-control subtask-title" value="{{ subtask.title }}">
+                                                        </div>
+                                                        <div class="col-1">
+                                                            <button type="button" class="btn btn-sm btn-danger remove-subtask">
+                                                                <i class="fas fa-times"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+                                            <div class="mt-3">
+                                                <button type="button" class="btn btn-sm btn-primary" id="add-subtask">
+                                                    <i class="fas fa-plus"></i> Add Subtask
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -157,12 +237,70 @@
             theme: 'bootstrap4'
         });
         
-        // Initialize datepicker for due date
-        $('#id_due_date').datepicker({
-            format: 'yyyy-mm-dd',
-            autoclose: true,
-            todayHighlight: true
+        // Native HTML5 date input is used instead of Bootstrap datepicker
+        // This prevents the double calendar issue
+        
+        // Handle additional note visibility
+        $('#id_has_additional_note').change(function() {
+            if($(this).is(':checked')) {
+                $('#additional-note-container').removeClass('d-none');
+            } else {
+                $('#additional-note-container').addClass('d-none');
+            }
         });
+        
+        // Handle subtasks visibility
+        $('#id_has_subtasks').change(function() {
+            if($(this).is(':checked')) {
+                $('#subtasks-container').removeClass('d-none');
+            } else {
+                $('#subtasks-container').addClass('d-none');
+            }
+        });
+        
+        // Add subtask
+        $('#add-subtask').click(function() {
+            var template = $('.subtask-form-template').html();
+            $('#subtasks-list').append(template);
+        });
+        
+        // Remove subtask (using event delegation for dynamically added elements)
+        $(document).on('click', '.remove-subtask', function() {
+            $(this).closest('.subtask-row').remove();
+        });
+        
+        // Handle form submission to collect subtasks data
+        $('form').submit(function() {
+            if($('#id_has_subtasks').is(':checked')) {
+                var subtasks = [];
+                $('#subtasks-list .subtask-row').each(function() {
+                    var $row = $(this);
+                    var subtaskId = $row.attr('id') ? $row.attr('id').replace('subtask-', '') : '';
+                    var title = $row.find('.subtask-title').val();
+                    var completed = $row.find('.subtask-completed').is(':checked');
+                    
+                    if(title) {
+                        subtasks.push({
+                            id: subtaskId,
+                            title: title,
+                            completed: completed
+                        });
+                    }
+                });
+                
+                // Add subtasks data as hidden input
+                $('<input>').attr({
+                    type: 'hidden',
+                    name: 'subtasks_data',
+                    value: JSON.stringify(subtasks)
+                }).appendTo('form');
+            }
+        });
+        
+        // Hide estimated_hours field if it exists
+        if ($('#div_id_estimated_hours').length) {
+            $('#div_id_estimated_hours').hide();
+        }
     });
 </script>
 {% endblock extra_js %}

@@ -1,10 +1,24 @@
 from django import forms
 from django.contrib.auth.models import User
+from django.forms import inlineformset_factory, formset_factory
 from .task_models import (
     BaseTask, R1D3Task, GameDevelopmentTask, EducationTask,
-    SocialMediaTask, ArcadeTask, ThemeParkTask
+    SocialMediaTask, ArcadeTask, ThemeParkTask, SubTask
 )
 from .game_models import GameMilestone
+from .widgets import TeamSelectWidget
+
+
+class SubTaskForm(forms.ModelForm):
+    """
+    Form for subtasks
+    """
+    class Meta:
+        model = SubTask
+        fields = ['title', 'is_completed']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control subtask-title', 'placeholder': 'Enter subtask'}),
+        }
 
 
 class BaseTaskForm(forms.ModelForm):
@@ -15,12 +29,22 @@ class BaseTaskForm(forms.ModelForm):
         model = BaseTask
         fields = [
             'title', 'description', 'task_type', 'status', 'priority',
-            'assigned_to', 'due_date', 'estimated_hours', 'actual_hours'
+            'assigned_to', 'team', 'due_date', 'has_additional_note', 'additional_note_text',
+            'has_subtasks', 'output'
         ]
         widgets = {
             'description': forms.Textarea(attrs={'rows': 3}),
             'due_date': forms.DateInput(attrs={'type': 'date'}),
+            'team': TeamSelectWidget(),
+            'additional_note_text': forms.Textarea(attrs={'rows': 2, 'class': 'additional-note-field'}),
+            'output': forms.Textarea(attrs={'rows': 4, 'class': 'output-field'}),
         }
+        
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Check if this is a ThemeParkTaskForm and remove estimated_hours if it exists
+        if self.__class__.__name__ == 'ThemeParkTaskForm' and 'estimated_hours' in self.fields:
+            del self.fields['estimated_hours']
 
 
 class R1D3TaskForm(BaseTaskForm):
@@ -87,17 +111,44 @@ class SocialMediaTaskForm(BaseTaskForm):
 
 class ArcadeTaskForm(BaseTaskForm):
     """
-    Form for arcade tasks
+    Form for arcade tasks - excludes estimated_hours field
     """
     class Meta(BaseTaskForm.Meta):
         model = ArcadeTask
-        fields = BaseTaskForm.Meta.fields + ['machine_id', 'location', 'maintenance_type']
+        fields = ['title', 'description', 'task_type', 'status', 'priority',
+                 'assigned_to', 'team', 'due_date', 'machine_id', 'location', 'maintenance_type',
+                 'has_additional_note', 'additional_note_text', 'has_subtasks', 'output']
+        exclude = ['estimated_hours']
+        
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Ensure estimated_hours is removed from the form fields
+        if 'estimated_hours' in self.fields:
+            del self.fields['estimated_hours']
 
 
 class ThemeParkTaskForm(BaseTaskForm):
     """
-    Form for theme park tasks
+    Form for theme park tasks - excludes estimated_hours field
     """
     class Meta(BaseTaskForm.Meta):
         model = ThemeParkTask
-        fields = BaseTaskForm.Meta.fields + ['attraction_id', 'zone', 'safety_priority']
+        fields = ['title', 'description', 'task_type', 'status', 'priority',
+                 'assigned_to', 'team', 'due_date', 'attraction_id', 'zone', 'safety_priority',
+                 'has_additional_note', 'additional_note_text', 'has_subtasks', 'output']
+        exclude = ['estimated_hours']
+        
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Ensure estimated_hours is removed from the form fields
+        if 'estimated_hours' in self.fields:
+            del self.fields['estimated_hours']
+
+
+# Create a formset for subtasks
+SubTaskFormSet = formset_factory(
+    SubTaskForm,
+    extra=3,  # Start with 3 empty forms
+    can_delete=True,
+    max_num=10  # Maximum of 10 subtasks
+)

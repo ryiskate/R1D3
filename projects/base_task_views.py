@@ -2,9 +2,12 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy, reverse
 from django.contrib import messages
+from django.contrib.contenttypes.models import ContentType
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from datetime import date
+from .task_models import SubTask
+import json
 
 class BaseTaskListView(LoginRequiredMixin, ListView):
     """
@@ -64,6 +67,15 @@ class BaseTaskDetailView(LoginRequiredMixin, DetailView):
             user == task.assigned_to
         )
         
+        # Get subtasks if the task has them
+        if task.has_subtasks:
+            content_type = ContentType.objects.get_for_model(task)
+            subtasks = SubTask.objects.filter(
+                content_type=content_type,
+                object_id=task.id
+            )
+            context['subtasks'] = subtasks
+        
         return context
 
 
@@ -71,7 +83,32 @@ class BaseTaskCreateView(LoginRequiredMixin, CreateView):
     """
     Base class for all task create views
     """
-    template_name = 'projects/task_form.html'
+    template_name = 'projects/unified_task_form.html'
+    
+    def form_valid(self, form):
+        # Set the created_by field to the current user
+        form.instance.created_by = self.request.user
+        response = super().form_valid(form)
+        
+        # Process subtasks if they exist
+        if form.instance.has_subtasks and 'subtasks' in self.request.POST:
+            subtasks_data = self.request.POST.getlist('subtasks')
+            content_type = ContentType.objects.get_for_model(self.object)
+            
+            for subtask_json in subtasks_data:
+                try:
+                    subtask_data = json.loads(subtask_json)
+                    if subtask_data.get('title'):
+                        SubTask.objects.create(
+                            content_type=content_type,
+                            object_id=self.object.id,
+                            title=subtask_data.get('title'),
+                            is_completed=subtask_data.get('completed', False)
+                        )
+                except json.JSONDecodeError:
+                    pass  # Skip invalid JSON data
+        
+        return response
     
     def get_success_url(self):
         """Default success URL - override in subclasses if needed"""
@@ -89,13 +126,65 @@ class BaseTaskUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     """
     Base class for all task update views
     """
-    template_name = 'projects/task_form.html'
+    template_name = 'projects/unified_task_form.html'
     
     def test_func(self):
         """Only allow staff, creator or assignee to update the task"""
         user = self.request.user
         task = self.get_object()
         return user.is_staff or user == task.created_by or user == task.assigned_to
+    
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        
+        # Get the content type for the task model
+        content_type = ContentType.objects.get_for_model(self.object)
+        
+        # Delete existing subtasks if the checkbox is unchecked
+        if not form.instance.has_subtasks:
+            SubTask.objects.filter(
+                content_type=content_type,
+                object_id=self.object.id
+            ).delete()
+        # Update existing subtasks
+        elif 'subtasks' in self.request.POST:
+            # First delete all existing subtasks
+            SubTask.objects.filter(
+                content_type=content_type,
+                object_id=self.object.id
+            ).delete()
+            
+            # Then create new ones from the form data
+            subtasks_data = self.request.POST.getlist('subtasks')
+            for subtask_json in subtasks_data:
+                try:
+                    subtask_data = json.loads(subtask_json)
+                    if subtask_data.get('title'):
+                        SubTask.objects.create(
+                            content_type=content_type,
+                            object_id=self.object.id,
+                            title=subtask_data.get('title'),
+                            is_completed=subtask_data.get('completed', False)
+                        )
+                except json.JSONDecodeError:
+                    pass  # Skip invalid JSON data
+        
+        return response
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Get existing subtasks for this task
+        if self.object and self.object.has_subtasks:
+            content_type = ContentType.objects.get_for_model(self.object)
+            subtasks = SubTask.objects.filter(
+                content_type=content_type,
+                object_id=self.object.id
+            )
+            context['subtasks'] = subtasks
+        
+        context['is_update'] = True
+        return context
     
     def get_success_url(self):
         """Default success URL - override in subclasses if needed"""

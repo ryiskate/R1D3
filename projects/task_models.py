@@ -1,6 +1,9 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils import timezone
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
+from .models import Team
 
 User = get_user_model()
 
@@ -47,6 +50,10 @@ class BaseTask(models.Model):
         User, on_delete=models.SET_NULL, 
         null=True, blank=True, related_name='%(class)s_assigned'
     )
+    team = models.ForeignKey(
+        Team, on_delete=models.SET_NULL,
+        null=True, blank=True, related_name='%(class)s_tasks'
+    )
     
     # Time tracking
     estimated_hours = models.DecimalField(max_digits=5, decimal_places=1, default=0)
@@ -57,6 +64,12 @@ class BaseTask(models.Model):
     
     # Task type for categorization
     task_type = models.CharField(max_length=100, blank=True)
+    
+    # Additional fields for notes and subtasks
+    has_additional_note = models.BooleanField(default=False, verbose_name="Add additional note")
+    additional_note_text = models.TextField(blank=True, null=True, verbose_name="Additional note")
+    has_subtasks = models.BooleanField(default=False, verbose_name="Add subtasks")
+    output = models.TextField(blank=True, null=True, verbose_name="Output")
     
     class Meta:
         abstract = True
@@ -81,6 +94,31 @@ class BaseTask(models.Model):
             'blocked': 30,
         }
         return status_percentages.get(self.status, 0)
+        
+
+class SubTask(models.Model):
+    """
+    Model for subtasks that can be added to any task type
+    Uses a generic foreign key to associate with any task model
+    """
+    # Link to parent task (any task model)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    parent_task = GenericForeignKey('content_type', 'object_id')
+    
+    # Subtask details
+    title = models.CharField(max_length=255)
+    is_completed = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['created_at']
+        verbose_name = 'Subtask'
+        verbose_name_plural = 'Subtasks'
+        
+    def __str__(self):
+        return self.title
 
 
 class R1D3Task(BaseTask):

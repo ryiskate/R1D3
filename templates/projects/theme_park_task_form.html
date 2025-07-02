@@ -101,6 +101,11 @@
             width: '100%'
         });
         
+        // Hide estimated_hours field if it exists
+        if ($('#div_id_estimated_hours').length) {
+            $('#div_id_estimated_hours').hide();
+        }
+        
         // Initialize select2 for area dropdown
         $('#id_area').select2({
             placeholder: "Select area",

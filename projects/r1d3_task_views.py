@@ -1,7 +1,7 @@
 """
 Views for handling general R1D3 company tasks in the R1D3 system.
 """
-from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView, View
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, View
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy, reverse
 from django.shortcuts import redirect
@@ -17,6 +17,7 @@ from datetime import date, timedelta
 from .task_models import R1D3Task
 from .task_forms import R1D3TaskForm
 from django.contrib.auth.models import User
+from .models import Team
 
 
 class R1D3TaskDashboardView(LoginRequiredMixin, ListView):
@@ -178,6 +179,17 @@ class R1D3TaskBatchUpdateView(LoginRequiredMixin, UpdateView):
                 update_data['assigned_to'] = user
             except User.DoesNotExist:
                 del update_data['assigned_to']
+                
+        # Handle team field
+        if 'team' in update_data:
+            if update_data['team'] == 'no_team':
+                update_data['team'] = None
+            elif update_data['team']:
+                try:
+                    team = Team.objects.get(id=update_data['team'])
+                    update_data['team'] = team
+                except Team.DoesNotExist:
+                    del update_data['team']
         
         # Update tasks
         updated_count = 0

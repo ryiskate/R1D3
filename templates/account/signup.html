@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Account Registration Disabled{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Registration Disabled</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Account registration is disabled. Please contact an administrator to create an account for you.
+                    </div>
+                    <p>If you already have an account, you can sign in below:</p>
+                    <a href="{% url 'account_login' %}" class="btn btn-primary">
+                        <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

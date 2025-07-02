@@ -371,10 +371,35 @@ class R1D3TaskUpdateView(LoginRequiredMixin, UpdateView):
     """
     Update an existing task from the global task dashboard.
     This view uses the task_type parameter to determine which model to use.
+    Can redirect to section-specific URLs for specialized task types.
     """
     template_name = 'projects/r1d3_task_form.html'
     login_url = '/'  # Redirect to home if not logged in
     context_object_name = 'task'
+    
+    def get(self, request, *args, **kwargs):
+        """Override get method to redirect to section-specific URLs when appropriate"""
+        from django.shortcuts import redirect
+        
+        task_type = self.kwargs.get('task_type')
+        task_id = self.kwargs.get('pk')
+        
+        # Map of task types to their section-specific URL names
+        section_url_map = {
+            'theme_park': 'theme_park:task_update',
+            'arcade': 'arcade:task_update',
+            'social_media': 'social_media:task_update',
+            'education': 'education:task_update',
+            'game_development': 'games:task_update',
+            # Add other sections as needed
+        }
+        
+        # If this task type should be redirected to a section-specific URL
+        if task_type in section_url_map:
+            return redirect(section_url_map[task_type], pk=task_id)
+        
+        # Default behavior for R1D3 tasks or if redirection fails
+        return super().get(request, *args, **kwargs)
     
     def get_object(self, queryset=None):
         # Import task models here to avoid circular imports
@@ -547,10 +572,36 @@ class R1D3TaskDetailView(LoginRequiredMixin, DetailView):
     """
     View an existing task from the global task dashboard.
     This view uses the task_type parameter to determine which model to use.
+    Can redirect to section-specific URLs for specialized task types.
     """
     template_name = 'projects/r1d3_task_detail.html'
     login_url = '/'  # Redirect to home if not logged in
     context_object_name = 'task'
+    
+    def get(self, request, *args, **kwargs):
+        """Override get method to redirect to section-specific URLs when appropriate"""
+        from django.shortcuts import redirect
+        from django.http import Http404
+        
+        task_type = self.kwargs.get('task_type')
+        task_id = self.kwargs.get('pk')
+        
+        # Map of task types to their section-specific URL names
+        section_url_map = {
+            'theme_park': 'theme_park:task_detail',
+            'arcade': 'arcade:task_detail',
+            'social_media': 'social_media:task_detail',
+            'education': 'education:task_detail',
+            'game_development': 'games:task_detail',
+            # Add other sections as needed
+        }
+        
+        # If this task type should be redirected to a section-specific URL
+        if task_type in section_url_map:
+            return redirect(section_url_map[task_type], pk=task_id)
+        
+        # Default behavior for R1D3 tasks or if redirection fails
+        return super().get(request, *args, **kwargs)
     
     def get_object(self, queryset=None):
         # Import task models here to avoid circular imports
@@ -604,7 +655,7 @@ class R1D3TaskDetailView(LoginRequiredMixin, DetailView):
             self.section_name = 'Arcade Task'
             self.active_department = 'arcade'
         elif model_name == 'ThemeParkTask':
-            self.template_name = 'projects/theme_park_task_detail.html'
+            self.template_name = 'theme_park/task_detail.html'
             self.section_name = 'Theme Park Task'
             self.active_department = 'theme_park'
         else:  # Default to R1D3Task

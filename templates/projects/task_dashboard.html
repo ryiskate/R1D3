@@ -108,6 +108,7 @@
                             <th width="120">Status</th>
                             <th width="100">Priority</th>
                             <th width="120">Assigned To</th>
+                            <th width="120">Team</th>
                             <th width="120">Due Date</th>
                             <th class="action-column">Actions</th>
                         </tr>
@@ -161,6 +162,15 @@
                                 </span>
                                 {% else %}
                                 <span class="text-muted">Unassigned</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if task.team %}
+                                <span class="badge rounded-pill bg-info">
+                                    <i class="fas fa-users me-1"></i> {{ task.team.name }}
+                                </span>
+                                {% else %}
+                                <span class="text-muted">No team</span>
                                 {% endif %}
                             </td>
                             <td>
@@ -328,6 +338,16 @@
                         </select>
                     </div>
                     <div class="mb-3">
+                        <label for="batchTeam" class="form-label">Team</label>
+                        <select class="form-select" id="batchTeam" name="team">
+                            <option value="">No Change</option>
+                            <option value="no_team">No Team</option>
+                            {% for team in teams %}
+                            <option value="{{ team.id }}">{{ team.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
                         <label for="batchDueDate" class="form-label">Due Date</label>
                         <input type="date" class="form-control" id="batchDueDate" name="due_date">
                         <div class="form-check mt-2">
@@ -417,6 +437,7 @@
                     status: formData.get('status') || null,
                     priority: formData.get('priority') || null,
                     assigned_to: formData.get('assigned_to') || null,
+                    team: formData.get('team') || null,
                     due_date: formData.get('due_date') || null,
                     clear_due_date: document.getElementById('clearDueDate').checked
                 };

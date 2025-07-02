@@ -5,7 +5,29 @@ from strategy.models import Goal, Objective
 from .game_models import GameTask, GameProject, GameMilestone, GDDSection
 
 # Make these models available at the package level
-__all__ = ['GameTask', 'GameProject', 'GameMilestone', 'GDDSection']
+__all__ = ['GameTask', 'GameProject', 'GameMilestone', 'GDDSection', 'Team']
+
+class Team(TimeStampedModel):
+    """
+    Team model for organizing users into functional teams
+    """
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
+    members = models.ManyToManyField(User, related_name='teams')
+    leader = models.ForeignKey(
+        User, on_delete=models.SET_NULL, 
+        null=True, blank=True, related_name='led_teams'
+    )
+    
+    def __str__(self):
+        return self.name
+        
+    def get_members_display(self):
+        """Return a string representation of team members"""
+        members_list = ", ".join([user.get_full_name() or user.username for user in self.members.all()[:3]])
+        if self.members.count() > 3:
+            members_list += f" and {self.members.count() - 3} more"
+        return members_list if members_list else "No members"
 
 class Project(TimeStampedModel):
     """

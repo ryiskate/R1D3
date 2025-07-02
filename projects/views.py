@@ -5,7 +5,7 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from django.db.models import Q, Sum, Count
 
-from .models import Project, Milestone, Task, Risk
+from .models import Project, Milestone, Task, Risk, Team
 from .forms import ProjectForm, MilestoneForm, TaskForm, RiskForm
 
 
@@ -177,5 +177,13 @@ class TaskListView(LoginRequiredMixin, ListView):
             'done': tasks.filter(status='done').count(),
             'blocked': tasks.filter(status='blocked').count(),
         }
+        
+        # Add teams for the batch update modal
+        context['teams'] = Team.objects.all().order_by('name')
+        
+        # Add users for the batch update modal
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        context['users'] = User.objects.filter(is_active=True).order_by('first_name', 'last_name')
             
         return context

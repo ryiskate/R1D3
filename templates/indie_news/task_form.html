@@ -80,12 +80,8 @@
             theme: 'bootstrap4',
         });
         
-        // Initialize datepicker for date fields
-        $('input[type="date"]').datepicker({
-            format: 'yyyy-mm-dd',
-            autoclose: true,
-            todayHighlight: true
-        });
+        // Using native HTML5 date input instead of Bootstrap datepicker
+        // This prevents the double calendar issue
     });
 </script>
 {% endblock %}
