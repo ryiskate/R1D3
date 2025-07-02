@@ -10,6 +10,8 @@ from django.db.models import Q, Count
 import json
 from datetime import date, datetime, timedelta
 
+from core.mixins import BreadcrumbMixin
+
 from .models import IndieNewsTask, IndieGame, IndieEvent, IndieTool
 from .forms import IndieNewsTaskForm, IndieGameForm, IndieEventForm, IndieToolForm
 from django.contrib.auth import get_user_model
@@ -17,13 +19,19 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 # Task Views
-class IndieNewsTaskListView(LoginRequiredMixin, ListView):
+class IndieNewsTaskListView(BreadcrumbMixin, LoginRequiredMixin, ListView):
     """
     Display a list of indie news tasks
     """
     model = IndieNewsTask
     template_name = 'indie_news/task_list.html'
     context_object_name = 'tasks'
+    
+    def get_breadcrumbs(self):
+        return [
+            {'title': 'Indie News', 'url': reverse('indie_news:dashboard')},
+            {'title': 'Tasks', 'url': None}
+        ]
     
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -77,13 +85,20 @@ class IndieNewsTaskListView(LoginRequiredMixin, ListView):
         return context
 
 
-class IndieNewsTaskCreateView(LoginRequiredMixin, CreateView):
+class IndieNewsTaskCreateView(BreadcrumbMixin, LoginRequiredMixin, CreateView):
     """
     Create a new indie news task
     """
     model = IndieNewsTask
     form_class = IndieNewsTaskForm
     template_name = 'indie_news/task_form.html'
+    
+    def get_breadcrumbs(self):
+        return [
+            {'title': 'Indie News', 'url': reverse('indie_news:dashboard')},
+            {'title': 'Tasks', 'url': reverse('indie_news:task_list')},
+            {'title': 'New Task', 'url': None}
+        ]
     
     def form_valid(self, form):
         form.instance.created_by = self.request.user
@@ -94,22 +109,39 @@ class IndieNewsTaskCreateView(LoginRequiredMixin, CreateView):
         return reverse('indie_news:task_list')
 
 
-class IndieNewsTaskDetailView(LoginRequiredMixin, DetailView):
+class IndieNewsTaskDetailView(BreadcrumbMixin, LoginRequiredMixin, DetailView):
     """
     View details of an indie news task
     """
     model = IndieNewsTask
     template_name = 'indie_news/task_detail.html'
     context_object_name = 'task'
+    
+    def get_breadcrumbs(self):
+        task = self.get_object()
+        return [
+            {'title': 'Indie News', 'url': reverse('indie_news:dashboard')},
+            {'title': 'Tasks', 'url': reverse('indie_news:task_list')},
+            {'title': task.title, 'url': None}
+        ]
 
 
-class IndieNewsTaskUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+class IndieNewsTaskUpdateView(BreadcrumbMixin, LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     """
     Update an existing indie news task
     """
     model = IndieNewsTask
     form_class = IndieNewsTaskForm
     template_name = 'indie_news/task_form.html'
+    
+    def get_breadcrumbs(self):
+        task = self.get_object()
+        return [
+            {'title': 'Indie News', 'url': reverse('indie_news:dashboard')},
+            {'title': 'Tasks', 'url': reverse('indie_news:task_list')},
+            {'title': task.title, 'url': reverse('indie_news:task_detail', kwargs={'pk': task.pk})},
+            {'title': 'Edit', 'url': None}
+        ]
     
     def test_func(self):
         task = self.get_object()
@@ -197,13 +229,19 @@ class IndieNewsTaskBatchUpdateView(LoginRequiredMixin, View):
 
 
 # Indie Game Views
-class IndieGameListView(LoginRequiredMixin, ListView):
+class IndieGameListView(BreadcrumbMixin, LoginRequiredMixin, ListView):
     """
     Display a list of indie games
     """
     model = IndieGame
     template_name = 'indie_news/game_list.html'
     context_object_name = 'games'
+    
+    def get_breadcrumbs(self):
+        return [
+            {'title': 'Indie News', 'url': reverse('indie_news:dashboard')},
+            {'title': 'Games', 'url': None}
+        ]
     
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -236,13 +274,20 @@ class IndieGameListView(LoginRequiredMixin, ListView):
         return context
 
 
-class IndieGameCreateView(LoginRequiredMixin, CreateView):
+class IndieGameCreateView(BreadcrumbMixin, LoginRequiredMixin, CreateView):
     """
     Create a new indie game
     """
     model = IndieGame
     form_class = IndieGameForm
     template_name = 'indie_news/game_form.html'
+    
+    def get_breadcrumbs(self):
+        return [
+            {'title': 'Indie News', 'url': reverse('indie_news:dashboard')},
+            {'title': 'Games', 'url': reverse('indie_news:game_list')},
+            {'title': 'New Game', 'url': None}
+        ]
     
     def form_valid(self, form):
         form.instance.added_by = self.request.user
@@ -253,22 +298,39 @@ class IndieGameCreateView(LoginRequiredMixin, CreateView):
         return reverse('indie_news:game_list')
 
 
-class IndieGameDetailView(LoginRequiredMixin, DetailView):
+class IndieGameDetailView(BreadcrumbMixin, LoginRequiredMixin, DetailView):
     """
     View details of an indie game
     """
     model = IndieGame
     template_name = 'indie_news/game_detail.html'
     context_object_name = 'game'
+    
+    def get_breadcrumbs(self):
+        game = self.get_object()
+        return [
+            {'title': 'Indie News', 'url': reverse('indie_news:dashboard')},
+            {'title': 'Games', 'url': reverse('indie_news:game_list')},
+            {'title': game.title, 'url': None}
+        ]
 
 
-class IndieGameUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+class IndieGameUpdateView(BreadcrumbMixin, LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     """
     Update an existing indie game
     """
     model = IndieGame
     form_class = IndieGameForm
     template_name = 'indie_news/game_form.html'
+    
+    def get_breadcrumbs(self):
+        game = self.get_object()
+        return [
+            {'title': 'Indie News', 'url': reverse('indie_news:dashboard')},
+            {'title': 'Games', 'url': reverse('indie_news:game_list')},
+            {'title': game.title, 'url': reverse('indie_news:game_detail', kwargs={'pk': game.pk})},
+            {'title': 'Edit', 'url': None}
+        ]
     
     def test_func(self):
         game = self.get_object()
@@ -302,13 +364,19 @@ class IndieGameDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 
 # Event Views
-class IndieEventListView(LoginRequiredMixin, ListView):
+class IndieEventListView(BreadcrumbMixin, LoginRequiredMixin, ListView):
     """
     Display a list of indie events
     """
     model = IndieEvent
     template_name = 'indie_news/event_list.html'
     context_object_name = 'events'
+    
+    def get_breadcrumbs(self):
+        return [
+            {'title': 'Indie News', 'url': reverse('indie_news:dashboard')},
+            {'title': 'Events', 'url': None}
+        ]
     
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -342,13 +410,20 @@ class IndieEventListView(LoginRequiredMixin, ListView):
         return context
 
 
-class IndieEventCreateView(LoginRequiredMixin, CreateView):
+class IndieEventCreateView(BreadcrumbMixin, LoginRequiredMixin, CreateView):
     """
     Create a new indie event
     """
     model = IndieEvent
     form_class = IndieEventForm
     template_name = 'indie_news/event_form.html'
+    
+    def get_breadcrumbs(self):
+        return [
+            {'title': 'Indie News', 'url': reverse('indie_news:dashboard')},
+            {'title': 'Events', 'url': reverse('indie_news:event_list')},
+            {'title': 'New Event', 'url': None}
+        ]
     
     def form_valid(self, form):
         form.instance.added_by = self.request.user
@@ -359,22 +434,39 @@ class IndieEventCreateView(LoginRequiredMixin, CreateView):
         return reverse('indie_news:event_list')
 
 
-class IndieEventDetailView(LoginRequiredMixin, DetailView):
+class IndieEventDetailView(BreadcrumbMixin, LoginRequiredMixin, DetailView):
     """
     View details of an indie event
     """
     model = IndieEvent
     template_name = 'indie_news/event_detail.html'
     context_object_name = 'event'
+    
+    def get_breadcrumbs(self):
+        event = self.get_object()
+        return [
+            {'title': 'Indie News', 'url': reverse('indie_news:dashboard')},
+            {'title': 'Events', 'url': reverse('indie_news:event_list')},
+            {'title': event.name, 'url': None}
+        ]
 
 
-class IndieEventUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+class IndieEventUpdateView(BreadcrumbMixin, LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     """
     Update an existing indie event
     """
     model = IndieEvent
     form_class = IndieEventForm
     template_name = 'indie_news/event_form.html'
+    
+    def get_breadcrumbs(self):
+        event = self.get_object()
+        return [
+            {'title': 'Indie News', 'url': reverse('indie_news:dashboard')},
+            {'title': 'Events', 'url': reverse('indie_news:event_list')},
+            {'title': event.name, 'url': reverse('indie_news:event_detail', kwargs={'pk': event.pk})},
+            {'title': 'Edit', 'url': None}
+        ]
     
     def test_func(self):
         event = self.get_object()
@@ -408,13 +500,19 @@ class IndieEventDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 
 # Tool Views
-class IndieToolListView(LoginRequiredMixin, ListView):
+class IndieToolListView(BreadcrumbMixin, LoginRequiredMixin, ListView):
     """
     Display a list of indie development tools
     """
     model = IndieTool
     template_name = 'indie_news/tool_list.html'
     context_object_name = 'tools'
+    
+    def get_breadcrumbs(self):
+        return [
+            {'title': 'Indie News', 'url': reverse('indie_news:dashboard')},
+            {'title': 'Tools', 'url': None}
+        ]
     
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -446,13 +544,20 @@ class IndieToolListView(LoginRequiredMixin, ListView):
         return context
 
 
-class IndieToolCreateView(LoginRequiredMixin, CreateView):
+class IndieToolCreateView(BreadcrumbMixin, LoginRequiredMixin, CreateView):
     """
     Create a new indie development tool
     """
     model = IndieTool
     form_class = IndieToolForm
     template_name = 'indie_news/tool_form.html'
+    
+    def get_breadcrumbs(self):
+        return [
+            {'title': 'Indie News', 'url': reverse('indie_news:dashboard')},
+            {'title': 'Tools', 'url': reverse('indie_news:tool_list')},
+            {'title': 'New Tool', 'url': None}
+        ]
     
     def form_valid(self, form):
         form.instance.added_by = self.request.user
@@ -463,22 +568,39 @@ class IndieToolCreateView(LoginRequiredMixin, CreateView):
         return reverse('indie_news:tool_list')
 
 
-class IndieToolDetailView(LoginRequiredMixin, DetailView):
+class IndieToolDetailView(BreadcrumbMixin, LoginRequiredMixin, DetailView):
     """
     View details of an indie development tool
     """
     model = IndieTool
     template_name = 'indie_news/tool_detail.html'
     context_object_name = 'tool'
+    
+    def get_breadcrumbs(self):
+        tool = self.get_object()
+        return [
+            {'title': 'Indie News', 'url': reverse('indie_news:dashboard')},
+            {'title': 'Tools', 'url': reverse('indie_news:tool_list')},
+            {'title': tool.name, 'url': None}
+        ]
 
 
-class IndieToolUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+class IndieToolUpdateView(BreadcrumbMixin, LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     """
     Update an existing indie development tool
     """
     model = IndieTool
     form_class = IndieToolForm
     template_name = 'indie_news/tool_form.html'
+    
+    def get_breadcrumbs(self):
+        tool = self.get_object()
+        return [
+            {'title': 'Indie News', 'url': reverse('indie_news:dashboard')},
+            {'title': 'Tools', 'url': reverse('indie_news:tool_list')},
+            {'title': tool.name, 'url': reverse('indie_news:tool_detail', kwargs={'pk': tool.pk})},
+            {'title': 'Edit', 'url': None}
+        ]
     
     def test_func(self):
         tool = self.get_object()
@@ -512,11 +634,16 @@ class IndieToolDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 
 # Dashboard View
-class IndieNewsDashboardView(LoginRequiredMixin, TemplateView):
+class IndieNewsDashboardView(BreadcrumbMixin, LoginRequiredMixin, TemplateView):
     """
     Dashboard for the Indie News section showing stats and recent items
     """
     template_name = 'indie_news/dashboard.html'
+    
+    def get_breadcrumbs(self):
+        return [
+            {'title': 'Indie News', 'url': None}
+        ]
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

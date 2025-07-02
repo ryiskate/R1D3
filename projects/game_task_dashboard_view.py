@@ -3,16 +3,41 @@ from django.views.generic import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count, Q, Sum, Case, When, IntegerField
 from django.utils import timezone
+from django.urls import reverse
 from datetime import timedelta
+
+from core.mixins import BreadcrumbMixin
 
 from .game_models import GameProject, GameMilestone, GDDFeature
 from .task_models import GameDevelopmentTask
 
-class GameTaskDashboardView(LoginRequiredMixin, View):
+class GameTaskDashboardView(BreadcrumbMixin, LoginRequiredMixin, View):
     """
     Comprehensive task management dashboard for game tasks
     """
     template_name = 'projects/game_task_dashboard.html'
+    
+    def get_breadcrumbs(self):
+        breadcrumbs = [
+            {'title': 'Game Development', 'url': reverse('games:dashboard')},
+            {'title': 'Tasks', 'url': None}
+        ]
+        
+        # Add game to breadcrumbs if available
+        game_id = self.kwargs.get('game_id') or self.request.GET.get('game')
+        if game_id:
+            try:
+                game = GameProject.objects.get(pk=game_id)
+                # Update breadcrumbs with game info
+                breadcrumbs = [
+                    {'title': 'Game Development', 'url': reverse('games:dashboard')},
+                    {'title': game.title, 'url': reverse('games:game_detail', args=[game.id])},
+                    {'title': 'Tasks', 'url': None}
+                ]
+            except GameProject.DoesNotExist:
+                pass
+        
+        return breadcrumbs
     
     def get(self, request, game_id=None):
         context = {}

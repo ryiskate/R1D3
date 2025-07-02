@@ -413,6 +413,13 @@
                 </ul>
             </nav>
             
+            <!-- Breadcrumbs -->
+            <div class="container-fluid mt-2 mb-3">
+                {% block breadcrumbs %}
+                {% include 'core/components/breadcrumbs.html' with breadcrumbs=breadcrumbs %}
+                {% endblock %}
+            </div>
+            
             <!-- Main Content -->
             <main>
                 {% if messages %}

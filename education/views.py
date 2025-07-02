@@ -6,8 +6,11 @@ from django.utils import timezone
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.utils.decorators import method_decorator
+from django.urls import reverse
 import json
 from datetime import date, timedelta
+
+from core.mixins import BreadcrumbMixin
 
 from projects.game_models import GameTask
 from projects.task_models import EducationTask
@@ -54,9 +57,15 @@ class ScheduleView(LoginRequiredMixin, TemplateView):
         return context
 
 
-class EducationTasksView(LoginRequiredMixin, TemplateView):
+class EducationTasksView(BreadcrumbMixin, LoginRequiredMixin, TemplateView):
     """View for displaying education-specific tasks in a dashboard format"""
     template_name = 'education/tasks.html'
+    
+    def get_breadcrumbs(self):
+        return [
+            {'title': 'Education', 'url': reverse('education:dashboard')},
+            {'title': 'Tasks', 'url': None}
+        ]
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -174,11 +183,18 @@ class EducationTaskBatchUpdateView(LoginRequiredMixin, View):
             return JsonResponse({'success': False, 'message': f'Error: {str(e)}'}, status=500)
 
 
-class EducationTaskCreateView(LoginRequiredMixin, TemplateView):
+class EducationTaskCreateView(BreadcrumbMixin, LoginRequiredMixin, TemplateView):
     """
     View for creating new education tasks using the object-oriented EducationTask model
     """
     template_name = 'education/task_form.html'
+    
+    def get_breadcrumbs(self):
+        return [
+            {'title': 'Education', 'url': reverse('education:dashboard')},
+            {'title': 'Tasks', 'url': reverse('education:tasks')},
+            {'title': 'New Task', 'url': None}
+        ]
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -207,11 +223,20 @@ class EducationTaskCreateView(LoginRequiredMixin, TemplateView):
         return self.render_to_response(context)
 
 
-class EducationTaskDetailView(LoginRequiredMixin, TemplateView):
+class EducationTaskDetailView(BreadcrumbMixin, LoginRequiredMixin, TemplateView):
     """
     View for displaying education task details
     """
     template_name = 'education/task_detail.html'
+    
+    def get_breadcrumbs(self):
+        task_id = self.kwargs.get('pk')
+        task = EducationTask.objects.get(pk=task_id)
+        return [
+            {'title': 'Education', 'url': reverse('education:dashboard')},
+            {'title': 'Tasks', 'url': reverse('education:tasks')},
+            {'title': task.title, 'url': None}
+        ]
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -227,11 +252,21 @@ class EducationTaskDetailView(LoginRequiredMixin, TemplateView):
         return context
 
 
-class EducationTaskUpdateView(LoginRequiredMixin, TemplateView):
+class EducationTaskUpdateView(BreadcrumbMixin, LoginRequiredMixin, TemplateView):
     """
     View for updating education tasks
     """
     template_name = 'education/task_form.html'
+    
+    def get_breadcrumbs(self):
+        task_id = self.kwargs.get('pk')
+        task = EducationTask.objects.get(pk=task_id)
+        return [
+            {'title': 'Education', 'url': reverse('education:dashboard')},
+            {'title': 'Tasks', 'url': reverse('education:tasks')},
+            {'title': task.title, 'url': reverse('education:task_detail', kwargs={'pk': task_id})},
+            {'title': 'Edit', 'url': None}
+        ]
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

@@ -6,9 +6,11 @@ from django.utils import timezone
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.utils.decorators import method_decorator
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 import json
 from datetime import date, timedelta
+
+from core.mixins import BreadcrumbMixin
 
 from projects.game_models import GameTask
 from projects.task_models import SocialMediaTask
@@ -56,11 +58,18 @@ class AnalyticsView(LoginRequiredMixin, TemplateView):
         return context
 
 
-class SocialMediaTaskCreateView(LoginRequiredMixin, TemplateView):
+class SocialMediaTaskCreateView(BreadcrumbMixin, LoginRequiredMixin, TemplateView):
     """
     View for creating new social media tasks using the object-oriented SocialMediaTask model
     """
     template_name = 'projects/social_media_task_form.html'
+    
+    def get_breadcrumbs(self):
+        return [
+            {'title': 'Social Media', 'url': reverse('social_media:dashboard')},
+            {'title': 'Tasks', 'url': reverse('social_media:tasks')},
+            {'title': 'New Task', 'url': None}
+        ]
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -92,13 +101,19 @@ class SocialMediaTaskCreateView(LoginRequiredMixin, TemplateView):
         return render(request, self.template_name, context)
 
 
-class SocialMediaTaskDetailView(LoginRequiredMixin, DetailView):
-    """
-    View for displaying details of a specific social media task
-    """
+class SocialMediaTaskDetailView(BreadcrumbMixin, LoginRequiredMixin, DetailView):
+    """View for displaying details of a specific social media task"""
     model = SocialMediaTask
     template_name = 'social_media/task_detail.html'
     context_object_name = 'task'
+    
+    def get_breadcrumbs(self):
+        task = self.get_object()
+        return [
+            {'title': 'Social Media', 'url': reverse('social_media:dashboard')},
+            {'title': 'Tasks', 'url': reverse('social_media:tasks')},
+            {'title': task.title, 'url': None}
+        ]
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -107,11 +122,21 @@ class SocialMediaTaskDetailView(LoginRequiredMixin, DetailView):
         return context
 
 
-class SocialMediaTaskUpdateView(LoginRequiredMixin, TemplateView):
+class SocialMediaTaskUpdateView(BreadcrumbMixin, LoginRequiredMixin, TemplateView):
     """
     View for updating an existing social media task
     """
     template_name = 'projects/social_media_task_form.html'
+    
+    def get_breadcrumbs(self):
+        task_id = self.kwargs.get('pk')
+        task = SocialMediaTask.objects.get(pk=task_id)
+        return [
+            {'title': 'Social Media', 'url': reverse('social_media:dashboard')},
+            {'title': 'Tasks', 'url': reverse('social_media:tasks')},
+            {'title': task.title, 'url': reverse('social_media:task_detail', kwargs={'pk': task_id})},
+            {'title': 'Edit', 'url': None}
+        ]
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -298,11 +323,17 @@ class SocialMediaTaskBatchUpdateView(LoginRequiredMixin, View):
         except Exception as e:
             return JsonResponse({'success': False, 'message': f'Error: {str(e)}'}, status=500)
 
-class SocialMediaTasksView(LoginRequiredMixin, ListView):
+class SocialMediaTasksView(BreadcrumbMixin, LoginRequiredMixin, ListView):
     """View for displaying social media-specific tasks in a dashboard format"""
     model = SocialMediaTask
     template_name = 'social_media/tasks.html'
     context_object_name = 'tasks'
+    
+    def get_breadcrumbs(self):
+        return [
+            {'title': 'Social Media', 'url': reverse('social_media:dashboard')},
+            {'title': 'Tasks', 'url': None}
+        ]
     
     def get_queryset(self):
         # Get all social media tasks

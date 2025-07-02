@@ -1,0 +1,29 @@
+{% comment %}
+Reusable breadcrumb component for the R1D3 system
+Usage:
+Include this template with:
+{% include 'core/components/breadcrumbs.html' with breadcrumbs=breadcrumbs %}
+
+Where breadcrumbs is a list of dictionaries with 'title' and 'url' keys.
+The last item in the list will be marked as active (no link).
+
+Example:
+breadcrumbs = [
+    {'title': 'Dashboard', 'url': url_for('dashboard')},
+    {'title': 'Tasks', 'url': url_for('tasks')},
+    {'title': 'Task Title', 'url': None}  # Last item has no URL
+]
+{% endcomment %}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb bg-light p-2 rounded">
+        <li class="breadcrumb-item"><a href="{% url 'core:home' %}"><i class="fas fa-home"></i> Home</a></li>
+        {% for crumb in breadcrumbs %}
+            {% if forloop.last %}
+                <li class="breadcrumb-item active">{{ crumb.title }}</li>
+            {% else %}
+                <li class="breadcrumb-item"><a href="{{ crumb.url }}">{{ crumb.title }}</a></li>
+            {% endif %}
+        {% endfor %}
+    </ol>
+</nav>

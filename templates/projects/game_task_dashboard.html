@@ -3,6 +3,8 @@
 
 {% block dashboard_title %}{% if game %}{{ game.title }} Tasks{% else %}Game Development Tasks{% endif %}{% endblock %}
 
+{% block table_title %}Game Development Tasks{% endblock %}
+
 {% block dashboard_heading %}{% if game %}{{ game.title }} Tasks{% else %}Game Development Tasks{% endif %}{% endblock %}
 
 {% block new_task_url %}{% if game %}{% url 'games:task_create' game.id %}{% else %}{% url 'games:task_create' %}{% endif %}{% endblock %}
@@ -15,6 +17,12 @@
 {% block task_edit_url %}{% url 'games:task_update' pk=task.id %}{% endblock %}
 
 {% block task_delete_url %}{% url 'games:task_delete' pk=task.id %}{% endblock %}
+
+{% block table_header_buttons %}
+<div>
+    <!-- All buttons removed as requested -->
+</div>
+{% endblock %}
 
 {% block section_stats %}{% endblock %}
 

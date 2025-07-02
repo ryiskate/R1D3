@@ -3,11 +3,13 @@ from django.views.generic import TemplateView, ListView, CreateView, UpdateView,
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Count
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.contrib import messages
 from django.http import JsonResponse
 from datetime import date, timedelta
 import json
+
+from core.mixins import BreadcrumbMixin
 
 from projects.game_models import GameTask
 from projects.task_models import ArcadeTask
@@ -54,11 +56,17 @@ class RevenueView(LoginRequiredMixin, TemplateView):
         return context
 
 
-class ArcadeTasksView(LoginRequiredMixin, ListView):
+class ArcadeTasksView(BreadcrumbMixin, LoginRequiredMixin, ListView):
     """View for arcade department tasks"""
     model = ArcadeTask
     template_name = 'arcade/tasks.html'
     context_object_name = 'arcade_tasks'
+    
+    def get_breadcrumbs(self):
+        return [
+            {'title': 'Arcade', 'url': reverse('arcade:dashboard')},
+            {'title': 'Tasks', 'url': None}
+        ]
     
     def get_queryset(self):
         queryset = ArcadeTask.objects.all()
@@ -120,11 +128,19 @@ class ArcadeTasksView(LoginRequiredMixin, ListView):
         return context
 
 
-class ArcadeTaskDetailView(LoginRequiredMixin, DetailView):
+class ArcadeTaskDetailView(BreadcrumbMixin, LoginRequiredMixin, DetailView):
     """View for viewing arcade task details"""
     model = ArcadeTask
     template_name = 'arcade/task_detail.html'
     context_object_name = 'task'
+    
+    def get_breadcrumbs(self):
+        task = self.get_object()
+        return [
+            {'title': 'Arcade', 'url': reverse('arcade:dashboard')},
+            {'title': 'Tasks', 'url': reverse('arcade:tasks')},
+            {'title': task.title, 'url': None}
+        ]
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -133,13 +149,22 @@ class ArcadeTaskDetailView(LoginRequiredMixin, DetailView):
         return context
 
 
-class ArcadeTaskUpdateView(LoginRequiredMixin, UpdateView):
+class ArcadeTaskUpdateView(BreadcrumbMixin, LoginRequiredMixin, UpdateView):
     """View for updating arcade tasks"""
     model = ArcadeTask
     template_name = 'arcade/task_form.html'
     from projects.task_forms import ArcadeTaskForm
     form_class = ArcadeTaskForm
     success_url = reverse_lazy('arcade:tasks')
+    
+    def get_breadcrumbs(self):
+        task = self.get_object()
+        return [
+            {'title': 'Arcade', 'url': reverse('arcade:dashboard')},
+            {'title': 'Tasks', 'url': reverse('arcade:tasks')},
+            {'title': task.title, 'url': reverse('arcade:task_detail', kwargs={'pk': task.pk})},
+            {'title': 'Edit', 'url': None}
+        ]
     
     def form_valid(self, form):
         messages.success(self.request, 'Arcade task updated successfully!')
@@ -250,13 +275,20 @@ class ArcadeTaskBatchUpdateView(LoginRequiredMixin, View):
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
 
-class ArcadeTaskCreateView(LoginRequiredMixin, CreateView):
+class ArcadeTaskCreateView(BreadcrumbMixin, LoginRequiredMixin, CreateView):
     """View for creating arcade tasks"""
     model = ArcadeTask
     template_name = 'arcade/task_form.html'
     from projects.task_forms import ArcadeTaskForm
     form_class = ArcadeTaskForm
     success_url = reverse_lazy('arcade:tasks')
+    
+    def get_breadcrumbs(self):
+        return [
+            {'title': 'Arcade', 'url': reverse('arcade:dashboard')},
+            {'title': 'Tasks', 'url': reverse('arcade:tasks')},
+            {'title': 'New Task', 'url': None}
+        ]
     
     def form_valid(self, form):
         form.instance.created_by = self.request.user

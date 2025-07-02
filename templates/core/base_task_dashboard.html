@@ -87,7 +87,21 @@
     <div class="row mb-4">
         <div class="col-md-8">
             <h1>{% block dashboard_heading %}Task Dashboard{% endblock %}</h1>
-            {% block breadcrumbs %}{% endblock %}
+            {% block breadcrumbs %}
+                {% if view.get_breadcrumbs %}
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        {% for breadcrumb in view.get_breadcrumbs %}
+                            {% if breadcrumb.url %}
+                                <li class="breadcrumb-item"><a href="{{ breadcrumb.url }}">{{ breadcrumb.title }}</a></li>
+                            {% else %}
+                                <li class="breadcrumb-item active" aria-current="page">{{ breadcrumb.title }}</li>
+                            {% endif %}
+                        {% endfor %}
+                    </ol>
+                </nav>
+                {% endif %}
+            {% endblock %}
         </div>
         <div class="col-md-4 text-end">
             {% block header_buttons %}
@@ -220,6 +234,7 @@
                 <span class="ms-2 badge bg-info">Filtered</span>
                 {% endif %}
             </h6>
+            {% block table_header_buttons %}
             <div>
                 <a href="{% block table_new_task_url %}{% url 'core:r1d3_task_create' %}{% endblock %}" class="btn btn-sm btn-primary">
                     <i class="fas fa-plus-circle me-1"></i> {% block table_new_task_text %}New Task{% endblock %}
@@ -236,6 +251,7 @@
                 </a>
                 {% endif %}
             </div>
+            {% endblock %}
         </div>
         <div class="card-body">
             <div class="table-responsive">

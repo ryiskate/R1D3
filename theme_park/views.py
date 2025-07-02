@@ -3,11 +3,13 @@ from django.views.generic import TemplateView, ListView, CreateView, UpdateView,
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Count
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.contrib import messages
 from django.http import JsonResponse
 from datetime import date, timedelta
 import json
+
+from core.mixins import BreadcrumbMixin
 
 from projects.task_models import ThemeParkTask
 from django.contrib.auth.models import User
@@ -53,11 +55,17 @@ class ParkMapView(LoginRequiredMixin, TemplateView):
         return context
 
 
-class ThemeParkTasksView(LoginRequiredMixin, ListView):
+class ThemeParkTasksView(BreadcrumbMixin, LoginRequiredMixin, ListView):
     """View for theme park department tasks"""
     model = ThemeParkTask
     template_name = 'theme_park/tasks.html'
     context_object_name = 'theme_park_tasks'
+    
+    def get_breadcrumbs(self):
+        return [
+            {'title': 'Theme Park', 'url': reverse('theme_park:dashboard')},
+            {'title': 'Tasks', 'url': None}
+        ]
     
     def get_queryset(self):
         # Get all theme park tasks
@@ -220,13 +228,20 @@ class ThemeParkTasksView(LoginRequiredMixin, ListView):
         return context
 
 
-class ThemeParkTaskCreateView(LoginRequiredMixin, CreateView):
+class ThemeParkTaskCreateView(BreadcrumbMixin, LoginRequiredMixin, CreateView):
     """View for creating new theme park tasks"""
     model = ThemeParkTask
     template_name = 'theme_park/task_form.html'
     from projects.task_forms import ThemeParkTaskForm
     form_class = ThemeParkTaskForm
     success_url = reverse_lazy('theme_park:tasks')
+    
+    def get_breadcrumbs(self):
+        return [
+            {'title': 'Theme Park Dashboard', 'url': reverse('theme_park:dashboard')},
+            {'title': 'Tasks', 'url': reverse('theme_park:tasks')},
+            {'title': 'New Task', 'url': None}
+        ]
     
     def form_valid(self, form):
         form.instance.created_by = self.request.user
@@ -242,11 +257,19 @@ class ThemeParkTaskCreateView(LoginRequiredMixin, CreateView):
         return context
 
 
-class ThemeParkTaskDetailView(LoginRequiredMixin, DetailView):
+class ThemeParkTaskDetailView(BreadcrumbMixin, LoginRequiredMixin, DetailView):
     """View for viewing theme park task details"""
     model = ThemeParkTask
     template_name = 'theme_park/task_detail.html'
     context_object_name = 'task'
+    
+    def get_breadcrumbs(self):
+        task = self.get_object()
+        return [
+            {'title': 'Theme Park Dashboard', 'url': reverse('theme_park:dashboard')},
+            {'title': 'Tasks', 'url': reverse('theme_park:tasks')},
+            {'title': task.title, 'url': None}
+        ]
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -255,13 +278,22 @@ class ThemeParkTaskDetailView(LoginRequiredMixin, DetailView):
         return context
 
 
-class ThemeParkTaskUpdateView(LoginRequiredMixin, UpdateView):
+class ThemeParkTaskUpdateView(BreadcrumbMixin, LoginRequiredMixin, UpdateView):
     """View for updating theme park tasks"""
     model = ThemeParkTask
     template_name = 'theme_park/task_form.html'
     from projects.task_forms import ThemeParkTaskForm
     form_class = ThemeParkTaskForm
     success_url = reverse_lazy('theme_park:tasks')
+    
+    def get_breadcrumbs(self):
+        task = self.get_object()
+        return [
+            {'title': 'Theme Park Dashboard', 'url': reverse('theme_park:dashboard')},
+            {'title': 'Tasks', 'url': reverse('theme_park:tasks')},
+            {'title': task.title, 'url': reverse('theme_park:task_detail', kwargs={'pk': task.pk})},
+            {'title': 'Edit', 'url': None}
+        ]
     
     def form_valid(self, form):
         messages.success(self.request, 'Theme park task updated successfully!')
