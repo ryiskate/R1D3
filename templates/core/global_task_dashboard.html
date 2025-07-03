@@ -3,6 +3,10 @@
 {% load project_extras %}
 {% load task_filters %}
 
+{% block sidebar_content %}
+    {% include 'core/includes/r1d3_tasks_sidebar.html' %}
+{% endblock %}
+
 {% block dashboard_title %}R1D3 Tasks{% endblock %}
 
 {% block dashboard_heading %}R1D3 Tasks{% endblock %}

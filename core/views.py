@@ -77,6 +77,9 @@ class GlobalTaskDashboardView(LoginRequiredMixin, View):
     template_name = 'core/global_task_dashboard.html'
     login_url = '/'  # Temporarily changed from '/accounts/login/' while allauth is disabled
     
+    def get_template_names(self):
+        return [self.template_name]
+    
     def get(self, request):
         # Get filter parameters
         status_filter = request.GET.get('status', '')

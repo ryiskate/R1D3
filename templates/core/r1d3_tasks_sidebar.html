@@ -1,0 +1,19 @@
+{% block sidebar_content %}
+    <div class="sidebar-heading">
+        R1D3 Tasks
+    </div>
+    
+    <li class="nav-item">
+        <a class="nav-link {% if request.path == '/R1D3-tasks/' %}active{% endif %}" href="/R1D3-tasks/">
+            <i class="fas fa-fw fa-clipboard-list"></i>
+            <span>Task Dashboard</span>
+        </a>
+    </li>
+    
+    <li class="nav-item">
+        <a class="nav-link {% if request.path == '/R1D3-tasks/newtask/' %}active{% endif %}" href="/R1D3-tasks/newtask/">
+            <i class="fas fa-fw fa-plus-circle"></i>
+            <span>New R1D3 Task</span>
+        </a>
+    </li>
+{% endblock %}

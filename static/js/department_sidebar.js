@@ -11,9 +11,50 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('Current path:', currentPath);
     
-    // Don't modify the sidebar if we're on a debug page or indie news section
-    if (currentPath.includes('/debug-') || currentPath.includes('/indie-news') || currentPath.includes('/indie_news')) {
-        console.log('Skipping sidebar modification for special section');
+    // Don't modify the sidebar if we're on a debug page, indie news section, or R1D3 tasks section
+    if (currentPath.includes('/debug-') || 
+        currentPath.includes('/indie-news') || 
+        currentPath.includes('/indie_news') || 
+        currentPath.includes('/R1D3-tasks')) {
+        console.log('Skipping sidebar modification for special section:', currentPath);
+        return;
+    }
+    
+    // R1D3 Tasks Section - Check for exact path match
+    console.log('Checking for R1D3 tasks path match:', currentPath);
+    if (currentPath === '/' || 
+        currentPath === '/dashboard/' || 
+        currentPath === '/R1D3-tasks/' || 
+        currentPath.indexOf('/R1D3-tasks/') === 0) {
+        
+        console.log('R1D3 Tasks path matched!');
+        sidebarHTML = `
+            <div class="sidebar-heading">
+                R1D3 Tasks
+            </div>
+            
+            <li class="nav-item">
+                <a class="nav-link ${currentPath === '/R1D3-tasks/' ? 'active' : ''}" href="/R1D3-tasks/">
+                    <i class="fas fa-fw fa-clipboard-list"></i>
+                    <span>Task Dashboard</span>
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link" href="/R1D3-tasks/newtask/">
+                    <i class="fas fa-fw fa-plus-circle"></i>
+                    <span>New R1D3 Task</span>
+                </a>
+            </li>
+        `;
+        
+        // Update the sidebar content and return early
+        if (sidebarContent) {
+            sidebarContent.innerHTML = sidebarHTML;
+            console.log('R1D3 Tasks sidebar content updated successfully');
+        } else {
+            console.error('Sidebar content element not found for R1D3 Tasks');
+        }
         return;
     }
     

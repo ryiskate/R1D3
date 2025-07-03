@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -249,7 +250,7 @@
                         <li class="nav-item">
                             <a class="nav-link arcade-tab {% if request.path|slice:":7" == '/arcade' %}active{% endif %}" 
                                href="/arcade/">
-                                <i class="fas fa-arcade me-1"></i> Arcade Entertainment
+                                <i class="fas fa-dice me-1"></i> Arcade Entertainment
                             </a>
                         </li>
                         <li class="nav-item">
@@ -295,31 +296,52 @@
                 <!-- Dynamic Department Sidebar Content -->
                 <div id="sidebar-content">
                     {% block sidebar_content %}
-                        <!-- Default sidebar content -->
-                        <div class="sidebar-heading">
-                            Game Development
-                        </div>
-                        
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.resolver_match.namespace == 'games' and request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'games:dashboard' %}">
-                                <i class="fas fa-fw fa-gamepad"></i>
-                                <span>Game Dashboard</span>
-                            </a>
-                        </li>
-                        
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.resolver_match.namespace == 'games' and request.resolver_match.url_name == 'game_list' %}active{% endif %}" href="{% url 'games:game_list' %}">
-                                <i class="fas fa-fw fa-list"></i>
-                                <span>Game Projects</span>
-                            </a>
-                        </li>
-                        
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'games:task_dashboard' %}">
-                                <i class="fas fa-fw fa-tasks"></i>
-                                <span>Game Tasks</span>
-                            </a>
-                        </li>
+                        {% if '/R1D3-tasks/' in request.path %}
+                            <!-- R1D3 Tasks sidebar content -->
+                            <div class="sidebar-heading">
+                                R1D3 Tasks
+                            </div>
+                            
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.path == '/R1D3-tasks/' %}active{% endif %}" href="/R1D3-tasks/">
+                                    <i class="fas fa-fw fa-clipboard-list"></i>
+                                    <span>Task Dashboard</span>
+                                </a>
+                            </li>
+                            
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.path == '/R1D3-tasks/newtask/' %}active{% endif %}" href="/R1D3-tasks/newtask/">
+                                    <i class="fas fa-fw fa-plus-circle"></i>
+                                    <span>New R1D3 Task</span>
+                                </a>
+                            </li>
+                        {% else %}
+                            <!-- Default sidebar content -->
+                            <div class="sidebar-heading">
+                                Game Development
+                            </div>
+                            
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.resolver_match.namespace == 'games' and request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'games:dashboard' %}">
+                                    <i class="fas fa-fw fa-gamepad"></i>
+                                    <span>Game Dashboard</span>
+                                </a>
+                            </li>
+                            
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.resolver_match.namespace == 'games' and request.resolver_match.url_name == 'game_list' %}active{% endif %}" href="{% url 'games:game_list' %}">
+                                    <i class="fas fa-fw fa-list"></i>
+                                    <span>Game Projects</span>
+                                </a>
+                            </li>
+                            
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'games:task_dashboard' %}">
+                                    <i class="fas fa-fw fa-tasks"></i>
+                                    <span>Game Tasks</span>
+                                </a>
+                            </li>
+                        {% endif %}
                     {% endblock %}
                 </div>
                 
@@ -461,6 +483,10 @@
     <!-- Department Sidebar Script -->
     {% if request.resolver_match.namespace != 'indie_news' %}
     <script src="/static/js/department_sidebar_v2.js"></script>
+    {% if '/R1D3-tasks/' in request.path %}
+    <!-- R1D3 Tasks Sidebar Script (takes precedence over department sidebar) -->
+    <script src="/static/js/r1d3_tasks_sidebar.js"></script>
+    {% endif %}
     {% endif %}
     
     {% block extra_js %}{% endblock %}
