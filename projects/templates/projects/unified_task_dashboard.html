@@ -275,6 +275,17 @@
             </select>
           </div>
           
+          <div class="form-group">
+            <label for="task_visibility">Task Visibility</label>
+            <select class="form-control" id="task_visibility" name="task_visibility">
+              <option value="my_tasks" {% if request.GET.my_tasks %}selected{% endif %}>My Tasks</option>
+              <option value="accessible_tasks" {% if request.GET.accessible_tasks %}selected{% endif %}>All Accessible Tasks</option>
+              {% if request.user.is_staff %}
+              <option value="all_tasks" {% if request.GET.all_tasks %}selected{% endif %}>All Tasks (Staff Only)</option>
+              {% endif %}
+            </select>
+          </div>
+          
           {% if games %}
           <div class="form-group">
             <label for="game"><i class="fas fa-gamepad"></i> Game Project</label>
@@ -367,6 +378,28 @@
     // Select all checkbox functionality
     $('#selectAll').change(function() {
       $('.task-checkbox').prop('checked', $(this).prop('checked'));
+    });
+    
+    // Handle task visibility selection
+    $("#task_visibility").change(function() {
+      // Remove any existing visibility parameters
+      var url = new URL(window.location.href);
+      url.searchParams.delete("my_tasks");
+      url.searchParams.delete("accessible_tasks");
+      url.searchParams.delete("all_tasks");
+      
+      // Add the selected visibility parameter
+      var visibility = $(this).val();
+      if (visibility === "my_tasks") {
+        url.searchParams.set("my_tasks", "true");
+      } else if (visibility === "accessible_tasks") {
+        url.searchParams.set("accessible_tasks", "true");
+      } else if (visibility === "all_tasks") {
+        url.searchParams.set("all_tasks", "true");
+      }
+      
+      // Redirect to the updated URL
+      window.location.href = url.toString();
     });
     
     // Batch update functionality

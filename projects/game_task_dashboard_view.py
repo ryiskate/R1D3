@@ -55,18 +55,23 @@ class GameTaskDashboardView(BreadcrumbMixin, LoginRequiredMixin, View):
             context['game'] = game
             tasks = GameDevelopmentTask.objects.filter(game=game)
         else:
-            # If no game specified, show all tasks the user has access to
-            if request.user.is_staff:
+            # If no game specified, show only the user's assigned tasks by default
+            if request.user.is_staff and request.GET.get('all_tasks'):
+                # Staff can see all tasks if they explicitly request it
                 tasks = GameDevelopmentTask.objects.all()
             else:
-                # Get tasks from games where user is a team member or lead
-                tasks = GameDevelopmentTask.objects.filter(
-                    Q(game__team_members=request.user) | 
-                    Q(game__lead_developer=request.user) | 
-                    Q(game__lead_designer=request.user) |
-                    Q(game__lead_artist=request.user) |
-                    Q(assigned_to=request.user)
-                ).distinct()
+                # By default, only show tasks assigned to the current user
+                tasks = GameDevelopmentTask.objects.filter(assigned_to=request.user)
+                
+                # If the user specifically wants to see all tasks they have access to
+                if request.GET.get('accessible_tasks'):
+                    tasks = GameDevelopmentTask.objects.filter(
+                        Q(game__team_members=request.user) | 
+                        Q(game__lead_developer=request.user) | 
+                        Q(game__lead_designer=request.user) |
+                        Q(game__lead_artist=request.user) |
+                        Q(assigned_to=request.user)
+                    ).distinct()
         
         # Filter by assigned user if requested
         if request.GET.get('my_tasks'):
@@ -76,6 +81,9 @@ class GameTaskDashboardView(BreadcrumbMixin, LoginRequiredMixin, View):
         status = request.GET.get('status')
         if status:
             tasks = tasks.filter(status=status)
+        else:
+            # By default, exclude tasks with 'done' status unless explicitly requested
+            tasks = tasks.exclude(status='done')
         
         # Filter by task type if provided
         task_type = request.GET.get('type')

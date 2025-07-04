@@ -68,23 +68,22 @@ class StrategyDashboardView(BreadcrumbMixin, LoginRequiredMixin, TemplateView):
         import os
         import json
         
-        # Force reset the milestones in session for testing
-        self.request.session['user_milestones'] = {}
-        
-        # Load initial milestones from fixtures
-        file_path = os.path.join(os.path.dirname(__file__), 'fixtures', 'initial_milestones.json')
-        
-        if os.path.exists(file_path):
-            try:
-                with open(file_path, 'r') as f:
-                    initial_milestones = json.load(f)
-                    self.request.session['user_milestones'] = initial_milestones
-                    self.request.session.modified = True
-                    messages.success(self.request, 'Initial milestones loaded successfully!')
-            except Exception as e:
-                messages.error(self.request, f'Error loading initial milestones: {e}')
-        else:
-            messages.error(self.request, f'Initial milestones file not found at {file_path}')
+        # Only initialize milestones if they don't exist in the session
+        if 'user_milestones' not in self.request.session:
+            # Load initial milestones from fixtures
+            file_path = os.path.join(os.path.dirname(__file__), 'fixtures', 'initial_milestones.json')
+            
+            if os.path.exists(file_path):
+                try:
+                    with open(file_path, 'r') as f:
+                        initial_milestones = json.load(f)
+                        self.request.session['user_milestones'] = initial_milestones
+                        self.request.session.modified = True
+                        messages.success(self.request, 'Initial milestones loaded successfully!')
+                except Exception as e:
+                    messages.error(self.request, f'Error loading initial milestones: {e}')
+            else:
+                messages.error(self.request, f'Initial milestones file not found at {file_path}')
 
 
         

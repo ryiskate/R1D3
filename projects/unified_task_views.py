@@ -96,6 +96,9 @@ class UnifiedTaskDashboardView(LoginRequiredMixin, View):
         status = request.GET.get('status')
         if status:
             tasks = tasks.filter(status=status)
+        else:
+            # By default, exclude tasks with 'done' status unless explicitly requested
+            tasks = tasks.exclude(status='done')
         
         # Filter by task type if provided
         task_type = request.GET.get('task_type')

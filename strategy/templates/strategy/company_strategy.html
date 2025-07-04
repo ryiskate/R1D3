@@ -144,21 +144,47 @@
                                 
                                 {% if phase.milestones %}
                                     <h6>Key Milestones:</h6>
-                                    <ul class="milestone-list">
-                                        {% for milestone in phase.milestones|slice:":3" %}
-                                            <li class="{% if milestone.is_completed %}completed{% endif %}">
-                                                {{ milestone.title }}
-                                                {% if milestone.is_completed %}
-                                                    <span class="badge bg-success milestone-badge">Completed</span>
-                                                {% endif %}
-                                            </li>
-                                        {% endfor %}
-                                        {% if phase.milestones|length > 3 %}
-                                            <li class="text-center">
-                                                <small class="text-muted">+ {{ phase.milestones|length|add:"-3" }} more</small>
-                                            </li>
-                                        {% endif %}
-                                    </ul>
+                                    <div class="table-responsive">
+                                        <table class="table table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>Milestone</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for milestone in phase.milestones|slice:":10" %}
+                                                    <tr>
+                                                        <td>
+                                                            <strong>{{ milestone.title }}</strong>
+                                                            <div class="small text-muted">{{ milestone.description|truncatechars:50 }}</div>
+                                                        </td>
+                                                        <td>
+                                                            {% if milestone.status == 'completed' %}
+                                                                <span class="badge bg-success">Completed</span>
+                                                            {% elif milestone.status == 'in_progress' %}
+                                                                <span class="badge bg-warning text-dark">In Progress</span>
+                                                            {% else %}
+                                                                <span class="badge bg-secondary">Not Started</span>
+                                                            {% endif %}
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="progress mt-3">
+                                        <div class="progress-bar bg-success" role="progressbar" 
+                                             style="width: {{ phase.progress_percentage }}%" 
+                                             aria-valuenow="{{ phase.progress_percentage }}" 
+                                             aria-valuemin="0" 
+                                             aria-valuemax="100">
+                                            {{ phase.progress_percentage }}%
+                                        </div>
+                                    </div>
+                                    <div class="text-center mt-2">
+                                        <small>{{ phase.completed_milestones }} of {{ phase.total_milestones }} milestones completed</small>
+                                    </div>
                                 {% endif %}
                                 
                                 <div class="mt-3">

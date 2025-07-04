@@ -193,21 +193,47 @@ class GlobalTaskDashboardView(LoginRequiredMixin, View):
         due_date_filter = request.GET.get('due_date', '')
         search_query = request.GET.get('search', '')
         
-        # Get all tasks from available task models
-        r1d3_tasks = list(R1D3Task.objects.all())
+        # Get all tasks from all available task models
+        from projects.task_models import (
+            R1D3Task, GameDevelopmentTask, EducationTask,
+            SocialMediaTask, ArcadeTask, ThemeParkTask
+        )
         
-        # Get tasks from the GameTask model
+        # Get tasks from each model
+        r1d3_tasks = list(R1D3Task.objects.all())
+        game_dev_tasks = list(GameDevelopmentTask.objects.all())
+        education_tasks = list(EducationTask.objects.all())
+        social_media_tasks = list(SocialMediaTask.objects.all())
+        arcade_tasks = list(ArcadeTask.objects.all())
+        theme_park_tasks = list(ThemeParkTask.objects.all())
+        
+        # For backward compatibility, also get tasks from the legacy GameTask model
         game_tasks = list(GameTask.objects.all())
         
         # Add task_type information to each task
         for task in r1d3_tasks:
             task.task_type = 'r1d3'
         
+        for task in game_dev_tasks:
+            task.task_type = 'game_development'
+            
+        for task in education_tasks:
+            task.task_type = 'education'
+            
+        for task in social_media_tasks:
+            task.task_type = 'social_media'
+            
+        for task in arcade_tasks:
+            task.task_type = 'arcade'
+            
+        for task in theme_park_tasks:
+            task.task_type = 'theme_park'
+            
         for task in game_tasks:
             task.task_type = 'game'
             
         # Combine all tasks into a single list
-        all_tasks = r1d3_tasks + game_tasks
+        all_tasks = r1d3_tasks + game_dev_tasks + education_tasks + social_media_tasks + arcade_tasks + theme_park_tasks + game_tasks
         
         # Sort tasks by created_at (newest first)
         tasks = sorted(all_tasks, key=lambda x: x.created_at, reverse=True)
@@ -218,6 +244,9 @@ class GlobalTaskDashboardView(LoginRequiredMixin, View):
         # Filter by status
         if status_filter and status_filter != 'all':
             filtered_tasks = [task for task in filtered_tasks if task.status == status_filter]
+        else:
+            # By default, exclude tasks with 'done' status unless explicitly requested
+            filtered_tasks = [task for task in filtered_tasks if task.status != 'done']
         
         # Filter by priority
         if priority_filter and priority_filter != 'all':
@@ -266,21 +295,15 @@ class GlobalTaskDashboardView(LoginRequiredMixin, View):
             'overdue': len([t for t in all_tasks if t.due_date and t.due_date < today and t.status in ['to_do', 'in_progress', 'blocked']]),
         }
         
-        # Calculate section statistics
-        # Count tasks by type
-        game_dev_count = len([t for t in game_tasks if getattr(t, 'company_section', '') == 'game_development' or not getattr(t, 'company_section', '')])
-        education_count = len([t for t in game_tasks if getattr(t, 'company_section', '') == 'education'])
-        social_media_count = len([t for t in game_tasks if getattr(t, 'company_section', '') == 'social_media'])
-        arcade_count = len([t for t in game_tasks if getattr(t, 'company_section', '') == 'arcade'])
-        theme_park_count = len([t for t in game_tasks if getattr(t, 'company_section', '') == 'theme_park'])
-        
+        # Calculate section statistics using the new task models
+        # Count tasks by type using the specialized task models
         section_stats = [
             {'section_name': 'r1d3', 'count': len(r1d3_tasks)},
-            {'section_name': 'game_development', 'count': game_dev_count},
-            {'section_name': 'education', 'count': education_count},
-            {'section_name': 'social_media', 'count': social_media_count},
-            {'section_name': 'arcade', 'count': arcade_count},
-            {'section_name': 'theme_park', 'count': theme_park_count},
+            {'section_name': 'game_development', 'count': len(game_dev_tasks) + len([t for t in game_tasks if getattr(t, 'company_section', '') == 'game_development' or not getattr(t, 'company_section', '')])},
+            {'section_name': 'education', 'count': len(education_tasks) + len([t for t in game_tasks if getattr(t, 'company_section', '') == 'education'])},
+            {'section_name': 'social_media', 'count': len(social_media_tasks) + len([t for t in game_tasks if getattr(t, 'company_section', '') == 'social_media'])},
+            {'section_name': 'arcade', 'count': len(arcade_tasks) + len([t for t in game_tasks if getattr(t, 'company_section', '') == 'arcade'])},
+            {'section_name': 'theme_park', 'count': len(theme_park_tasks) + len([t for t in game_tasks if getattr(t, 'company_section', '') == 'theme_park'])},
         ]
         
         # Get recent and upcoming tasks
