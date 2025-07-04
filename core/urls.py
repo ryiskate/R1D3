@@ -28,5 +28,8 @@ urlpatterns = [
     path('quick-links/create/', QuickLinkCreateView.as_view(), name='quick_link_create'),
     path('quick-links/<int:pk>/update/', QuickLinkUpdateView.as_view(), name='quick_link_update'),
     path('quick-links/<int:pk>/delete/', QuickLinkDeleteView.as_view(), name='quick_link_delete'),
+    
+    # AJAX Task Status Update
+    path('R1D3-tasks/update-status/', views.update_task_status, name='update_task_status'),
     path('quick-links/reorder/', reorder_quick_links, name='quick_link_reorder'),
 ]

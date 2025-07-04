@@ -1,11 +1,14 @@
-from django.shortcuts import render, HttpResponse, redirect
+from django.shortcuts import render, HttpResponse, redirect, get_object_or_404
 from django.views.generic import TemplateView, View, CreateView, UpdateView, DeleteView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count, Q, F
 from django.urls import reverse_lazy
 from django.contrib import messages
-from django.http import Http404
+from django.http import Http404, JsonResponse
+from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
 from datetime import date, timedelta, datetime
+import json
 
 # Import legacy views for backward compatibility
 from .legacy_views import R1D3TaskDetailLegacyView, R1D3TaskUpdateLegacyView, R1D3TaskDeleteLegacyView
@@ -15,6 +18,16 @@ from .model_utils import get_task_model_map, get_task_type_for_model
 
 # Import task models for dashboard stats
 TASK_MODELS_AVAILABLE = False
+try:
+    from projects.task_models import (
+        R1D3Task, GameDevelopmentTask, EducationTask,
+        SocialMediaTask, ArcadeTask, ThemeParkTask
+    )
+    from projects.game_models import GameTask
+    TASK_MODELS_AVAILABLE = True
+except ImportError:
+    # Models not available, will be imported dynamically when needed
+    pass
 GAME_MODELS_AVAILABLE = False
 IMPORT_ERROR_MESSAGE = ""
 
@@ -453,6 +466,121 @@ class R1D3TaskCreateView(LoginRequiredMixin, CreateView):
         context['section_name'] = "R1D3 Task"
         context['is_create'] = True
         return context
+
+
+@login_required
+@require_POST
+def update_task_status(request):
+    """AJAX view to update task status directly from the task table."""
+    
+    # Use task models imported at the top of the file
+    # If they weren't imported successfully, try importing them now
+    if not TASK_MODELS_AVAILABLE:
+        try:
+            from projects.task_models import (
+                R1D3Task, GameDevelopmentTask, EducationTask,
+                SocialMediaTask, ArcadeTask, ThemeParkTask
+            )
+            from projects.game_models import GameTask
+        except ImportError as e:
+            return JsonResponse({'error': f'Task models not available: {str(e)}'}, status=500)
+    
+    # Handle both JSON and form data
+    print(f"DEBUG: Content-Type: {request.content_type}")
+    print(f"DEBUG: Request method: {request.method}")
+    print(f"DEBUG: POST data: {request.POST}")
+    print(f"DEBUG: Raw body: {request.body[:200]}")
+    
+    if request.content_type and 'application/json' in request.content_type:
+        try:
+            data = json.loads(request.body)
+            print(f"DEBUG: Parsed JSON data: {data}")
+        except json.JSONDecodeError as e:
+            print(f"DEBUG: JSON decode error: {e}")
+            return JsonResponse({'error': f'Invalid JSON: {str(e)}'}, status=400)
+    else:
+        data = request.POST
+        print(f"[DEBUG] Form data: {dict(data)}")
+    
+    task_id = data.get('task_id')
+    task_type = data.get('task_type')
+    status = data.get('status')
+    
+    print(f"[DEBUG] Task ID: {task_id}, Task Type: {task_type}, Status: {status}")
+    
+    # Validate required fields
+    if not all([task_id, task_type, status]):
+        missing = []
+        if not task_id: missing.append('task_id')
+        if not task_type: missing.append('task_type')
+        if not status: missing.append('status')
+        print(f"[DEBUG] Missing fields: {missing}")
+        return JsonResponse({'error': f'Missing required fields: {missing}'}, status=400)
+    
+    # Normalize task_type to lowercase for case-insensitive matching
+    task_type_lower = task_type.lower()
+    
+    # Comprehensive model mapping with both snake_case and CamelCase keys
+    model_map = {
+        # Snake case keys (normalized from frontend)
+        'r1d3': R1D3Task,
+        'game_development': GameDevelopmentTask,
+        'education': EducationTask,
+        'social_media': SocialMediaTask,
+        'arcade': ArcadeTask,
+        'theme_park': ThemeParkTask,
+        'game': GameTask,
+        # Class name keys (from template filter)
+        'r1d3task': R1D3Task,
+        'gamedevelopmenttask': GameDevelopmentTask,
+        'educationtask': EducationTask,
+        'socialmediatask': SocialMediaTask,
+        'arcadetask': ArcadeTask,
+        'themeparktask': ThemeParkTask,
+        'gametask': GameTask,
+    }
+    
+    # Try to get model using case-insensitive matching
+    model = None
+    for key, value in model_map.items():
+        if key.lower() == task_type_lower:
+            model = value
+            break
+    
+    if not model:
+        print(f"[DEBUG] Invalid task type: {task_type}")
+        return JsonResponse({'error': f'Invalid task type: {task_type}'}, status=400)
+    
+    print(f"[DEBUG] Using model: {model.__name__}")
+    
+    try:
+        task = model.objects.get(pk=task_id)
+        print(f"[DEBUG] Found task: {task}")
+    except model.DoesNotExist:
+        print(f"[DEBUG] Task not found: {task_id}")
+        return JsonResponse({'error': f'Task not found: {task_id}'}, status=404)
+    except ValueError as e:
+        print(f"[DEBUG] Invalid task ID: {task_id}, Error: {e}")
+        return JsonResponse({'error': f'Invalid task ID: {task_id}'}, status=400)
+    
+    valid_statuses = ['to_do', 'in_progress', 'in_review', 'done', 'backlog', 'blocked']
+    if status not in valid_statuses:
+        print(f"[DEBUG] Invalid status: {status}")
+        return JsonResponse({'error': f'Invalid status: {status}'}, status=400)
+
+    old_status = task.status
+    print(f"[DEBUG] Updating status from {old_status} to {status}")
+    task.status = status
+    task.save(update_fields=['status'])
+    print(f"[DEBUG] Task status updated successfully - ID: {task_id}, Old: {old_status}, New: {status}")
+
+    # Return success response
+    return JsonResponse({
+        'success': True,
+        'task_id': task_id,
+        'status': status,
+        'status_display': task.get_status_display() if hasattr(task, 'get_status_display') else status.replace('_', ' ').title()
+    })
 
 
 class R1D3TaskUpdateView(LoginRequiredMixin, UpdateView):
