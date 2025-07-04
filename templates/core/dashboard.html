@@ -1,47 +1,54 @@
 {% extends "base.html" %}
 {% load static %}
+{% load i18n %}
 
 {% block title %}Dashboard - R1D3{% endblock %}
 
 {% block content %}
 <div class="container-fluid py-4">
-    <h1 class="mb-4">Dashboard</h1>
+    <h1 class="mb-4">{{ request.user.username }}'s Dashboard</h1>
     
     <div class="row mb-4">
         <div class="col-md-6">
             <div class="card h-100">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Game Development</h5>
-                    <a href="{% url 'games:dashboard' %}" class="btn btn-sm btn-primary">View All</a>
+                    <h5 class="mb-0">Quick Links</h5>
+                    <a href="{% url 'core:quick_links' %}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-cog"></i> Manage
+                    </a>
                 </div>
                 <div class="card-body">
-                    <div class="row mb-3">
-                        <div class="col-6">
-                            <div class="card bg-primary text-white">
-                                <div class="card-body text-center">
-                                    <h3 class="display-4">{{ game_count|default:"0" }}</h3>
-                                    <p class="mb-0">Active Games</p>
-                                </div>
+                    <div class="list-group">
+                        {% if quick_links %}
+                            {% for quick_link in quick_links %}
+                                <a href="{{ quick_link.url }}" class="list-group-item list-group-item-action">
+                                    <i class="{{ quick_link.icon }} me-2"></i> {{ quick_link.name }}
+                                </a>
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-center py-4">
+                                <i class="fas fa-link fa-3x text-muted mb-3"></i>
+                                <h5>No Quick Links Yet</h5>
+                                <p class="text-muted">Add custom links for quick access to your favorite pages.</p>
+                                <a href="{% url 'core:quick_link_create' %}" class="btn btn-primary mt-2">
+                                    <i class="fas fa-plus me-2"></i> Add Quick Link
+                                </a>
                             </div>
+                        {% endif %}
+                        
+                        <!-- Default system links -->
+                        <div class="mt-3 pt-3 border-top">
+                            <h6 class="text-muted mb-2">System Links</h6>
+                            <a href="{% url 'games:dashboard' %}" class="list-group-item list-group-item-action">
+                                <i class="fas fa-gamepad me-2"></i> Game Dashboard
+                            </a>
+                            <a href="/R1D3-tasks/" class="list-group-item list-group-item-action">
+                                <i class="fas fa-clipboard-list me-2"></i> R1D3 Tasks
+                            </a>
+                            <a href="{% url 'strategy:dashboard' %}" class="list-group-item list-group-item-action company-strategy">
+                                <i class="fas fa-road me-2"></i> Company Strategy
+                            </a>
                         </div>
-                        <div class="col-6">
-                            <div class="card bg-success text-white">
-                                <div class="card-body text-center">
-                                    <h3 class="display-4">{{ task_count|default:"0" }}</h3>
-                                    <p class="mb-0">Open Tasks</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <p>Quick access to game development resources:</p>
-                    <div class="d-grid gap-2">
-                        <a href="{% url 'games:game_create' %}" class="btn btn-outline-primary">
-                            <i class="fas fa-plus me-2"></i> New Game Project
-                        </a>
-                        <a href="{% url 'games:game_list' %}" class="btn btn-outline-secondary">
-                            <i class="fas fa-list me-2"></i> View All Games
-                        </a>
                     </div>
                 </div>
             </div>
@@ -63,8 +70,8 @@
                     </ol>
                     
                     <div class="d-grid gap-2 mt-3">
-                        <a href="#" class="btn btn-outline-primary">
-                            <i class="fas fa-bullseye me-2"></i> View Strategy Dashboard
+                        <a href="{% url 'strategy:dashboard' %}" class="btn btn-primary">
+                            <i class="fas fa-road me-2"></i> View Company Strategy
                         </a>
                     </div>
                 </div>
@@ -73,94 +80,140 @@
     </div>
     
     <div class="row">
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">Recent Activity</h5>
-                </div>
-                <div class="card-body">
-                    <div class="list-group list-group-flush">
-                        <div class="list-group-item px-0">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h6 class="mb-1">New game project created</h6>
-                                <small>3 days ago</small>
-                            </div>
-                            <p class="mb-1">Project: Space Explorer</p>
-                        </div>
-                        <div class="list-group-item px-0">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h6 class="mb-1">GDD updated</h6>
-                                <small>5 days ago</small>
-                            </div>
-                            <p class="mb-1">Project: Dungeon Crawler</p>
-                        </div>
-                        <div class="list-group-item px-0">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h6 class="mb-1">New build released</h6>
-                                <small>1 week ago</small>
-                            </div>
-                            <p class="mb-1">Project: Puzzle Quest v0.3.2</p>
-                        </div>
+        <div class="col-md-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 font-weight-bold text-primary">My Tasks ({{ all_tasks_count|default:"0" }} total)</h5>
+                    <div>
+                        <small class="text-muted me-3">
+                            <span class="badge bg-success">Game Tasks: {{ game_tasks_count|default:"0" }}</span>
+                            <span class="badge bg-primary">R1D3 Tasks: {{ r1d3_tasks_count|default:"0" }}</span>
+                        </small>
+                        <a href="/R1D3-tasks/" class="btn btn-sm btn-primary">View All Tasks</a>
                     </div>
                 </div>
-            </div>
-        </div>
-        
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">My Tasks</h5>
-                </div>
+
                 <div class="card-body">
-                    {% if user_tasks %}
-                        <div class="list-group list-group-flush">
-                            {% for task in user_tasks %}
-                                <div class="list-group-item px-0">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h6 class="mb-1">{{ task.title }}</h6>
-                                        <span class="badge bg-{{ task.priority|yesno:'danger,warning,info,secondary' }}">{{ task.get_priority_display }}</span>
-                                    </div>
-                                    <p class="mb-1">{{ task.game.title }}</p>
-                                    <small>Due: {{ task.due_date|date:"M d"|default:"No due date" }}</small>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        <p class="text-center">No tasks assigned to you.</p>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">Quick Links</h5>
-                </div>
-                <div class="card-body">
-                    <div class="list-group">
-                        <a href="{% url 'games:dashboard' %}" class="list-group-item list-group-item-action">
-                            <i class="fas fa-gamepad me-2"></i> Game Dashboard
-                        </a>
-                        <a href="#" class="list-group-item list-group-item-action">
-                            <i class="fas fa-file-alt me-2"></i> Game Design Documents
-                        </a>
-                        <a href="#" class="list-group-item list-group-item-action">
-                            <i class="fas fa-tasks me-2"></i> Task Management
-                        </a>
-                        <a href="#" class="list-group-item list-group-item-action">
-                            <i class="fas fa-cubes me-2"></i> Asset Management
-                        </a>
-                        <a href="#" class="list-group-item list-group-item-action">
-                            <i class="fas fa-bug me-2"></i> Bug Tracking
-                        </a>
-                        <a href="#" class="list-group-item list-group-item-action">
-                            <i class="fas fa-chart-line me-2"></i> Analytics
-                        </a>
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="myTasksTable">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th width="120">Company Section</th>
+                                    <th width="120">Status</th>
+                                    <th width="100">Priority</th>
+                                    <th width="120">Due Date</th>
+                                    <th width="80">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if user_tasks %}
+                                    {% for task in user_tasks %}
+                                    <tr class="task-row" data-task-id="{{ task.id }}" data-status="{{ task.status }}">
+                                        <td>
+                                            <a href="{% if task.task_type == 'game' %}{% url 'games:task_detail' task.id %}{% elif task.task_type == 'r1d3' %}{% url 'core:r1d3_task_detail_legacy' task.id %}{% endif %}" class="text-decoration-none">
+                                                {{ task.title }}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            {% if task.task_type == 'r1d3' %}
+                                            <span class="badge bg-primary">R1D3</span>
+                                            {% elif task.task_type == 'game' %}
+                                                {% if task.company_section == 'game_development' %}
+                                                <span class="badge bg-success">Game Development</span>
+                                                {% elif task.company_section == 'education' %}
+                                                <span class="badge bg-info">Education</span>
+                                                {% elif task.company_section == 'arcade' %}
+                                                <span class="badge bg-danger">Arcade</span>
+                                                {% elif task.company_section == 'marketing' %}
+                                                <span class="badge bg-warning">Marketing</span>
+                                                {% elif task.company_section == 'finance' %}
+                                                <span class="badge bg-secondary">Finance</span>
+                                                {% elif task.company_section == 'hr' %}
+                                                <span class="badge bg-secondary">HR</span>
+                                                {% elif task.company_section == 'it' %}
+                                                <span class="badge bg-secondary">IT</span>
+                                                {% elif task.company_section == 'research' %}
+                                                <span class="badge bg-primary">Research</span>
+                                                {% else %}
+                                                <span class="badge bg-secondary">Other</span>
+                                                {% endif %}
+                                            {% else %}
+                                            <span class="badge bg-secondary">{{ task.task_type|title }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge status-badge 
+                                                {% if task.status == 'to_do' or task.status == 'todo' %}bg-primary
+                                                {% elif task.status == 'in_progress' %}bg-warning
+                                                {% elif task.status == 'review' %}bg-info
+                                                {% elif task.status == 'done' %}bg-success
+                                                {% elif task.status == 'blocked' %}bg-danger
+                                                {% else %}bg-secondary{% endif %}">
+                                                {% if task.get_status_display %}{{ task.get_status_display }}{% else %}{{ task.status|title }}{% endif %}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge priority-badge 
+                                                {% if task.priority == 'high' %}bg-danger
+                                                {% elif task.priority == 'medium' %}bg-warning
+                                                {% else %}bg-info{% endif %}">
+                                                {{ task.get_priority_display }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {% if task.due_date %}
+                                            {{ task.due_date|date:"M d, Y" }}
+                                            {% else %}
+                                            <span class="text-muted">No due date</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="btn-group">
+                                                <a href="{% if task.task_type == 'game' %}{% url 'games:task_update' task.id %}{% elif task.task_type == 'r1d3' %}{% url 'core:r1d3_task_update_legacy' task.id %}{% endif %}" class="btn btn-sm btn-outline-primary" title="Edit">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="6" class="text-center py-4">
+                                            <div class="text-muted">
+                                                <i class="fas fa-tasks fa-2x mb-3"></i>
+                                                <p>No tasks assigned to you.</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        $('#myTasksTable').DataTable({
+            "order": [[3, "desc"], [4, "asc"]], // Sort by priority (desc) then due date (asc)
+            "pageLength": 10,
+            "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+            "language": {
+                "emptyTable": "No tasks assigned to you",
+                "info": "Showing _START_ to _END_ of _TOTAL_ tasks",
+                "infoEmpty": "Showing 0 to 0 of 0 tasks",
+                "infoFiltered": "(filtered from _MAX_ total tasks)"
+            },
+            "columnDefs": [
+                { "orderable": false, "targets": 5 } // Disable sorting on the Actions column
+            ]
+        });
+    });
+</script>
 {% endblock %}

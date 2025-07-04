@@ -5,7 +5,7 @@ from django.db.models import Count, Q, F
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.http import Http404
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 
 # Import legacy views for backward compatibility
 from .legacy_views import R1D3TaskDetailLegacyView, R1D3TaskUpdateLegacyView, R1D3TaskDeleteLegacyView
@@ -14,15 +14,21 @@ from .legacy_views import R1D3TaskDetailLegacyView, R1D3TaskUpdateLegacyView, R1
 from .model_utils import get_task_model_map, get_task_type_for_model
 
 # Import task models for dashboard stats
+TASK_MODELS_AVAILABLE = False
+GAME_MODELS_AVAILABLE = False
+IMPORT_ERROR_MESSAGE = ""
+
 try:
-    from projects.task_models import (
-        R1D3Task, GameDevelopmentTask, EducationTask,
-        SocialMediaTask, ArcadeTask, ThemeParkTask
-    )
-    from projects.game_models import GameTask
+    from projects.game_models import GameTask, GameProject
+    GAME_MODELS_AVAILABLE = True
+except ImportError as e:
+    IMPORT_ERROR_MESSAGE += f"Game models import error: {str(e)}\n"
+
+try:
+    from projects.task_models import R1D3Task
     TASK_MODELS_AVAILABLE = True
-except ImportError:
-    TASK_MODELS_AVAILABLE = False
+except ImportError as e:
+    IMPORT_ERROR_MESSAGE += f"R1D3Task import error: {str(e)}\n"
 
 # Import game project models for dashboard stats
 try:
@@ -50,6 +56,11 @@ class DashboardView(LoginRequiredMixin, TemplateView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        user = self.request.user
+        
+        # Add task models availability to context (for internal use only)
+        task_models_available = TASK_MODELS_AVAILABLE
+        game_models_available = GAME_MODELS_AVAILABLE
         
         # Add game development stats if models are available
         if GAME_MODELS_AVAILABLE:
@@ -63,13 +74,106 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                 status__in=['to_do', 'in_progress', 'blocked']
             ).count()
             
-            # Get tasks assigned to current user
-            context['user_tasks'] = GameTask.objects.filter(
-                assigned_to=self.request.user,
-                status__in=['to_do', 'in_progress']
-            ).order_by('-priority', 'due_date')[:5]
+            # Initialize lists for different task types
+            game_tasks = []
+            r1d3_tasks = []
+            
+            # Get GameTask objects assigned to the current user
+            game_tasks = list(GameTask.objects.filter(
+                assigned_to=user
+            ).order_by('-priority', 'due_date'))
+            
+            # Get R1D3Task objects assigned to the current user if available
+            if TASK_MODELS_AVAILABLE:
+                r1d3_tasks = list(R1D3Task.objects.filter(assigned_to=user).order_by('-priority', 'due_date'))
+            else:
+                r1d3_tasks = []
+            
+            # Add task type information to each task
+            for task in game_tasks:
+                task.task_type = 'game'
+                
+            for task in r1d3_tasks:
+                task.task_type = 'r1d3'
+            
+            # Combine all tasks
+            all_tasks = game_tasks + r1d3_tasks
+            
+            # Sort tasks by priority (high to low) and due date (soonest first)
+            # Handle tasks with None due_date by using a far future date for sorting
+            from datetime import datetime, date
+            future_date = date(9999, 12, 31)  # Far future date for sorting
+            all_tasks.sort(key=lambda x: (-self.get_priority_value(x.priority), x.due_date or future_date))
+            
+            # Sort and count tasks
+            
+            # Count tasks by type
+            context['game_tasks_count'] = len(game_tasks)
+            context['r1d3_tasks_count'] = len(r1d3_tasks)
+            context['all_tasks_count'] = len(all_tasks)
+            
+            # Assign all tasks to context
+            context['user_tasks'] = all_tasks
+            
+            # Add section stats to context
+            context['game_section_stats'] = {
+                'tasks': len(game_tasks),
+                'projects': GameProject.objects.filter(status__in=['pre_production', 'production', 'alpha', 'beta']).count()
+            }
+            
+            context['r1d3_section_stats'] = {
+                'tasks': len(r1d3_tasks),
+            }
+            
+            # Add quick links to context
+            context['quick_links'] = user.quick_links.all()
         
         return context
+        
+    @staticmethod
+    def get_priority_value(priority):
+        """Helper function to convert priority string to numeric value for sorting"""
+        priority_map = {
+            'high': 3,
+            'medium': 2,
+            'low': 1,
+            'none': 0
+        }
+        return priority_map.get(priority, 0)
+        
+    @staticmethod
+    def get_task_type_from_section(company_section):
+        """Helper function to determine task type for URL generation based on company section"""
+        section_to_type = {
+            'game_development': 'game',
+            'education': 'education',
+            'arcade': 'arcade',
+            'marketing': 'social_media',  # Using social_media for marketing tasks
+            'finance': 'finance',
+            'hr': 'hr',
+            'it': 'it',
+            'research': 'research',
+            'other': 'r1d3'  # Default to r1d3 for other sections
+        }
+        return section_to_type.get(company_section, 'r1d3')
+        
+    @staticmethod
+    def get_task_type(task):
+        """Legacy helper function for backward compatibility"""
+        class_name = task.__class__.__name__
+        if class_name == 'GameTask':
+            return 'game'
+        elif class_name == 'R1D3Task':
+            return 'r1d3'
+        elif class_name == 'EducationTask' or class_name == 'GameDevelopmentTask' and getattr(task, 'company_section', '') == 'education':
+            return 'education'
+        elif class_name == 'SocialMediaTask' or class_name == 'GameDevelopmentTask' and getattr(task, 'company_section', '') == 'social_media':
+            return 'social_media'
+        elif class_name == 'ArcadeTask' or class_name == 'GameDevelopmentTask' and getattr(task, 'company_section', '') == 'arcade':
+            return 'arcade'
+        elif class_name == 'ThemeParkTask' or class_name == 'GameDevelopmentTask' and getattr(task, 'company_section', '') == 'theme_park':
+            return 'theme_park'
+        return 'unknown'
 
 
 class GlobalTaskDashboardView(LoginRequiredMixin, View):
@@ -89,71 +193,35 @@ class GlobalTaskDashboardView(LoginRequiredMixin, View):
         due_date_filter = request.GET.get('due_date', '')
         search_query = request.GET.get('search', '')
         
-        # Get all tasks from all task models
+        # Get all tasks from available task models
         r1d3_tasks = list(R1D3Task.objects.all())
-        print(f"R1D3Task count: {len(r1d3_tasks)}")
         
-        game_tasks = list(GameDevelopmentTask.objects.all())
-        print(f"GameDevelopmentTask count: {len(game_tasks)}")
-        
-        education_tasks = list(EducationTask.objects.all())
-        print(f"EducationTask count: {len(education_tasks)}")
-        
-        social_media_tasks = list(SocialMediaTask.objects.all())
-        print(f"SocialMediaTask count: {len(social_media_tasks)}")
-        
-        arcade_tasks = list(ArcadeTask.objects.all())
-        print(f"ArcadeTask count: {len(arcade_tasks)}")
-        
-        theme_park_tasks = list(ThemeParkTask.objects.all())
-        print(f"ThemeParkTask count: {len(theme_park_tasks)}")
-        
-        # Get tasks from the old GameTask model
-        old_game_tasks = list(GameTask.objects.all())
-        print(f"Old GameTask count: {len(old_game_tasks)}")
+        # Get tasks from the GameTask model
+        game_tasks = list(GameTask.objects.all())
         
         # Add task_type information to each task
         for task in r1d3_tasks:
             task.task_type = 'r1d3'
         
         for task in game_tasks:
-            task.task_type = 'game_development'
-        
-        for task in education_tasks:
-            task.task_type = 'education'
-        
-        for task in social_media_tasks:
-            task.task_type = 'social_media'
-        
-        for task in arcade_tasks:
-            task.task_type = 'arcade'
-        
-        for task in theme_park_tasks:
-            task.task_type = 'theme_park'
-        
-        for task in old_game_tasks:
-            task.task_type = task.company_section if task.company_section else 'game_development'
-        
+            task.task_type = 'game'
+            
         # Combine all tasks into a single list
-        all_tasks = r1d3_tasks + game_tasks + education_tasks + social_media_tasks + arcade_tasks + theme_park_tasks + old_game_tasks
-        print(f"Total tasks before filtering: {len(all_tasks)}")
+        all_tasks = r1d3_tasks + game_tasks
         
         # Sort tasks by created_at (newest first)
         tasks = sorted(all_tasks, key=lambda x: x.created_at, reverse=True)
         
         # Apply filters - since we're working with a Python list, we need to filter manually
         filtered_tasks = tasks
-        print(f"Tasks before filtering: {len(filtered_tasks)}")
         
         # Filter by status
         if status_filter and status_filter != 'all':
             filtered_tasks = [task for task in filtered_tasks if task.status == status_filter]
-            print(f"Tasks after status filter '{status_filter}': {len(filtered_tasks)}")
         
         # Filter by priority
         if priority_filter and priority_filter != 'all':
             filtered_tasks = [task for task in filtered_tasks if task.priority == priority_filter]
-            print(f"Tasks after priority filter '{priority_filter}': {len(filtered_tasks)}")
         
         # Filter by assigned_to
         if assigned_filter == 'me':
@@ -165,28 +233,22 @@ class GlobalTaskDashboardView(LoginRequiredMixin, View):
         
         # For company section, we need to check the task_type attribute
         if company_section_filter:
-            print(f"Applying company section filter: '{company_section_filter}'")
             # Use the task_type attribute we added to each task
             filtered_tasks = [task for task in filtered_tasks if task.task_type == company_section_filter]
-            print(f"Tasks after company section filter '{company_section_filter}': {len(filtered_tasks)}")
         
         today = date.today()
         if due_date_filter == 'overdue':
             filtered_tasks = [task for task in filtered_tasks if task.due_date and task.due_date < today and task.status in ['to_do', 'in_progress', 'blocked']]
-            print(f"Tasks after due_date filter 'overdue': {len(filtered_tasks)}")
         elif due_date_filter == 'today':
             filtered_tasks = [task for task in filtered_tasks if task.due_date and task.due_date == today]
-            print(f"Tasks after due_date filter 'today': {len(filtered_tasks)}")
         elif due_date_filter == 'this_week':
             end_of_week = today + timedelta(days=(6 - today.weekday()))
             filtered_tasks = [task for task in filtered_tasks if task.due_date and today <= task.due_date <= end_of_week]
-            print(f"Tasks after due_date filter 'this_week': {len(filtered_tasks)}")
         
         if search_query:
             filtered_tasks = [task for task in filtered_tasks if 
                              search_query.lower() in task.title.lower() or 
                              (task.description and search_query.lower() in task.description.lower())]
-            print(f"Tasks after search query '{search_query}': {len(filtered_tasks)}")
             
         # Update tasks with filtered results
         tasks = filtered_tasks
@@ -205,12 +267,12 @@ class GlobalTaskDashboardView(LoginRequiredMixin, View):
         }
         
         # Calculate section statistics
-        # Count GameTask objects by company section
-        game_dev_count = len(game_tasks) + len([t for t in old_game_tasks if t.company_section == 'game_development'])
-        education_count = len(education_tasks) + len([t for t in old_game_tasks if t.company_section == 'education'])
-        social_media_count = len(social_media_tasks) + len([t for t in old_game_tasks if t.company_section == 'social_media'])
-        arcade_count = len(arcade_tasks) + len([t for t in old_game_tasks if t.company_section == 'arcade'])
-        theme_park_count = len(theme_park_tasks) + len([t for t in old_game_tasks if t.company_section == 'theme_park'])
+        # Count tasks by type
+        game_dev_count = len([t for t in game_tasks if getattr(t, 'company_section', '') == 'game_development' or not getattr(t, 'company_section', '')])
+        education_count = len([t for t in game_tasks if getattr(t, 'company_section', '') == 'education'])
+        social_media_count = len([t for t in game_tasks if getattr(t, 'company_section', '') == 'social_media'])
+        arcade_count = len([t for t in game_tasks if getattr(t, 'company_section', '') == 'arcade'])
+        theme_park_count = len([t for t in game_tasks if getattr(t, 'company_section', '') == 'theme_park'])
         
         section_stats = [
             {'section_name': 'r1d3', 'count': len(r1d3_tasks)},

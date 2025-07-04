@@ -366,6 +366,35 @@
                         <span>Logout</span>
                     </a>
                 </li>
+                
+                {% if user.is_authenticated %}
+                <hr class="sidebar-divider">
+                
+                <div class="d-flex justify-content-between align-items-center px-3 mb-2">
+                    <div class="sidebar-heading mb-0">
+                        Quick Links
+                    </div>
+                    <a href="{% url 'core:quick_links' %}" class="text-white" title="Manage Quick Links">
+                        <i class="fas fa-cog fa-sm"></i>
+                    </a>
+                </div>
+                
+                {% for quick_link in request.user.quick_links.all %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ quick_link.url }}">
+                        <i class="{{ quick_link.icon }} fa-fw"></i>
+                        <span>{{ quick_link.name }}</span>
+                    </a>
+                </li>
+                {% empty %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'core:quick_link_create' %}">
+                        <i class="fas fa-fw fa-plus-circle"></i>
+                        <span>Add Quick Link</span>
+                    </a>
+                </li>
+                {% endfor %}
+                {% endif %}
             </ul>
         </div>
         

@@ -1,5 +1,9 @@
 from django.urls import path
 from . import views
+from .quick_link_views import (
+    QuickLinkListView, QuickLinkCreateView, 
+    QuickLinkUpdateView, QuickLinkDeleteView, reorder_quick_links
+)
 
 app_name = 'core'
 
@@ -18,4 +22,11 @@ urlpatterns = [
     path('R1D3-tasks/<int:pk>/update/', views.R1D3TaskUpdateLegacyView.as_view(), name='r1d3_task_update_legacy'),
     path('R1D3-tasks/<int:pk>/delete/', views.R1D3TaskDeleteLegacyView.as_view(), name='r1d3_task_delete_legacy'),
     path('test/', views.TestView.as_view(), name='test'),
+    
+    # Quick Links URLs
+    path('quick-links/', QuickLinkListView.as_view(), name='quick_links'),
+    path('quick-links/create/', QuickLinkCreateView.as_view(), name='quick_link_create'),
+    path('quick-links/<int:pk>/update/', QuickLinkUpdateView.as_view(), name='quick_link_update'),
+    path('quick-links/<int:pk>/delete/', QuickLinkDeleteView.as_view(), name='quick_link_delete'),
+    path('quick-links/reorder/', reorder_quick_links, name='quick_link_reorder'),
 ]

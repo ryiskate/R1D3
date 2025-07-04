@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}Quick Links - R1D3{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Quick Links</h1>
+        <a href="{% url 'core:quick_link_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i> Add New Link
+        </a>
+    </div>
+    
+    <div class="card shadow">
+        <div class="card-header py-3">
+            <h5 class="mb-0 font-weight-bold text-primary">Manage Your Quick Links</h5>
+        </div>
+        <div class="card-body">
+            {% if quick_links %}
+                <p class="text-muted mb-4">Drag and drop to reorder your links. These links will appear in the side menu below your account.</p>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px">#</th>
+                                <th style="width: 50px">Icon</th>
+                                <th>Name</th>
+                                <th>URL</th>
+                                <th style="width: 120px">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="quick-links-list">
+                            {% for link in quick_links %}
+                            <tr data-id="{{ link.id }}" class="quick-link-item">
+                                <td>
+                                    <span class="drag-handle" title="Drag to reorder">
+                                        <i class="fas fa-grip-lines"></i>
+                                    </span>
+                                </td>
+                                <td><i class="{{ link.icon }}"></i></td>
+                                <td>{{ link.name }}</td>
+                                <td>
+                                    <a href="{{ link.url }}" target="_blank" class="text-decoration-none">
+                                        {{ link.url }}
+                                    </a>
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="{% url 'core:quick_link_update' link.id %}" class="btn btn-sm btn-outline-primary" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{% url 'core:quick_link_delete' link.id %}" class="btn btn-sm btn-outline-danger" title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-link fa-4x text-muted mb-3"></i>
+                    <h4>No Quick Links Yet</h4>
+                    <p class="text-muted">Add custom links to quickly access your favorite pages.</p>
+                    <a href="{% url 'core:quick_link_create' %}" class="btn btn-primary mt-3">
+                        <i class="fas fa-plus me-2"></i> Add Your First Link
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if quick_links %}
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Initialize sortable
+        var el = document.getElementById('quick-links-list');
+        var sortable = Sortable.create(el, {
+            handle: '.drag-handle',
+            animation: 150,
+            onEnd: function() {
+                // Get the new order
+                var linkIds = [];
+                $('.quick-link-item').each(function() {
+                    linkIds.push($(this).data('id'));
+                });
+                
+                // Save the new order via AJAX
+                $.ajax({
+                    url: '{% url "core:quick_link_reorder" %}',
+                    type: 'POST',
+                    data: {
+                        'link_ids[]': linkIds,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            // Show success message
+                            toastr.success('Quick links order updated successfully');
+                        } else {
+                            toastr.error('Error updating quick links order');
+                        }
+                    },
+                    error: function() {
+                        toastr.error('Error updating quick links order');
+                    }
+                });
+            }
+        });
+    });
+</script>
+{% endif %}
+{% endblock %}

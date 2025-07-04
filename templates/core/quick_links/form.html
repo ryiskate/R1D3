@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% if form.instance.pk %}Edit{% else %}Add{% endif %} Quick Link - R1D3{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>{% if form.instance.pk %}Edit{% else %}Add{% endif %} Quick Link</h1>
+        <a href="{% url 'core:quick_links' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i> Back to Quick Links
+        </a>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h5 class="mb-0 font-weight-bold text-primary">
+                        {% if form.instance.pk %}Edit{% else %}Add{% endif %} Quick Link
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if form.instance.pk %}
+                    <div id="initial-data" data-name="{{ form.instance.name }}" data-icon="{{ form.instance.icon }}" style="display: none;"></div>
+                    {% endif %}
+                    <form method="post" action="">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.name.id_for_label }}" class="form-label">Name</label>
+                            {{ form.name }}
+                            {% if form.name.errors %}
+                                <div class="invalid-feedback d-block">{{ form.name.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.url.id_for_label }}" class="form-label">URL</label>
+                            {{ form.url }}
+                            <div class="form-text">
+                                You can use absolute URLs (https://example.com) or relative paths (/dashboard/).
+                            </div>
+                            {% if form.url.errors %}
+                                <div class="invalid-feedback d-block">{{ form.url.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="{{ form.icon.id_for_label }}" class="form-label">Icon</label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    {{ form.icon }}
+                                    {% if form.icon.errors %}
+                                        <div class="invalid-feedback d-block">{{ form.icon.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="icon-preview p-3 border rounded text-center">
+                                        <i id="icon-preview" class="fas fa-link fa-2x"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i> Save Quick Link
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h5 class="mb-0 font-weight-bold text-primary">Preview</h5>
+                </div>
+                <div class="card-body">
+                    <div class="sidebar-preview bg-light p-3 rounded">
+                        <div class="sidebar-item mb-2">
+                            <a href="#" class="sidebar-link">
+                                <i class="fas fa-home me-2"></i> Home
+                            </a>
+                        </div>
+                        <div class="sidebar-item mb-2">
+                            <a href="#" class="sidebar-link">
+                                <i class="fas fa-gamepad me-2"></i> Games
+                            </a>
+                        </div>
+                        <div class="sidebar-item mb-2 bg-primary text-white p-2 rounded">
+                            <a href="#" class="sidebar-link text-white">
+                                <i id="preview-icon" class="fas fa-link me-2"></i>
+                                <span id="preview-name">Link Name</span>
+                            </a>
+                        </div>
+                        <div class="sidebar-item mb-2">
+                            <a href="#" class="sidebar-link">
+                                <i class="fas fa-tasks me-2"></i> Tasks
+                            </a>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <p class="text-muted small">
+                            This is how your quick link will appear in the side menu.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Initialize with current values if editing
+        if (document.getElementById('initial-data')) {
+            var initialName = document.getElementById('initial-data').getAttribute('data-name');
+            var initialIcon = document.getElementById('initial-data').getAttribute('data-icon');
+            updatePreview(initialName, initialIcon);
+        }
+        
+        // Update preview when name changes
+        $('#{{ form.name.id_for_label }}').on('input', function() {
+            updateNamePreview($(this).val());
+        });
+        
+        // Update preview when icon changes
+        $('#{{ form.icon.id_for_label }}').on('change', function() {
+            updateIconPreview($(this).val());
+        });
+        
+        // Initial update from form values
+        updateNamePreview($('#{{ form.name.id_for_label }}').val());
+        updateIconPreview($('#{{ form.icon.id_for_label }}').val());
+        
+        function updateNamePreview(name) {
+            if (name) {
+                $('#preview-name').text(name);
+            } else {
+                $('#preview-name').text('Link Name');
+            }
+        }
+        
+        function updateIconPreview(iconClass) {
+            if (iconClass) {
+                $('#icon-preview').attr('class', iconClass + ' fa-2x');
+                $('#preview-icon').attr('class', iconClass + ' me-2');
+            } else {
+                $('#icon-preview').attr('class', 'fas fa-link fa-2x');
+                $('#preview-icon').attr('class', 'fas fa-link me-2');
+            }
+        }
+        
+        function updatePreview(name, iconClass) {
+            updateNamePreview(name);
+            updateIconPreview(iconClass);
+        }
+    });
+</script>
+{% endblock %}

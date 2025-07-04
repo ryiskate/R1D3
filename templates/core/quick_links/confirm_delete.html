@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}Delete Quick Link - R1D3{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Delete Quick Link</h1>
+        <a href="{% url 'core:quick_links' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i> Back to Quick Links
+        </a>
+    </div>
+    
+    <div class="card shadow">
+        <div class="card-header py-3">
+            <h5 class="mb-0 font-weight-bold text-danger">Confirm Deletion</h5>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                Are you sure you want to delete the quick link <strong>"{{ object.name }}"</strong>?
+            </div>
+            
+            <div class="mt-4">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <i class="{{ object.icon }} fa-2x text-primary"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-1">{{ object.name }}</h5>
+                                <p class="mb-0 text-muted">
+                                    <a href="{{ object.url }}" target="_blank" class="text-decoration-none">
+                                        {{ object.url }}
+                                    </a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <form method="post" action="" class="mt-4">
+                {% csrf_token %}
+                <div class="d-flex justify-content-end">
+                    <a href="{% url 'core:quick_links' %}" class="btn btn-secondary me-2">
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-2"></i> Delete Quick Link
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

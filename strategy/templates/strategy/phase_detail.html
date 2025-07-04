@@ -1,0 +1,290 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{{ phase.name }} - Strategy Phase - R1D3{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Progress bar width classes */
+    .progress-width-0 { width: 0%; }
+    .progress-width-10 { width: 10%; }
+    .progress-width-20 { width: 20%; }
+    .progress-width-25 { width: 25%; }
+    .progress-width-30 { width: 30%; }
+    .progress-width-33 { width: 33%; }
+    .progress-width-40 { width: 40%; }
+    .progress-width-50 { width: 50%; }
+    .progress-width-60 { width: 60%; }
+    .progress-width-66 { width: 66%; }
+    .progress-width-70 { width: 70%; }
+    .progress-width-75 { width: 75%; }
+    .progress-width-80 { width: 80%; }
+    .progress-width-90 { width: 90%; }
+    .progress-width-100 { width: 100%; }
+
+    .phase-header {
+        padding: 20px;
+        color: white;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+    
+    .phase-indie {
+        background: linear-gradient(135deg, #6f42c1, #007bff);
+    }
+    
+    .phase-arcade {
+        background: linear-gradient(135deg, #fd7e14, #e83e8c);
+    }
+    
+    .phase-theme-park {
+        background: linear-gradient(135deg, #20c997, #28a745);
+    }
+    
+    .milestone-card {
+        border-left: 4px solid #007bff;
+        transition: all 0.3s ease;
+    }
+    
+    .milestone-card:hover {
+        transform: translateX(5px);
+    }
+    
+    .milestone-card.completed {
+        border-left-color: #28a745;
+    }
+    
+    .milestone-date {
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+    
+    .phase-stats {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+    
+    .stat-card {
+        flex: 1;
+        padding: 15px;
+        margin: 0 10px;
+        border-radius: 5px;
+        text-align: center;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .stat-card h3 {
+        margin-bottom: 5px;
+        font-weight: 600;
+    }
+    
+    .stat-card p {
+        margin-bottom: 0;
+        color: #6c757d;
+    }
+    
+    .progress-container {
+        margin: 20px 0;
+    }
+    
+    .progress-container .progress {
+        height: 10px;
+        border-radius: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>{{ phase.name }}</h1>
+        <div>
+            <a href="{% url 'strategy:milestone_create' phase_id=phase.id %}" class="btn btn-primary">
+                <i class="fas fa-plus-circle me-2"></i> Add Milestone
+            </a>
+            <a href="{% url 'strategy:dashboard' %}" class="btn btn-outline-secondary ms-2">
+                <i class="fas fa-arrow-left me-2"></i> Back to Strategy
+            </a>
+        </div>
+    </div>
+
+    <div class="phase-header {% if phase.phase_type == 'indie_dev' %}phase-indie{% elif phase.phase_type == 'arcade' %}phase-arcade{% else %}phase-theme-park{% endif %}">
+        <div class="row">
+            <div class="col-md-8">
+                <h2 class="mb-3">{{ phase.name }}</h2>
+                <p class="lead mb-0">{{ phase.description }}</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                {% if phase.is_current %}
+                    <div>
+                        <span class="badge bg-success p-2">
+                            <i class="fas fa-star me-1"></i> Current Phase
+                        </span>
+                    </div>
+                {% elif phase.is_completed %}
+                    <div>
+                        <span class="badge bg-secondary p-2">
+                            <i class="fas fa-check-circle me-1"></i> Completed
+                        </span>
+                    </div>
+                {% else %}
+                    <div>
+                        <span class="badge bg-warning text-dark p-2">
+                            <i class="fas fa-clock me-1"></i> Planned
+                        </span>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="stat-card bg-light">
+                <h3>{{ milestones|length }}</h3>
+                <p>Total Milestones</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card bg-light">
+                <h3>{{ completed_milestones|default:0 }}</h3>
+                <p>Completed Milestones</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card bg-light">
+                <h3>Ongoing</h3>
+                <p>Estimated Duration</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="progress-container">
+        <div class="d-flex justify-content-between mb-1">
+            <span>Phase Progress</span>
+            <span>
+                {% if milestones|length > 0 %}
+                    {{ completed_milestones|default:0 }}/{{ milestones|length }} ({{ progress_percentage|default:0 }}%)
+                {% else %}
+                    0/0 (0%)
+                {% endif %}
+            </span>
+        </div>
+        <div class="progress">
+            <div class="progress-bar bg-success progress-width-{{ progress_percentage|default:0 }}" role="progressbar" 
+                 aria-valuenow="{{ progress_percentage|default:0 }}" 
+                 aria-valuemin="0" 
+                 aria-valuemax="100">
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Phase Milestones</h5>
+                </div>
+                <div class="card-body">
+
+                    
+                    {% if milestones %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Milestone</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for milestone in milestones %}
+                                        <tr>
+                                            <td>
+                                                <strong>{{ milestone.title }}</strong>
+                                                <div class="small text-muted">{{ milestone.description|truncatechars:100 }}</div>
+                                            </td>
+                                            <td>
+                                                {% if milestone.status == 'completed' %}
+                                                    <span class="badge bg-success">Completed</span>
+                                                {% elif milestone.status == 'in_progress' %}
+                                                    <span class="badge bg-warning text-dark">In Progress</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">Not Started</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm">
+                                                    <a href="{% url 'strategy:milestone_update' phase_id=phase.id milestone_id=milestone.id %}" class="btn btn-outline-primary">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <a href="{% url 'strategy:milestone_delete' phase_id=phase.id milestone_id=milestone.id %}" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to delete this milestone?');">
+                                                        <i class="fas fa-trash"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <div class="empty-state">
+                                <i class="fas fa-flag-checkered fa-4x text-muted mb-3"></i>
+                                <h3>No Milestones Yet</h3>
+                                <p class="text-muted">Add milestones to track progress for this phase.</p>
+                                <a href="{% url 'strategy:milestone_create' phase_id=phase.id %}" class="btn btn-primary mt-3">
+                                    <i class="fas fa-plus-circle me-2"></i> Add First Milestone
+                                </a>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Phase Description</h5>
+                </div>
+                <div class="card-body">
+                    <p>{{ phase.description }}</p>
+                    
+                    {% if phase.phase_type == 'indie_dev' %}
+                        <h6 class="mt-4">Key Focus Areas:</h6>
+                        <ul>
+                            <li><strong>Game Development:</strong> Learning tools, processes, and best practices</li>
+                            <li><strong>Education:</strong> Building knowledge through courses and self-learning</li>
+                            <li><strong>Indie News:</strong> Staying updated with industry trends and innovations</li>
+                            <li><strong>Marketing:</strong> Understanding how to promote and sell games</li>
+                        </ul>
+                    {% elif phase.phase_type == 'arcade' %}
+                        <h6 class="mt-4">Key Focus Areas:</h6>
+                        <ul>
+                            <li><strong>Hardware Integration:</strong> Learning how controllers interface with games</li>
+                            <li><strong>Sensors:</strong> Implementing various sensors for interactive experiences</li>
+                            <li><strong>Display Technologies:</strong> Working with different screen types and displays</li>
+                            <li><strong>Arcade Business:</strong> Understanding arcade location management</li>
+                        </ul>
+                    {% elif phase.phase_type == 'theme_park' %}
+                        <h6 class="mt-4">Key Focus Areas:</h6>
+                        <ul>
+                            <li><strong>3D Attractions:</strong> Creating immersive 3D experiences</li>
+                            <li><strong>Simulators:</strong> Developing advanced simulation technologies</li>
+                            <li><strong>Roller Coasters:</strong> Designing and building physical rides</li>
+                            <li><strong>Themed Environments:</strong> Creating cohesive themed areas</li>
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,120 @@
+{
+    "1": [
+        {
+            "id": 1001,
+            "title": "Complete Game Development Course",
+            "description": "Finish comprehensive game development course covering Unity, Unreal Engine, and game design principles.",
+            "order": 1,
+            "status": "completed",
+            "is_completed": true
+        },
+        {
+            "id": 1002,
+            "title": "Release First Indie Game",
+            "description": "Develop and release our first indie game on Steam and mobile platforms.",
+            "order": 2,
+            "status": "in_progress",
+            "is_completed": false
+        },
+        {
+            "id": 1003,
+            "title": "Establish Game Development Blog",
+            "description": "Create and grow a game development blog with tutorials and industry insights.",
+            "order": 3,
+            "status": "not_started",
+            "is_completed": false
+        },
+        {
+            "id": 1004,
+            "title": "Launch Game Development Education Platform",
+            "description": "Create an online platform for teaching game development skills to others.",
+            "order": 4,
+            "status": "not_started",
+            "is_completed": false
+        },
+        {
+            "id": 1005,
+            "title": "Attend Major Game Industry Conference",
+            "description": "Participate in a major game industry conference to network and showcase our games.",
+            "order": 5,
+            "status": "not_started",
+            "is_completed": false
+        }
+    ],
+    "2": [
+        {
+            "id": 2001,
+            "title": "Hardware Integration Research",
+            "description": "Complete research on hardware integration for arcade machines including controls, sensors, and displays.",
+            "order": 1,
+            "status": "not_started",
+            "is_completed": false
+        },
+        {
+            "id": 2002,
+            "title": "Prototype First Arcade Cabinet",
+            "description": "Build a prototype arcade cabinet with custom controls and game integration.",
+            "order": 2,
+            "status": "not_started",
+            "is_completed": false
+        },
+        {
+            "id": 2003,
+            "title": "Develop Arcade-Specific Game",
+            "description": "Create a game specifically designed for arcade machine play with unique controls.",
+            "order": 3,
+            "status": "not_started",
+            "is_completed": false
+        },
+        {
+            "id": 2004,
+            "title": "Open First Arcade Location",
+            "description": "Establish our first physical arcade location featuring our custom machines.",
+            "order": 4,
+            "status": "not_started",
+            "is_completed": false
+        }
+    ],
+    "3": [
+        {
+            "id": 3001,
+            "title": "3D Attraction Prototype",
+            "description": "Develop a prototype for an immersive 3D attraction combining VR and physical elements.",
+            "order": 1,
+            "status": "not_started",
+            "is_completed": false
+        },
+        {
+            "id": 3002,
+            "title": "Simulator Technology Development",
+            "description": "Research and develop motion simulator technology for theme park rides.",
+            "order": 2,
+            "status": "not_started",
+            "is_completed": false
+        },
+        {
+            "id": 3003,
+            "title": "First Roller Coaster Design",
+            "description": "Complete the design for our first game-themed roller coaster attraction.",
+            "order": 3,
+            "status": "not_started",
+            "is_completed": false
+        },
+        {
+            "id": 3004,
+            "title": "Themed Environment Prototype",
+            "description": "Create a prototype of a fully themed environment based on our game properties.",
+            "order": 4,
+            "status": "not_started",
+            "is_completed": false
+        },
+        {
+            "id": 3005,
+            "title": "Theme Park Land Opening",
+            "description": "Open our first themed land within an existing theme park.",
+            "order": 5,
+            "status": "not_started",
+            "is_completed": false
+        }
+    ]
+}

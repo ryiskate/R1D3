@@ -1,5 +1,5 @@
 from django import forms
-from .models import Vision, Goal, Objective, KeyResult
+from .models import Vision, Goal, Objective, KeyResult, StrategyPhase, StrategyMilestone
 
 
 class VisionForm(forms.ModelForm):
@@ -37,4 +37,30 @@ class KeyResultForm(forms.ModelForm):
         fields = ['title', 'description', 'objective', 'target_value', 'current_value', 'unit']
         widgets = {
             'description': forms.Textarea(attrs={'rows': 3}),
+        }
+
+
+class StrategyPhaseForm(forms.ModelForm):
+    class Meta:
+        model = StrategyPhase
+        fields = ['name', 'phase_type', 'description', 'order', 'start_year', 'end_year', 'is_current', 'is_completed']
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 4, 'class': 'form-control'}),
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'start_year': forms.NumberInput(attrs={'class': 'form-control'}),
+            'end_year': forms.NumberInput(attrs={'class': 'form-control'}),
+            'order': forms.NumberInput(attrs={'class': 'form-control'}),
+        }
+
+
+class StrategyMilestoneForm(forms.ModelForm):
+    class Meta:
+        model = StrategyMilestone
+        fields = ['title', 'description', 'phase', 'target_date', 'is_completed', 'completion_date', 'order']
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
+            'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'target_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'completion_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'order': forms.NumberInput(attrs={'class': 'form-control'}),
         }

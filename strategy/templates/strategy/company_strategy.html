@@ -1,0 +1,271 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}Company Strategy - R1D3{% endblock %}
+
+{% block extra_css %}
+<style>
+    .strategy-timeline {
+        position: relative;
+        padding: 20px 0;
+    }
+    
+    /* Removed vertical timeline line */
+    .strategy-timeline::before {
+        display: none;
+    }
+    
+    .phase-card {
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        margin-bottom: 30px;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .phase-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+    
+    .phase-card.current {
+        border: 2px solid #28a745;
+    }
+    
+    .phase-card.completed {
+        border: 2px solid #6c757d;
+    }
+    
+    .phase-header {
+        padding: 15px 20px;
+        color: white;
+    }
+    
+    .phase-indie {
+        background: linear-gradient(135deg, #6f42c1, #007bff);
+    }
+    
+    .phase-arcade {
+        background: linear-gradient(135deg, #fd7e14, #e83e8c);
+    }
+    
+    .phase-theme-park {
+        background: linear-gradient(135deg, #20c997, #28a745);
+    }
+    
+    .phase-year-badge {
+        font-size: 0.8rem;
+        padding: 3px 10px;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.2);
+        margin-left: 10px;
+    }
+    
+    .milestone-list {
+        list-style-type: none;
+        padding-left: 0;
+    }
+    
+    .milestone-list li {
+        position: relative;
+        padding: 10px 0 10px 30px;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .milestone-list li:last-child {
+        border-bottom: none;
+    }
+    
+    .milestone-list li::before {
+        content: '';
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #007bff;
+    }
+    
+    .milestone-list li.completed::before {
+        background: #28a745;
+    }
+    
+    .milestone-badge {
+        float: right;
+        font-size: 0.75rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Company Growth Strategy</h1>
+        <div>
+            <a href="{% url 'strategy:dashboard' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i> Back to Strategy
+            </a>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">From Indie Games to Theme Parks</h5>
+                    <p class="card-text">
+                        Our company strategy is a comprehensive roadmap that outlines our journey from indie game development 
+                        to eventually building theme park attractions. This ambitious plan is divided into three major phases, 
+                        each building on the knowledge and success of the previous one.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="strategy-timeline">
+        <div class="row">
+            {% if phases %}
+                {% for phase in phases %}
+                    <div class="col-md-4 mb-4">
+                        <div class="phase-card {% if phase.is_current %}current{% elif phase.is_completed %}completed{% endif %}">
+                            <div class="phase-header {% if phase.phase_type == 'indie_dev' %}phase-indie{% elif phase.phase_type == 'arcade' %}phase-arcade{% else %}phase-theme-park{% endif %}">
+                                <h4 class="mb-0">
+                                    {{ phase.name }}
+                                </h4>
+                            </div>
+                            <div class="card-body">
+                                <p>{{ phase.description|truncatewords:30 }}</p>
+                                
+                                {% if phase.milestones %}
+                                    <h6>Key Milestones:</h6>
+                                    <ul class="milestone-list">
+                                        {% for milestone in phase.milestones|slice:":3" %}
+                                            <li class="{% if milestone.is_completed %}completed{% endif %}">
+                                                {{ milestone.title }}
+                                                {% if milestone.is_completed %}
+                                                    <span class="badge bg-success milestone-badge">Completed</span>
+                                                {% endif %}
+                                            </li>
+                                        {% endfor %}
+                                        {% if phase.milestones|length > 3 %}
+                                            <li class="text-center">
+                                                <small class="text-muted">+ {{ phase.milestones|length|add:"-3" }} more</small>
+                                            </li>
+                                        {% endif %}
+                                    </ul>
+                                {% endif %}
+                                
+                                <div class="mt-3">
+                                    <a href="{% url 'strategy:phase_detail' pk=phase.id %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye me-1"></i> View Details
+                                    </a>
+                                </div>
+                            </div>
+                            {% if phase.is_current %}
+                                <div class="card-footer bg-success text-white">
+                                    <i class="fas fa-star me-1"></i> Current Phase
+                                </div>
+                            {% elif phase.is_completed %}
+                                <div class="card-footer bg-secondary text-white">
+                                    <i class="fas fa-check-circle me-1"></i> Completed
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12 text-center py-5">
+                    <div class="empty-state">
+                        <i class="fas fa-road fa-4x text-muted mb-3"></i>
+                        <h3>No Strategy Phases Defined Yet</h3>
+                        <p class="text-muted">Start by adding the first phase of your company strategy roadmap.</p>
+                        <a href="{% url 'strategy:phase_create' %}" class="btn btn-primary mt-3">
+                            <i class="fas fa-plus-circle me-2"></i> Add First Phase
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-header phase-indie text-white">
+                    <h5 class="mb-0">Phase 1: Indie Game Development</h5>
+                </div>
+                <div class="card-body">
+                    <p>Building a foundation in game development through education and indie projects.</p>
+                    
+                    <ul class="mt-3">
+                        <li>Learn game development tools and processes</li>
+                        <li>Create and publish indie games</li>
+                        <li>Build marketing knowledge</li>
+                        <li>Establish industry connections</li>
+                    </ul>
+                    
+                    <div class="mt-3">
+                        <a href="{% url 'strategy:phase_detail' pk=1 %}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-eye me-1"></i> View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-header phase-arcade text-white">
+                    <h5 class="mb-0">Phase 2: Arcade Machines</h5>
+                </div>
+                <div class="card-body">
+                    <p>Expanding into physical gaming experiences through arcade machine development.</p>
+                    
+                    <ul class="mt-3">
+                        <li>Learn hardware integration with games</li>
+                        <li>Develop custom controllers and interfaces</li>
+                        <li>Create arcade-specific game experiences</li>
+                        <li>Establish arcade locations</li>
+                    </ul>
+                    
+                    <div class="mt-3">
+                        <a href="{% url 'strategy:phase_detail' pk=2 %}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-eye me-1"></i> View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-header phase-theme-park text-white">
+                    <h5 class="mb-0">Phase 3: Theme Park Attractions</h5>
+                </div>
+                <div class="card-body">
+                    <p>Creating immersive physical experiences through theme park attractions.</p>
+                    
+                    <ul class="mt-3">
+                        <li>Develop 3D attractions and simulators</li>
+                        <li>Design and build roller coasters</li>
+                        <li>Create themed environments</li>
+                        <li>Establish full theme park experiences</li>
+                    </ul>
+                    
+                    <div class="mt-3">
+                        <a href="{% url 'strategy:phase_detail' pk=3 %}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-eye me-1"></i> View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
