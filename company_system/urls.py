@@ -16,6 +16,7 @@ urlpatterns = [
     path('strategy/', include('strategy.urls')),
     # Project functionality has been moved to specific apps
     path('games/', include('projects.game_urls')),
+    path('projects/', include('projects.urls', namespace='projects')),
     # Debug URL patterns
     path('debug-tasks/', DebugAllTasksView.as_view(), name='debug_all_tasks'),
     path('template-debug/', TemplateDebugView.as_view(), name='template_debug'),

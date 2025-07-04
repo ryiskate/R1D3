@@ -832,8 +832,14 @@ class R1D3TaskUpdateView(LoginRequiredMixin, UpdateView):
             self.section_name = 'R1D3 Task'
     
     def form_valid(self, form):
+        response = super().form_valid(form)
+        
+        # Import and use the subtask handler
+        from core.subtask_handler import handle_subtasks
+        handle_subtasks(self.request, form.instance)
+        
         messages.success(self.request, f"Task '{form.instance.title}' updated successfully!")
-        return super().form_valid(form)
+        return response
     
     def get_success_url(self):
         # Redirect back to the global task dashboard
@@ -843,6 +849,12 @@ class R1D3TaskUpdateView(LoginRequiredMixin, UpdateView):
         context = super().get_context_data(**kwargs)
         context['section_name'] = getattr(self, 'section_name', 'Task')
         context['is_update'] = True
+        
+        # Get existing subtasks for this task if it exists
+        if self.object and self.object.pk:
+            from core.task_utils import get_task_subtasks
+            context['subtasks'] = get_task_subtasks(self.object)
+        
         return context
 
 
@@ -929,6 +941,10 @@ class R1D3TaskDeleteView(LoginRequiredMixin, DeleteView):
         context = super().get_context_data(**kwargs)
         context['section_name'] = getattr(self, 'section_name', 'Task')
         context['active_department'] = getattr(self, 'active_department', 'r1d3')
+        # Get subtasks for this task
+        from core.task_utils import get_task_subtasks
+        context['subtasks'] = get_task_subtasks(self.object)
+        
         return context
 
 
@@ -1031,4 +1047,8 @@ class R1D3TaskDetailView(LoginRequiredMixin, DetailView):
         context = super().get_context_data(**kwargs)
         context['section_name'] = getattr(self, 'section_name', 'Task')
         context['active_department'] = getattr(self, 'active_department', 'r1d3')
+        # Get subtasks for this task
+        from core.task_utils import get_task_subtasks
+        context['subtasks'] = get_task_subtasks(self.object)
+        
         return context
