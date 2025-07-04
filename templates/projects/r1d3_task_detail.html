@@ -166,6 +166,66 @@
                             </div>
                         </div>
                     </div>
+                    
+                    {% if task.has_additional_note and task.additional_note_text %}
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <h6 class="fw-bold">Additional Notes</h6>
+                            <div class="mb-3">
+                                <div class="card">
+                                    <div class="card-body bg-light">
+                                        {{ task.additional_note_text|linebreaks }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if task.output %}
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <h6 class="fw-bold">Output</h6>
+                            <div class="mb-3">
+                                <div class="card">
+                                    <div class="card-body bg-light">
+                                        <pre class="mb-0">{{ task.output }}</pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if task.has_subtasks and subtasks %}
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <h6 class="fw-bold">Subtasks</h6>
+                            <div class="mb-3">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <ul class="list-group list-group-flush">
+                                            {% for subtask in subtasks %}
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    {% if subtask.is_completed %}
+                                                    <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                                    <span class="text-decoration-line-through">{{ subtask.title }}</span>
+                                                    {% else %}
+                                                    <i class="bi bi-circle text-secondary me-2"></i>
+                                                    <span>{{ subtask.title }}</span>
+                                                    {% endif %}
+                                                </div>
+                                                <small class="text-muted">{{ subtask.updated_at|date:"M d, Y" }}</small>
+                                            </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -214,7 +274,7 @@
                 <h5 class="modal-title" id="updateStatusModalLabel">Update Task Status</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form method="post" action="#">
+            <form method="post" action="{% url 'projects:r1d3_task_status_update' %}">
                 {% csrf_token %}
                 <div class="modal-body">
                     <div class="mb-3">
@@ -228,6 +288,7 @@
                             <option value="blocked" {% if task.status == 'blocked' %}selected{% endif %}>Blocked</option>
                         </select>
                     </div>
+                    <input type="hidden" name="task_id" value="{{ task.id }}">
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -246,13 +307,14 @@
                 <h5 class="modal-title" id="updateHoursModalLabel">Log Hours</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form method="post" action="#">
+            <form method="post" action="{% url 'projects:r1d3_task_hours_update' %}">
                 {% csrf_token %}
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="hours_spent" class="form-label">Hours Spent</label>
                         <input type="number" class="form-control" id="hours_spent" name="hours_spent" step="0.5" min="0" value="0">
                     </div>
+                    <input type="hidden" name="task_id" value="{{ task.id }}">
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
