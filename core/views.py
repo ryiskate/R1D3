@@ -18,6 +18,7 @@ from .model_utils import get_task_model_map, get_task_type_for_model
 
 # Import task models for dashboard stats
 TASK_MODELS_AVAILABLE = False
+INDIE_NEWS_AVAILABLE = False
 try:
     from projects.task_models import (
         R1D3Task, GameDevelopmentTask, EducationTask,
@@ -27,6 +28,13 @@ try:
     TASK_MODELS_AVAILABLE = True
 except ImportError:
     # Models not available, will be imported dynamically when needed
+    pass
+
+try:
+    from indie_news.models import IndieNewsTask
+    INDIE_NEWS_AVAILABLE = True
+except ImportError:
+    # Indie news models not available
     pass
 GAME_MODELS_AVAILABLE = False
 IMPORT_ERROR_MESSAGE = ""
@@ -71,75 +79,182 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         user = self.request.user
         
-        # Add task models availability to context (for internal use only)
-        task_models_available = TASK_MODELS_AVAILABLE
-        game_models_available = GAME_MODELS_AVAILABLE
+        # Add debugging information
+        context['debug_info'] = {
+            'username': user.username,
+            'user_id': user.id,
+            'is_authenticated': user.is_authenticated,
+            'task_models_available': TASK_MODELS_AVAILABLE,
+            'game_models_available': GAME_MODELS_AVAILABLE
+        }
         
-        # Add game development stats if models are available
+        # Add task models availability to context (for internal use only)
+        context['task_models_available'] = TASK_MODELS_AVAILABLE
+        context['game_models_available'] = GAME_MODELS_AVAILABLE
+        
+        # Initialize empty lists for tasks
+        game_tasks = []
+        r1d3_tasks = []
+        education_tasks = []
+        social_media_tasks = []
+        arcade_tasks = []
+        theme_park_tasks = []
+        indie_news_tasks = []
+        
+        # Get GameTask objects if game models are available
         if GAME_MODELS_AVAILABLE:
-            # Count active game projects
-            context['game_count'] = GameProject.objects.filter(
-                status__in=['pre_production', 'production', 'alpha', 'beta']
-            ).count()
-            
-            # Count open tasks
-            context['task_count'] = GameTask.objects.filter(
+            # Count open game tasks
+            context['game_task_count'] = GameTask.objects.filter(
                 status__in=['to_do', 'in_progress', 'blocked']
             ).count()
-            
-            # Initialize lists for different task types
-            game_tasks = []
-            r1d3_tasks = []
             
             # Get GameTask objects assigned to the current user
             game_tasks = list(GameTask.objects.filter(
                 assigned_to=user
             ).order_by('-priority', 'due_date'))
             
-            # Get R1D3Task objects assigned to the current user if available
-            if TASK_MODELS_AVAILABLE:
-                r1d3_tasks = list(R1D3Task.objects.filter(assigned_to=user).order_by('-priority', 'due_date'))
-            else:
-                r1d3_tasks = []
-            
-            # Add task type information to each task
+            # Add task type information to each game task
             for task in game_tasks:
                 task.task_type = 'game'
                 
+            # Get GameDevelopmentTask objects assigned to the current user
+            try:
+                game_dev_tasks = list(GameDevelopmentTask.objects.filter(
+                    assigned_to=user
+                ).order_by('-priority', 'due_date'))
+                
+                # Add task type information to each Game Development task
+                for task in game_dev_tasks:
+                    task.task_type = 'game_development'
+                    
+                # Add game development tasks to the list
+                game_tasks.extend(game_dev_tasks)
+            except Exception as e:
+                print(f"Error loading game development tasks: {e}")
+                game_dev_tasks = []
+        
+        # Get R1D3Task objects assigned to the current user if task models are available
+        if TASK_MODELS_AVAILABLE:
+            # Count open R1D3 tasks
+            context['r1d3_task_count'] = R1D3Task.objects.filter(
+                status__in=['to_do', 'in_progress', 'blocked']
+            ).count()
+            
+            # Get R1D3Task objects assigned to the current user
+            r1d3_tasks = list(R1D3Task.objects.filter(
+                assigned_to=user
+            ).order_by('-priority', 'due_date'))
+            
+            # Print debug info for R1D3 tasks
+            print(f"R1D3 tasks for user {user.username}: {len(r1d3_tasks)}")
+            for task in r1d3_tasks:
+                print(f"  - {task.title} (ID: {task.id})")
+            
+            # Add task type information to each R1D3 task
             for task in r1d3_tasks:
                 task.task_type = 'r1d3'
-            
-            # Combine all tasks
-            all_tasks = game_tasks + r1d3_tasks
-            
-            # Sort tasks by priority (high to low) and due date (soonest first)
-            # Handle tasks with None due_date by using a far future date for sorting
-            from datetime import datetime, date
-            future_date = date(9999, 12, 31)  # Far future date for sorting
-            all_tasks.sort(key=lambda x: (-self.get_priority_value(x.priority), x.due_date or future_date))
-            
-            # Sort and count tasks
-            
-            # Count tasks by type
-            context['game_tasks_count'] = len(game_tasks)
-            context['r1d3_tasks_count'] = len(r1d3_tasks)
-            context['all_tasks_count'] = len(all_tasks)
-            
-            # Assign all tasks to context
-            context['user_tasks'] = all_tasks
-            
-            # Add section stats to context
+                
+            # Get EducationTask objects assigned to the current user
+            try:
+                from projects.task_models import EducationTask
+                education_tasks = list(EducationTask.objects.filter(
+                    assigned_to=user
+                ).order_by('-priority', 'due_date'))
+                
+                # Add task type information to each Education task
+                for task in education_tasks:
+                    task.task_type = 'education'
+            except (ImportError, AttributeError):
+                education_tasks = []
+                
+            # Get SocialMediaTask objects assigned to the current user
+            try:
+                from projects.task_models import SocialMediaTask
+                social_media_tasks = list(SocialMediaTask.objects.filter(
+                    assigned_to=user
+                ).order_by('-priority', 'due_date'))
+                
+                # Add task type information to each Social Media task
+                for task in social_media_tasks:
+                    task.task_type = 'social_media'
+            except (ImportError, AttributeError):
+                social_media_tasks = []
+                
+            # Get ArcadeTask objects assigned to the current user
+            try:
+                from projects.task_models import ArcadeTask
+                arcade_tasks = list(ArcadeTask.objects.filter(
+                    assigned_to=user
+                ).order_by('-priority', 'due_date'))
+                
+                # Add task type information to each Arcade task
+                for task in arcade_tasks:
+                    task.task_type = 'arcade'
+            except (ImportError, AttributeError):
+                arcade_tasks = []
+                
+            # Get ThemeParkTask objects assigned to the current user
+            try:
+                from projects.task_models import ThemeParkTask
+                theme_park_tasks = list(ThemeParkTask.objects.filter(
+                    assigned_to=user
+                ).order_by('-priority', 'due_date'))
+                
+                # Add task type information to each Theme Park task
+                for task in theme_park_tasks:
+                    task.task_type = 'theme_park'
+            except (ImportError, AttributeError):
+                theme_park_tasks = []
+                
+        # Get IndieNewsTask objects assigned to the current user if available
+        if INDIE_NEWS_AVAILABLE:
+            try:
+                indie_news_tasks = list(IndieNewsTask.objects.filter(
+                    assigned_to=user
+                ).order_by('-priority', 'due_date'))
+                
+                # Print debug info for indie news tasks
+                print(f"Indie News tasks for user {user.username}: {len(indie_news_tasks)}")
+                for task in indie_news_tasks:
+                    print(f"  - {task.title} (ID: {task.id})")
+                
+                # Add task type information to each Indie News task
+                for task in indie_news_tasks:
+                    task.task_type = 'indie_news'
+            except Exception as e:
+                print(f"Error loading indie news tasks: {e}")
+                indie_news_tasks = []
+        
+        # Combine all tasks
+        all_tasks = game_tasks + r1d3_tasks + education_tasks + social_media_tasks + arcade_tasks + theme_park_tasks + indie_news_tasks
+        
+        # Sort tasks by priority (high to low) and due date (soonest first)
+        # Handle tasks with None due_date by using a far future date for sorting
+        from datetime import datetime, date
+        future_date = date(9999, 12, 31)  # Far future date for sorting
+        all_tasks.sort(key=lambda x: (-self.get_priority_value(x.priority), x.due_date or future_date))
+        
+        # Count tasks by type
+        context['game_tasks_count'] = len(game_tasks)
+        context['r1d3_tasks_count'] = len(r1d3_tasks)
+        context['all_tasks_count'] = len(all_tasks)
+        
+        # Assign all tasks to context
+        context['user_tasks'] = all_tasks
+        
+        # Add section stats to context
+        if GAME_MODELS_AVAILABLE:
             context['game_section_stats'] = {
                 'tasks': len(game_tasks),
                 'projects': GameProject.objects.filter(status__in=['pre_production', 'production', 'alpha', 'beta']).count()
             }
-            
-            context['r1d3_section_stats'] = {
-                'tasks': len(r1d3_tasks),
-            }
-            
-            # Add quick links to context
-            context['quick_links'] = user.quick_links.all()
+        
+        context['r1d3_section_stats'] = {
+            'tasks': len(r1d3_tasks),
+        }
+        
+        # Add quick links to context
+        context['quick_links'] = user.quick_links.all()
         
         return context
         
@@ -212,6 +327,19 @@ class GlobalTaskDashboardView(LoginRequiredMixin, View):
             SocialMediaTask, ArcadeTask, ThemeParkTask
         )
         
+        # Import indie news tasks
+        indie_news_tasks = []
+        try:
+            from indie_news.models import IndieNewsTask
+            indie_news_tasks = list(IndieNewsTask.objects.all())
+            print(f"Loaded {len(indie_news_tasks)} indie news tasks")
+            # Debug info for indie news tasks
+            for task in indie_news_tasks:
+                print(f"  - Indie News Task: {task.title} (ID: {task.id})")
+        except ImportError as e:
+            print(f"IndieNewsTask model not available: {e}")
+            pass
+        
         # Get tasks from each model
         r1d3_tasks = list(R1D3Task.objects.all())
         game_dev_tasks = list(GameDevelopmentTask.objects.all())
@@ -245,8 +373,12 @@ class GlobalTaskDashboardView(LoginRequiredMixin, View):
         for task in game_tasks:
             task.task_type = 'game'
             
+        # Add task_type information to indie news tasks
+        for task in indie_news_tasks:
+            task.task_type = 'indie_news'
+            
         # Combine all tasks into a single list
-        all_tasks = r1d3_tasks + game_dev_tasks + education_tasks + social_media_tasks + arcade_tasks + theme_park_tasks + game_tasks
+        all_tasks = r1d3_tasks + game_dev_tasks + education_tasks + social_media_tasks + arcade_tasks + theme_park_tasks + game_tasks + indie_news_tasks
         
         # Sort tasks by created_at (newest first)
         tasks = sorted(all_tasks, key=lambda x: x.created_at, reverse=True)
@@ -317,6 +449,7 @@ class GlobalTaskDashboardView(LoginRequiredMixin, View):
             {'section_name': 'social_media', 'count': len(social_media_tasks) + len([t for t in game_tasks if getattr(t, 'company_section', '') == 'social_media'])},
             {'section_name': 'arcade', 'count': len(arcade_tasks) + len([t for t in game_tasks if getattr(t, 'company_section', '') == 'arcade'])},
             {'section_name': 'theme_park', 'count': len(theme_park_tasks) + len([t for t in game_tasks if getattr(t, 'company_section', '') == 'theme_park'])},
+            {'section_name': 'indie_news', 'count': len(indie_news_tasks)},
         ]
         
         # Get recent and upcoming tasks
@@ -473,8 +606,10 @@ class R1D3TaskCreateView(LoginRequiredMixin, CreateView):
 def update_task_status(request):
     """AJAX view to update task status directly from the task table."""
     
-    # Use task models imported at the top of the file
-    # If they weren't imported successfully, try importing them now
+    # Import the task models if they're not already available
+    global R1D3Task, GameDevelopmentTask, EducationTask, SocialMediaTask, ArcadeTask, ThemeParkTask, GameTask
+    
+    # If the models weren't imported successfully at the module level, try importing them now
     if not TASK_MODELS_AVAILABLE:
         try:
             from projects.task_models import (
@@ -488,19 +623,27 @@ def update_task_status(request):
     # Handle both JSON and form data
     print(f"DEBUG: Content-Type: {request.content_type}")
     print(f"DEBUG: Request method: {request.method}")
-    print(f"DEBUG: POST data: {request.POST}")
-    print(f"DEBUG: Raw body: {request.body[:200]}")
     
+    # IMPORTANT: We can only read the request body ONCE
+    # So we need to be careful not to access both request.POST and request.body
+    
+    # Check if it's JSON content
     if request.content_type and 'application/json' in request.content_type:
         try:
+            # For JSON requests, read the body directly
             data = json.loads(request.body)
             print(f"DEBUG: Parsed JSON data: {data}")
         except json.JSONDecodeError as e:
             print(f"DEBUG: JSON decode error: {e}")
             return JsonResponse({'error': f'Invalid JSON: {str(e)}'}, status=400)
     else:
+        # For form data, use request.POST but don't access request.body
         data = request.POST
         print(f"[DEBUG] Form data: {dict(data)}")
+    
+    # Log the data we received
+    print(f"[DEBUG] Received data: {data}")
+    
     
     task_id = data.get('task_id')
     task_type = data.get('task_type')

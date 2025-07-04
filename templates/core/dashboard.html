@@ -7,6 +7,18 @@
 {% block content %}
 <div class="container-fluid py-4">
     <h1 class="mb-4">{{ request.user.username }}'s Dashboard</h1>
+
+    <!-- Debug information -->
+    <div class="alert alert-info mb-4">
+        <h5>Debug Information</h5>
+        <p><strong>Username:</strong> {{ debug_info.username }}</p>
+        <p><strong>User ID:</strong> {{ debug_info.user_id }}</p>
+        <p><strong>Is Authenticated:</strong> {{ debug_info.is_authenticated }}</p>
+        <p><strong>Task Models Available:</strong> {{ debug_info.task_models_available }}</p>
+        <p><strong>Game Models Available:</strong> {{ debug_info.game_models_available }}</p>
+        <p><strong>R1D3 Tasks Count:</strong> {{ r1d3_tasks_count|default:"0" }}</p>
+        <p><strong>Game Tasks Count:</strong> {{ game_tasks_count|default:"0" }}</p>
+    </div>
     
     <div class="row mb-4">
         <div class="col-md-6">
@@ -83,7 +95,7 @@
         <div class="col-md-12">
             <div class="card shadow mb-4">
                 <div class="card-header py-3 d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0 font-weight-bold text-primary">My Tasks ({{ all_tasks_count|default:"0" }} total)</h5>
+                    <h5 class="mb-0 font-weight-bold text-primary">All Tasks ({{ all_tasks_count|default:"0" }} total)</h5>
                     <div>
                         <small class="text-muted me-3">
                             <span class="badge bg-success">Game Tasks: {{ game_tasks_count|default:"0" }}</span>
@@ -102,6 +114,7 @@
                                     <th width="120">Company Section</th>
                                     <th width="120">Status</th>
                                     <th width="100">Priority</th>
+                                    <th width="120">Assigned To</th>
                                     <th width="120">Due Date</th>
                                     <th width="80">Actions</th>
                                 </tr>
@@ -138,6 +151,18 @@
                                                 {% else %}
                                                 <span class="badge bg-secondary">Other</span>
                                                 {% endif %}
+                                            {% elif task.task_type == 'game_development' %}
+                                                <span class="badge bg-success">Game Development</span>
+                                            {% elif task.task_type == 'education' %}
+                                                <span class="badge bg-info">Education</span>
+                                            {% elif task.task_type == 'social_media' %}
+                                                <span class="badge bg-warning text-dark">Social Media</span>
+                                            {% elif task.task_type == 'arcade' %}
+                                                <span class="badge bg-danger">Arcade</span>
+                                            {% elif task.task_type == 'theme_park' %}
+                                                <span class="badge bg-success">Theme Park</span>
+                                            {% elif task.task_type == 'indie_news' %}
+                                                <span class="badge bg-info">Indie News</span>
                                             {% else %}
                                             <span class="badge bg-secondary">{{ task.task_type|title }}</span>
                                             {% endif %}
@@ -162,6 +187,15 @@
                                             </span>
                                         </td>
                                         <td>
+                                            {% if task.assigned_to %}
+                                                <span class="badge {% if task.assigned_to.username == request.user.username %}bg-success{% else %}bg-secondary{% endif %}">
+                                                    {{ task.assigned_to.username }}
+                                                </span>
+                                            {% else %}
+                                                <span class="text-muted">Unassigned</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
                                             {% if task.due_date %}
                                             {{ task.due_date|date:"M d, Y" }}
                                             {% else %}
@@ -179,10 +213,10 @@
                                     {% endfor %}
                                 {% else %}
                                     <tr>
-                                        <td colspan="6" class="text-center py-4">
+                                        <td colspan="7" class="text-center py-4">
                                             <div class="text-muted">
                                                 <i class="fas fa-tasks fa-2x mb-3"></i>
-                                                <p>No tasks assigned to you.</p>
+                                                <p>No tasks found in the system.</p>
                                             </div>
                                         </td>
                                     </tr>
