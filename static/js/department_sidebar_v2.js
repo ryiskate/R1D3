@@ -5,12 +5,17 @@
  */
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Get the current path to determine which department is active
+    console.log("Department Sidebar V2 Script loaded at " + new Date().toLocaleTimeString());
+    
+    // Get the current path
     const currentPath = window.location.pathname;
+    
+    // Get the sidebar content element
     const sidebarContent = document.getElementById('sidebar-content');
     
-    // Don't modify the sidebar if we're on a debug page
-    if (currentPath.includes('/debug-')) {
+    // Don't modify the sidebar if we're on a debug page or in the education section
+    if (currentPath.includes('/debug/') || currentPath.startsWith('/education')) {
+        console.log('Debug page or education section detected, skipping sidebar modification');
         return;
     }
     
@@ -53,21 +58,28 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
             
             <li class="nav-item">
-                <a class="nav-link" href="/education/dashboard/">
+                <a class="nav-link ${currentPath === '/education/dashboard/' || currentPath === '/education/' ? 'active' : ''}" href="/education/dashboard/">
                     <i class="fas fa-fw fa-chalkboard-teacher"></i>
                     <span>Education Dashboard</span>
                 </a>
             </li>
             
             <li class="nav-item">
-                <a class="nav-link" href="/education/courses/">
+                <a class="nav-link ${currentPath.includes('/education/courses') ? 'active' : ''}" href="/education/courses/">
                     <i class="fas fa-fw fa-book"></i>
                     <span>Courses</span>
                 </a>
             </li>
             
             <li class="nav-item">
-                <a class="nav-link" href="/education/tasks/">
+                <a class="nav-link ${currentPath.includes('/education/knowledge') ? 'active' : ''}" href="/education/knowledge/">
+                    <i class="fas fa-fw fa-lightbulb"></i>
+                    <span>Knowledge Base</span>
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link ${currentPath.includes('/education/tasks') ? 'active' : ''}" href="/education/tasks/">
                     <i class="fas fa-fw fa-tasks"></i>
                     <span>Education Tasks</span>
                 </a>

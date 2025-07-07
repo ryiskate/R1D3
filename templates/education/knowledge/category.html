@@ -1,0 +1,242 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ category.name }} | Knowledge Base | Education | R1D3{% endblock %}
+
+{% block extra_css %}
+<style>
+    .knowledge-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        height: 100%;
+    }
+    .knowledge-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+    .category-badge {
+        font-size: 0.8rem;
+        padding: 0.35em 0.65em;
+    }
+    .tag-badge {
+        font-size: 0.75rem;
+        padding: 0.25em 0.5em;
+        margin-right: 0.25rem;
+        margin-bottom: 0.25rem;
+        display: inline-block;
+        background-color: #f8f9fc;
+        color: #5a5c69;
+        border: 1px solid #e3e6f0;
+    }
+    .tag-badge:hover {
+        background-color: #eaecf4;
+        color: #3a3b45;
+        text-decoration: none;
+    }
+    .sidebar-card {
+        border-radius: 0.35rem;
+    }
+    .sidebar-heading {
+        font-size: 0.85rem;
+        letter-spacing: 0.1rem;
+        text-transform: uppercase;
+    }
+    .article-meta {
+        font-size: 0.85rem;
+        color: #858796;
+    }
+    .featured-image {
+        height: 160px;
+        object-fit: cover;
+        width: 100%;
+    }
+    .category-header {
+        background-color: {{ category.color }};
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Category Header -->
+    <div class="category-header">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto text-center">
+                    <i class="fas {{ category.icon }} fa-3x mb-3"></i>
+                    <h1 class="h2 mb-2">{{ category.name }}</h1>
+                    {% if category.description %}
+                    <p class="lead mb-0">{{ category.description }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-9">
+            <!-- Articles Grid -->
+            <div class="row">
+                {% if articles %}
+                    {% for article in articles %}
+                    <div class="col-lg-6 mb-4">
+                        <div class="card shadow knowledge-card">
+                            {% if article.featured_image %}
+                            <img src="{{ article.featured_image.url }}" class="card-img-top featured-image" alt="{{ article.title }}">
+                            {% else %}
+                            <div class="card-img-top featured-image bg-gradient-primary d-flex align-items-center justify-content-center">
+                                <i class="fas fa-book fa-3x text-white"></i>
+                            </div>
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title mt-2">
+                                    <a href="{% url 'education:knowledge_article' article.slug %}" class="text-gray-800">{{ article.title }}</a>
+                                </h5>
+                                <p class="card-text">{{ article.summary|truncatechars:120 }}</p>
+                                <div class="article-meta mb-2">
+                                    <i class="far fa-user mr-1"></i> {{ article.author.get_full_name|default:article.author.username }}
+                                    <i class="far fa-calendar-alt ml-2 mr-1"></i> {{ article.updated_at|date:"M d, Y" }}
+                                    <i class="far fa-eye ml-2 mr-1"></i> {{ article.view_count }}
+                                </div>
+                                <div class="mb-2">
+                                    {% for tag in article.tags.all %}
+                                    <a href="{% url 'education:knowledge_tag' tag.slug %}" class="tag-badge badge">
+                                        <i class="fas fa-tag mr-1"></i> {{ tag.name }}
+                                    </a>
+                                    {% endfor %}
+                                </div>
+                                <a href="{% url 'education:knowledge_article' article.slug %}" class="btn btn-sm btn-primary">
+                                    Read More <i class="fas fa-arrow-right ml-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="col-12">
+                        <div class="card shadow mb-4">
+                            <div class="card-body text-center py-5">
+                                <i class="fas fa-search fa-3x text-gray-300 mb-3"></i>
+                                <h4 class="text-gray-800">No articles found in this category</h4>
+                                <p class="text-gray-600">Be the first to <a href="{% url 'education:knowledge_article_create' %}">create an article</a> in this category.</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Pagination -->
+            {% if is_paginated %}
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1" aria-label="First">
+                            <span aria-hidden="true">&laquo;&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ num }}</span>
+                        </li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Last">
+                            <span aria-hidden="true">&raquo;&raquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+            
+            <!-- Action Buttons -->
+            <div class="d-flex justify-content-between mb-4">
+                <a href="{% url 'education:knowledge_base' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left mr-1"></i> Back to Knowledge Base
+                </a>
+                <a href="{% url 'education:knowledge_article_create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus mr-1"></i> Create Article
+                </a>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-3">
+            <!-- Categories -->
+            <div class="card shadow mb-4 sidebar-card">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary sidebar-heading">Categories</h6>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for cat in categories %}
+                        <a href="{% url 'education:knowledge_category' cat.slug %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center {% if cat.id == category.id %}active{% endif %}">
+                            <div>
+                                <i class="fas {{ cat.icon }} mr-1"></i>
+                                {{ cat.name }}
+                            </div>
+                            <span class="badge badge-primary badge-pill">{{ cat.article_count }}</span>
+                        </a>
+                        {% empty %}
+                        <div class="text-center py-3">
+                            <p class="text-gray-600 mb-0">No categories yet</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Popular Tags -->
+            <div class="card shadow mb-4 sidebar-card">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary sidebar-heading">Popular Tags</h6>
+                </div>
+                <div class="card-body">
+                    {% for tag in popular_tags %}
+                    <a href="{% url 'education:knowledge_tag' tag.slug %}" class="tag-badge badge">
+                        <i class="fas fa-tag mr-1"></i> {{ tag.name }}
+                    </a>
+                    {% empty %}
+                    <div class="text-center py-3">
+                        <p class="text-gray-600 mb-0">No tags yet</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Initialize tooltips
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+</script>
+{% endblock %}

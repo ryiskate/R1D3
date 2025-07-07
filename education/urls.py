@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 from . import debug_views
+from . import knowledge_views
 
 app_name = 'education'
 
@@ -19,4 +20,15 @@ urlpatterns = [
     path('tasks/<int:pk>/status-update/', views.EducationTaskStatusUpdateView.as_view(), name='task_status_update'),
     path('tasks/<int:pk>/hours-update/', views.EducationTaskHoursUpdateView.as_view(), name='task_hours_update'),
     path('tasks/batch-update/', views.EducationTaskBatchUpdateView.as_view(), name='batch_task_update'),
+    
+    # Knowledge Base URLs
+    path('knowledge/', knowledge_views.KnowledgeBaseView.as_view(), name='knowledge_base'),
+    path('knowledge/create/', knowledge_views.KnowledgeArticleCreateView.as_view(), name='knowledge_article_create'),
+    path('knowledge/article/<slug:slug>/', knowledge_views.KnowledgeArticleDetailView.as_view(), name='knowledge_article'),
+    path('knowledge/article/<slug:slug>/edit/', knowledge_views.KnowledgeArticleUpdateView.as_view(), name='knowledge_article_update'),
+    path('knowledge/article/<slug:slug>/delete/', knowledge_views.KnowledgeArticleDeleteView.as_view(), name='knowledge_article_delete'),
+    path('knowledge/category/<slug:slug>/', knowledge_views.KnowledgeCategoryView.as_view(), name='knowledge_category'),
+    path('knowledge/tag/<slug:slug>/', knowledge_views.KnowledgeTagView.as_view(), name='knowledge_tag'),
+    path('knowledge/article/<slug:slug>/upload-media/', knowledge_views.MediaAttachmentUploadView.as_view(), name='media_upload'),
+    path('knowledge/media/<int:pk>/delete/', knowledge_views.MediaAttachmentDeleteView.as_view(), name='media_delete'),
 ]

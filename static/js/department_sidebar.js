@@ -104,14 +104,21 @@ document.addEventListener('DOMContentLoaded', function() {
             </li>
             
             <li class="nav-item">
-                <a class="nav-link" href="/education/courses/">
+                <a class="nav-link ${currentPath.includes('/education/courses') ? 'active' : ''}" href="/education/courses/">
                     <i class="fas fa-fw fa-book"></i>
                     <span>Courses</span>
                 </a>
             </li>
             
             <li class="nav-item">
-                <a class="nav-link ${currentPath === '/education/tasks/' ? 'active' : ''}" href="/education/tasks/">
+                <a class="nav-link ${currentPath.includes('/education/knowledge') ? 'active' : ''}" href="/education/knowledge/">
+                    <i class="fas fa-fw fa-lightbulb"></i>
+                    <span>Knowledge Base</span>
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link ${currentPath.includes('/education/tasks') ? 'active' : ''}" href="/education/tasks/">
                     <i class="fas fa-fw fa-tasks"></i>
                     <span>Education Tasks</span>
                 </a>

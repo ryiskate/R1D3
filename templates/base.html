@@ -319,6 +319,9 @@
                                     <span>New R1D3 Task</span>
                                 </a>
                             </li>
+                        {% elif request.resolver_match.namespace == 'education' %}
+                            <!-- Education Department sidebar content is handled by JavaScript -->
+                            <!-- Empty placeholder for JavaScript to populate -->
                         {% else %}
                             <!-- Default sidebar content -->
                             <div class="sidebar-heading">
@@ -540,7 +543,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
     
     <!-- Department Sidebar Script -->
-    {% if request.resolver_match.namespace != 'indie_news' %}
+    {% if request.resolver_match.namespace == 'education' %}
+    <!-- Education Department Sidebar Script -->
+    <script src="/static/js/education_sidebar.js"></script>
+    {% elif request.resolver_match.namespace != 'indie_news' %}
     <script src="/static/js/department_sidebar_v2.js"></script>
     {% if '/R1D3-tasks/' in request.path %}
     <!-- R1D3 Tasks Sidebar Script (takes precedence over department sidebar) -->

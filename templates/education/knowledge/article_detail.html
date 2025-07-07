@@ -1,0 +1,255 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ article.title }} | Knowledge Base | Education | R1D3{% endblock %}
+
+{% block extra_css %}
+<style>
+    .article-header {
+        background-color: #f8f9fc;
+        border-bottom: 1px solid #e3e6f0;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+    }
+    .article-meta {
+        font-size: 0.85rem;
+        color: #858796;
+    }
+    .article-content {
+        font-size: 1rem;
+        line-height: 1.8;
+    }
+    .article-content h1, .article-content h2, .article-content h3, 
+    .article-content h4, .article-content h5, .article-content h6 {
+        margin-top: 1.5rem;
+        margin-bottom: 1rem;
+        font-weight: 700;
+    }
+    .article-content img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 0.35rem;
+        margin: 1rem 0;
+    }
+    .article-content pre {
+        background-color: #f8f9fc;
+        border-radius: 0.35rem;
+        padding: 1rem;
+        margin: 1rem 0;
+        overflow-x: auto;
+    }
+    .article-content table {
+        width: 100%;
+        margin-bottom: 1rem;
+        border-collapse: collapse;
+    }
+    .article-content table th, .article-content table td {
+        padding: 0.75rem;
+        border: 1px solid #e3e6f0;
+    }
+    .article-content table th {
+        background-color: #f8f9fc;
+    }
+    .article-content blockquote {
+        border-left: 4px solid #4e73df;
+        padding-left: 1rem;
+        margin-left: 0;
+        color: #5a5c69;
+    }
+    .tag-badge {
+        font-size: 0.75rem;
+        padding: 0.25em 0.5em;
+        margin-right: 0.25rem;
+        margin-bottom: 0.25rem;
+        display: inline-block;
+        background-color: #f8f9fc;
+        color: #5a5c69;
+        border: 1px solid #e3e6f0;
+    }
+    .tag-badge:hover {
+        background-color: #eaecf4;
+        color: #3a3b45;
+        text-decoration: none;
+    }
+    .category-badge {
+        font-size: 0.8rem;
+        padding: 0.35em 0.65em;
+    }
+    .attachment-card {
+        transition: transform 0.2s ease;
+    }
+    .attachment-card:hover {
+        transform: translateY(-3px);
+    }
+    .related-article {
+        transition: transform 0.3s ease;
+    }
+    .related-article:hover {
+        transform: translateY(-5px);
+    }
+    .featured-image {
+        max-height: 400px;
+        object-fit: cover;
+        width: 100%;
+        border-radius: 0.35rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Article Header -->
+    <div class="article-header">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto text-center">
+                    {% if article.category %}
+                    <a href="{% url 'education:knowledge_category' article.category.slug %}" class="category-badge badge mb-3" style="background-color: {{ article.category.color }}; color: white;">
+                        <i class="fas {{ article.category.icon }} mr-1"></i> {{ article.category.name }}
+                    </a>
+                    {% endif %}
+                    <h1 class="h2 text-gray-800 mb-3">{{ article.title }}</h1>
+                    <div class="article-meta mb-3">
+                        <span><i class="far fa-user mr-1"></i> {{ article.author.get_full_name|default:article.author.username }}</span>
+                        <span class="mx-2">|</span>
+                        <span><i class="far fa-calendar-alt mr-1"></i> {{ article.updated_at|date:"F d, Y" }}</span>
+                        <span class="mx-2">|</span>
+                        <span><i class="far fa-eye mr-1"></i> {{ article.view_count }} views</span>
+                    </div>
+                    <div class="mb-3">
+                        {% for tag in article.tags.all %}
+                        <a href="{% url 'education:knowledge_tag' tag.slug %}" class="tag-badge badge">
+                            <i class="fas fa-tag mr-1"></i> {{ tag.name }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Featured Image -->
+            {% if article.featured_image %}
+            <div class="text-center mb-4">
+                <img src="{{ article.featured_image.url }}" alt="{{ article.title }}" class="featured-image shadow">
+            </div>
+            {% endif %}
+
+            <!-- Article Content -->
+            <div class="card shadow mb-4">
+                <div class="card-body">
+                    <div class="article-content">
+                        {{ article.content|safe }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Media Attachments -->
+            {% if article.attachments.exists %}
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Media Gallery</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for attachment in article.attachments.all %}
+                        <div class="col-md-4 mb-4">
+                            <div class="card attachment-card h-100">
+                                {% if attachment.file_type == 'image' %}
+                                <img src="{{ attachment.file.url }}" class="card-img-top" alt="{{ attachment.title|default:attachment.filename }}">
+                                {% elif attachment.file_type == 'video' %}
+                                <div class="card-img-top bg-gradient-info text-white d-flex align-items-center justify-content-center" style="height: 120px;">
+                                    <i class="fas fa-video fa-3x"></i>
+                                </div>
+                                {% elif attachment.file_type == 'document' %}
+                                <div class="card-img-top bg-gradient-primary text-white d-flex align-items-center justify-content-center" style="height: 120px;">
+                                    <i class="fas fa-file-alt fa-3x"></i>
+                                </div>
+                                {% elif attachment.file_type == 'audio' %}
+                                <div class="card-img-top bg-gradient-success text-white d-flex align-items-center justify-content-center" style="height: 120px;">
+                                    <i class="fas fa-music fa-3x"></i>
+                                </div>
+                                {% else %}
+                                <div class="card-img-top bg-gradient-secondary text-white d-flex align-items-center justify-content-center" style="height: 120px;">
+                                    <i class="fas fa-file fa-3x"></i>
+                                </div>
+                                {% endif %}
+                                <div class="card-body">
+                                    <h6 class="card-title">{{ attachment.title|default:attachment.filename }}</h6>
+                                    {% if attachment.description %}
+                                    <p class="card-text small">{{ attachment.description|truncatechars:50 }}</p>
+                                    {% endif %}
+                                    <a href="{{ attachment.file.url }}" class="btn btn-sm btn-primary" target="_blank">
+                                        <i class="fas fa-download mr-1"></i> Download
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Action Buttons -->
+            <div class="d-flex justify-content-between mb-4">
+                <a href="{% url 'education:knowledge_base' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left mr-1"></i> Back to Knowledge Base
+                </a>
+                <div>
+                    <a href="{% url 'education:knowledge_article_update' article.slug %}" class="btn btn-primary mr-2">
+                        <i class="fas fa-edit mr-1"></i> Edit
+                    </a>
+                    <a href="{% url 'education:knowledge_article_delete' article.slug %}" class="btn btn-danger">
+                        <i class="fas fa-trash mr-1"></i> Delete
+                    </a>
+                </div>
+            </div>
+
+            <!-- Related Articles -->
+            {% if related_articles %}
+            <h4 class="mb-3">Related Articles</h4>
+            <div class="row">
+                {% for related in related_articles %}
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow h-100 related-article">
+                        <div class="card-body">
+                            <h5 class="card-title h6">
+                                <a href="{% url 'education:knowledge_article' related.slug %}" class="text-gray-800">{{ related.title }}</a>
+                            </h5>
+                            <p class="card-text small">{{ related.summary|truncatechars:80 }}</p>
+                            <div class="article-meta small mb-2">
+                                <i class="far fa-calendar-alt mr-1"></i> {{ related.updated_at|date:"M d, Y" }}
+                            </div>
+                            <a href="{% url 'education:knowledge_article' related.slug %}" class="btn btn-sm btn-outline-primary">Read More</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Initialize tooltips
+        $('[data-toggle="tooltip"]').tooltip();
+        
+        // Add Bootstrap classes to tables in article content
+        $('.article-content table').addClass('table table-bordered');
+        
+        // Add syntax highlighting to code blocks
+        document.querySelectorAll('pre code').forEach((block) => {
+            if (typeof hljs !== 'undefined') {
+                hljs.highlightBlock(block);
+            }
+        });
+    });
+</script>
+{% endblock %}

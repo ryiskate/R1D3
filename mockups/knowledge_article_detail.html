@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Level Design Principles - GameDev Knowledge Base</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        .sidebar { background-color: #f8f9fa; height: 100vh; }
+        .tag { background-color: #e9ecef; padding: 0.25rem 0.5rem; border-radius: 0.25rem; margin-right: 0.5rem; }
+        .article-meta { background-color: #f8f9fa; border-radius: 0.25rem; }
+        .article-content img { max-width: 100%; height: auto; }
+        .code-block { background-color: #f8f9fa; padding: 1rem; border-radius: 0.25rem; font-family: monospace; }
+        .media-gallery { display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0; }
+        .media-item { width: 150px; height: 150px; object-fit: cover; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar p-3">
+                <h4>GameDev Knowledge Base</h4>
+                <hr>
+                <div class="mb-4">
+                    <button class="btn btn-primary w-100 mb-2">New Article</button>
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search...">
+                        <button class="btn btn-outline-secondary"><i class="fas fa-search"></i></button>
+                    </div>
+                </div>
+                <h6>Categories</h6>
+                <ul class="nav flex-column">
+                    <li class="nav-item"><a href="#" class="nav-link active">Game Design</a></li>
+                    <li class="nav-item"><a href="#" class="nav-link">Programming</a></li>
+                    <li class="nav-item"><a href="#" class="nav-link">Art & Animation</a></li>
+                    <li class="nav-item"><a href="#" class="nav-link">Audio</a></li>
+                    <li class="nav-item"><a href="#" class="nav-link">Project Management</a></li>
+                </ul>
+                <h6 class="mt-3">Tags</h6>
+                <div>
+                    <span class="tag">Unity</span>
+                    <span class="tag">C#</span>
+                    <span class="tag">Level Design</span>
+                    <span class="tag">Shaders</span>
+                    <span class="tag">UI/UX</span>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="#">Knowledge Base</a></li>
+                            <li class="breadcrumb-item"><a href="#">Game Design</a></li>
+                            <li class="breadcrumb-item active">Level Design Principles</li>
+                        </ol>
+                    </nav>
+                    <div>
+                        <button class="btn btn-outline-primary"><i class="fas fa-edit"></i> Edit</button>
+                        <button class="btn btn-outline-secondary"><i class="fas fa-file-pdf"></i> Export PDF</button>
+                    </div>
+                </div>
+                
+                <div class="article-meta p-3 mb-4">
+                    <h1>Level Design Principles</h1>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="badge bg-primary">Game Design</span>
+                            <span class="tag">Level Design</span>
+                            <span class="tag">Game Feel</span>
+                            <span class="tag">Player Experience</span>
+                        </div>
+                        <div class="text-muted">
+                            <small>Created: July 1, 2025 | Updated: July 5, 2025</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="article-content">
+                    <p class="lead">Key principles for creating engaging game levels with proper pacing and flow.</p>
+                    
+                    <h2>Introduction</h2>
+                    <p>Level design is the art of creating game spaces that are both functional and engaging. Good level design guides players through an experience while teaching them game mechanics and providing appropriate challenges.</p>
+                    
+                    <div class="media-gallery">
+                        <img src="https://via.placeholder.com/150" alt="Level Design Example" class="media-item">
+                        <img src="https://via.placeholder.com/150" alt="Level Flow Diagram" class="media-item">
+                        <img src="https://via.placeholder.com/150" alt="Player Path Analysis" class="media-item">
+                    </div>
+                    
+                    <h2>Core Principles</h2>
+                    <h3>1. Player Guidance</h3>
+                    <p>Use visual cues, lighting, and architecture to subtly guide players in the right direction without explicit instructions.</p>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-header bg-success text-white">Do</div>
+                                <div class="card-body">
+                                    <ul>
+                                        <li>Use lighting to highlight important paths</li>
+                                        <li>Create visual landmarks for orientation</li>
+                                        <li>Design architecture that naturally funnels players</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-header bg-danger text-white">Don't</div>
+                                <div class="card-body">
+                                    <ul>
+                                        <li>Rely solely on UI markers or arrows</li>
+                                        <li>Create confusing layouts with too many similar paths</li>
+                                        <li>Force players down a single corridor with no choices</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h3>2. Pacing and Flow</h3>
+                    <p>Alternate between high-intensity and low-intensity segments to create a rhythm that keeps players engaged without exhaustion.</p>
+                    
+                    <div class="code-block">
+                        <pre>
+// Example pacing structure for a level
+LevelSegment[] levelFlow = {
+    new LevelSegment(SegmentType.Tutorial, Intensity.Low),
+    new LevelSegment(SegmentType.Challenge, Intensity.Medium),
+    new LevelSegment(SegmentType.Rest, Intensity.Low),
+    new LevelSegment(SegmentType.Challenge, Intensity.High),
+    new LevelSegment(SegmentType.Reward, Intensity.Low),
+    new LevelSegment(SegmentType.Boss, Intensity.VeryHigh),
+    new LevelSegment(SegmentType.Conclusion, Intensity.Low)
+};</pre>
+                    </div>
+                    
+                    <h2>Case Study: Super Mario World</h2>
+                    <p>Nintendo's Super Mario World exemplifies excellent level design through its:</p>
+                    <ul>
+                        <li>Progressive difficulty curve</li>
+                        <li>Introduction of mechanics in safe environments before challenging players</li>
+                        <li>Visual consistency within themed worlds</li>
+                        <li>Multiple paths for different skill levels</li>
+                    </ul>
+                    
+                    <div class="ratio ratio-16x9 my-4">
+                        <!-- Placeholder for video embed -->
+                        <div class="bg-dark d-flex align-items-center justify-content-center">
+                            <i class="fas fa-play-circle fa-3x text-white"></i>
+                            <span class="text-white ms-2">Video: Super Mario World Level Design Analysis</span>
+                        </div>
+                    </div>
+                    
+                    <h2>References</h2>
+                    <ol>
+                        <li>Adams, E. (2023). Fundamentals of Game Design. New Riders.</li>
+                        <li>Schell, J. (2024). The Art of Game Design: A Book of Lenses. CRC Press.</li>
+                        <li>Brown, M. (2025). "Level Design Workshop." GDC Proceedings.</li>
+                    </ol>
+                    
+                    <h2>Related Articles</h2>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Game Feel and Juice</h5>
+                                    <p class="card-text">How to add satisfying feedback to player actions.</p>
+                                    <a href="#" class="btn btn-sm btn-outline-primary">Read Article</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Environmental Storytelling</h5>
+                                    <p class="card-text">Using level design to tell stories without words.</p>
+                                    <a href="#" class="btn btn-sm btn-outline-primary">Read Article</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <hr class="my-4">
+                
+                <div class="d-flex justify-content-between">
+                    <button class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> Previous: Game Mechanics Analysis</button>
+                    <button class="btn btn-outline-secondary">Next: Player Psychology <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

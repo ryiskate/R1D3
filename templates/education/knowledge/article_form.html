@@ -1,0 +1,685 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% if is_create %}Create{% else %}Edit{% endif %} Article | Knowledge Base | Education | R1D3{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link href="https://cdn.tiny.cloud/1/no-api-key/tinymce/5/skins/ui/oxide/skin.min.css" rel="stylesheet">
+<style>
+    .select2-container--default .select2-selection--single,
+    .select2-container--default .select2-selection--multiple {
+        border: 1px solid #d1d3e2;
+        border-radius: 0.35rem;
+        min-height: 38px;
+    }
+    .select2-container--default .select2-selection--multiple .select2-selection__choice {
+        background-color: #4e73df;
+        border: none;
+        color: white;
+        padding: 0.2rem 0.5rem;
+    }
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+        color: white;
+        margin-right: 5px;
+    }
+    .tox-tinymce {
+        border-radius: 0.35rem !important;
+    }
+    .media-preview {
+        max-width: 100%;
+        max-height: 200px;
+        border-radius: 0.35rem;
+    }
+    .media-item {
+        transition: transform 0.2s ease;
+    }
+    .media-item:hover {
+        transform: translateY(-3px);
+    }
+    .template-btn {
+        margin-bottom: 1rem;
+    }
+    #media-gallery {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    
+    /* Feature management styles */
+    .feature-item {
+        transition: all 0.2s ease;
+        border-left: 4px solid #4e73df;
+    }
+    
+    .feature-item:hover {
+        box-shadow: 0 .15rem 1.75rem 0 rgba(58,59,69,.15);
+    }
+    
+    .feature-type-badge .badge {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.6rem;
+    }
+    
+    .feature-text img, .feature-text video {
+        max-width: 100%;
+        height: auto;
+        border-radius: 0.35rem;
+    }
+    
+    #features-container {
+        min-height: 100px;
+    }
+    
+    .feature-item .card-header {
+        padding: 0.75rem 1rem;
+    }
+    
+    .feature-controls {
+        display: flex;
+        gap: 0.25rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            {% if is_create %}Create New Article{% else %}Edit Article{% endif %}
+        </h1>
+        <a href="{% url 'education:knowledge_base' %}" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm">
+            <i class="fas fa-arrow-left fa-sm text-white-50 mr-1"></i> Back to Knowledge Base
+        </a>
+    </div>
+
+    <div class="row">
+        <!-- Main Form -->
+        <div class="col-lg-9">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Article Information</h6>
+                    {% if not is_create %}
+                    <a href="{% url 'education:knowledge_article' article.slug %}" class="btn btn-sm btn-info">
+                        <i class="fas fa-eye fa-sm mr-1"></i> View Article
+                    </a>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" id="article-form">
+                        {% csrf_token %}
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-8">
+                                {{ form.title|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form.slug|as_crispy_field }}
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                {{ form.category|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.tags|as_crispy_field }}
+                            </div>
+                        </div>
+                        
+                        {{ form.summary|as_crispy_field }}
+                        
+                        <!-- Content Features Container -->
+                        <div class="mb-4">
+                            <h6 class="font-weight-bold text-primary mb-3">Article Features</h6>
+                            <div id="features-container" class="border rounded p-3 mb-3">
+                                <!-- Features will be added here dynamically -->
+                                <div class="text-center text-muted py-4" id="no-features-message">
+                                    <i class="fas fa-info-circle mb-2"></i>
+                                    <p>No features added yet. Use the form below to add content features.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Hidden content field that will be populated with JSON -->
+                        <div style="display: none;">
+                            {{ form.content }}
+                            {{ form.featured_image }}
+                        </div>
+                        
+                        <!-- Feature Addition Form -->
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">Add Content Feature</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col-md-12">
+                                        <label for="feature-title" class="form-label">Title</label>
+                                        <input type="text" class="form-control" id="feature-title" placeholder="Feature title">
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-12">
+                                        <label for="feature-text" class="form-label">Text</label>
+                                        <textarea class="form-control" id="feature-text" rows="3" placeholder="Feature description"></textarea>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="feature-media" class="form-label">Image/Video</label>
+                                        <input type="file" class="form-control" id="feature-media" accept="image/*,video/*">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="feature-type" class="form-label">Feature Type</label>
+                                        <select class="form-control" id="feature-type">
+                                            <option value="text">Text Block</option>
+                                            <option value="bullet">Bullet Points</option>
+                                            <option value="image">Image with Caption</option>
+                                            <option value="video">Video with Caption</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <button type="button" id="add-feature-btn" class="btn btn-primary">
+                                    <i class="fas fa-plus mr-1"></i> Add Feature
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <div class="custom-control custom-checkbox">
+                                {{ form.is_published }}
+                                <label class="custom-control-label" for="{{ form.is_published.id_for_label }}">
+                                    {{ form.is_published.label }}
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'education:knowledge_base' %}" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save mr-1"></i> {% if is_create %}Create Article{% else %}Save Changes{% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            {% if not is_create %}
+            <!-- Media Attachments -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Media Attachments</h6>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" id="media-form" action="{% url 'education:media_upload' article.slug %}">
+                        {% csrf_token %}
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                {{ media_form.file|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ media_form.file_type|as_crispy_field }}
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                {{ media_form.title|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ media_form.description|as_crispy_field }}
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="upload-media-btn">
+                            <i class="fas fa-upload mr-1"></i> Upload Media
+                        </button>
+                    </form>
+                    
+                    <hr>
+                    
+                    <h6 class="font-weight-bold">Media Gallery</h6>
+                    <div id="media-gallery" class="row">
+                        {% for attachment in media_attachments %}
+                        <div class="col-md-4 mb-3 media-item" id="media-item-{{ attachment.id }}">
+                            <div class="card h-100">
+                                {% if attachment.file_type == 'image' %}
+                                <img src="{{ attachment.file.url }}" class="card-img-top" style="height: 120px; object-fit: cover;" alt="{{ attachment.title|default:attachment.filename }}">
+                                {% elif attachment.file_type == 'video' %}
+                                <div class="card-img-top bg-gradient-info text-white d-flex align-items-center justify-content-center" style="height: 120px;">
+                                    <i class="fas fa-video fa-2x"></i>
+                                </div>
+                                {% elif attachment.file_type == 'document' %}
+                                <div class="card-img-top bg-gradient-primary text-white d-flex align-items-center justify-content-center" style="height: 120px;">
+                                    <i class="fas fa-file-alt fa-2x"></i>
+                                </div>
+                                {% elif attachment.file_type == 'audio' %}
+                                <div class="card-img-top bg-gradient-success text-white d-flex align-items-center justify-content-center" style="height: 120px;">
+                                    <i class="fas fa-music fa-2x"></i>
+                                </div>
+                                {% else %}
+                                <div class="card-img-top bg-gradient-secondary text-white d-flex align-items-center justify-content-center" style="height: 120px;">
+                                    <i class="fas fa-file fa-2x"></i>
+                                </div>
+                                {% endif %}
+                                <div class="card-body p-2">
+                                    <h6 class="card-title mb-1 text-truncate">{{ attachment.title|default:attachment.filename }}</h6>
+                                    <div class="d-flex justify-content-between mt-2">
+                                        <a href="{{ attachment.file.url }}" class="btn btn-sm btn-info" target="_blank">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-primary insert-media-btn" data-url="{{ attachment.file.url }}" data-type="{{ attachment.file_type }}">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-danger delete-media-btn" data-id="{{ attachment.id }}">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="col-12 text-center py-4" id="no-media-message">
+                            <p class="text-muted mb-0">No media attachments yet. Upload some using the form above.</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="col-lg-3">
+            <!-- Tips Card -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Tips for Great Articles</h6>
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0">
+                        <li class="mb-2">Use clear, descriptive titles</li>
+                        <li class="mb-2">Include a concise summary</li>
+                        <li class="mb-2">Organize content with headings</li>
+                        <li class="mb-2">Add relevant images and diagrams</li>
+                        <li class="mb-2">Include code examples where appropriate</li>
+                        <li class="mb-2">Link to related articles</li>
+                        <li class="mb-2">Use proper formatting for readability</li>
+                        <li>Add appropriate tags for discoverability</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Markdown Reference -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Editor Shortcuts</h6>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2"><strong>Ctrl+B</strong> - Bold</p>
+                    <p class="mb-2"><strong>Ctrl+I</strong> - Italic</p>
+                    <p class="mb-2"><strong>Ctrl+K</strong> - Insert link</p>
+                    <p class="mb-2"><strong>Ctrl+1-6</strong> - Headings</p>
+                    <p class="mb-2"><strong>Ctrl+Shift+L</strong> - Bulleted list</p>
+                    <p class="mb-2"><strong>Ctrl+Shift+N</strong> - Numbered list</p>
+                    <p class="mb-0"><strong>Ctrl+Shift+C</strong> - Code block</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+<script>
+    $(document).ready(function() {
+        // Initialize Select2
+        $('.select2, select[name="category"], select[name="tags"]').select2({
+            theme: 'bootstrap4',
+            width: '100%'
+        });
+        
+        // Features array to store all added features
+        let features = [];
+        let featureCounter = 0;
+        
+        // Initialize TinyMCE for feature text
+        tinymce.init({
+            selector: '#feature-text',
+            height: 200,
+            menubar: false,
+            plugins: [
+                'advlist autolink lists link charmap',
+                'searchreplace visualblocks code',
+                'insertdatetime table paste code help wordcount'
+            ],
+            toolbar: 'undo redo | formatselect | bold italic | \
+                     alignleft aligncenter alignright | \
+                     bullist numlist | removeformat | help',
+            content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 16px; }'
+        });
+        
+        // Add feature button click handler
+        $('#add-feature-btn').click(function() {
+            const title = $('#feature-title').val().trim();
+            const text = tinymce.get('feature-text').getContent();
+            const type = $('#feature-type').val();
+            
+            // Validate inputs
+            if (!title) {
+                alert('Please enter a feature title');
+                return;
+            }
+            
+            if (!text && type !== 'image' && type !== 'video') {
+                alert('Please enter feature text');
+                return;
+            }
+            
+            // Create feature object
+            const feature = {
+                id: 'feature-' + featureCounter++,
+                title: title,
+                text: text,
+                type: type,
+                media: null
+            };
+            
+            // Handle media upload if present
+            const mediaInput = $('#feature-media')[0];
+            if (mediaInput.files && mediaInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    feature.media = {
+                        dataUrl: e.target.result,
+                        fileName: mediaInput.files[0].name,
+                        fileType: mediaInput.files[0].type
+                    };
+                    
+                    // Add feature to array and render
+                    addFeatureToList(feature);
+                };
+                reader.readAsDataURL(mediaInput.files[0]);
+            } else {
+                // Add feature to array and render without media
+                addFeatureToList(feature);
+            }
+        });
+        
+        // Add feature to the list and render it
+        function addFeatureToList(feature) {
+            // Add to features array
+            features.push(feature);
+            
+            // Create feature element
+            const featureElement = createFeatureElement(feature);
+            
+            // Add to features container
+            $('#no-features-message').hide();
+            $('#features-container').append(featureElement);
+            
+            // Reset form
+            $('#feature-title').val('');
+            tinymce.get('feature-text').setContent('');
+            $('#feature-media').val('');
+            $('#feature-type').val('text');
+            
+            // Update hidden content field with JSON
+            updateContentField();
+        }
+        
+        // Create feature element
+        function createFeatureElement(feature) {
+            let mediaHtml = '';
+            
+            if (feature.media) {
+                if (feature.media.fileType.startsWith('image/')) {
+                    mediaHtml = `
+                        <div class="mt-2 mb-3">
+                            <img src="${feature.media.dataUrl}" class="img-fluid rounded" style="max-height: 200px;" alt="${feature.title}">
+                        </div>
+                    `;
+                } else if (feature.media.fileType.startsWith('video/')) {
+                    mediaHtml = `
+                        <div class="mt-2 mb-3">
+                            <video src="${feature.media.dataUrl}" controls class="img-fluid rounded" style="max-height: 200px;"></video>
+                        </div>
+                    `;
+                }
+            }
+            
+            // Create feature card
+            const featureElement = $(`
+                <div class="card mb-3 feature-item" id="${feature.id}">
+                    <div class="card-header py-2 d-flex justify-content-between align-items-center bg-light">
+                        <h6 class="m-0 font-weight-bold">${feature.title}</h6>
+                        <div class="feature-controls">
+                            <button type="button" class="btn btn-sm btn-outline-secondary move-up-btn" title="Move Up">
+                                <i class="fas fa-arrow-up"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary move-down-btn" title="Move Down">
+                                <i class="fas fa-arrow-down"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-danger delete-feature-btn" title="Delete Feature">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body py-2">
+                        <div class="feature-type-badge mb-2">
+                            <span class="badge badge-${getTypeBadgeClass(feature.type)}">
+                                <i class="fas ${getTypeIconClass(feature.type)} mr-1"></i>
+                                ${capitalizeFirstLetter(feature.type)}
+                            </span>
+                        </div>
+                        ${mediaHtml}
+                        <div class="feature-text">${feature.text}</div>
+                    </div>
+                </div>
+            `);
+            
+            // Add event handlers
+            featureElement.find('.delete-feature-btn').click(function() {
+                deleteFeature(feature.id);
+            });
+            
+            featureElement.find('.move-up-btn').click(function() {
+                moveFeature(feature.id, 'up');
+            });
+            
+            featureElement.find('.move-down-btn').click(function() {
+                moveFeature(feature.id, 'down');
+            });
+            
+            return featureElement;
+        }
+        
+        // Delete feature
+        function deleteFeature(featureId) {
+            if (confirm('Are you sure you want to delete this feature?')) {
+                // Remove from DOM
+                $(`#${featureId}`).remove();
+                
+                // Remove from array
+                features = features.filter(f => f.id !== featureId);
+                
+                // Show message if no features
+                if (features.length === 0) {
+                    $('#no-features-message').show();
+                }
+                
+                // Update hidden content field
+                updateContentField();
+            }
+        }
+        
+        // Move feature up or down
+        function moveFeature(featureId, direction) {
+            const index = features.findIndex(f => f.id === featureId);
+            if (index === -1) return;
+            
+            if (direction === 'up' && index > 0) {
+                // Swap in array
+                [features[index], features[index - 1]] = [features[index - 1], features[index]];
+                
+                // Swap in DOM
+                const featureElement = $(`#${featureId}`);
+                featureElement.insertBefore(featureElement.prev());
+            } else if (direction === 'down' && index < features.length - 1) {
+                // Swap in array
+                [features[index], features[index + 1]] = [features[index + 1], features[index]];
+                
+                // Swap in DOM
+                const featureElement = $(`#${featureId}`);
+                featureElement.insertAfter(featureElement.next());
+            }
+            
+            // Update hidden content field
+            updateContentField();
+        }
+        
+        // Update hidden content field with HTML generated from features
+        function updateContentField() {
+            let contentHtml = '';
+            
+            features.forEach(feature => {
+                contentHtml += `<section class="feature" data-type="${feature.type}">`;
+                contentHtml += `<h2>${feature.title}</h2>`;
+                
+                if (feature.media) {
+                    if (feature.media.fileType.startsWith('image/')) {
+                        contentHtml += `<div class="feature-media"><img src="${feature.media.dataUrl}" alt="${feature.title}"></div>`;
+                    } else if (feature.media.fileType.startsWith('video/')) {
+                        contentHtml += `<div class="feature-media"><video src="${feature.media.dataUrl}" controls></video></div>`;
+                    }
+                }
+                
+                contentHtml += `<div class="feature-content">${feature.text}</div>`;
+                contentHtml += '</section>';
+            });
+            
+            // Set content field value
+            $('#{{ form.content.id_for_label }}').val(contentHtml);
+            
+            // If first feature has an image, use it as featured image
+            if (features.length > 0 && features[0].media && features[0].media.fileType.startsWith('image/')) {
+                // We would need to handle this on the server side
+                // For now, we'll just note that we have a featured image
+                console.log('Using first feature image as featured image');
+            }
+        }
+        
+        // Helper functions
+        function getTypeBadgeClass(type) {
+            switch (type) {
+                case 'text': return 'primary';
+                case 'bullet': return 'info';
+                case 'image': return 'success';
+                case 'video': return 'warning';
+                default: return 'secondary';
+            }
+        }
+        
+        function getTypeIconClass(type) {
+            switch (type) {
+                case 'text': return 'fa-paragraph';
+                case 'bullet': return 'fa-list';
+                case 'image': return 'fa-image';
+                case 'video': return 'fa-video';
+                default: return 'fa-file-alt';
+            }
+        }
+        
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+        
+        // Form submission handler
+        $('form').submit(function() {
+            // Make sure content field is updated before submission
+            updateContentField();
+            return true;
+        });
+        
+        // Initialize with existing content if editing
+        {% if not is_create and form.instance.content %}
+            try {
+                // Parse existing content into features
+                console.log('Parsing existing content');
+                const content = $('#{{ form.content.id_for_label }}').val();
+                
+                // Create a temporary div to parse the HTML
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = content;
+                
+                // Find all section elements with class 'feature'
+                const sections = tempDiv.querySelectorAll('section.feature');
+                
+                if (sections.length > 0) {
+                    // Hide the no features message
+                    $('#no-features-message').hide();
+                    
+                    // Process each section into a feature
+                    Array.from(sections).forEach(section => {
+                        // Extract feature type
+                        const type = section.dataset.type || 'text';
+                        
+                        // Extract title
+                        const titleEl = section.querySelector('h2');
+                        const title = titleEl ? titleEl.textContent : 'Untitled Feature';
+                        
+                        // Extract media if present
+                        let media = null;
+                        const mediaEl = section.querySelector('.feature-media img, .feature-media video');
+                        if (mediaEl) {
+                            const isImage = mediaEl.tagName.toLowerCase() === 'img';
+                            media = {
+                                dataUrl: mediaEl.src,
+                                fileType: isImage ? 'image/jpeg' : 'video/mp4',
+                                fileName: isImage ? 'image.jpg' : 'video.mp4'
+                            };
+                        }
+                        
+                        // Extract content
+                        const contentEl = section.querySelector('.feature-content');
+                        const text = contentEl ? contentEl.innerHTML : '';
+                        
+                        // Create and add the feature
+                        const feature = {
+                            id: 'existing-' + featureCounter++,
+                            title: title,
+                            text: text,
+                            type: type,
+                            media: media
+                        };
+                        
+                        features.push(feature);
+                        renderFeature(feature);
+                    });
+                } else {
+                    // If no sections found, create a single feature with all content
+                    const feature = {
+                        id: 'existing-' + featureCounter++,
+                        title: 'Article Content',
+                        text: content,
+                        type: 'text',
+                        media: null
+                    };
+                    
+                    features.push(feature);
+                    renderFeature(feature);
+                    $('#no-features-message').hide();
+                }
+            } catch (e) {
+                console.error('Error parsing existing content', e);
+                $('#features-container').append(
+                    '<div class="alert alert-warning">Could not parse existing content. Please recreate features manually.</div>'
+                );
+                $('#no-features-message').hide();
+            }
+        {% endif %}
+    });
+</script>
+{% endblock %}

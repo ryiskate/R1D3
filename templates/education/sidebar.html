@@ -1,0 +1,55 @@
+<!-- Education Department Sidebar Content -->
+<!-- Education Department Sidebar Content -->
+<div class="sidebar-heading">
+    Education Department
+</div>
+
+<li class="nav-item">
+    <a class="nav-link {% if request.resolver_match.namespace == 'education' and request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'education:dashboard' %}">
+        <i class="fas fa-fw fa-chalkboard-teacher"></i>
+        <span>Education Dashboard</span>
+    </a>
+</li>
+
+<li class="nav-item">
+    <a class="nav-link {% if request.resolver_match.namespace == 'education' and request.resolver_match.url_name == 'classes' %}active{% endif %}" href="{% url 'education:classes' %}">
+        <i class="fas fa-fw fa-users-class"></i>
+        <span>Classes</span>
+    </a>
+</li>
+
+<li class="nav-item">
+    <a class="nav-link {% if request.resolver_match.namespace == 'education' and request.resolver_match.url_name == 'materials' %}active{% endif %}" href="{% url 'education:materials' %}">
+        <i class="fas fa-fw fa-book"></i>
+        <span>Course Materials</span>
+    </a>
+</li>
+
+<li class="nav-item">
+    <a class="nav-link {% if request.resolver_match.namespace == 'education' and request.resolver_match.url_name == 'knowledge_base' or 'knowledge_article' in request.resolver_match.url_name or 'knowledge_category' in request.resolver_match.url_name or 'knowledge_tag' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'education:knowledge_base' %}">
+        <i class="fas fa-fw fa-lightbulb"></i>
+        <span>Knowledge Base</span>
+    </a>
+</li>
+
+<li class="nav-item">
+    <a class="nav-link {% if request.resolver_match.namespace == 'education' and request.resolver_match.url_name == 'schedule' %}active{% endif %}" href="{% url 'education:schedule' %}">
+        <i class="fas fa-fw fa-calendar-alt"></i>
+        <span>Schedule</span>
+    </a>
+</li>
+
+<li class="nav-item">
+    <a class="nav-link {% if request.resolver_match.namespace == 'education' and request.resolver_match.url_name == 'tasks' %}active{% endif %}" href="{% url 'education:tasks' %}">
+        <i class="fas fa-fw fa-tasks"></i>
+        <span>Education Tasks</span>
+    </a>
+</li>
+
+<li class="nav-item">
+    <a class="nav-link {% if request.resolver_match.namespace == 'education' and request.resolver_match.url_name == 'task_create' %}active{% endif %}" href="{% url 'education:task_create' %}">
+        <i class="fas fa-fw fa-plus-circle"></i>
+        <span>New Education Task</span>
+    </a>
+</li>
+<!-- End of Education Department Sidebar Content -->
