@@ -7,7 +7,6 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('projects', '0015_team_arcadetask_team_educationtask_team_and_more'),
         ('indie_news', '0001_initial'),
     ]
 
