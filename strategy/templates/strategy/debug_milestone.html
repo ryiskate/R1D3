@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Debug Milestone Information</h1>
+    
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h3>Strategy Context Variables</h3>
+        </div>
+        <div class="card-body">
+            <h4>Strategy In-Progress Milestone</h4>
+            {% if strategy_in_progress_milestone %}
+                <ul class="list-group mb-3">
+                    <li class="list-group-item"><strong>ID:</strong> {{ strategy_in_progress_milestone.id }}</li>
+                    <li class="list-group-item"><strong>Title:</strong> {{ strategy_in_progress_milestone.title }}</li>
+                    <li class="list-group-item"><strong>Status:</strong> {{ strategy_in_progress_milestone.status }}</li>
+                    <li class="list-group-item"><strong>Phase ID:</strong> {{ strategy_in_progress_milestone.phase_id }}</li>
+                </ul>
+            {% else %}
+                <div class="alert alert-warning">No strategy in-progress milestone found</div>
+            {% endif %}
+            
+            <h4>Strategy Company Phase</h4>
+            {% if strategy_company_phase %}
+                <ul class="list-group">
+                    <li class="list-group-item"><strong>ID:</strong> {{ strategy_company_phase.id }}</li>
+                    <li class="list-group-item"><strong>Name:</strong> {{ strategy_company_phase.name }}</li>
+                    <li class="list-group-item"><strong>Type:</strong> {{ strategy_company_phase.phase_type }}</li>
+                    <li class="list-group-item"><strong>Order:</strong> {{ strategy_company_phase.order }}</li>
+                </ul>
+            {% else %}
+                <div class="alert alert-warning">No strategy company phase found</div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-header bg-info text-white">
+            <h3>Core Context Variables</h3>
+        </div>
+        <div class="card-body">
+            <h4>In-Progress Milestone</h4>
+            {% if in_progress_milestone %}
+                <ul class="list-group mb-3">
+                    <li class="list-group-item"><strong>ID:</strong> {{ in_progress_milestone.id }}</li>
+                    <li class="list-group-item"><strong>Title:</strong> {{ in_progress_milestone.title }}</li>
+                    <li class="list-group-item"><strong>Status:</strong> {{ in_progress_milestone.status }}</li>
+                </ul>
+            {% else %}
+                <div class="alert alert-warning">No in-progress milestone found</div>
+            {% endif %}
+            
+            <h4>Company Phase</h4>
+            {% if company_phase %}
+                <ul class="list-group">
+                    <li class="list-group-item"><strong>ID:</strong> {{ company_phase.id }}</li>
+                    <li class="list-group-item"><strong>Name:</strong> {{ company_phase.name }}</li>
+                    <li class="list-group-item"><strong>Order:</strong> {{ company_phase.order }}</li>
+                </ul>
+            {% else %}
+                <div class="alert alert-warning">No company phase found</div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header bg-success text-white">
+            <h3>Raw Template Variables</h3>
+        </div>
+        <div class="card-body">
+            <h4>Banner Variables</h4>
+            <ul class="list-group">
+                <li class="list-group-item"><strong>phase_order:</strong> {{ phase_order }}</li>
+                <li class="list-group-item"><strong>phase_name:</strong> {{ phase_name }}</li>
+                <li class="list-group-item"><strong>milestone_title:</strong> {{ milestone_title }}</li>
+                <li class="list-group-item"><strong>background_style:</strong> {{ background_style }}</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

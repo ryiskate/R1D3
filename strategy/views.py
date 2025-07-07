@@ -5,6 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse, reverse_lazy
 from django.contrib import messages
 from django.utils import timezone
+from django.http import HttpResponse
 
 from core.mixins import BreadcrumbMixin
 from .models import Vision, Goal, Objective, KeyResult, StrategyPhase, StrategyMilestone
@@ -624,32 +625,12 @@ class StrategyMilestoneDeleteView(BreadcrumbMixin, LoginRequiredMixin, View):
         ]
 
 
-class StrategyMilestoneCreateView(BreadcrumbMixin, LoginRequiredMixin, TemplateView):
-    """
-    Create view for strategy milestones
-    """
-    template_name = 'strategy/milestone_form.html'
+class StrategyMilestoneDeleteView(BreadcrumbMixin, LoginRequiredMixin, DeleteView):
+    model = StrategyMilestone
+    template_name = 'strategy/strategy_milestone_confirm_delete.html'
     
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        
-        # Get the phase ID from the URL
-        phase_id = int(self.kwargs.get('phase_id'))
-        
-        # Get the phase from the database
-        try:
-            phase = StrategyPhase.objects.get(id=phase_id)
-        except StrategyPhase.DoesNotExist:
-            # If phase not found, redirect to the company strategy page
-            return redirect('strategy:dashboard')
-        
-        context['phase'] = {
-            'id': phase.id,
-            'name': phase.name,
-            'phase_type': phase.phase_type,
-            'description': phase.description
-        }
-        context['form_action'] = reverse('strategy:milestone_create', kwargs={'phase_id': phase_id})
+    def get_success_url(self):
+        return reverse('strategy:strategy_milestones')
         context['is_update'] = False
         context['form_title'] = 'Create Strategy Milestone'
         context['submit_text'] = 'Create Milestone'

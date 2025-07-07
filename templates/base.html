@@ -424,6 +424,26 @@
                     </script>
                     
                     <!-- Simple milestone display -->
+                    {% if strategy_in_progress_milestone and strategy_company_phase %}
+                    <div class="d-inline-block py-2 px-3 rounded" 
+                        {% if strategy_company_phase.phase_type == 'indie_dev' %}
+                        style="background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);"
+                        {% elif strategy_company_phase.phase_type == 'arcade' %}
+                        style="background: linear-gradient(135deg, #1cc88a 0%, #13855c 100%);"
+                        {% elif strategy_company_phase.phase_type == 'theme_park' %}
+                        style="background: linear-gradient(135deg, #f6c23e 0%, #dda20a 100%);"
+                        {% else %}
+                        style="background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);"
+                        {% endif %}
+                    >
+                        <span class="text-white">
+                            <i class="fas fa-flag me-1"></i>
+                            <span class="fw-bold">Company Phase {{ strategy_company_phase.order }}:</span>
+                            <span class="ms-1">"{{ strategy_company_phase.name }}" - "{{ strategy_in_progress_milestone.title }}"</span>
+                            <!-- Strategy milestone display -->
+                        </span>
+                    </div>
+                    {% else %}
                     <div class="d-inline-block py-2 px-3 rounded" 
                         style="{{ background_style }}"
                     >
@@ -434,6 +454,7 @@
                             <!-- Hidden timestamp for refresh: {{ timestamp }} {{ random_id }} -->
                         </span>
                     </div>
+                    {% endif %}
                 </div>
                 
 

@@ -153,7 +153,7 @@ def milestone_info(request):
         # First check if there's an in-progress milestone in the strategy app
         print("Searching for in-progress strategy milestones...")
         try:
-            from strategy.models import StrategyMilestone
+            from strategy.models import StrategyMilestone, StrategyPhase
             strategy_milestones = StrategyMilestone.objects.filter(status='in_progress')
             
             if strategy_milestones.exists():
@@ -161,46 +161,56 @@ def milestone_info(request):
                 strategy_milestone = strategy_milestones.first()
                 milestone_title = strategy_milestone.title
                 game_title = "Strategy"
-                print(f"Found in-progress strategy milestone: {milestone_title}")
+                print(f"Found in-progress strategy milestone: {milestone_title} (ID: {strategy_milestone.id})")
                 
-                # Get phase info based on milestone title
-                phase_info = get_phase_for_milestone(milestone_title)
-                phase_name = phase_info['name']
-                phase_type = phase_info['phase_type']
-                phase_order = phase_info['order']
-                print(f"Phase determined from strategy milestone: {phase_name} (Type: {phase_type})")
-                
-                # Try to get the phase directly from the database
+                # Get the phase directly from the database
                 try:
-                    from strategy.models import StrategyPhase
                     phase = strategy_milestone.phase
                     phase_name = phase.name
                     phase_type = phase.phase_type
                     phase_order = phase.order
-                    print(f"Phase retrieved from database: {phase_name} (Type: {phase_type})")
+                    print(f"Phase retrieved from database: {phase_name} (ID: {phase.id}, Type: {phase_type}, Order: {phase_order})")
+                    
+                    # Set the background style based on the phase type
+                    background_style = "background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);"  # Default blue
+                    if phase_type == 'arcade':
+                        background_style = "background: linear-gradient(135deg, #1cc88a 0%, #13855c 100%);"
+                    elif phase_type == 'theme_park':
+                        background_style = "background: linear-gradient(135deg, #f6c23e 0%, #dda20a 100%);"
+                    
+                    # Create a company phase object for the template
+                    class CompanyPhaseObj:
+                        def __init__(self, id, name, phase_type, order):
+                            self.id = id
+                            self.name = name
+                            self.phase_type = phase_type
+                            self.order = order
+                    
+                    company_phase_obj = CompanyPhaseObj(phase.id, phase_name, phase_type, phase_order)
+                    
+                    # Return early with the strategy milestone data
+                    return {
+                        'milestone_title': milestone_title,
+                        'game_title': game_title,
+                        'phase_name': phase_name,
+                        'phase_type': phase_type,
+                        'phase_order': phase_order,
+                        'background_style': background_style,
+                        'timestamp': timestamp,
+                        'random_id': random_id,
+                        'in_progress_milestone': strategy_milestone,
+                        'company_phase': company_phase_obj,
+                        'debug_info': {
+                            'milestone': milestone_title,
+                            'phase': phase_name,
+                            'phase_id': phase.id,
+                            'timestamp': timestamp,
+                            'random_id': random_id
+                        }
+                    }
                 except Exception as e:
                     print(f"Error getting phase from database: {str(e)}")
-                    # Keep the phase info from get_phase_for_milestone
-                
-                # Return early with the strategy milestone data
-                return {
-                    'milestone_title': milestone_title,
-                    'game_title': game_title,
-                    'phase_name': phase_name,
-                    'phase_type': phase_type,
-                    'phase_order': phase_order,
-                    'background_style': "background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);",
-                    'timestamp': timestamp,
-                    'random_id': random_id,
-                    'in_progress_milestone': strategy_milestone,
-                    'company_phase': CompanyPhase(phase_name, phase_type, phase_order),
-                    'debug_info': {
-                        'milestone': milestone_title,
-                        'phase': phase_name,
-                        'timestamp': timestamp,
-                        'random_id': random_id
-                    }
-                }
+                    # Fall through to game milestones if we can't get the phase
         except Exception as e:
             print(f"Error checking strategy milestones: {str(e)}")
         
