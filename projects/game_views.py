@@ -45,6 +45,7 @@ class GameDashboardView(LoginRequiredMixin, ListView):
         ).count()
         context['my_tasks'] = GameTask.objects.filter(
             assigned_to=self.request.user, 
+            company_section='game_development',
             status__in=['backlog', 'to_do', 'in_progress', 'in_review', 'blocked']
         )
         context['overdue_tasks'] = GameTask.objects.filter(

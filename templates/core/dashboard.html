@@ -8,17 +8,7 @@
 <div class="container-fluid py-4">
     <h1 class="mb-4">{{ request.user.username }}'s Dashboard</h1>
 
-    <!-- Debug information -->
-    <div class="alert alert-info mb-4">
-        <h5>Debug Information</h5>
-        <p><strong>Username:</strong> {{ debug_info.username }}</p>
-        <p><strong>User ID:</strong> {{ debug_info.user_id }}</p>
-        <p><strong>Is Authenticated:</strong> {{ debug_info.is_authenticated }}</p>
-        <p><strong>Task Models Available:</strong> {{ debug_info.task_models_available }}</p>
-        <p><strong>Game Models Available:</strong> {{ debug_info.game_models_available }}</p>
-        <p><strong>R1D3 Tasks Count:</strong> {{ r1d3_tasks_count|default:"0" }}</p>
-        <p><strong>Game Tasks Count:</strong> {{ game_tasks_count|default:"0" }}</p>
-    </div>
+    <!-- Dashboard content starts here -->
     
     <div class="row mb-4">
         <div class="col-md-6">

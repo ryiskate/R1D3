@@ -356,12 +356,12 @@
                                         {% if task.get_status_display %}{{ task.get_status_display }}{% else %}{{ task.status|title }}{% endif %}
                                     </span>
                                     <ul class="dropdown-menu status-menu" data-task-id="{{ task.id }}" data-task-type="{{ task|class_name }}">
-                                        <li><a class="dropdown-item status-option" data-status="to_do" href="#"><span class="badge bg-primary">To Do</span></a></li>
-                                        <li><a class="dropdown-item status-option" data-status="in_progress" href="#"><span class="badge bg-warning">In Progress</span></a></li>
-                                        <li><a class="dropdown-item status-option" data-status="in_review" href="#"><span class="badge bg-purple">In Review</span></a></li>
-                                        <li><a class="dropdown-item status-option" data-status="done" href="#"><span class="badge bg-success">Done</span></a></li>
-                                        <li><a class="dropdown-item status-option" data-status="backlog" href="#"><span class="badge bg-secondary">Backlog</span></a></li>
-                                        <li><a class="dropdown-item status-option" data-status="blocked" href="#"><span class="badge bg-danger">Blocked</span></a></li>
+                                        <li><a class="dropdown-item status-option" data-status="to_do" href="javascript:void(0);"><span class="badge bg-primary">To Do</span></a></li>
+                                        <li><a class="dropdown-item status-option" data-status="in_progress" href="javascript:void(0);"><span class="badge bg-warning">In Progress</span></a></li>
+                                        <li><a class="dropdown-item status-option" data-status="in_review" href="javascript:void(0);"><span class="badge bg-purple">In Review</span></a></li>
+                                        <li><a class="dropdown-item status-option" data-status="done" href="javascript:void(0);"><span class="badge bg-success">Done</span></a></li>
+                                        <li><a class="dropdown-item status-option" data-status="backlog" href="javascript:void(0);"><span class="badge bg-secondary">Backlog</span></a></li>
+                                        <li><a class="dropdown-item status-option" data-status="blocked" href="javascript:void(0);"><span class="badge bg-danger">Blocked</span></a></li>
                                     </ul>
                                 </div>
                             </td>

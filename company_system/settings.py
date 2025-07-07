@@ -53,6 +53,8 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    # Custom middleware to clear cache on every request
+    'core.middleware.ClearCacheMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -79,6 +81,8 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'core.context_processors.breadcrumbs_processor',
+                'strategy.context_processors.strategy_milestone_info',
+                'core.context_processors.milestone_info',
             ],
         },
     },

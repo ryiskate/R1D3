@@ -91,11 +91,12 @@ class GameAssetForm(forms.ModelForm):
 class GameMilestoneForm(forms.ModelForm):
     class Meta:
         model = GameMilestone
-        fields = ['title', 'description', 'due_date', 'is_completed', 'completion_date']
+        fields = ['title', 'description', 'due_date', 'status', 'completion_date']
         widgets = {
             'description': forms.Textarea(attrs={'rows': 3}),
             'due_date': forms.DateInput(attrs={'type': 'date'}),
             'completion_date': forms.DateInput(attrs={'type': 'date'}),
+            'status': forms.Select(attrs={'class': 'form-select'}),
         }
 
 

@@ -3,7 +3,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>{% block title %}R1D3 Game Development System{% endblock %}</title>
     
     <!-- Bootstrap CSS -->
@@ -407,60 +411,36 @@
                     <i class="fa fa-bars"></i>
                 </button>
                 
-                <!-- Topbar Search -->
-                <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
-                    <div class="input-group">
-                        <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
-                        <div class="input-group-append">
-                            <button class="btn btn-primary" type="button">
-                                <i class="fas fa-search fa-sm"></i>
-                            </button>
-                        </div>
+                <!-- Milestone Display (replaces search) -->
+                <div class="milestone-display ms-3 me-auto" id="milestone-display">
+                    <!-- Debug info -->
+                    <script>
+                        console.log('Milestone Debug Info:');
+                        console.log('milestone_title:', '{{ milestone_title|escapejs }}');
+                        console.log('phase_name:', '{{ phase_name|escapejs }}');
+                        console.log('phase_type:', '{{ phase_type|escapejs }}');
+                        console.log('timestamp:', '{{ timestamp }}');
+                        console.log('random_id:', '{{ random_id }}');
+                    </script>
+                    
+                    <!-- Simple milestone display -->
+                    <div class="d-inline-block py-2 px-3 rounded" 
+                        style="{{ background_style }}"
+                    >
+                        <span class="text-white">
+                            <i class="fas fa-flag me-1"></i>
+                            <span class="fw-bold">Company Phase {{ phase_order }}:</span>
+                            <span class="ms-1">"{{ phase_name }}" - "{{ milestone_title }}"</span>
+                            <!-- Hidden timestamp for refresh: {{ timestamp }} {{ random_id }} -->
+                        </span>
                     </div>
-                </form>
+                </div>
+                
+
                 
                 <!-- Topbar Navbar -->
                 <ul class="navbar-nav ml-auto">
-                    <!-- Nav Item - User Information -->
-                    <li class="nav-item dropdown no-arrow">
-                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <span class="mr-2 d-none d-lg-inline text-gray-600 small">
-                                {% if user.is_authenticated %}
-                                    {{ user.get_full_name|default:user.username }}
-                                {% else %}
-                                    Guest
-                                {% endif %}
-                            </span>
-                            <img class="img-profile rounded-circle" src="https://ui-avatars.com/api/?name={% if user.is_authenticated %}{{ user.username }}{% else %}Guest{% endif %}&background=4e73df&color=ffffff" width="32" height="32">
-                        </a>
-                        <!-- Dropdown - User Information -->
-                        <div class="dropdown-menu dropdown-menu-end shadow animated--grow-in" aria-labelledby="userDropdown">
-                            {% if user.is_authenticated %}
-                                <a class="dropdown-item" href="#">
-                                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Profile
-                                </a>
-                                <a class="dropdown-item" href="#">
-                                    <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Settings
-                                </a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="#"><!-- Temporarily disabled: {% url 'account_logout' %} -->
-                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Logout
-                                </a>
-                            {% else %}
-                                <a class="dropdown-item" href="#"><!-- Temporarily disabled: {% url 'account_login' %} -->
-                                    <i class="fas fa-sign-in-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Login
-                                </a>
-                                <a class="dropdown-item" href="#"><!-- Temporarily disabled: {% url 'account_signup' %} -->
-                                    <i class="fas fa-user-plus fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Register
-                                </a>
-                            {% endif %}
-                        </div>
-                    </li>
+                    <!-- Empty navbar right side -->
                 </ul>
             </nav>
             
@@ -501,6 +481,35 @@
     <!-- jQuery first, then Bootstrap JS Bundle with Popper -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Milestone Display -->
+    <script>
+        // Function to refresh the milestone display
+        function refreshMilestoneDisplay() {
+            console.log('Refreshing milestone display...');
+            location.reload();
+        }
+        
+        // Log the current milestone to the console
+        $(document).ready(function() {
+            // Extract the current milestone title and phase info
+            var milestoneTitle = '{{ milestone_title|escapejs }}';
+            var phaseInfo = '{{ phase_name|escapejs }}';
+            var phaseType = '{{ phase_type|escapejs }}';
+            var timestamp = '{{ timestamp }}';
+            var randomId = '{{ random_id }}';
+            
+            // Log the extracted information
+            console.log('Current milestone: ' + milestoneTitle);
+            console.log('Current phase: ' + phaseInfo + ' (' + phaseType + ')');
+            console.log('Last updated: ' + new Date(timestamp * 1000).toLocaleTimeString());
+            console.log('Update ID: ' + randomId);
+            
+            // Set up auto-refresh every 10 seconds
+            console.log('Auto-refresh scheduled in 10 seconds');
+            setTimeout(refreshMilestoneDisplay, 10000);
+        });
+    </script>
     <!-- DataTables JS -->
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>

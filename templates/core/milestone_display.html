@@ -1,0 +1,55 @@
+{% if strategy_in_progress_milestone and strategy_company_phase %}
+<div class="d-inline-block py-2 px-3 rounded" 
+    {% if strategy_company_phase.phase_type == 'indie_dev' %}
+    style="background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);"
+    {% elif strategy_company_phase.phase_type == 'arcade' %}
+    style="background: linear-gradient(135deg, #1cc88a 0%, #13855c 100%);"
+    {% elif strategy_company_phase.phase_type == 'theme_park' %}
+    style="background: linear-gradient(135deg, #f6c23e 0%, #dda20a 100%);"
+    {% else %}
+    style="background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);"
+    {% endif %}
+>
+    <span class="text-white">
+        <i class="fas fa-flag me-1"></i>
+        <span class="fw-bold">Company Phase {{ strategy_company_phase.order }}:</span>
+        <span class="ms-1">"{{ strategy_company_phase.name }}" - "{{ strategy_in_progress_milestone.title }}"</span>
+        <!-- Strategy milestone display -->
+    </span>
+</div>
+{% elif in_progress_milestone and company_phase %}
+<div class="d-inline-block py-2 px-3 rounded" 
+    {% if company_phase.phase_type == 'indie_dev' %}
+    style="background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);"
+    {% elif company_phase.phase_type == 'arcade' %}
+    style="background: linear-gradient(135deg, #1cc88a 0%, #13855c 100%);"
+    {% elif company_phase.phase_type == 'theme_park' %}
+    style="background: linear-gradient(135deg, #f6c23e 0%, #dda20a 100%);"
+    {% else %}
+    style="background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);"
+    {% endif %}
+>
+    <span class="text-white">
+        <i class="fas fa-flag me-1"></i>
+        <span class="fw-bold">Company Phase {{ company_phase.order }}:</span>
+        <span class="ms-1">"{{ company_phase.name }}" - "{{ in_progress_milestone.title }}"</span>
+        <!-- Hidden timestamp to force refresh: {{ milestone_debug.timestamp }} {{ refresh_timestamp }} {{ milestone_debug.random_id }} -->
+    </span>
+</div>
+{% elif in_progress_milestone %}
+<div class="d-inline-block py-2 px-3 rounded" style="background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);">
+    <span class="text-white">
+        <i class="fas fa-flag me-1"></i>
+        <span class="fw-bold">Current Milestone:</span>
+        <span class="ms-1">"{{ in_progress_milestone.title }}"</span>
+    </span>
+</div>
+{% else %}
+<div class="d-inline-block py-2 px-3 rounded" style="background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);">
+    <span class="text-white">
+        <i class="fas fa-flag me-1"></i>
+        <span class="fw-bold">Company Phase:</span>
+        <span class="ms-1">No active milestone</span>
+    </span>
+</div>
+{% endif %}

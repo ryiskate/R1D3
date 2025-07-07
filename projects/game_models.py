@@ -283,12 +283,18 @@ class GameMilestone(TimeStampedModel):
     """
     Game development milestone
     """
+    STATUS_CHOICES = [
+        ('not_started', 'Not Started'),
+        ('in_progress', 'In Progress'),
+        ('completed', 'Completed'),
+    ]
+    
     game = models.ForeignKey(GameProject, on_delete=models.CASCADE, related_name='milestones')
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     due_date = models.DateField()
-    is_completed = models.BooleanField(default=False)
     completion_date = models.DateField(null=True, blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='not_started')
     
     def __str__(self):
         return f"{self.game.title} - {self.title}"

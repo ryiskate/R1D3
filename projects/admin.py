@@ -28,8 +28,8 @@ class GameAssetAdmin(admin.ModelAdmin):
 
 @admin.register(GameMilestone)
 class GameMilestoneAdmin(admin.ModelAdmin):
-    list_display = ('title', 'game', 'due_date', 'is_completed', 'completion_date')
-    list_filter = ('is_completed',)
+    list_display = ('title', 'game', 'due_date', 'status', 'completion_date')
+    list_filter = ('status',)
     search_fields = ('title', 'description', 'game__title')
 
 

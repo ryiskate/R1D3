@@ -4,14 +4,19 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count, Q, F
 from django.urls import reverse_lazy
 from django.contrib import messages
-from django.http import Http404, JsonResponse
+from django.http import Http404, JsonResponse, HttpResponse
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from datetime import date, timedelta, datetime
 import json
+from django.template.loader import render_to_string
+from django.core.cache import cache
 
 # Import legacy views for backward compatibility
 from .legacy_views import R1D3TaskDetailLegacyView, R1D3TaskUpdateLegacyView, R1D3TaskDeleteLegacyView
+
+# Import context processor for milestone data
+from .context_processors import breadcrumbs_processor
 
 # Import model utilities
 from .model_utils import get_task_model_map, get_task_type_for_model

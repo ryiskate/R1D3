@@ -26,12 +26,18 @@ class Goal(TimeStampedModel):
         ('long', 'Long-term (3+ years)'),
     ]
     
+    STATUS_CHOICES = [
+        ('not_started', 'Not Started'),
+        ('in_progress', 'In Progress'),
+        ('completed', 'Completed')
+    ]
+    
     title = models.CharField(max_length=200)
     description = models.TextField()
     vision = models.ForeignKey(Vision, on_delete=models.CASCADE, related_name='goals')
     timeframe = models.CharField(max_length=10, choices=TIMEFRAME_CHOICES)
     target_date = models.DateField()
-    is_completed = models.BooleanField(default=False)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='not_started')
     
     def __str__(self):
         return self.title
@@ -41,12 +47,18 @@ class Objective(TimeStampedModel):
     """
     Specific objectives (OKRs) related to strategic goals
     """
+    STATUS_CHOICES = [
+        ('not_started', 'Not Started'),
+        ('in_progress', 'In Progress'),
+        ('completed', 'Completed')
+    ]
+    
     title = models.CharField(max_length=200)
     description = models.TextField()
     goal = models.ForeignKey(Goal, on_delete=models.CASCADE, related_name='objectives')
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owned_objectives')
     due_date = models.DateField()
-    is_completed = models.BooleanField(default=False)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='not_started')
     
     def __str__(self):
         return self.title
@@ -84,6 +96,12 @@ class StrategyPhase(TimeStampedModel):
         ('theme_park', 'Theme Park Attractions'),
     ]
     
+    STATUS_CHOICES = [
+        ('not_started', 'Not Started'),
+        ('in_progress', 'In Progress'),
+        ('completed', 'Completed')
+    ]
+    
     name = models.CharField(max_length=100)
     phase_type = models.CharField(max_length=20, choices=PHASE_CHOICES)
     description = models.TextField()
@@ -91,7 +109,7 @@ class StrategyPhase(TimeStampedModel):
     start_year = models.IntegerField(help_text="Estimated start year")
     end_year = models.IntegerField(help_text="Estimated completion year")
     is_current = models.BooleanField(default=False, help_text="Is this the current active phase?")
-    is_completed = models.BooleanField(default=False)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='not_started')
     
     class Meta:
         ordering = ['order']
@@ -104,11 +122,17 @@ class StrategyMilestone(TimeStampedModel):
     """
     Key milestones within a strategy phase
     """
+    STATUS_CHOICES = [
+        ('not_started', 'Not Started'),
+        ('in_progress', 'In Progress'),
+        ('completed', 'Completed')
+    ]
+    
     title = models.CharField(max_length=200)
     description = models.TextField()
     phase = models.ForeignKey(StrategyPhase, on_delete=models.CASCADE, related_name='milestones')
     target_date = models.DateField(null=True, blank=True)
-    is_completed = models.BooleanField(default=False)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='not_started')
     completion_date = models.DateField(null=True, blank=True)
     order = models.PositiveIntegerField(default=0)
     
