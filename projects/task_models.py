@@ -50,10 +50,11 @@ class BaseTask(models.Model):
         User, on_delete=models.SET_NULL, 
         null=True, blank=True, related_name='%(class)s_assigned'
     )
-    team = models.ForeignKey(
-        Team, on_delete=models.SET_NULL,
-        null=True, blank=True, related_name='%(class)s_tasks'
-    )
+    # Temporarily commented out to fix migration issues
+    # team = models.ForeignKey(
+    #     'projects.Team', on_delete=models.SET_NULL,
+    #     null=True, blank=True, related_name='%(class)s_tasks'
+    # )
     
     # Time tracking
     estimated_hours = models.DecimalField(max_digits=5, decimal_places=1, default=0)

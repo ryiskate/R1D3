@@ -29,13 +29,12 @@ class BaseTaskForm(forms.ModelForm):
         model = BaseTask
         fields = [
             'title', 'description', 'task_type', 'status', 'priority',
-            'assigned_to', 'team', 'due_date', 'has_additional_note', 'additional_note_text',
+            'assigned_to', 'due_date', 'has_additional_note', 'additional_note_text',
             'has_subtasks', 'output'
         ]
         widgets = {
             'description': forms.Textarea(attrs={'rows': 3}),
             'due_date': forms.DateInput(attrs={'type': 'date'}),
-            'team': TeamSelectWidget(),
             'additional_note_text': forms.Textarea(attrs={'rows': 2, 'class': 'additional-note-field'}),
             'output': forms.Textarea(attrs={'rows': 4, 'class': 'output-field'}),
         }
@@ -116,7 +115,7 @@ class ArcadeTaskForm(BaseTaskForm):
     class Meta(BaseTaskForm.Meta):
         model = ArcadeTask
         fields = ['title', 'description', 'task_type', 'status', 'priority',
-                 'assigned_to', 'team', 'due_date', 'machine_id', 'location', 'maintenance_type',
+                 'assigned_to', 'due_date', 'machine_id', 'location', 'maintenance_type',
                  'has_additional_note', 'additional_note_text', 'has_subtasks', 'output']
         exclude = ['estimated_hours']
         
@@ -134,7 +133,7 @@ class ThemeParkTaskForm(BaseTaskForm):
     class Meta(BaseTaskForm.Meta):
         model = ThemeParkTask
         fields = ['title', 'description', 'task_type', 'status', 'priority',
-                 'assigned_to', 'team', 'due_date', 'attraction_id', 'zone', 'safety_priority',
+                 'assigned_to', 'due_date', 'attraction_id', 'zone', 'safety_priority',
                  'has_additional_note', 'additional_note_text', 'has_subtasks', 'output']
         exclude = ['estimated_hours']
         
