@@ -84,6 +84,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     <span>Education Tasks</span>
                 </a>
             </li>
+            
+            <li class="nav-item">
+                <a class="nav-link" href="/education/documentation/">
+                    <i class="fas fa-fw fa-file-alt"></i>
+                    <span>Documentation</span>
+                </a>
+            </li>
         `;
     }
     

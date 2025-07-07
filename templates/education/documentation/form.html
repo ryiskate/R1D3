@@ -1,0 +1,665 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    {% if is_update %}Edit{% else %}Create{% endif %} Course Documentation | R1D3 Education
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .formset-item {
+        border: 1px solid #dee2e6;
+        border-radius: 0.25rem;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        position: relative;
+    }
+    
+    .delete-row {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+    }
+    
+    .formset-container {
+        margin-bottom: 1rem;
+    }
+    
+    .add-row {
+        margin-top: 0.5rem;
+    }
+    
+    .section-title {
+        background-color: #f8f9fa;
+        padding: 0.75rem;
+        margin-bottom: 1rem;
+        border-radius: 0.25rem;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mt-4">
+            {% if is_update %}
+                Edit Documentation: {{ documentation.title }}
+            {% else %}
+                Create New Documentation
+            {% endif %}
+        </h1>
+        <a href="{% if is_update %}{% url 'education:documentation_detail' documentation.pk %}{% else %}{% url 'education:documentation_list' %}{% endif %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
+    </div>
+    
+    {% include 'partials/_breadcrumbs.html' %}
+    
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-edit me-1"></i>
+                    Documentation Form
+                </div>
+                <div class="card-body">
+                    <form method="post" id="documentationForm">
+                        {% csrf_token %}
+                        
+                        <!-- Main form errors -->
+                        {% if form.errors %}
+                            <div class="alert alert-danger">
+                                <strong>Please correct the errors below.</strong>
+                            </div>
+                        {% endif %}
+                        
+                        <!-- 1. Initial Information Section -->
+                        <div class="section-title">
+                            <i class="fas fa-info-circle me-1"></i> 1. Informações Iniciais
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.title.id_for_label }}">Título do Documento</label>
+                                    {{ form.title }}
+                                    {% if form.title.errors %}
+                                        <div class="text-danger">{{ form.title.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.central_theme.id_for_label }}">Tema Central</label>
+                                    {{ form.central_theme }}
+                                    {% if form.central_theme.errors %}
+                                        <div class="text-danger">{{ form.central_theme.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="{{ form.objective.id_for_label }}">Objetivo do Documento</label>
+                                    {{ form.objective }}
+                                    {% if form.objective.errors %}
+                                        <div class="text-danger">{{ form.objective.errors }}</div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">Exemplo: Reunir e explicar os conceitos fundamentais de Python para uso em projetos de automação.</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 2. Summary Section -->
+                        <div class="section-title mt-4">
+                            <i class="fas fa-file-alt me-1"></i> 2. Resumo do Tema
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="{{ form.summary.id_for_label }}">Uma visão geral clara e concisa sobre o tema abordado</label>
+                                    {{ form.summary }}
+                                    {% if form.summary.errors %}
+                                        <div class="text-danger">{{ form.summary.errors }}</div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">Exemplo: Python é uma linguagem de programação de alto nível focada em legibilidade e produtividade...</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 3. Introduction Section -->
+                        <div class="section-title mt-4">
+                            <i class="fas fa-book-open me-1"></i> 4. Introdução ao Tema
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="{{ form.introduction.id_for_label }}">Introdução ao Tema</label>
+                                    {{ form.introduction }}
+                                    {% if form.introduction.errors %}
+                                        <div class="text-danger">{{ form.introduction.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="{{ form.practical_applications.id_for_label }}">Aplicações práticas</label>
+                                    {{ form.practical_applications }}
+                                    {% if form.practical_applications.errors %}
+                                        <div class="text-danger">{{ form.practical_applications.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 5. Fundamental Concepts Section -->
+                        <div class="section-title mt-4">
+                            <i class="fas fa-lightbulb me-1"></i> 5. Conceitos Fundamentais
+                        </div>
+                        
+                        <p class="text-muted mb-3">Divida os principais conceitos em seções, com definições, explicações e exemplos.</p>
+                        
+                        {{ concept_formset.management_form }}
+                        <div id="concept-formset" class="formset-container">
+                            {% for concept_form in concept_formset %}
+                                <div class="formset-item concept-form">
+                                    {% if concept_form.instance.pk %}
+                                        {{ concept_form.id }}
+                                    {% endif %}
+                                    
+                                    {% if concept_form.DELETE %}
+                                        <div class="delete-row">
+                                            <label class="form-check-label">
+                                                {{ concept_form.DELETE }} Remover
+                                            </label>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-8">
+                                            <div class="form-group">
+                                                <label for="{{ concept_form.name.id_for_label }}">Nome do Conceito</label>
+                                                {{ concept_form.name }}
+                                                {% if concept_form.name.errors %}
+                                                    <div class="text-danger">{{ concept_form.name.errors }}</div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="{{ concept_form.order.id_for_label }}">Ordem</label>
+                                                {{ concept_form.order }}
+                                                {% if concept_form.order.errors %}
+                                                    <div class="text-danger">{{ concept_form.order.errors }}</div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="{{ concept_form.definition.id_for_label }}">Definição</label>
+                                                {{ concept_form.definition }}
+                                                {% if concept_form.definition.errors %}
+                                                    <div class="text-danger">{{ concept_form.definition.errors }}</div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="{{ concept_form.detailed_explanation.id_for_label }}">Explicação detalhada</label>
+                                                {{ concept_form.detailed_explanation }}
+                                                {% if concept_form.detailed_explanation.errors %}
+                                                    <div class="text-danger">{{ concept_form.detailed_explanation.errors }}</div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="{{ concept_form.illustrative_example.id_for_label }}">Exemplo ilustrativo</label>
+                                                {{ concept_form.illustrative_example }}
+                                                {% if concept_form.illustrative_example.errors %}
+                                                    <div class="text-danger">{{ concept_form.illustrative_example.errors }}</div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <button type="button" id="add-concept" class="btn btn-outline-primary add-row">
+                            <i class="fas fa-plus"></i> Adicionar Conceito
+                        </button>
+                        
+                        <!-- 6. Advanced Topics Section -->
+                        <div class="section-title mt-4">
+                            <i class="fas fa-brain me-1"></i> 6. Tópicos Avançados
+                        </div>
+                        
+                        <p class="text-muted mb-3">Aprofundamento em técnicas, teorias, ou ferramentas específicas.</p>
+                        
+                        {{ advanced_topic_formset.management_form }}
+                        <div id="advanced-topic-formset" class="formset-container">
+                            {% for topic_form in advanced_topic_formset %}
+                                <div class="formset-item advanced-topic-form">
+                                    {% if topic_form.instance.pk %}
+                                        {{ topic_form.id }}
+                                    {% endif %}
+                                    
+                                    {% if topic_form.DELETE %}
+                                        <div class="delete-row">
+                                            <label class="form-check-label">
+                                                {{ topic_form.DELETE }} Remover
+                                            </label>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-8">
+                                            <div class="form-group">
+                                                <label for="{{ topic_form.name.id_for_label }}">Nome do Tópico</label>
+                                                {{ topic_form.name }}
+                                                {% if topic_form.name.errors %}
+                                                    <div class="text-danger">{{ topic_form.name.errors }}</div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="{{ topic_form.order.id_for_label }}">Ordem</label>
+                                                {{ topic_form.order }}
+                                                {% if topic_form.order.errors %}
+                                                    <div class="text-danger">{{ topic_form.order.errors }}</div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="{{ topic_form.applications.id_for_label }}">Aplicações</label>
+                                                {{ topic_form.applications }}
+                                                {% if topic_form.applications.errors %}
+                                                    <div class="text-danger">{{ topic_form.applications.errors }}</div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="{{ topic_form.challenges.id_for_label }}">Riscos/desafios</label>
+                                                {{ topic_form.challenges }}
+                                                {% if topic_form.challenges.errors %}
+                                                    <div class="text-danger">{{ topic_form.challenges.errors }}</div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="{{ topic_form.real_example.id_for_label }}">Exemplo real</label>
+                                                {{ topic_form.real_example }}
+                                                {% if topic_form.real_example.errors %}
+                                                    <div class="text-danger">{{ topic_form.real_example.errors }}</div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <button type="button" id="add-advanced-topic" class="btn btn-outline-primary add-row">
+                            <i class="fas fa-plus"></i> Adicionar Tópico Avançado
+                        </button>
+                        
+                        <!-- 7. Practical Examples Section -->
+                        <div class="section-title mt-4">
+                            <i class="fas fa-code me-1"></i> 7. Exemplos Práticos
+                        </div>
+                        
+                        <p class="text-muted mb-3">Exemplos práticos de aplicação do tema, com código, configurações ou procedimentos.</p>
+                        
+                        {{ example_formset.management_form }}
+                        <div id="example-formset" class="formset-container">
+                            {% for example_form in example_formset %}
+                                <div class="formset-item example-form">
+                                    {% if example_form.instance.pk %}
+                                        {{ example_form.id }}
+                                    {% endif %}
+                                    
+                                    {% if example_form.DELETE %}
+                                        <div class="delete-row">
+                                            <label class="form-check-label">
+                                                {{ example_form.DELETE }} Remover
+                                            </label>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-8">
+                                            <div class="form-group">
+                                                <label for="{{ example_form.title.id_for_label }}">Título do Exemplo</label>
+                                                {{ example_form.title }}
+                                                {% if example_form.title.errors %}
+                                                    <div class="text-danger">{{ example_form.title.errors }}</div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="{{ example_form.order.id_for_label }}">Ordem</label>
+                                                {{ example_form.order }}
+                                                {% if example_form.order.errors %}
+                                                    <div class="text-danger">{{ example_form.order.errors }}</div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="{{ example_form.description.id_for_label }}">Descrição</label>
+                                                {{ example_form.description }}
+                                                {% if example_form.description.errors %}
+                                                    <div class="text-danger">{{ example_form.description.errors }}</div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="{{ example_form.code_snippet.id_for_label }}">Trecho de código ou procedimento</label>
+                                                {{ example_form.code_snippet }}
+                                                {% if example_form.code_snippet.errors %}
+                                                    <div class="text-danger">{{ example_form.code_snippet.errors }}</div>
+                                                {% endif %}
+                                                <small class="form-text text-muted">Use formatação markdown para código: ```python\ncódigo aqui\n```</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="{{ example_form.expected_result.id_for_label }}">Resultado esperado</label>
+                                                {{ example_form.expected_result }}
+                                                {% if example_form.expected_result.errors %}
+                                                    <div class="text-danger">{{ example_form.expected_result.errors }}</div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <button type="button" id="add-example" class="btn btn-outline-primary add-row">
+                            <i class="fas fa-plus"></i> Adicionar Exemplo Prático
+                        </button>
+                        
+                        <!-- 8. Resources Section -->
+                        <div class="section-title mt-4">
+                            <i class="fas fa-book me-1"></i> 8. Recursos e Referências
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="{{ form.resources.id_for_label }}">Recursos e Referências</label>
+                                    {{ form.resources }}
+                                    {% if form.resources.errors %}
+                                        <div class="text-danger">{{ form.resources.errors }}</div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">Liste livros, artigos, sites, vídeos e outros recursos relevantes. Use formatação markdown para links: [título](url)</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 9. Glossary Section -->
+                        <div class="section-title mt-4">
+                            <i class="fas fa-book-reader me-1"></i> 9. Glossário
+                        </div>
+                        
+                        <p class="text-muted mb-3">Definições de termos técnicos ou específicos mencionados no documento.</p>
+                        
+                        {{ glossary_formset.management_form }}
+                        <div id="glossary-formset" class="formset-container">
+                            {% for term_form in glossary_formset %}
+                                <div class="formset-item glossary-form">
+                                    {% if term_form.instance.pk %}
+                                        {{ term_form.id }}
+                                    {% endif %}
+                                    
+                                    {% if term_form.DELETE %}
+                                        <div class="delete-row">
+                                            <label class="form-check-label">
+                                                {{ term_form.DELETE }} Remover
+                                            </label>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="{{ term_form.term.id_for_label }}">Termo</label>
+                                                {{ term_form.term }}
+                                                {% if term_form.term.errors %}
+                                                    <div class="text-danger">{{ term_form.term.errors }}</div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="{{ term_form.definition.id_for_label }}">Definição</label>
+                                                {{ term_form.definition }}
+                                                {% if term_form.definition.errors %}
+                                                    <div class="text-danger">{{ term_form.definition.errors }}</div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <button type="button" id="add-glossary" class="btn btn-outline-primary add-row">
+                            <i class="fas fa-plus"></i> Adicionar Termo ao Glossário
+                        </button>
+                        
+                        <!-- 10. Attachments Section -->
+                        <div class="section-title mt-4">
+                            <i class="fas fa-paperclip me-1"></i> 10. Anexos
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="{{ form.attachments.id_for_label }}">Anexos</label>
+                                    {{ form.attachments }}
+                                    {% if form.attachments.errors %}
+                                        <div class="text-danger">{{ form.attachments.errors }}</div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">Liste links para arquivos anexos ou materiais complementares. Use formatação markdown para links: [nome do arquivo](url)</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Status Section -->
+                        <div class="section-title mt-4">
+                            <i class="fas fa-tasks me-1"></i> Status do Documento
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.status.id_for_label }}">Status</label>
+                                    {{ form.status }}
+                                    {% if form.status.errors %}
+                                        <div class="text-danger">{{ form.status.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.last_updated.id_for_label }}">Data da Última Atualização</label>
+                                    {{ form.last_updated }}
+                                    {% if form.last_updated.errors %}
+                                        <div class="text-danger">{{ form.last_updated.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Submit Button -->
+                        <div class="mt-4 d-flex justify-content-between">
+                            <a href="{% url 'education:documentation_list' %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> {% if is_update %}Atualizar{% else %}Salvar{% endif %} Documentação
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Initialize formsets
+        const conceptFormsetPrefix = "{{ concept_formset.prefix }}";
+        const advancedTopicFormsetPrefix = "{{ advanced_topic_formset.prefix }}";
+        const exampleFormsetPrefix = "{{ example_formset.prefix }}";
+        const glossaryFormsetPrefix = "{{ glossary_formset.prefix }}";
+        
+        // Function to update form indices
+        function updateFormIndices(formset, prefix) {
+            const forms = formset.find('.formset-item');
+            const totalForms = forms.length;
+            
+            // Update the total forms count in the management form
+            $(`#id_${prefix}-TOTAL_FORMS`).val(totalForms);
+            
+            // Update each form's index
+            forms.each(function(index) {
+                $(this).find(':input').each(function() {
+                    if ($(this).attr('id')) {
+                        const oldId = $(this).attr('id');
+                        const newId = oldId.replace(new RegExp(`${prefix}-\\d+`), `${prefix}-${index}`);
+                        $(this).attr('id', newId);
+                    }
+                    
+                    if ($(this).attr('name')) {
+                        const oldName = $(this).attr('name');
+                        const newName = oldName.replace(new RegExp(`${prefix}-\\d+`), `${prefix}-${index}`);
+                        $(this).attr('name', newName);
+                    }
+                });
+                
+                // Update labels as well
+                $(this).find('label').each(function() {
+                    if ($(this).attr('for')) {
+                        const oldFor = $(this).attr('for');
+                        const newFor = oldFor.replace(new RegExp(`${prefix}-\\d+`), `${prefix}-${index}`);
+                        $(this).attr('for', newFor);
+                    }
+                });
+            });
+        }
+        
+        // Function to create a new form
+        function addForm(formset, prefix, emptyFormHtml) {
+            const totalForms = parseInt($(`#id_${prefix}-TOTAL_FORMS`).val());
+            const newForm = emptyFormHtml.replace(new RegExp(`${prefix}-__prefix__`, 'g'), `${prefix}-${totalForms}`);
+            formset.append(newForm);
+            $(`#id_${prefix}-TOTAL_FORMS`).val(totalForms + 1);
+            
+            // Initialize any widgets in the new form
+            initializeFormWidgets();
+        }
+        
+        // Function to initialize widgets (like rich text editors)
+        function initializeFormWidgets() {
+            // Add any widget initialization here if needed
+        }
+        
+        // Store empty form HTML for each formset
+        const conceptEmptyForm = $('#concept-formset .concept-form').first().clone();
+        const advancedTopicEmptyForm = $('#advanced-topic-formset .advanced-topic-form').first().clone();
+        const exampleEmptyForm = $('#example-formset .example-form').first().clone();
+        const glossaryEmptyForm = $('#glossary-formset .glossary-form').first().clone();
+        
+        // Reset the empty forms
+        conceptEmptyForm.find(':input').val('');
+        advancedTopicEmptyForm.find(':input').val('');
+        exampleEmptyForm.find(':input').val('');
+        glossaryEmptyForm.find(':input').val('');
+        
+        // Add form buttons
+        $('#add-concept').click(function() {
+            const newForm = conceptEmptyForm.clone();
+            $('#concept-formset').append(newForm);
+            updateFormIndices($('#concept-formset'), conceptFormsetPrefix);
+        });
+        
+        $('#add-advanced-topic').click(function() {
+            const newForm = advancedTopicEmptyForm.clone();
+            $('#advanced-topic-formset').append(newForm);
+            updateFormIndices($('#advanced-topic-formset'), advancedTopicFormsetPrefix);
+        });
+        
+        $('#add-example').click(function() {
+            const newForm = exampleEmptyForm.clone();
+            $('#example-formset').append(newForm);
+            updateFormIndices($('#example-formset'), exampleFormsetPrefix);
+        });
+        
+        $('#add-glossary').click(function() {
+            const newForm = glossaryEmptyForm.clone();
+            $('#glossary-formset').append(newForm);
+            updateFormIndices($('#glossary-formset'), glossaryFormsetPrefix);
+        });
+        
+        // Handle delete checkboxes
+        $(document).on('change', '.delete-row input[type="checkbox"]', function() {
+            const formItem = $(this).closest('.formset-item');
+            if ($(this).is(':checked')) {
+                formItem.fadeOut();
+            } else {
+                formItem.fadeIn();
+            }
+        });
+        
+        // Initialize any widgets on page load
+        initializeFormWidgets();
+    });
+</script>
+{% endblock %}

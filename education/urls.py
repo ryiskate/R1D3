@@ -2,6 +2,7 @@ from django.urls import path
 from . import views
 from . import debug_views
 from . import knowledge_views
+from . import documentation_views
 
 app_name = 'education'
 
@@ -32,4 +33,11 @@ urlpatterns = [
     path('knowledge/article/<slug:slug>/upload-media/', knowledge_views.MediaAttachmentUploadView.as_view(), name='media_upload'),
     path('knowledge/media/<int:pk>/delete/', knowledge_views.MediaAttachmentDeleteView.as_view(), name='media_delete'),
     path('knowledge/test-form/', knowledge_views.TestFormView.as_view(), name='knowledge_test_form'),
+
+    # Documentation URLs
+    path('documentation/', documentation_views.DocumentationListView.as_view(), name='documentation_list'),
+    path('documentation/create/', documentation_views.DocumentationCreateView.as_view(), name='documentation_create'),
+    path('documentation/<int:pk>/', documentation_views.DocumentationDetailView.as_view(), name='documentation_detail'),
+    path('documentation/<int:pk>/update/', documentation_views.DocumentationUpdateView.as_view(), name='documentation_update'),
+    path('documentation/<int:pk>/delete/', documentation_views.DocumentationDeleteView.as_view(), name='documentation_delete'),
 ]
