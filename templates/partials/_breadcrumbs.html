@@ -1,0 +1,32 @@
+{% comment %}
+Reusable breadcrumb component for the R1D3 system
+Usage:
+Include this template with:
+{% include 'partials/_breadcrumbs.html' %}
+
+The breadcrumbs are set on the request object by the BreadcrumbMixin.
+If no breadcrumbs are provided, only the Home link will be shown.
+
+Example in view with BreadcrumbMixin:
+def get_breadcrumbs(self):
+    return [
+        {'title': 'Dashboard', 'url': reverse('dashboard')},
+        {'title': 'Tasks', 'url': reverse('tasks')},
+        {'title': 'Task Title', 'url': None}  # Last item has no URL
+    ]
+{% endcomment %}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb bg-light p-2 rounded">
+        <li class="breadcrumb-item"><a href="{% url 'core:home' %}"><i class="fas fa-home"></i> Home</a></li>
+        {% if request.breadcrumbs %}
+            {% for crumb in request.breadcrumbs %}
+                {% if forloop.last %}
+                    <li class="breadcrumb-item active">{{ crumb.title }}</li>
+                {% else %}
+                    <li class="breadcrumb-item"><a href="{{ crumb.url }}">{{ crumb.title }}</a></li>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    </ol>
+</nav>

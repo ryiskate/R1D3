@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Course Documentation | R1D3 Education{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mt-4">Course Documentation</h1>
+        <a href="{% url 'education:documentation_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Create New Documentation
+        </a>
+    </div>
+    
+    {% include 'partials/_breadcrumbs.html' %}
+    
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-book me-1"></i>
+                    Available Documentation
+                </div>
+                <div class="card-body">
+                    {% if documentations %}
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover" id="documentationTable">
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Central Theme</th>
+                                        <th>Author</th>
+                                        <th>Status</th>
+                                        <th>Created</th>
+                                        <th>Last Updated</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for doc in documentations %}
+                                    <tr>
+                                        <td>
+                                            <a href="{% url 'education:documentation_detail' doc.pk %}">
+                                                {{ doc.title }}
+                                            </a>
+                                        </td>
+                                        <td>{{ doc.central_theme }}</td>
+                                        <td>{{ doc.author.get_full_name|default:doc.author.username }}</td>
+                                        <td>
+                                            {% if doc.status == 'draft' %}
+                                                <span class="badge bg-secondary">Draft</span>
+                                            {% elif doc.status == 'review' %}
+                                                <span class="badge bg-info">In Review</span>
+                                            {% elif doc.status == 'published' %}
+                                                <span class="badge bg-success">Published</span>
+                                            {% elif doc.status == 'archived' %}
+                                                <span class="badge bg-warning">Archived</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ doc.created_at|date:"M d, Y" }}</td>
+                                        <td>{{ doc.updated_at|date:"M d, Y" }}</td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a href="{% url 'education:documentation_detail' doc.pk %}" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="{% url 'education:documentation_update' doc.pk %}" class="btn btn-sm btn-outline-secondary">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a href="{% url 'education:documentation_delete' doc.pk %}" class="btn btn-sm btn-outline-danger">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            No documentation found. <a href="{% url 'education:documentation_create' %}">Create your first documentation</a>.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        $('#documentationTable').DataTable({
+            order: [[4, 'desc']]
+        });
+    });
+</script>
+{% endblock %}

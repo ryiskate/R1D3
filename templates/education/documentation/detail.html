@@ -1,0 +1,305 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ documentation.title }} | R1D3 Education{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mt-4">{{ documentation.title }}</h1>
+        <div>
+            <a href="{% url 'education:documentation_update' documentation.pk %}" class="btn btn-primary">
+                <i class="fas fa-edit"></i> Edit
+            </a>
+            <a href="{% url 'education:documentation_list' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to List
+            </a>
+        </div>
+    </div>
+    
+    {% include 'partials/_breadcrumbs.html' %}
+    
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="fas fa-info-circle me-1"></i>
+                        Document Information
+                    </div>
+                    <div>
+                        {% if documentation.status == 'draft' %}
+                            <span class="badge bg-secondary">Draft</span>
+                        {% elif documentation.status == 'review' %}
+                            <span class="badge bg-info">In Review</span>
+                        {% elif documentation.status == 'published' %}
+                            <span class="badge bg-success">Published</span>
+                        {% elif documentation.status == 'archived' %}
+                            <span class="badge bg-warning">Archived</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Central Theme:</strong> {{ documentation.central_theme }}</p>
+                            <p><strong>Author:</strong> {{ documentation.author.get_full_name|default:documentation.author.username }}</p>
+                            <p><strong>Created:</strong> {{ documentation.created_at|date:"F d, Y" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Last Updated:</strong> {{ documentation.updated_at|date:"F d, Y" }}</p>
+                            <p><strong>Objective:</strong> {{ documentation.objective }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Summary Section -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-file-alt me-1"></i>
+                    Summary
+                </div>
+                <div class="card-body">
+                    {{ documentation.summary|linebreaks }}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Introduction Section -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-book-open me-1"></i>
+                    Introduction
+                </div>
+                <div class="card-body">
+                    <h5>Overview</h5>
+                    {{ documentation.introduction|linebreaks }}
+                    
+                    <h5 class="mt-4">Practical Applications</h5>
+                    {{ documentation.practical_applications|linebreaks }}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Fundamental Concepts Section -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-lightbulb me-1"></i>
+                    Fundamental Concepts
+                </div>
+                <div class="card-body">
+                    {% if concepts %}
+                        <div class="accordion" id="conceptsAccordion">
+                            {% for concept in concepts %}
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="heading{{ concept.id }}">
+                                        <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ concept.id }}" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}" aria-controls="collapse{{ concept.id }}">
+                                            {{ concept.name }}
+                                        </button>
+                                    </h2>
+                                    <div id="collapse{{ concept.id }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" aria-labelledby="heading{{ concept.id }}" data-bs-parent="#conceptsAccordion">
+                                        <div class="accordion-body">
+                                            <h5>Definition</h5>
+                                            <p>{{ concept.definition }}</p>
+                                            
+                                            <h5 class="mt-3">Detailed Explanation</h5>
+                                            {{ concept.detailed_explanation|linebreaks }}
+                                            
+                                            <h5 class="mt-3">Example</h5>
+                                            <div class="bg-light p-3 rounded">
+                                                {{ concept.illustrative_example|linebreaks }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No concepts have been added to this documentation.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Advanced Topics Section -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-brain me-1"></i>
+                    Advanced Topics
+                </div>
+                <div class="card-body">
+                    {% if advanced_topics %}
+                        <div class="accordion" id="advancedTopicsAccordion">
+                            {% for topic in advanced_topics %}
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingAdv{{ topic.id }}">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAdv{{ topic.id }}" aria-expanded="false" aria-controls="collapseAdv{{ topic.id }}">
+                                            {{ topic.name }}
+                                        </button>
+                                    </h2>
+                                    <div id="collapseAdv{{ topic.id }}" class="accordion-collapse collapse" aria-labelledby="headingAdv{{ topic.id }}" data-bs-parent="#advancedTopicsAccordion">
+                                        <div class="accordion-body">
+                                            <h5>Applications</h5>
+                                            <p>{{ topic.applications }}</p>
+                                            
+                                            <h5 class="mt-3">Challenges & Risks</h5>
+                                            {{ topic.challenges|linebreaks }}
+                                            
+                                            <h5 class="mt-3">Real-world Example</h5>
+                                            <div class="bg-light p-3 rounded">
+                                                {{ topic.real_example|linebreaks }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No advanced topics have been added to this documentation.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Practical Examples Section -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-code me-1"></i>
+                    Practical Examples
+                </div>
+                <div class="card-body">
+                    {% if practical_examples %}
+                        <div class="accordion" id="examplesAccordion">
+                            {% for example in practical_examples %}
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingEx{{ example.id }}">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEx{{ example.id }}" aria-expanded="false" aria-controls="collapseEx{{ example.id }}">
+                                            {{ example.title }}
+                                        </button>
+                                    </h2>
+                                    <div id="collapseEx{{ example.id }}" class="accordion-collapse collapse" aria-labelledby="headingEx{{ example.id }}" data-bs-parent="#examplesAccordion">
+                                        <div class="accordion-body">
+                                            {% if example.code %}
+                                                <h5>Code</h5>
+                                                <pre class="bg-dark text-light p-3 rounded"><code>{{ example.code }}</code></pre>
+                                            {% endif %}
+                                            
+                                            {% if example.image %}
+                                                <h5 class="mt-3">Illustration</h5>
+                                                <img src="{{ example.image }}" alt="{{ example.title }}" class="img-fluid mb-3 rounded">
+                                            {% endif %}
+                                            
+                                            <h5 class="mt-3">Step-by-step Explanation</h5>
+                                            {{ example.step_by_step|linebreaks }}
+                                            
+                                            {% if example.real_application %}
+                                                <h5 class="mt-3">Application in Real Project</h5>
+                                                <div class="bg-light p-3 rounded">
+                                                    {{ example.real_application|linebreaks }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No practical examples have been added to this documentation.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Resources Section -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-link me-1"></i>
+                    Recommended Resources
+                </div>
+                <div class="card-body">
+                    {% if documentation.recommended_resources %}
+                        {{ documentation.recommended_resources|linebreaks }}
+                    {% else %}
+                        <p class="text-muted">No resources have been added to this documentation.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Glossary Section -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-book me-1"></i>
+                    Glossary
+                </div>
+                <div class="card-body">
+                    {% if glossary_terms %}
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 30%">Term</th>
+                                        <th>Definition</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for term in glossary_terms %}
+                                        <tr>
+                                            <td><strong>{{ term.term }}</strong></td>
+                                            <td>{{ term.definition }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No glossary terms have been added to this documentation.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Attachments Section -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-paperclip me-1"></i>
+                    Attachments
+                </div>
+                <div class="card-body">
+                    {% if documentation.attachments %}
+                        {{ documentation.attachments|linebreaks }}
+                    {% else %}
+                        <p class="text-muted">No attachments have been added to this documentation.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
