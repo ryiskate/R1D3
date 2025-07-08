@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, Submit, Div, HTML
 from .models import IndieNewsTask, IndieGame, IndieEvent, IndieTool
+from projects.models import Team
 
 User = get_user_model()
 
@@ -14,7 +15,7 @@ class IndieNewsTaskForm(forms.ModelForm):
         model = IndieNewsTask
         fields = [
             'title', 'description', 'status', 'priority', 
-            'assigned_to', 'due_date', 'estimated_hours',
+            'assigned_to', 'assigned_users', 'due_date', 'estimated_hours',
             'article_id', 'news_type', 'developer', 'game_title',
             'publish_date', 'word_count', 'tags'
         ]
@@ -23,10 +24,15 @@ class IndieNewsTaskForm(forms.ModelForm):
             'publish_date': forms.DateInput(attrs={'type': 'date'}),
             'description': forms.Textarea(attrs={'rows': 4}),
             'tags': forms.TextInput(attrs={'placeholder': 'Separate tags with commas'}),
+            'assigned_users': forms.SelectMultiple(attrs={'class': 'select2', 'multiple': 'multiple'}),
         }
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # Set up the assigned_users field to show all users
+        self.fields["assigned_users"].queryset = User.objects.all().order_by("username")
+        self.fields["assigned_users"].label = "Team"
+        self.fields["assigned_users"].help_text = "Hold Ctrl/Cmd to select multiple users"
         self.helper = FormHelper()
         self.helper.form_method = 'post'
         self.helper.layout = Layout(
@@ -41,7 +47,11 @@ class IndieNewsTaskForm(forms.ModelForm):
                 ),
                 Div(
                     Div('assigned_to', css_class='col-md-6'),
-                    Div('due_date', css_class='col-md-6'),
+                    Div('assigned_users', css_class='col-md-6'),
+                    css_class='row'
+                ),
+                Div(
+                    Div('due_date', css_class='col-md-12'),
                     css_class='row'
                 ),
             ),

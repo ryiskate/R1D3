@@ -82,6 +82,18 @@
                                 {% endif %}
                             </p>
                             <p>
+                                <strong>Team:</strong>
+                                {% if task.assigned_users.all %}
+                                    <ul class="list-unstyled mb-0">
+                                        {% for user in task.assigned_users.all %}
+                                            <li><span class="badge badge-pill badge-info">{{ user.get_full_name|default:user.username }}</span></li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <span class="text-muted">No team members assigned</span>
+                                {% endif %}
+                            </p>
+                            <p>
                                 <strong>Due date:</strong> 
                                 {% if task.due_date %}
                                     {{ task.due_date|date:"F j, Y" }}
