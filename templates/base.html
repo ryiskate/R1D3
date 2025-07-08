@@ -418,12 +418,8 @@
                 <div class="milestone-display ms-3 me-auto" id="milestone-display">
                     <!-- Debug info -->
                     <script>
-                        console.log('Milestone Debug Info:');
-                        console.log('milestone_title:', '{{ milestone_title|escapejs }}');
-                        console.log('phase_name:', '{{ phase_name|escapejs }}');
-                        console.log('phase_type:', '{{ phase_type|escapejs }}');
-                        console.log('timestamp:', '{{ timestamp }}');
-                        console.log('random_id:', '{{ random_id }}');
+                        // Milestone debug logs removed for cleaner console
+                        // All milestone debug logs removed for cleaner console
                     </script>
                     
                     <!-- Simple milestone display -->
@@ -508,10 +504,21 @@
     
     <!-- Milestone Display -->
     <script>
-        // Function to refresh the milestone display
+        // Function to refresh the milestone display without page reload
         function refreshMilestoneDisplay() {
-            console.log('Refreshing milestone display...');
-            location.reload();
+            // Milestone refresh debug log removed
+            // Instead of reloading the entire page, we'll just log the milestone info
+            // This could be replaced with an AJAX call to update just the milestone info
+            // Timestamp debug log removed
+            
+            // Don't schedule another refresh if we're on a form page to prevent interruptions
+            if (!window.location.href.includes('_form') && 
+                !window.location.href.includes('/create/') && 
+                !window.location.href.includes('/edit/')) {
+                setTimeout(refreshMilestoneDisplay, 30000); // Increased to 30 seconds
+            } else {
+                console.log('Auto-refresh disabled on form pages to prevent data loss');
+            }
         }
         
         // Log the current milestone to the console
@@ -524,14 +531,18 @@
             var randomId = '{{ random_id }}';
             
             // Log the extracted information
-            console.log('Current milestone: ' + milestoneTitle);
-            console.log('Current phase: ' + phaseInfo + ' (' + phaseType + ')');
-            console.log('Last updated: ' + new Date(timestamp * 1000).toLocaleTimeString());
-            console.log('Update ID: ' + randomId);
+            // Current milestone debug log removed
+            // All phase debug logs removed for cleaner console
             
-            // Set up auto-refresh every 10 seconds
-            console.log('Auto-refresh scheduled in 10 seconds');
-            setTimeout(refreshMilestoneDisplay, 10000);
+            // Only set up refresh for non-form pages
+            if (!window.location.href.includes('_form') && 
+                !window.location.href.includes('/create/') && 
+                !window.location.href.includes('/edit/')) {
+                console.log('Auto-refresh scheduled in 30 seconds');
+                setTimeout(refreshMilestoneDisplay, 30000); // Increased to 30 seconds
+            } else {
+                console.log('Auto-refresh disabled on form pages to prevent data loss');
+            }
         });
     </script>
     <!-- DataTables JS -->

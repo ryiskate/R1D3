@@ -1,16 +1,14 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, View
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, FormView, View, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy, reverse
-from django.http import JsonResponse
-from django.db.models import Q
 from django.contrib import messages
-from django.utils.text import slugify
+from django.http import JsonResponse, HttpResponseRedirect
+from django.db.models import Q
 
 from core.mixins import BreadcrumbMixin
 from .knowledge_models import KnowledgeArticle, KnowledgeCategory, KnowledgeTag, MediaAttachment
 from .knowledge_forms import KnowledgeArticleForm, MediaAttachmentForm
-
 
 class KnowledgeBaseView(LoginRequiredMixin, BreadcrumbMixin, ListView):
     """Main view for the Knowledge Base dashboard"""
@@ -109,6 +107,10 @@ class KnowledgeArticleCreateView(LoginRequiredMixin, BreadcrumbMixin, CreateView
     form_class = KnowledgeArticleForm
     template_name = 'education/knowledge/article_form.html'
     
+    def get_success_url(self):
+        """Return the URL to redirect to after processing a valid form."""
+        return self.object.get_absolute_url()
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['active_department'] = 'education'
@@ -124,10 +126,57 @@ class KnowledgeArticleCreateView(LoginRequiredMixin, BreadcrumbMixin, CreateView
         return breadcrumbs
     
     def form_valid(self, form):
+        import logging
+        logger = logging.getLogger(__name__)
+        
+        # Set the author to the current user
         form.instance.author = self.request.user
-        response = super().form_valid(form)
+        
+        # Process content blocks data if provided
+        content_blocks = self.request.POST.get('content_blocks')
+        logger.info(f"Content blocks data received: {content_blocks[:100] if content_blocks else 'None'}...")
+        
+        if content_blocks:
+            form.instance.content = f"Content blocks: {len(content_blocks)} characters"
+        
+        # Ensure the slug is set if not provided
+        from django.utils.text import slugify
+        if not form.instance.slug:
+            form.instance.slug = slugify(form.instance.title)
+        logger.info(f"Using slug: {form.instance.slug}")
+        
+        # Save the form
+        self.object = form.save()
+        logger.info(f"Article saved with ID: {self.object.id}, slug: {self.object.slug}")
+        
+        # Add success message
         messages.success(self.request, f"Article '{self.object.title}' created successfully.")
-        return response
+        
+        # Get the absolute URL for the article
+        redirect_url = self.object.get_absolute_url()
+        logger.info(f"Redirecting to: {redirect_url}")
+        
+        # Check if this is an AJAX request
+        is_ajax = self.request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+        logger.info(f"Is AJAX request: {is_ajax}")
+        
+        if is_ajax:
+            # Return JSON response for AJAX requests
+            return JsonResponse({
+                'success': True,
+                'redirect_url': redirect_url,
+                'slug': self.object.slug,
+                'article_id': self.object.id,
+                'message': f"Article '{self.object.title}' created successfully."
+            })
+        else:
+            # Use HttpResponseRedirect for standard form submissions
+            from django.http import HttpResponseRedirect
+            response = HttpResponseRedirect(redirect_url)
+            response['X-Article-Created'] = 'True'
+            response['X-Article-Slug'] = self.object.slug
+            logger.info(f"Returning HttpResponseRedirect to {redirect_url}")
+            return response
 
 
 class KnowledgeArticleUpdateView(LoginRequiredMixin, BreadcrumbMixin, UpdateView):
@@ -135,6 +184,10 @@ class KnowledgeArticleUpdateView(LoginRequiredMixin, BreadcrumbMixin, UpdateView
     model = KnowledgeArticle
     form_class = KnowledgeArticleForm
     template_name = 'education/knowledge/article_form.html'
+    
+    def get_success_url(self):
+        """Return the URL to redirect to after processing a valid form."""
+        return self.object.get_absolute_url()
     slug_url_kwarg = 'slug'
     
     def get_context_data(self, **kwargs):
@@ -156,9 +209,54 @@ class KnowledgeArticleUpdateView(LoginRequiredMixin, BreadcrumbMixin, UpdateView
         return breadcrumbs
     
     def form_valid(self, form):
-        response = super().form_valid(form)
+        import logging
+        logger = logging.getLogger(__name__)
+        
+        # Process content blocks data if provided
+        content_blocks = self.request.POST.get('content_blocks')
+        logger.info(f"Content blocks data received: {content_blocks[:100] if content_blocks else 'None'}...")
+        
+        if content_blocks:
+            form.instance.content = f"Content blocks: {len(content_blocks)} characters"
+        
+        # Ensure the slug is set if not provided
+        from django.utils.text import slugify
+        if not form.instance.slug:
+            form.instance.slug = slugify(form.instance.title)
+        logger.info(f"Using slug: {form.instance.slug}")
+        
+        # Save the form
+        self.object = form.save()
+        logger.info(f"Article updated with ID: {self.object.id}, slug: {self.object.slug}")
+        
+        # Add success message
         messages.success(self.request, f"Article '{self.object.title}' updated successfully.")
-        return response
+        
+        # Get the absolute URL for the article
+        redirect_url = self.object.get_absolute_url()
+        logger.info(f"Redirecting to: {redirect_url}")
+        
+        # Check if this is an AJAX request
+        is_ajax = self.request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+        logger.info(f"Is AJAX request: {is_ajax}")
+        
+        if is_ajax:
+            # Return JSON response for AJAX requests
+            return JsonResponse({
+                'success': True,
+                'redirect_url': redirect_url,
+                'slug': self.object.slug,
+                'article_id': self.object.id,
+                'message': f"Article '{self.object.title}' updated successfully."
+            })
+        else:
+            # Use HttpResponseRedirect for standard form submissions
+            from django.http import HttpResponseRedirect
+            response = HttpResponseRedirect(redirect_url)
+            response['X-Article-Updated'] = 'True'
+            response['X-Article-Slug'] = self.object.slug
+            logger.info(f"Returning HttpResponseRedirect to {redirect_url}")
+            return response
 
 
 class KnowledgeArticleDeleteView(LoginRequiredMixin, BreadcrumbMixin, DeleteView):
@@ -167,6 +265,19 @@ class KnowledgeArticleDeleteView(LoginRequiredMixin, BreadcrumbMixin, DeleteView
     template_name = 'education/knowledge/article_confirm_delete.html'
     success_url = reverse_lazy('education:knowledge_base')
     slug_url_kwarg = 'slug'
+    
+
+class TestFormView(LoginRequiredMixin, BreadcrumbMixin, TemplateView):
+    """Test view for form submission"""
+    template_name = 'education/knowledge/test_form.html'
+    
+    def get_breadcrumbs(self):
+        breadcrumbs = [
+            {'title': 'Education', 'url': reverse_lazy('education:dashboard')},
+            {'title': 'Knowledge Base', 'url': reverse_lazy('education:knowledge_base')},
+            {'title': 'Test Form', 'url': '#'}
+        ]
+        return breadcrumbs
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

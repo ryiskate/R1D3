@@ -107,8 +107,9 @@
                     {% endif %}
                 </div>
                 <div class="card-body">
-                    <form method="post" enctype="multipart/form-data" id="article-form">
+                    <form method="post" enctype="multipart/form-data" id="article-form" action="{% if is_create %}{% url 'education:knowledge_article_create' %}{% else %}{% url 'education:knowledge_article_update' article.slug %}{% endif %}" onsubmit="return handleFormSubmission(event);">
                         {% csrf_token %}
+                        <input type="hidden" name="content_blocks" id="content-blocks-data" value="">
                         
                         <div class="row mb-3">
                             <div class="col-md-8">
@@ -130,62 +131,11 @@
                         
                         {{ form.summary|as_crispy_field }}
                         
-                        <!-- Content Features Container -->
-                        <div class="mb-4">
-                            <h6 class="font-weight-bold text-primary mb-3">Article Features</h6>
-                            <div id="features-container" class="border rounded p-3 mb-3">
-                                <!-- Features will be added here dynamically -->
-                                <div class="text-center text-muted py-4" id="no-features-message">
-                                    <i class="fas fa-info-circle mb-2"></i>
-                                    <p>No features added yet. Use the form below to add content features.</p>
-                                </div>
-                            </div>
-                        </div>
+                        <!-- Hidden input to store JSON data of all blocks -->
+                        <input type="hidden" name="content_blocks" id="content-blocks-data" value="[]">
                         
-                        <!-- Hidden content field that will be populated with JSON -->
-                        <div style="display: none;">
-                            {{ form.content }}
-                            {{ form.featured_image }}
-                        </div>
-                        
-                        <!-- Feature Addition Form -->
-                        <div class="card shadow-sm mb-4">
-                            <div class="card-header py-3">
-                                <h6 class="m-0 font-weight-bold text-primary">Add Content Feature</h6>
-                            </div>
-                            <div class="card-body">
-                                <div class="row mb-3">
-                                    <div class="col-md-12">
-                                        <label for="feature-title" class="form-label">Title</label>
-                                        <input type="text" class="form-control" id="feature-title" placeholder="Feature title">
-                                    </div>
-                                </div>
-                                <div class="row mb-3">
-                                    <div class="col-md-12">
-                                        <label for="feature-text" class="form-label">Text</label>
-                                        <textarea class="form-control" id="feature-text" rows="3" placeholder="Feature description"></textarea>
-                                    </div>
-                                </div>
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <label for="feature-media" class="form-label">Image/Video</label>
-                                        <input type="file" class="form-control" id="feature-media" accept="image/*,video/*">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="feature-type" class="form-label">Feature Type</label>
-                                        <select class="form-control" id="feature-type">
-                                            <option value="text">Text Block</option>
-                                            <option value="bullet">Bullet Points</option>
-                                            <option value="image">Image with Caption</option>
-                                            <option value="video">Video with Caption</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <button type="button" id="add-feature-btn" class="btn btn-primary">
-                                    <i class="fas fa-plus mr-1"></i> Add Feature
-                                </button>
-                            </div>
-                        </div>
+                        <!-- Hidden content field for compatibility -->
+                        <input type="hidden" name="content" id="{{ form.content.id_for_label }}" value="">
                         
                         <div class="form-group">
                             <div class="custom-control custom-checkbox">
@@ -196,11 +146,103 @@
                             </div>
                         </div>
                         
-                        <div class="d-flex justify-content-between">
-                            <a href="{% url 'education:knowledge_base' %}" class="btn btn-secondary">Cancel</a>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save mr-1"></i> {% if is_create %}Create Article{% else %}Save Changes{% endif %}
+                        <hr>
+                        
+                        <!-- Content Blocks Section (integrated into main form) -->
+                        <h5 class="font-weight-bold text-primary mb-3">Content Blocks</h5>
+                        
+                        <!-- Content blocks container -->
+                        <div id="content-blocks-container" class="mb-3">
+                            <!-- Blocks will be added here dynamically -->
+                            <div class="text-center text-muted py-2" id="no-blocks-message">
+                                <p>No content blocks added yet. Use the form below to add content blocks.</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Block Type Selection -->
+                        <div class="d-flex mb-3">
+                            <select id="block-type-select" class="form-control mr-2">
+                                <option value="">-- Select Block Type --</option>
+                                <option value="bullet">Bullet Points</option>
+                                <option value="image">Image</option>
+                                <option value="video">Video</option>
+                            </select>
+                            <button type="button" class="btn btn-primary" onclick="showBlockForm(); return false;">
+                                <i class="fas fa-plus"></i> Add
                             </button>
+                        </div>
+                        
+                        <!-- Block Form Container -->
+                        <div id="block-form-container" style="display: none;" class="border rounded p-3 mt-3 mb-4">
+                            <div class="form-group">
+                                <label for="block-title">Block Title</label>
+                                <input type="text" class="form-control" id="block-title" placeholder="Enter block title">
+                            </div>
+                            <div class="form-group">
+                                <label for="block-description">Block Description</label>
+                                <textarea class="form-control" id="block-description" rows="3" placeholder="Enter block description"></textarea>
+                            </div>
+                            
+                            <!-- Bullet Points Options -->
+                            <div id="bullet-options" class="block-option-container" style="display: none;">
+                                <div class="form-group">
+                                    <label>Bullet Points</label>
+                                    <div id="bullet-points-container">
+                                        <div class="input-group mb-2">
+                                            <input type="text" class="form-control bullet-point" placeholder="Enter bullet point">
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-danger" type="button" onclick="removeBulletPoint(this); return false;">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="addBulletPoint(); return false;">
+                                        <i class="fas fa-plus"></i> Add Bullet Point
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Image Options -->
+                            <div id="image-options" class="block-option-container" style="display: none;">
+                                <div class="form-group">
+                                    <label for="image-url">Image URL</label>
+                                    <input type="text" class="form-control" id="image-url" placeholder="Enter image URL">
+                                </div>
+                                <div class="form-group">
+                                    <label for="image-description">Image Description</label>
+                                    <input type="text" class="form-control" id="image-description" placeholder="Enter image description">
+                                </div>
+                            </div>
+                            
+                            <!-- Video Options -->
+                            <div id="video-options" class="block-option-container" style="display: none;">
+                                <div class="form-group">
+                                    <label for="video-url">Video URL (YouTube or Vimeo)</label>
+                                    <input type="text" class="form-control" id="video-url" placeholder="Enter video URL">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group mt-3">
+                                <button type="button" class="btn btn-primary" onclick="addContentBlock(); return false;">
+                                    <i class="fas fa-save"></i> Save Block
+                                </button>
+                                <button type="button" class="btn btn-secondary ml-2" onclick="hideBlockForm(); return false;">
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Submit button at the bottom -->
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'education:knowledge_base' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left mr-1"></i> Cancel
+                            </a>
+                            <div>
+                                <button type="submit" class="btn btn-primary" id="submit-article-btn">
+                                    <i class="fas fa-save mr-1"></i> {% if is_create %}Create Article{% else %}Save Changes{% endif %}
+                                </button>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -327,13 +369,496 @@
             </div>
         </div>
     </div>
+        </div>
+        <div class="col-lg-3">
+            <!-- Empty column for layout balance -->
+        </div>
+    </div>
 </div>
+
 {% endblock %}
 
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+<!-- TinyMCE removed as requested -->
 <script>
+    // Initialize content blocks array as a global variable
+    let contentBlocks = [];
+    
+    // Function to show the block form based on selected type
+    function showBlockForm() {
+        const blockType = $('#block-type-select').val();
+        if (!blockType) {
+            alert('Please select a block type');
+            return false;
+        }
+        
+        // Show the form container
+        $('#block-form-container').slideDown();
+        
+        // Hide all block option containers first
+        $('.block-option-container').hide();
+        
+        // Show the specific options for the selected block type
+        if (blockType === 'bullet') {
+            $('#bullet-options').show();
+        } else if (blockType === 'image') {
+            $('#image-options').show();
+        } else if (blockType === 'video') {
+            $('#video-options').show();
+        }
+        
+        resetBlockForm();
+        
+        return false; // Prevent form submission
+    }
+    
+    // Function to hide the block form
+    function hideBlockForm() {
+        $('#block-form-container').slideUp();
+        return false; // Prevent form submission
+    }
+    
+    // Global function to add a bullet point field
+    function addBulletPoint() {
+        const newBulletPoint = `
+            <div class="input-group mb-2">
+                <input type="text" class="form-control bullet-point" placeholder="Enter bullet point">
+                <div class="input-group-append">
+                    <button type="button" class="btn btn-outline-danger" onclick="removeBulletPoint(this); return false;"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+        `;
+        $('#bullet-points-container').append(newBulletPoint);
+        return false; // Prevent form submission
+    }
+    
+    // Global function to remove a bullet point field
+    function removeBulletPoint(button) {
+        $(button).closest('.input-group').remove();
+        return false; // Prevent form submission
+    }
+    
+    // Global function to add content block (called directly from button onclick)
+    function addContentBlock() {
+        // Get values from form
+        const title = $('#block-title').val();
+        const description = $('#block-description').val();
+        const blockType = $('#block-type-select').val();
+        
+        // Validate required fields
+        if (!title || !blockType) {
+            alert('Please enter a title and select a block type');
+            return false;
+        }
+        
+        // Create block data object
+        const blockId = 'block-' + Date.now(); // Unique ID based on timestamp
+        const blockData = {
+            id: blockId,
+            title: title,
+            description: description,
+            type: blockType,
+            content: {}
+        };
+        
+        // Get content based on block type
+        switch(blockType) {
+            case 'bullet':
+                const bulletPoints = [];
+                $('.bullet-point').each(function() {
+                    const point = $(this).val().trim();
+                    if (point) {
+                        bulletPoints.push(point);
+                    }
+                });
+                
+                if (bulletPoints.length === 0) {
+                    alert('Please add at least one bullet point');
+                    return false;
+                }
+                
+                blockData.content.bulletPoints = bulletPoints;
+                break;
+                
+            case 'image':
+                const imageUrl = $('#image-url').val().trim();
+                const imageAlt = $('#image-alt').val().trim();
+                
+                if (!imageUrl) {
+                    alert('Please enter an image URL');
+                    return false;
+                }
+                
+                blockData.content.imageUrl = imageUrl;
+                blockData.content.imageAlt = imageAlt || title;
+                break;
+                
+            case 'video':
+                const videoUrl = $('#video-url').val().trim();
+                
+                if (!videoUrl) {
+                    alert('Please enter a video URL');
+                    return false;
+                }
+                
+                blockData.content.videoUrl = videoUrl;
+                break;
+        }
+        
+        // Add block to array
+        contentBlocks.push(blockData);
+        
+        // Update hidden input with serialized blocks
+        $('#content-blocks-data').val(JSON.stringify(contentBlocks));
+        
+        // Render the block in UI
+        renderContentBlock(blockData);
+        
+        // Reset form
+        resetBlockForm();
+        
+        // Hide form after adding
+        $('#block-form-container').slideUp();
+        
+        // Hide no blocks message if this is the first block
+        $('#no-blocks-message').hide();
+        
+        return false; // Prevent form submission
+    }
+    
+    // Global function to remove a content block
+    function removeContentBlock(blockId) {
+        if (confirm('Are you sure you want to remove this block?')) {
+            // Remove from array
+            contentBlocks = contentBlocks.filter(block => block.id !== blockId);
+            
+            // Update hidden input
+            $('#content-blocks-data').val(JSON.stringify(contentBlocks));
+            
+            // Remove from UI
+            $(`.content-block[data-block-id="${blockId}"]`).remove();
+            
+            // Show the "no blocks" message if there are no blocks
+            if (contentBlocks.length === 0) {
+                $('#no-blocks-message').show();
+            }
+        }
+        return false; // Prevent form submission
+    }
+    
+    // Global function to move a block up
+    function moveBlockUp(blockId) {
+        const currentBlock = $(`.content-block[data-block-id="${blockId}"]`);
+        const prevBlock = currentBlock.prev('.content-block');
+        
+        if (prevBlock.length) {
+            currentBlock.insertBefore(prevBlock);
+            updateBlocksOrder();
+        }
+        return false; // Prevent form submission
+    }
+    
+    // Global function to move a block down
+    function moveBlockDown(blockId) {
+        const currentBlock = $(`.content-block[data-block-id="${blockId}"]`);
+        const nextBlock = currentBlock.next('.content-block');
+        
+        if (nextBlock.length) {
+            currentBlock.insertAfter(nextBlock);
+            updateBlocksOrder();
+        }
+        return false; // Prevent form submission
+    }
+    
+    // Global function to update blocks order in the array
+    function updateBlocksOrder() {
+        const newOrder = [];
+        
+        $('.content-block').each(function() {
+            const blockId = $(this).data('block-id');
+            const block = contentBlocks.find(b => b.id === blockId);
+            
+            if (block) {
+                newOrder.push(block);
+            }
+        });
+        
+        contentBlocks = newOrder;
+        $('#content-blocks-data').val(JSON.stringify(contentBlocks));
+        return false; // Prevent form submission
+    }
+    
+    // Function to render a content block in the UI
+    function renderContentBlock(blockData) {
+        let blockContent = '';
+        
+        // Create block content based on type
+        switch(blockData.type) {
+            case 'bullet':
+                let bulletList = '<ul>';
+                blockData.content.bulletPoints.forEach(point => {
+                    bulletList += `<li>${point}</li>`;
+                });
+                bulletList += '</ul>';
+                blockContent = bulletList;
+                break;
+                
+            case 'image':
+                blockContent = `
+                    <div class="text-center">
+                        <img src="${blockData.content.imageUrl}" alt="${blockData.content.imageAlt}" class="img-fluid mb-2" style="max-height: 200px;">
+                    </div>
+                `;
+                break;
+                
+            case 'video':
+                // Simple embed - in a real app, you'd want to process the URL to create a proper embed
+                blockContent = `
+                    <div class="embed-responsive embed-responsive-16by9">
+                        <iframe class="embed-responsive-item" src="${blockData.content.videoUrl}" allowfullscreen></iframe>
+                    </div>
+                `;
+                break;
+        }
+        
+        // Create block HTML
+        const blockHtml = `
+            <div class="content-block card mb-3" data-block-id="${blockData.id}">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold">${blockData.title}</h6>
+                    <div>
+                        <button type="button" class="btn btn-sm btn-outline-primary" title="Move Up" onclick="moveBlockUp('${blockData.id}'); return false;">
+                            <i class="fas fa-arrow-up"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-primary" title="Move Down" onclick="moveBlockDown('${blockData.id}'); return false;">
+                            <i class="fas fa-arrow-down"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-danger" title="Remove" onclick="removeContentBlock('${blockData.id}'); return false;">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    ${blockData.description ? `<p class="card-text">${blockData.description}</p>` : ''}
+                    ${blockContent}
+                </div>
+                <div class="card-footer bg-light">
+                    <small class="text-muted">
+                        <i class="fas ${getBlockTypeIcon(blockData.type)}"></i> 
+                        ${getBlockTypeName(blockData.type)}
+                    </small>
+                </div>
+            </div>
+        `;
+        
+        // Add block to container
+        $('#content-blocks-container').append(blockHtml);
+    }
+    
+    // Function to reset the block form
+    function resetBlockForm() {
+        $('#block-title').val('');
+        $('#block-description').val('');
+        
+        // Reset bullet points
+        $('#bullet-points-container').html(`
+            <div class="input-group mb-2">
+                <input type="text" class="form-control bullet-point" placeholder="Enter bullet point">
+                <div class="input-group-append">
+                    <button type="button" class="btn btn-outline-secondary" onclick="addBulletPoint(); return false;"><i class="fas fa-plus"></i></button>
+                </div>
+            </div>
+        `);
+        
+        // Reset other fields
+        $('#image-url').val('');
+        $('#image-alt').val('');
+        $('#video-url').val('');
+    }
+    
+    // Get icon class for block type
+    function getBlockTypeIcon(blockType) {
+        switch(blockType) {
+            case 'bullet': return 'fa-list-ul';
+            case 'image': return 'fa-image';
+            case 'video': return 'fa-video';
+            default: return 'fa-cube';
+        }
+    }
+    
+    // Get display name for block type
+    function getBlockTypeName(blockType) {
+        switch(blockType) {
+            case 'bullet': return 'Bullet Points';
+            case 'image': return 'Image';
+            case 'video': return 'Video';
+            default: return 'Unknown';
+        }
+    }
+    
+    // Function to prepare form submission by serializing content blocks
+    function prepareFormSubmission() {
+        // Serialize content blocks to JSON and store in hidden input
+        $('#content-blocks-data').val(JSON.stringify(contentBlocks));
+        
+        // If there are content blocks, set a summary in the content field
+        if (contentBlocks.length > 0) {
+            let contentSummary = 'Content blocks: ' + contentBlocks.length + ' blocks';
+            $('#' + $('#content-blocks-data').attr('id').replace('blocks-data', '')).val(contentSummary);
+        }
+        
+        return true; // Allow form submission to proceed
+    }
+    
+    // Function to prepare content blocks for form submission
+    function prepareContentBlocksForSubmission() {
+        console.log('Preparing content blocks for submission');
+        
+        // Get all content blocks
+        const contentBlocks = [];
+        $('.content-block').each(function() {
+            const blockId = $(this).data('block-id');
+            const blockType = $(this).data('block-type');
+            const blockContent = getBlockContent($(this));
+            
+            contentBlocks.push({
+                id: blockId,
+                type: blockType,
+                content: blockContent
+            });
+        });
+        
+        // Serialize content blocks to JSON and set in hidden input
+        const contentBlocksJson = JSON.stringify(contentBlocks);
+        $('#content-blocks-data').val(contentBlocksJson);
+        
+        // If there are content blocks, set a summary in the content field
+        if (contentBlocks.length > 0) {
+            let contentSummary = 'Content blocks: ' + contentBlocks.length + ' blocks';
+            $('#id_content').val(contentSummary);
+        }
+        
+        console.log('Content blocks prepared:', contentBlocksJson);
+        console.log('Form action:', $('#article-form').attr('action'));
+        console.log('Form method:', $('#article-form').attr('method'));
+        
+        return true; // Allow form submission to proceed
+    }
+    
+    // Function to handle form submission with explicit redirection
+    function handleFormSubmission(event) {
+        event.preventDefault(); // Prevent default form submission
+        console.log('Form submission handler called');
+        
+        // Prepare content blocks data
+        prepareContentBlocksForSubmission();
+        
+        // Get form data
+        const form = document.getElementById('article-form');
+        const formData = new FormData(form);
+        
+        // Log form data for debugging
+        console.log('Form title:', formData.get('title'));
+        console.log('Form slug:', formData.get('slug'));
+        
+        // Get CSRF token
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        console.log('Submitting form to:', form.action);
+        
+        // Show loading indicator
+        const submitBtn = document.querySelector('button[type="submit"]');
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        }
+        
+        // Submit the form using fetch API
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': csrftoken,
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'same-origin'
+        })
+        .then(response => {
+            console.log('Response status:', response.status);
+            console.log('Response headers:', response.headers);
+            
+            // Reset submit button
+            const submitBtn = document.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Create Article';
+            }
+            
+            if (response.ok) {
+                // Try to parse the response as JSON
+                response.json().then(data => {
+                    console.log('Response data:', data);
+                    
+                    // If we have a slug from the server response, use it
+                    if (data.slug) {
+                        console.log('Using server-provided slug:', data.slug);
+                        const baseUrl = window.location.origin;
+                        const detailUrl = `${baseUrl}/education/knowledge/article/${data.slug}/`;
+                        console.log('Redirecting to:', detailUrl);
+                        window.location.href = detailUrl;
+                        return;
+                    }
+                    
+                    // If we have a redirect_url from the server response, use it
+                    if (data.redirect_url) {
+                        console.log('Redirecting to server-provided URL:', data.redirect_url);
+                        window.location.href = data.redirect_url;
+                        return;
+                    }
+                    
+                    // Fallback: try to get the slug from the form
+                    const slugInput = document.getElementById('id_slug');
+                    const titleInput = document.getElementById('id_title');
+                    let slug = slugInput.value;
+                    
+                    if (!slug && titleInput.value) {
+                        // Generate a slug from the title if slug field is empty
+                        slug = titleInput.value.toLowerCase().replace(/[^\w]+/g, '-');
+                    }
+                    
+                    if (slug) {
+                        // Construct the URL for the article detail page
+                        const baseUrl = window.location.origin;
+                        const detailUrl = `${baseUrl}/education/knowledge/article/${slug}/`;
+                        
+                        console.log('Redirecting to article detail page:', detailUrl);
+                        window.location.href = detailUrl;
+                    } else {
+                        // If we couldn't determine the slug, just reload the page
+                        window.location.reload();
+                    }
+                }).catch(error => {
+                    // If the response is not JSON, just submit the form normally
+                    console.log('Response is not JSON, submitting form normally');
+                    form.removeEventListener('submit', handleFormSubmission);
+                    form.submit();
+                });
+            } else {
+                // For error responses, show an alert
+                console.error('Form submission failed with status:', response.status);
+                alert('There was an error creating the article. Please try again.');
+            }
+        })
+        .catch(error => {
+            console.error('Error submitting form:', error);
+            alert('There was an error submitting the form. Please try again.');
+        });
+        
+        return false; // Prevent default form submission
+    }
+    
+    // Initialize event handlers when document is ready
     $(document).ready(function() {
         // Initialize Select2
         $('.select2, select[name="category"], select[name="tags"]').select2({
@@ -341,345 +866,36 @@
             width: '100%'
         });
         
-        // Features array to store all added features
-        let features = [];
-        let featureCounter = 0;
-        
-        // Initialize TinyMCE for feature text
-        tinymce.init({
-            selector: '#feature-text',
-            height: 200,
-            menubar: false,
-            plugins: [
-                'advlist autolink lists link charmap',
-                'searchreplace visualblocks code',
-                'insertdatetime table paste code help wordcount'
-            ],
-            toolbar: 'undo redo | formatselect | bold italic | \
-                     alignleft aligncenter alignright | \
-                     bullist numlist | removeformat | help',
-            content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 16px; }'
-        });
-        
-        // Add feature button click handler
-        $('#add-feature-btn').click(function() {
-            const title = $('#feature-title').val().trim();
-            const text = tinymce.get('feature-text').getContent();
-            const type = $('#feature-type').val();
-            
-            // Validate inputs
-            if (!title) {
-                alert('Please enter a feature title');
-                return;
-            }
-            
-            if (!text && type !== 'image' && type !== 'video') {
-                alert('Please enter feature text');
-                return;
-            }
-            
-            // Create feature object
-            const feature = {
-                id: 'feature-' + featureCounter++,
-                title: title,
-                text: text,
-                type: type,
-                media: null
-            };
-            
-            // Handle media upload if present
-            const mediaInput = $('#feature-media')[0];
-            if (mediaInput.files && mediaInput.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    feature.media = {
-                        dataUrl: e.target.result,
-                        fileName: mediaInput.files[0].name,
-                        fileType: mediaInput.files[0].type
-                    };
-                    
-                    // Add feature to array and render
-                    addFeatureToList(feature);
-                };
-                reader.readAsDataURL(mediaInput.files[0]);
-            } else {
-                // Add feature to array and render without media
-                addFeatureToList(feature);
-            }
-        });
-        
-        // Add feature to the list and render it
-        function addFeatureToList(feature) {
-            // Add to features array
-            features.push(feature);
-            
-            // Create feature element
-            const featureElement = createFeatureElement(feature);
-            
-            // Add to features container
-            $('#no-features-message').hide();
-            $('#features-container').append(featureElement);
-            
-            // Reset form
-            $('#feature-title').val('');
-            tinymce.get('feature-text').setContent('');
-            $('#feature-media').val('');
-            $('#feature-type').val('text');
-            
-            // Update hidden content field with JSON
-            updateContentField();
+        // Add hidden input for content blocks data if it doesn't exist
+        if (!$('#content-blocks-data').length) {
+            $('#article-form').append('<input type="hidden" id="content-blocks-data" name="content_blocks" value="[]">');        
         }
         
-        // Create feature element
-        function createFeatureElement(feature) {
-            let mediaHtml = '';
-            
-            if (feature.media) {
-                if (feature.media.fileType.startsWith('image/')) {
-                    mediaHtml = `
-                        <div class="mt-2 mb-3">
-                            <img src="${feature.media.dataUrl}" class="img-fluid rounded" style="max-height: 200px;" alt="${feature.title}">
-                        </div>
-                    `;
-                } else if (feature.media.fileType.startsWith('video/')) {
-                    mediaHtml = `
-                        <div class="mt-2 mb-3">
-                            <video src="${feature.media.dataUrl}" controls class="img-fluid rounded" style="max-height: 200px;"></video>
-                        </div>
-                    `;
-                }
-            }
-            
-            // Create feature card
-            const featureElement = $(`
-                <div class="card mb-3 feature-item" id="${feature.id}">
-                    <div class="card-header py-2 d-flex justify-content-between align-items-center bg-light">
-                        <h6 class="m-0 font-weight-bold">${feature.title}</h6>
-                        <div class="feature-controls">
-                            <button type="button" class="btn btn-sm btn-outline-secondary move-up-btn" title="Move Up">
-                                <i class="fas fa-arrow-up"></i>
-                            </button>
-                            <button type="button" class="btn btn-sm btn-outline-secondary move-down-btn" title="Move Down">
-                                <i class="fas fa-arrow-down"></i>
-                            </button>
-                            <button type="button" class="btn btn-sm btn-outline-danger delete-feature-btn" title="Delete Feature">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="card-body py-2">
-                        <div class="feature-type-badge mb-2">
-                            <span class="badge badge-${getTypeBadgeClass(feature.type)}">
-                                <i class="fas ${getTypeIconClass(feature.type)} mr-1"></i>
-                                ${capitalizeFirstLetter(feature.type)}
-                            </span>
-                        </div>
-                        ${mediaHtml}
-                        <div class="feature-text">${feature.text}</div>
-                    </div>
-                </div>
-            `);
-            
-            // Add event handlers
-            featureElement.find('.delete-feature-btn').click(function() {
-                deleteFeature(feature.id);
-            });
-            
-            featureElement.find('.move-up-btn').click(function() {
-                moveFeature(feature.id, 'up');
-            });
-            
-            featureElement.find('.move-down-btn').click(function() {
-                moveFeature(feature.id, 'down');
-            });
-            
-            return featureElement;
-        }
+        // Remove ALL form submission handlers to avoid conflicts
+        $('#article-form').off('submit');
+        $('#submit-article-btn').off('click');
         
-        // Delete feature
-        function deleteFeature(featureId) {
-            if (confirm('Are you sure you want to delete this feature?')) {
-                // Remove from DOM
-                $(`#${featureId}`).remove();
-                
-                // Remove from array
-                features = features.filter(f => f.id !== featureId);
-                
-                // Show message if no features
-                if (features.length === 0) {
-                    $('#no-features-message').show();
-                }
-                
-                // Update hidden content field
-                updateContentField();
-            }
-        }
-        
-        // Move feature up or down
-        function moveFeature(featureId, direction) {
-            const index = features.findIndex(f => f.id === featureId);
-            if (index === -1) return;
-            
-            if (direction === 'up' && index > 0) {
-                // Swap in array
-                [features[index], features[index - 1]] = [features[index - 1], features[index]];
-                
-                // Swap in DOM
-                const featureElement = $(`#${featureId}`);
-                featureElement.insertBefore(featureElement.prev());
-            } else if (direction === 'down' && index < features.length - 1) {
-                // Swap in array
-                [features[index], features[index + 1]] = [features[index + 1], features[index]];
-                
-                // Swap in DOM
-                const featureElement = $(`#${featureId}`);
-                featureElement.insertAfter(featureElement.next());
-            }
-            
-            // Update hidden content field
-            updateContentField();
-        }
-        
-        // Update hidden content field with HTML generated from features
-        function updateContentField() {
-            let contentHtml = '';
-            
-            features.forEach(feature => {
-                contentHtml += `<section class="feature" data-type="${feature.type}">`;
-                contentHtml += `<h2>${feature.title}</h2>`;
-                
-                if (feature.media) {
-                    if (feature.media.fileType.startsWith('image/')) {
-                        contentHtml += `<div class="feature-media"><img src="${feature.media.dataUrl}" alt="${feature.title}"></div>`;
-                    } else if (feature.media.fileType.startsWith('video/')) {
-                        contentHtml += `<div class="feature-media"><video src="${feature.media.dataUrl}" controls></video></div>`;
-                    }
-                }
-                
-                contentHtml += `<div class="feature-content">${feature.text}</div>`;
-                contentHtml += '</section>';
-            });
-            
-            // Set content field value
-            $('#{{ form.content.id_for_label }}').val(contentHtml);
-            
-            // If first feature has an image, use it as featured image
-            if (features.length > 0 && features[0].media && features[0].media.fileType.startsWith('image/')) {
-                // We would need to handle this on the server side
-                // For now, we'll just note that we have a featured image
-                console.log('Using first feature image as featured image');
-            }
-        }
-        
-        // Helper functions
-        function getTypeBadgeClass(type) {
-            switch (type) {
-                case 'text': return 'primary';
-                case 'bullet': return 'info';
-                case 'image': return 'success';
-                case 'video': return 'warning';
-                default: return 'secondary';
-            }
-        }
-        
-        function getTypeIconClass(type) {
-            switch (type) {
-                case 'text': return 'fa-paragraph';
-                case 'bullet': return 'fa-list';
-                case 'image': return 'fa-image';
-                case 'video': return 'fa-video';
-                default: return 'fa-file-alt';
-            }
-        }
-        
-        function capitalizeFirstLetter(string) {
-            return string.charAt(0).toUpperCase() + string.slice(1);
-        }
-        
-        // Form submission handler
-        $('form').submit(function() {
-            // Make sure content field is updated before submission
-            updateContentField();
-            return true;
-        });
-        
-        // Initialize with existing content if editing
-        {% if not is_create and form.instance.content %}
+        // Load existing content blocks if any
+        const existingBlocks = $('#content-blocks-data').val();
+        if (existingBlocks && existingBlocks !== '[]') {
             try {
-                // Parse existing content into features
-                console.log('Parsing existing content');
-                const content = $('#{{ form.content.id_for_label }}').val();
-                
-                // Create a temporary div to parse the HTML
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = content;
-                
-                // Find all section elements with class 'feature'
-                const sections = tempDiv.querySelectorAll('section.feature');
-                
-                if (sections.length > 0) {
-                    // Hide the no features message
-                    $('#no-features-message').hide();
-                    
-                    // Process each section into a feature
-                    Array.from(sections).forEach(section => {
-                        // Extract feature type
-                        const type = section.dataset.type || 'text';
-                        
-                        // Extract title
-                        const titleEl = section.querySelector('h2');
-                        const title = titleEl ? titleEl.textContent : 'Untitled Feature';
-                        
-                        // Extract media if present
-                        let media = null;
-                        const mediaEl = section.querySelector('.feature-media img, .feature-media video');
-                        if (mediaEl) {
-                            const isImage = mediaEl.tagName.toLowerCase() === 'img';
-                            media = {
-                                dataUrl: mediaEl.src,
-                                fileType: isImage ? 'image/jpeg' : 'video/mp4',
-                                fileName: isImage ? 'image.jpg' : 'video.mp4'
-                            };
-                        }
-                        
-                        // Extract content
-                        const contentEl = section.querySelector('.feature-content');
-                        const text = contentEl ? contentEl.innerHTML : '';
-                        
-                        // Create and add the feature
-                        const feature = {
-                            id: 'existing-' + featureCounter++,
-                            title: title,
-                            text: text,
-                            type: type,
-                            media: media
-                        };
-                        
-                        features.push(feature);
-                        renderFeature(feature);
-                    });
-                } else {
-                    // If no sections found, create a single feature with all content
-                    const feature = {
-                        id: 'existing-' + featureCounter++,
-                        title: 'Article Content',
-                        text: content,
-                        type: 'text',
-                        media: null
-                    };
-                    
-                    features.push(feature);
-                    renderFeature(feature);
-                    $('#no-features-message').hide();
+                contentBlocks = JSON.parse(existingBlocks);
+                // Render each block
+                contentBlocks.forEach(function(block) {
+                    renderContentBlock(block);
+                });
+                // Hide the no blocks message
+                if (contentBlocks.length > 0) {
+                    $('#no-blocks-message').hide();
                 }
             } catch (e) {
-                console.error('Error parsing existing content', e);
-                $('#features-container').append(
-                    '<div class="alert alert-warning">Could not parse existing content. Please recreate features manually.</div>'
-                );
-                $('#no-features-message').hide();
+                console.error('Error parsing content blocks:', e);
             }
-        {% endif %}
+        }
+        
+        // Log form details for debugging
+        console.log('Form action:', $('#article-form').attr('action'));
+        console.log('Form method:', $('#article-form').attr('method'));
     });
 </script>
 {% endblock %}

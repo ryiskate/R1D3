@@ -31,4 +31,5 @@ urlpatterns = [
     path('knowledge/tag/<slug:slug>/', knowledge_views.KnowledgeTagView.as_view(), name='knowledge_tag'),
     path('knowledge/article/<slug:slug>/upload-media/', knowledge_views.MediaAttachmentUploadView.as_view(), name='media_upload'),
     path('knowledge/media/<int:pk>/delete/', knowledge_views.MediaAttachmentDeleteView.as_view(), name='media_delete'),
+    path('knowledge/test-form/', knowledge_views.TestFormView.as_view(), name='knowledge_test_form'),
 ]
