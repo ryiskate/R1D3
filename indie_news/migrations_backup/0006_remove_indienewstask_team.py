@@ -10,8 +10,9 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='indienewstask',
-            name='team',
+        # Replaced RemoveField with a dummy operation since the field doesn't exist
+        migrations.RunPython(
+            code=lambda apps, schema_editor: None,
+            reverse_code=lambda apps, schema_editor: None,
         ),
     ]
