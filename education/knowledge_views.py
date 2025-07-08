@@ -146,37 +146,46 @@ class KnowledgeArticleCreateView(LoginRequiredMixin, BreadcrumbMixin, CreateView
         logger.info(f"Using slug: {form.instance.slug}")
         
         # Save the form
-        self.object = form.save()
-        logger.info(f"Article saved with ID: {self.object.id}, slug: {self.object.slug}")
-        
-        # Add success message
-        messages.success(self.request, f"Article '{self.object.title}' created successfully.")
-        
-        # Get the absolute URL for the article
-        redirect_url = self.object.get_absolute_url()
-        logger.info(f"Redirecting to: {redirect_url}")
-        
-        # Check if this is an AJAX request
-        is_ajax = self.request.headers.get('X-Requested-With') == 'XMLHttpRequest'
-        logger.info(f"Is AJAX request: {is_ajax}")
-        
-        if is_ajax:
-            # Return JSON response for AJAX requests
-            return JsonResponse({
-                'success': True,
-                'redirect_url': redirect_url,
-                'slug': self.object.slug,
-                'article_id': self.object.id,
-                'message': f"Article '{self.object.title}' created successfully."
-            })
-        else:
-            # Use HttpResponseRedirect for standard form submissions
-            from django.http import HttpResponseRedirect
-            response = HttpResponseRedirect(redirect_url)
-            response['X-Article-Created'] = 'True'
-            response['X-Article-Slug'] = self.object.slug
-            logger.info(f"Returning HttpResponseRedirect to {redirect_url}")
-            return response
+        try:
+            self.object = form.save()
+            logger.info(f"Article saved with ID: {self.object.id}, slug: {self.object.slug}")
+            
+            # Add success message
+            messages.success(self.request, f"Article '{self.object.title}' created successfully.")
+            
+            # Get the absolute URL for the article
+            redirect_url = self.object.get_absolute_url()
+            logger.info(f"Redirecting to: {redirect_url}")
+            
+            # Check if this is an AJAX request
+            is_ajax = self.request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+            logger.info(f"Is AJAX request: {is_ajax}")
+            
+            if is_ajax:
+                # Return JSON response for AJAX requests with full URL
+                # Include the full URL to avoid any client-side URL construction issues
+                full_redirect_url = self.request.build_absolute_uri(redirect_url)
+                logger.info(f"Full redirect URL for AJAX: {full_redirect_url}")
+                
+                return JsonResponse({
+                    'success': True,
+                    'redirect_url': full_redirect_url,
+                    'slug': self.object.slug,
+                    'article_id': self.object.id,
+                    'message': f"Article '{self.object.title}' created successfully."
+                })
+            else:
+                # Use HttpResponseRedirect for standard form submissions
+                from django.http import HttpResponseRedirect
+                response = HttpResponseRedirect(redirect_url)
+                response['X-Article-Created'] = 'True'
+                response['X-Article-Slug'] = self.object.slug
+                logger.info(f"Returning HttpResponseRedirect to {redirect_url}")
+                return response
+        except Exception as e:
+            logger.error(f"Error saving article: {str(e)}")
+            # Re-raise the exception to let Django handle it
+            raise
 
 
 class KnowledgeArticleUpdateView(LoginRequiredMixin, BreadcrumbMixin, UpdateView):
@@ -226,37 +235,46 @@ class KnowledgeArticleUpdateView(LoginRequiredMixin, BreadcrumbMixin, UpdateView
         logger.info(f"Using slug: {form.instance.slug}")
         
         # Save the form
-        self.object = form.save()
-        logger.info(f"Article updated with ID: {self.object.id}, slug: {self.object.slug}")
-        
-        # Add success message
-        messages.success(self.request, f"Article '{self.object.title}' updated successfully.")
-        
-        # Get the absolute URL for the article
-        redirect_url = self.object.get_absolute_url()
-        logger.info(f"Redirecting to: {redirect_url}")
-        
-        # Check if this is an AJAX request
-        is_ajax = self.request.headers.get('X-Requested-With') == 'XMLHttpRequest'
-        logger.info(f"Is AJAX request: {is_ajax}")
-        
-        if is_ajax:
-            # Return JSON response for AJAX requests
-            return JsonResponse({
-                'success': True,
-                'redirect_url': redirect_url,
-                'slug': self.object.slug,
-                'article_id': self.object.id,
-                'message': f"Article '{self.object.title}' updated successfully."
-            })
-        else:
-            # Use HttpResponseRedirect for standard form submissions
-            from django.http import HttpResponseRedirect
-            response = HttpResponseRedirect(redirect_url)
-            response['X-Article-Updated'] = 'True'
-            response['X-Article-Slug'] = self.object.slug
-            logger.info(f"Returning HttpResponseRedirect to {redirect_url}")
-            return response
+        try:
+            self.object = form.save()
+            logger.info(f"Article updated with ID: {self.object.id}, slug: {self.object.slug}")
+            
+            # Add success message
+            messages.success(self.request, f"Article '{self.object.title}' updated successfully.")
+            
+            # Get the absolute URL for the article
+            redirect_url = self.object.get_absolute_url()
+            logger.info(f"Redirecting to: {redirect_url}")
+            
+            # Check if this is an AJAX request
+            is_ajax = self.request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+            logger.info(f"Is AJAX request: {is_ajax}")
+            
+            if is_ajax:
+                # Return JSON response for AJAX requests with full URL
+                # Include the full URL to avoid any client-side URL construction issues
+                full_redirect_url = self.request.build_absolute_uri(redirect_url)
+                logger.info(f"Full redirect URL for AJAX: {full_redirect_url}")
+                
+                return JsonResponse({
+                    'success': True,
+                    'redirect_url': full_redirect_url,
+                    'slug': self.object.slug,
+                    'article_id': self.object.id,
+                    'message': f"Article '{self.object.title}' updated successfully."
+                })
+            else:
+                # Use HttpResponseRedirect for standard form submissions
+                from django.http import HttpResponseRedirect
+                response = HttpResponseRedirect(redirect_url)
+                response['X-Article-Updated'] = 'True'
+                response['X-Article-Slug'] = self.object.slug
+                logger.info(f"Returning HttpResponseRedirect to {redirect_url}")
+                return response
+        except Exception as e:
+            logger.error(f"Error updating article: {str(e)}")
+            # Re-raise the exception to let Django handle it
+            raise
 
 
 class KnowledgeArticleDeleteView(LoginRequiredMixin, BreadcrumbMixin, DeleteView):

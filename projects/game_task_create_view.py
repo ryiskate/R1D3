@@ -16,7 +16,7 @@ class GameDevelopmentTaskCreateView(LoginRequiredMixin, CreateView):
     """
     model = GameDevelopmentTask
     form_class = GameDevelopmentSectionTaskForm
-    template_name = 'projects/game_development_task_form.html'
+    template_name = 'projects/game_task_form.html'
     login_url = '/'  # Redirect to home if not logged in
     
     def get_form_kwargs(self):

@@ -42,26 +42,43 @@
     </div>
     <div class="card-body">
         <div class="row">
+            {% if 'game' in form.fields %}
             <div class="col-md-6">
                 {{ form.game|as_crispy_field }}
             </div>
+            {% endif %}
+            {% if 'milestone' in form.fields %}
             <div class="col-md-6">
                 {{ form.milestone|as_crispy_field }}
             </div>
+            {% endif %}
+            {% if not 'game' in form.fields and not 'milestone' in form.fields %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> This is a general game development task not tied to a specific game.
+                </div>
+            </div>
+            {% endif %}
         </div>
         <div class="row">
+            {% if 'gdd_section' in form.fields %}
             <div class="col-md-6">
                 {{ form.gdd_section|as_crispy_field }}
             </div>
+            {% endif %}
+            {% if 'platform' in form.fields %}
             <div class="col-md-6">
                 {{ form.platform|as_crispy_field }}
             </div>
+            {% endif %}
         </div>
+        {% if 'feature_id' in form.fields %}
         <div class="row">
             <div class="col-12">
                 {{ form.feature_id|as_crispy_field }}
             </div>
         </div>
+        {% endif %}
     </div>
 </div>
 
@@ -106,34 +123,51 @@
 {% block section_js %}
 <script>
     $(document).ready(function() {
-        // Initialize select2 for game dropdown
-        $('#id_game').select2({
-            placeholder: "Select a game",
-            allowClear: true,
-            width: '100%'
-        });
+        // Initialize select2 for game dropdown if it exists
+        if ($('#id_game').length) {
+            $('#id_game').select2({
+                placeholder: "Select a game",
+                allowClear: true,
+                width: '100%'
+            });
+        }
         
-        // Initialize select2 for milestone dropdown
-        $('#id_milestone').select2({
-            placeholder: "Select milestone",
-            allowClear: true,
-            width: '100%'
-        });
+        // Initialize select2 for milestone dropdown if it exists
+        if ($('#id_milestone').length) {
+            $('#id_milestone').select2({
+                placeholder: "Select milestone",
+                allowClear: true,
+                width: '100%'
+            });
+        }
         
-        // Initialize select2 for GDD section dropdown
-        $('#id_gdd_section').select2({
-            placeholder: "Select GDD section",
-            allowClear: true,
-            width: '100%'
-        });
+        // Initialize select2 for GDD section dropdown if it exists
+        if ($('#id_gdd_section').length) {
+            $('#id_gdd_section').select2({
+                placeholder: "Select GDD section",
+                allowClear: true,
+                width: '100%'
+            });
+        }
         
-        // Initialize select2 for platform dropdown
-        $('#id_platform').select2({
-            placeholder: "Select platform",
-            allowClear: true,
-            tags: true,
-            width: '100%'
-        });
+        // Initialize select2 for platform dropdown if it exists
+        if ($('#id_platform').length) {
+            $('#id_platform').select2({
+                placeholder: "Select platform",
+                allowClear: true,
+                tags: true,
+                width: '100%'
+            });
+        }
+        
+        // Initialize select2 for feature_id dropdown if it exists
+        if ($('#id_feature_id').length) {
+            $('#id_feature_id').select2({
+                placeholder: "Select feature",
+                allowClear: true,
+                width: '100%'
+            });
+        }
     });
 </script>
 {% endblock %}
