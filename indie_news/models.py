@@ -26,6 +26,9 @@ class IndieNewsTask(BaseTask):
     publish_date = models.DateField(null=True, blank=True)
     word_count = models.IntegerField(default=0)
     
+    # Multiple users can be assigned to a task
+    assigned_users = models.ManyToManyField(User, related_name='assigned_indie_news_tasks', blank=True)
+    
     class Meta:
         verbose_name = "Indie News Task"
         verbose_name_plural = "Indie News Tasks"
