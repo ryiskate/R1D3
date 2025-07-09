@@ -1,4 +1,4 @@
-# Generated manually to fix missing table in production
+# Generated manually to fix missing table in production for SQLite
 
 from django.db import migrations
 
@@ -22,7 +22,8 @@ class Migration(migrations.Migration):
                 "status" varchar(20) NOT NULL,
                 "completion_date" date NULL,
                 "order" integer NOT NULL,
-                "phase_id" integer NOT NULL REFERENCES "strategy_strategyphase" ("id") DEFERRABLE INITIALLY DEFERRED
+                "phase_id" integer NOT NULL,
+                FOREIGN KEY ("phase_id") REFERENCES "strategy_strategyphase" ("id")
             );
             """,
             reverse_sql="DROP TABLE IF EXISTS strategy_strategymilestone;"
