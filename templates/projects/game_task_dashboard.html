@@ -20,7 +20,17 @@
 
 {% block table_header_buttons %}
 <div>
-    <!-- All buttons removed as requested -->
+    <a href="{% if game %}{% url 'games:task_create' game.id %}{% else %}{% url 'games:task_create' %}{% endif %}" class="btn btn-sm btn-primary">
+        <i class="fas fa-plus-circle me-1"></i> New Game Task
+    </a>
+    <button type="button" class="btn btn-sm btn-outline-secondary ms-2" data-bs-toggle="modal" data-bs-target="#filterModal">
+        <i class="fas fa-filter me-1"></i> Filter
+    </button>
+    {% if current_filters %}
+    <a href="{% url 'games:task_dashboard' %}" class="btn btn-sm btn-outline-secondary ms-2">
+        <i class="fas fa-times me-1"></i> Clear Filters
+    </a>
+    {% endif %}
 </div>
 {% endblock %}
 
@@ -96,4 +106,83 @@
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block task_table %}
+<div class="table-responsive">
+    <table class="table" id="taskTable" width="100%" cellspacing="0">
+        <thead>
+            <tr>
+                <th style="width: 30px;">
+                    <input type="checkbox" class="form-check-input" id="selectAllTasks">
+                </th>
+                <th>Task</th>
+                <th>Company Section</th>
+                <th>Status</th>
+                <th>Priority</th>
+                <th>Assigned To</th>
+                <th>Due Date</th>
+                <th width="80">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if tasks %}
+                {% for task in tasks %}
+                    <tr class="task-row" data-task-id="{{ task.id }}" data-status="{{ task.status }}">
+                        <td>
+                            <input type="checkbox" class="form-check-input task-checkbox" value="{{ task.id }}">
+                        </td>
+                        <td>
+                            <a href="{% url 'games:task_detail' task.id %}" class="text-primary fw-bold">{{ task.title }}</a>
+                            <div class="small text-muted">ID: {{ task.id }}</div>
+                        </td>
+                        <td>
+                            <span class="badge text-white" style="background-color: #FF5733;">Game Development</span>
+                        </td>
+                        <td>
+                            <span class="badge bg-primary">{{ task.get_status_display }}</span>
+                        </td>
+                        <td>
+                            {% if task.priority == 'critical' or task.priority == 'high' %}
+                                <span class="badge bg-danger">{{ task.get_priority_display }}</span>
+                            {% elif task.priority == 'medium' %}
+                                <span class="badge bg-warning text-dark">{{ task.get_priority_display }}</span>
+                            {% else %}
+                                <span class="badge bg-info">{{ task.get_priority_display }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if task.assigned_to %}
+                                {{ task.assigned_to.get_full_name|default:task.assigned_to.username }}
+                            {% else %}
+                                <span class="text-muted">Unassigned</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if task.due_date %}
+                                <a href="#" class="text-primary">{{ task.due_date|date:"M d, Y" }}</a>
+                            {% else %}
+                                <span class="text-muted">No due date</span>
+                            {% endif %}
+                        </td>
+                        <td class="action-column">
+                            <div class="btn-group">
+                                <a href="{% url 'games:task_update' pk=task.id %}" class="btn btn-sm btn-outline-primary" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'games:task_delete' pk=task.id %}" class="btn btn-sm btn-outline-danger" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="8" class="text-center">No tasks found.</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}
