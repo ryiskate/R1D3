@@ -92,71 +92,171 @@
     
     <!-- My Tasks -->
     <div class="row mb-4">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">My Tasks</h5>
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-tasks me-1"></i> My Game Development Tasks
+                    </h6>
+                    <a href="{% url 'games:task_dashboard' %}?my_tasks=1" class="btn btn-sm btn-primary btn-icon-split">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-list"></i>
+                        </span>
+                        <span class="text">View All My Tasks</span>
+                    </a>
                 </div>
                 <div class="card-body">
                     {% if my_tasks %}
-                        <div class="list-group">
-                            {% for task in my_tasks %}
-                                <a href="{% url 'games:task_detail' task.id %}" class="list-group-item list-group-item-action">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h6 class="mb-1">{{ task.title }}</h6>
-                                        <span class="badge {% if task.status == 'to_do' %}bg-secondary
-                                            {% elif task.status == 'in_progress' %}bg-primary
-                                            {% elif task.status == 'in_review' %}bg-info
-                                            {% elif task.status == 'done' %}bg-success
-                                            {% elif task.status == 'blocked' %}bg-danger
-                                            {% elif task.status == 'backlog' %}bg-dark text-white
-                                            {% else %}bg-light{% endif %}">
-                                            {{ task.get_status_display }}
-                                        </span>
-                                    </div>
-                                    <p class="mb-1">Game: {{ task.game.title }}</p>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <small>Due: {{ task.due_date|default:"No due date" }}</small>
-                                        <span class="badge {% if task.priority == 'high' %}bg-danger
-                                            {% elif task.priority == 'medium' %}bg-warning text-dark
-                                            {% else %}bg-info{% endif %}">
-                                            {{ task.get_priority_display }}
-                                        </span>
-                                    </div>
-                                </a>
-                            {% endfor %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th width="120">Status</th>
+                                        <th width="100">Priority</th>
+                                        <th width="120">Due Date</th>
+                                        <th width="120">Game</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for task in my_tasks %}
+                                    <tr>
+                                        <td>
+                                            <a href="{% url 'games:task_detail' task.id %}">{{ task.title }}</a>
+                                            {% if task.is_overdue %}
+                                            <span class="badge bg-danger ms-1 rounded-pill"><i class="fas fa-exclamation-circle me-1"></i>Overdue</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge rounded-pill 
+                                                {% if task.status == 'to_do' %}bg-primary
+                                                {% elif task.status == 'in_progress' %}bg-warning
+                                                {% elif task.status == 'in_review' %}bg-purple
+                                                {% elif task.status == 'done' %}bg-success
+                                                {% elif task.status == 'blocked' %}bg-danger
+                                                {% else %}bg-secondary{% endif %}">
+                                                {% if task.status == 'to_do' %}<i class="fas fa-clipboard-list me-1"></i>
+                                                {% elif task.status == 'in_progress' %}<i class="fas fa-spinner me-1"></i>
+                                                {% elif task.status == 'in_review' %}<i class="fas fa-search me-1"></i>
+                                                {% elif task.status == 'done' %}<i class="fas fa-check-circle me-1"></i>
+                                                {% elif task.status == 'blocked' %}<i class="fas fa-ban me-1"></i>
+                                                {% else %}<i class="fas fa-clock me-1"></i>{% endif %}
+                                                {{ task.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge rounded-pill 
+                                                {% if task.priority == 'critical' %}bg-danger
+                                                {% elif task.priority == 'high' %}bg-warning
+                                                {% elif task.priority == 'medium' %}bg-info
+                                                {% else %}bg-secondary{% endif %}">
+                                                {% if task.priority == 'critical' %}<i class="fas fa-exclamation-triangle me-1"></i>
+                                                {% elif task.priority == 'high' %}<i class="fas fa-arrow-up me-1"></i>
+                                                {% elif task.priority == 'medium' %}<i class="fas fa-equals me-1"></i>
+                                                {% else %}<i class="fas fa-arrow-down me-1"></i>{% endif %}
+                                                {{ task.get_priority_display }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {% if task.due_date %}
+                                            <span class="{% if task.is_overdue %}text-danger fw-bold{% endif %}">
+                                                <i class="fas fa-calendar-alt me-1"></i> {{ task.due_date|date:"M d, Y" }}
+                                            </span>
+                                            {% else %}
+                                            <span class="text-muted"><i class="fas fa-calendar-times me-1"></i> No due date</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if task.game %}
+                                            <a href="{% url 'games:game_detail' task.game.id %}" class="badge bg-success rounded-pill">
+                                                <i class="fas fa-gamepad me-1"></i> {{ task.game.title }}
+                                            </a>
+                                            {% else %}
+                                            <span class="badge bg-secondary rounded-pill">
+                                                <i class="fas fa-gamepad me-1"></i> General
+                                            </span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
                         </div>
                     {% else %}
-                        <p class="text-center">No tasks assigned to you.</p>
+                        <div class="text-center py-4">
+                            <i class="fas fa-tasks fa-3x text-gray-300 mb-3"></i>
+                            <p class="mb-0 text-muted">No game development tasks assigned to you.</p>
+                            <a href="{% url 'games:task_create' %}" class="btn btn-sm btn-primary mt-3">
+                                <i class="fas fa-plus-circle me-1"></i> Create New Task
+                            </a>
+                        </div>
                     {% endif %}
                 </div>
             </div>
         </div>
-        
-        <!-- Recent Builds -->
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">Recent Builds</h5>
+    </div>
+    
+    <!-- Recent Builds -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-code-branch me-1"></i> Recent Builds
+                    </h6>
+                    <a href="#" class="btn btn-sm btn-primary btn-icon-split">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-upload"></i>
+                        </span>
+                        <span class="text">New Build</span>
+                    </a>
                 </div>
                 <div class="card-body">
                     {% if recent_builds %}
-                        <div class="list-group">
-                            {% for build in recent_builds %}
-                                <div class="list-group-item">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h6 class="mb-1">{{ build.game.title }} v{{ build.version_number }}</h6>
-                                        <small>{{ build.build_date|date:"M d, Y" }}</small>
-                                    </div>
-                                    <p class="mb-1">{{ build.get_version_type_display }}</p>
-                                    {% if build.download_url %}
-                                        <a href="{{ build.download_url }}" class="btn btn-sm btn-outline-primary">Download</a>
-                                    {% endif %}
-                                </div>
-                            {% endfor %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Game</th>
+                                        <th>Version</th>
+                                        <th>Type</th>
+                                        <th>Build Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for build in recent_builds %}
+                                    <tr>
+                                        <td>
+                                            <a href="{% url 'games:game_detail' build.game.id %}">{{ build.game.title }}</a>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-success rounded-pill">v{{ build.version_number }}</span>
+                                        </td>
+                                        <td>{{ build.get_version_type_display }}</td>
+                                        <td>
+                                            <i class="fas fa-calendar-alt me-1"></i> {{ build.build_date|date:"M d, Y" }}
+                                        </td>
+                                        <td>
+                                            {% if build.download_url %}
+                                            <a href="{{ build.download_url }}" class="btn btn-sm btn-outline-primary btn-icon-split">
+                                                <span class="icon text-primary">
+                                                    <i class="fas fa-download"></i>
+                                                </span>
+                                                <span class="text">Download</span>
+                                            </a>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
                         </div>
                     {% else %}
-                        <p class="text-center">No recent builds.</p>
+                        <div class="text-center py-4">
+                            <i class="fas fa-code-branch fa-3x text-gray-300 mb-3"></i>
+                            <p class="mb-0 text-muted">No recent builds available.</p>
+                        </div>
                     {% endif %}
                 </div>
             </div>

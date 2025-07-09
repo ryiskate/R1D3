@@ -55,23 +55,22 @@ class GameTaskDashboardView(BreadcrumbMixin, LoginRequiredMixin, View):
             context['game'] = game
             tasks = GameDevelopmentTask.objects.filter(game=game)
         else:
-            # If no game specified, show only the user's assigned tasks by default
-            if request.user.is_staff and request.GET.get('all_tasks'):
-                # Staff can see all tasks if they explicitly request it
-                tasks = GameDevelopmentTask.objects.all()
-            else:
-                # By default, only show tasks assigned to the current user
-                tasks = GameDevelopmentTask.objects.filter(assigned_to=request.user)
+            # Show all game development tasks by default
+            tasks = GameDevelopmentTask.objects.all()
+            
+            # Filter to only show user's tasks if specifically requested
+            if request.GET.get('my_tasks'):
+                tasks = tasks.filter(assigned_to=request.user)
                 
-                # If the user specifically wants to see all tasks they have access to
-                if request.GET.get('accessible_tasks'):
-                    tasks = GameDevelopmentTask.objects.filter(
-                        Q(game__team_members=request.user) | 
-                        Q(game__lead_developer=request.user) | 
-                        Q(game__lead_designer=request.user) |
-                        Q(game__lead_artist=request.user) |
-                        Q(assigned_to=request.user)
-                    ).distinct()
+            # Filter to show accessible tasks if specifically requested
+            if request.GET.get('accessible_tasks'):
+                tasks = GameDevelopmentTask.objects.filter(
+                    Q(game__team_members=request.user) | 
+                    Q(game__lead_developer=request.user) | 
+                    Q(game__lead_designer=request.user) |
+                    Q(game__lead_artist=request.user) |
+                    Q(assigned_to=request.user)
+                ).distinct()
         
         # Filter by assigned user if requested
         if request.GET.get('my_tasks'):
