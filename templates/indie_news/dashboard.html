@@ -170,53 +170,63 @@
         <div class="col-lg-6 mb-4">
             <div class="card shadow mb-4 card-indie-news">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Recent Tasks</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">My Indie News Tasks</h6>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-bordered table-sm" width="100%" cellspacing="0">
+                        <table class="table" width="100%" cellspacing="0">
                             <thead>
                                 <tr>
-                                    <th>Title</th>
-                                    <th>Type</th>
+                                    <th style="width: 30px;">
+                                        <input type="checkbox" class="form-check-input" id="selectAllTasks">
+                                    </th>
+                                    <th>Task</th>
+                                    <th>Company Section</th>
                                     <th>Status</th>
+                                    <th>Priority</th>
                                     <th>Due Date</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for task in recent_tasks %}
-                                <tr>
-                                    <td>
-                                        <a href="{% url 'indie_news:task_detail' task.pk %}">{{ task.title }}</a>
-                                        {% if task.is_overdue %}
-                                            <i class="fas fa-exclamation-circle text-danger" title="Overdue"></i>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if task.news_type %}
-                                            <span class="badge badge-pill badge-primary">{{ task.get_news_type_display }}</span>
-                                        {% else %}
-                                            -
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        <span class="badge badge-pill badge-status-{{ task.status }}">
-                                            {{ task.get_status_display }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        {% if task.due_date %}
-                                            {{ task.due_date|date:"Y-m-d" }}
-                                        {% else %}
-                                            <span class="text-muted">-</span>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="4" class="text-center">No tasks found.</td>
-                                </tr>
-                                {% endfor %}
+                                {% if user_indie_news_tasks %}
+                                    {% for task in user_indie_news_tasks %}
+                                        <tr>
+                                            <td>
+                                                <input type="checkbox" class="form-check-input task-checkbox" value="{{ task.id }}">
+                                            </td>
+                                            <td>
+                                                <a href="{% url 'indie_news:task_detail' task.id %}" class="text-primary fw-bold">{{ task.title }}</a>
+                                                <div class="small text-muted">ID: {{ task.id }}</div>
+                                            </td>
+                                            <td>
+                                                <span class="badge text-white" style="background-color: #28a745;">Indie News</span>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-primary">{{ task.get_status_display }}</span>
+                                            </td>
+                                            <td>
+                                                {% if task.priority == 'Critical' or task.priority == 'High' %}
+                                                    <span class="badge bg-danger">{{ task.get_priority_display }}</span>
+                                                {% elif task.priority == 'Medium' %}
+                                                    <span class="badge bg-warning text-dark">{{ task.get_priority_display }}</span>
+                                                {% else %}
+                                                    <span class="badge bg-info">{{ task.get_priority_display }}</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if task.due_date %}
+                                                    <a href="#" class="text-primary">{{ task.due_date|date:"M d, Y" }}</a>
+                                                {% else %}
+                                                    No due date
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="6" class="text-center">You don't have any indie news tasks assigned to you.</td>
+                                    </tr>
+                                {% endif %}
                             </tbody>
                         </table>
                     </div>

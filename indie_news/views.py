@@ -677,8 +677,11 @@ class IndieNewsDashboardView(BreadcrumbMixin, LoginRequiredMixin, TemplateView):
             'guide': next((item['count'] for item in news_type_counts if item['news_type'] == 'guide'), 0),
         }
         
-        # Get recent tasks
-        context['recent_tasks'] = IndieNewsTask.objects.all().order_by('-updated_at')[:5]
+        # Get recent tasks assigned to the current user
+        context['recent_tasks'] = IndieNewsTask.objects.filter(assigned_to=self.request.user).order_by('-updated_at')[:5]
+        
+        # Also add the full list of user's tasks for the dashboard table
+        context['user_indie_news_tasks'] = IndieNewsTask.objects.filter(assigned_to=self.request.user).order_by('-due_date')
         
         # Get recent games
         context['recent_games'] = IndieGame.objects.all().order_by('-added_on')[:4]

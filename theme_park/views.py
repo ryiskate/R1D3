@@ -22,6 +22,11 @@ class ThemeParkDashboardView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['active_department'] = 'theme_park'
+        
+        # Fetch only the current user's theme park tasks
+        user_tasks = ThemeParkTask.objects.filter(assigned_to=self.request.user).order_by('-due_date')
+        context['user_theme_park_tasks'] = user_tasks
+        
         return context
 
 
