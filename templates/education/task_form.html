@@ -48,45 +48,6 @@
 {% endblock %}
 
 {% block sidebar_content %}
-    <div class="card mb-4">
-        <div class="card-header bg-info text-white">
-            <h5 class="mb-0">Education Task Help</h5>
-        </div>
-        <div class="card-body">
-            <h6>Course ID</h6>
-            <p class="small text-muted mb-3">Enter the course identifier that this task is associated with.</p>
-            
-            <h6>Target Audience</h6>
-            <p class="small text-muted mb-3">Specify who this educational content is intended for (e.g., beginners, advanced students, teachers).</p>
-            
-            <h6>Learning Objective</h6>
-            <p class="small text-muted">Clearly define what the learner should be able to do after completing this task or educational content.</p>
-        </div>
-    </div>
-    
-    <div class="card">
-        <div class="card-header bg-info text-white">
-            <h5 class="mb-0">Priority Levels</h5>
-        </div>
-        <div class="card-body">
-            <ul class="list-group list-group-flush">
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <span>Critical</span>
-                    <span class="badge bg-danger rounded-pill">Urgent attention required</span>
-                </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <span>High</span>
-                    <span class="badge bg-warning text-dark rounded-pill">Important</span>
-                </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <span>Medium</span>
-                    <span class="badge bg-primary rounded-pill">Standard priority</span>
-                </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <span>Low</span>
-                    <span class="badge bg-success rounded-pill">When time permits</span>
-                </li>
-            </ul>
-        </div>
-    </div>
+    <!-- Include the standard education sidebar instead of the task help sidebar -->
+    {% include 'education/sidebar.html' %}
 {% endblock %}

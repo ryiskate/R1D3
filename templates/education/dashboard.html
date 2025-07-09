@@ -106,85 +106,84 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-bordered" id="educationTasksTable" width="100%" cellspacing="0">
+                <table class="table" id="educationTasksTable" width="100%" cellspacing="0">
                     <thead>
                         <tr>
-                            <th>Task ID</th>
-                            <th>Task Name</th>
-                            <th>Description</th>
-                            <th>Priority</th>
+                            <th style="width: 30px;">
+                                <input type="checkbox" class="form-check-input" id="selectAllTasks">
+                            </th>
+                            <th>Task</th>
+                            <th>Company Section</th>
                             <th>Status</th>
+                            <th>Priority</th>
                             <th>Assigned To</th>
                             <th>Due Date</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>EDU-001</td>
-                            <td>Develop Game Design Curriculum</td>
-                            <td>Create a comprehensive curriculum for teaching game design principles</td>
-                            <td><span class="badge bg-danger">Critical</span></td>
-                            <td><span class="badge bg-warning">In Progress</span></td>
-                            <td>John Smith</td>
-                            <td>2025-06-30</td>
-                            <td>
-                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
-                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>EDU-002</td>
-                            <td>Create Unity Tutorial Series</td>
-                            <td>Develop a series of video tutorials for Unity game development</td>
-                            <td><span class="badge bg-primary">High</span></td>
-                            <td><span class="badge bg-secondary">To Do</span></td>
-                            <td>Jane Doe</td>
-                            <td>2025-07-15</td>
-                            <td>
-                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
-                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>EDU-003</td>
-                            <td>Schedule Guest Lecturer</td>
-                            <td>Coordinate with industry professionals for guest lectures</td>
-                            <td><span class="badge bg-info">Medium</span></td>
-                            <td><span class="badge bg-success">Done</span></td>
-                            <td>Robert Johnson</td>
-                            <td>2025-06-10</td>
-                            <td>
-                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
-                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>EDU-004</td>
-                            <td>Update Learning Management System</td>
-                            <td>Implement new features in the LMS for better tracking</td>
-                            <td><span class="badge bg-primary">High</span></td>
-                            <td><span class="badge bg-warning">In Progress</span></td>
-                            <td>Sarah Williams</td>
-                            <td>2025-07-05</td>
-                            <td>
-                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
-                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>EDU-005</td>
-                            <td>Prepare Student Showcase</td>
-                            <td>Organize end-of-term student project showcase event</td>
-                            <td><span class="badge bg-info">Medium</span></td>
-                            <td><span class="badge bg-secondary">To Do</span></td>
-                            <td>Michael Brown</td>
-                            <td>2025-08-20</td>
-                            <td>
-                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
-                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
-                            </td>
-                        </tr>
+                        {% if user_education_tasks %}
+                            {% for task in user_education_tasks %}
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" class="form-check-input task-checkbox" value="{{ task.id }}">
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'education:task_detail' task.id %}" class="text-primary fw-bold">{{ task.title }}</a>
+                                        <div class="small text-muted">ID: {{ task.id }}</div>
+                                    </td>
+                                    <td>
+                                        <span class="badge text-white" style="background-color: #28a745;">Education</span>
+                                    </td>
+                                    <td>
+                                        {% if task.status == 'To Do' %}
+                                            <span class="badge bg-primary">To Do</span>
+                                        {% elif task.status == 'In Progress' %}
+                                            <span class="badge bg-primary">In Progress</span>
+                                        {% elif task.status == 'Review' %}
+                                            <span class="badge bg-primary">Review</span>
+                                        {% elif task.status == 'Done' %}
+                                            <span class="badge bg-primary">Done</span>
+                                        {% else %}
+                                            <span class="badge bg-primary">Blocked</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if task.priority == 'Critical' %}
+                                            <span class="badge bg-danger">High</span>
+                                        {% elif task.priority == 'High' %}
+                                            <span class="badge bg-danger">High</span>
+                                        {% elif task.priority == 'Medium' %}
+                                            <span class="badge bg-warning text-dark">Medium</span>
+                                        {% else %}
+                                            <span class="badge bg-info">Low</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if task.assigned_to %}
+                                            {{ task.assigned_to.username }}
+                                        {% else %}
+                                            Unassigned
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if task.due_date %}
+                                            <a href="#" class="text-primary">{{ task.due_date|date:"M d, Y" }}</a>
+                                        {% else %}
+                                            No due date
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'education:task_update' task.id %}" class="btn btn-sm btn-outline-primary"><i class="fas fa-edit"></i></a>
+                                        <a href="#" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="8" class="text-center">You don't have any education tasks assigned to you.</td>
+                            </tr>
+                        {% endif %}
                     </tbody>
                 </table>
             </div>

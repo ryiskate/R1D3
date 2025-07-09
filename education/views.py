@@ -24,6 +24,11 @@ class EducationDashboardView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['active_department'] = 'education'
+        
+        # Fetch only the current user's education tasks
+        user_tasks = EducationTask.objects.filter(assigned_to=self.request.user).order_by('-due_date')
+        context['user_education_tasks'] = user_tasks
+        
         return context
 
 

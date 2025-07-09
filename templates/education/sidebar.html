@@ -11,19 +11,7 @@
     </a>
 </li>
 
-<li class="nav-item">
-    <a class="nav-link {% if request.resolver_match.namespace == 'education' and request.resolver_match.url_name == 'classes' %}active{% endif %}" href="{% url 'education:classes' %}">
-        <i class="fas fa-fw fa-users-class"></i>
-        <span>Classes</span>
-    </a>
-</li>
-
-<li class="nav-item">
-    <a class="nav-link {% if request.resolver_match.namespace == 'education' and request.resolver_match.url_name == 'materials' %}active{% endif %}" href="{% url 'education:materials' %}">
-        <i class="fas fa-fw fa-book"></i>
-        <span>Course Materials</span>
-    </a>
-</li>
+<!-- Classes and Course Materials links removed as requested -->
 
 <li class="nav-item">
     <a class="nav-link {% if request.resolver_match.namespace == 'education' and request.resolver_match.url_name == 'knowledge_base' or 'knowledge_article' in request.resolver_match.url_name or 'knowledge_category' in request.resolver_match.url_name or 'knowledge_tag' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'education:knowledge_base' %}">
@@ -46,10 +34,5 @@
     </a>
 </li>
 
-<li class="nav-item">
-    <a class="nav-link {% if request.resolver_match.namespace == 'education' and request.resolver_match.url_name == 'task_create' %}active{% endif %}" href="{% url 'education:task_create' %}">
-        <i class="fas fa-fw fa-plus-circle"></i>
-        <span>New Education Task</span>
-    </a>
-</li>
+<!-- New Education Task link removed as requested -->
 <!-- End of Education Department Sidebar Content -->

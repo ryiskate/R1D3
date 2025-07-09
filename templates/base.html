@@ -320,8 +320,8 @@
                                 </a>
                             </li>
                         {% elif request.resolver_match.namespace == 'education' %}
-                            <!-- Education Department sidebar content is handled by JavaScript -->
-                            <!-- Empty placeholder for JavaScript to populate -->
+                            <!-- Education Department sidebar content -->
+                            {% include 'education/sidebar.html' %}
                         {% else %}
                             <!-- Default sidebar content -->
                             <div class="sidebar-heading">
@@ -443,9 +443,7 @@
                         </span>
                     </div>
                     {% else %}
-                    <div class="d-inline-block py-2 px-3 rounded" 
-                        style="{{ background_style }}"
-                    >
+                    <div class="d-inline-block py-2 px-3 rounded" style="{{ background_style }}">
                         <span class="text-white">
                             <i class="fas fa-flag me-1"></i>
                             <span class="fw-bold">Company Phase {{ phase_order }}:</span>
@@ -555,8 +553,8 @@
     
     <!-- Department Sidebar Script -->
     {% if request.resolver_match.namespace == 'education' %}
-    <!-- Education Department Sidebar Script -->
-    <script src="/static/js/education_sidebar.js"></script>
+    <!-- Education Department Sidebar Script - DISABLED to prevent conflict with sidebar.html -->
+    <!-- The education sidebar is now included via the sidebar.html template -->
     {% elif request.resolver_match.namespace != 'indie_news' %}
     <script src="/static/js/department_sidebar_v2.js"></script>
     {% if '/R1D3-tasks/' in request.path %}

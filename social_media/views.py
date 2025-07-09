@@ -25,6 +25,11 @@ class SocialMediaDashboardView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['active_department'] = 'social_media'
+        
+        # Fetch only the current user's social media tasks
+        user_tasks = SocialMediaTask.objects.filter(assigned_to=self.request.user).order_by('-due_date')
+        context['user_social_media_tasks'] = user_tasks
+        
         return context
 
 

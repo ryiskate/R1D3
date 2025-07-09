@@ -4,6 +4,9 @@
  * Created: 2025-07-07
  */
 
+// Use a flag to ensure the sidebar is only updated once per page load
+let educationSidebarUpdated = false;
+
 document.addEventListener('DOMContentLoaded', function() {
     console.log("Education Sidebar Script loaded at " + new Date().toLocaleTimeString());
     
@@ -20,6 +23,15 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('Sidebar content element not found');
         return;
     }
+    
+    // Check if sidebar has already been updated
+    if (educationSidebarUpdated) {
+        console.log('Education sidebar already updated, skipping');
+        return;
+    }
+    
+    // Set the flag to prevent multiple updates
+    educationSidebarUpdated = true;
     
     // Define the education sidebar HTML
     const educationSidebarHTML = `
