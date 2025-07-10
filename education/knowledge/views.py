@@ -7,8 +7,8 @@ from django.http import JsonResponse, HttpResponseRedirect
 from django.db.models import Q
 
 from core.mixins import BreadcrumbMixin
-from .knowledge_models import KnowledgeArticle, KnowledgeCategory, KnowledgeTag, MediaAttachment
-from .knowledge_forms import KnowledgeArticleForm, MediaAttachmentForm
+from .models import KnowledgeArticle, KnowledgeCategory, KnowledgeTag, MediaAttachment
+from .forms import KnowledgeArticleForm, MediaAttachmentForm
 
 class KnowledgeBaseView(LoginRequiredMixin, BreadcrumbMixin, ListView):
     """Main view for the Knowledge Base dashboard"""
