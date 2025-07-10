@@ -11,7 +11,13 @@
     </a>
 </li>
 
-<!-- Classes and Course Materials links removed as requested -->
+<!-- Courses link -->
+<li class="nav-item">
+    <a class="nav-link {% if request.resolver_match.namespace == 'education' and 'course' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'education:course_list' %}">
+        <i class="fas fa-fw fa-book"></i>
+        <span>Courses</span>
+    </a>
+</li>
 
 <li class="nav-item">
     <a class="nav-link {% if request.resolver_match.namespace == 'education' and request.resolver_match.url_name == 'knowledge_base' or 'knowledge_article' in request.resolver_match.url_name or 'knowledge_category' in request.resolver_match.url_name or 'knowledge_tag' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'education:knowledge_base' %}">

@@ -6,9 +6,9 @@ from django.urls import reverse
 User = get_user_model()
 
 
-class CourseDocumentation(models.Model):
+class Course(models.Model):
     """
-    Model for comprehensive course documentation based on a structured template
+    Model for comprehensive course content based on a structured template
     """
     # 1. Initial Information
     title = models.CharField(max_length=255, verbose_name="Document Title")
@@ -53,22 +53,22 @@ class CourseDocumentation(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft')
     
     class Meta:
-        verbose_name = "Course Documentation"
-        verbose_name_plural = "Course Documentations"
+        verbose_name = "Course"
+        verbose_name_plural = "Courses"
         ordering = ['-updated_at']
     
     def __str__(self):
         return self.title
     
     def get_absolute_url(self):
-        return reverse('education:documentation_detail', kwargs={'pk': self.pk})
+        return reverse('education:course_detail', kwargs={'pk': self.pk})
 
 
 class ConceptSection(models.Model):
     """
-    Model for fundamental concepts within a course documentation
+    Model for fundamental concepts within a course
     """
-    documentation = models.ForeignKey(CourseDocumentation, on_delete=models.CASCADE, related_name='concepts')
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='concepts')
     name = models.CharField(max_length=255, verbose_name="Concept Name")
     definition = models.TextField(verbose_name="Definition")
     detailed_explanation = models.TextField(verbose_name="Detailed Explanation")
@@ -81,14 +81,14 @@ class ConceptSection(models.Model):
         verbose_name_plural = "Concept Sections"
     
     def __str__(self):
-        return f"{self.name} - {self.documentation.title}"
+        return f"{self.name} - {self.course.title}"
 
 
 class AdvancedTopicSection(models.Model):
     """
-    Model for advanced topics within a course documentation
+    Model for advanced topics within a course
     """
-    documentation = models.ForeignKey(CourseDocumentation, on_delete=models.CASCADE, related_name='advanced_topics')
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='advanced_topics')
     name = models.CharField(max_length=255, verbose_name="Topic Name")
     applications = models.TextField(verbose_name="Applications")
     challenges = models.TextField(verbose_name="Risks/Challenges")
@@ -101,14 +101,14 @@ class AdvancedTopicSection(models.Model):
         verbose_name_plural = "Advanced Topics"
     
     def __str__(self):
-        return f"{self.name} - {self.documentation.title}"
+        return f"{self.name} - {self.course.title}"
 
 
 class PracticalExample(models.Model):
     """
-    Model for practical examples within a course documentation
+    Model for practical examples within a course
     """
-    documentation = models.ForeignKey(CourseDocumentation, on_delete=models.CASCADE, related_name='practical_examples')
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='practical_examples')
     title = models.CharField(max_length=255, verbose_name="Example Title")
     code = models.TextField(verbose_name="Code", blank=True)
     image = models.URLField(verbose_name="Image URL", blank=True)
@@ -122,14 +122,14 @@ class PracticalExample(models.Model):
         verbose_name_plural = "Practical Examples"
     
     def __str__(self):
-        return f"{self.title} - {self.documentation.title}"
+        return f"{self.title} - {self.course.title}"
 
 
 class GlossaryTerm(models.Model):
     """
-    Model for glossary terms within a course documentation
+    Model for glossary terms within a course
     """
-    documentation = models.ForeignKey(CourseDocumentation, on_delete=models.CASCADE, related_name='glossary_terms')
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='glossary_terms')
     term = models.CharField(max_length=255, verbose_name="Term")
     definition = models.TextField(verbose_name="Definition")
     
@@ -139,4 +139,4 @@ class GlossaryTerm(models.Model):
         verbose_name_plural = "Glossary Terms"
     
     def __str__(self):
-        return f"{self.term} - {self.documentation.title}"
+        return f"{self.term} - {self.course.title}"
