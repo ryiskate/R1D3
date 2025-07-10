@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{{ course.title }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.5;
+            margin: 20px;
+            color: #333;
+        }
+        h1, h2, h3, h4, h5 {
+            color: #2c3e50;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        h1 {
+            text-align: center;
+            font-size: 24px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        h2 {
+            font-size: 20px;
+            border-bottom: 1px solid #bdc3c7;
+            padding-bottom: 5px;
+        }
+        h3 {
+            font-size: 18px;
+        }
+        h4 {
+            font-size: 16px;
+        }
+        h5 {
+            font-size: 14px;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+        .info-row {
+            margin-bottom: 10px;
+        }
+        .info-label {
+            font-weight: bold;
+        }
+        .concept, .advanced-topic, .example {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .concept h4, .advanced-topic h4, .example h4 {
+            margin-top: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        .status {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+        }
+        .status-draft {
+            background-color: #95a5a6;
+        }
+        .status-review {
+            background-color: #3498db;
+        }
+        .status-published {
+            background-color: #2ecc71;
+        }
+        .status-archived {
+            background-color: #f39c12;
+        }
+        .code-block {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>{{ course.title }}</h1>
+    
+    <!-- Course Information -->
+    <div class="section">
+        <h2>Course Information</h2>
+        <div class="info-row">
+            <span class="info-label">Central Theme:</span> {{ course.central_theme }}
+        </div>
+        <div class="info-row">
+            <span class="info-label">Author:</span> {{ course.author.get_full_name|default:course.author.username }}
+        </div>
+        <div class="info-row">
+            <span class="info-label">Created:</span> {{ course.created_at|date:"F d, Y" }}
+        </div>
+        <div class="info-row">
+            <span class="info-label">Last Updated:</span> {{ course.updated_at|date:"F d, Y" }}
+        </div>
+        <div class="info-row">
+            <span class="info-label">Status:</span>
+            {% if course.status == 'draft' %}
+                <span class="status status-draft">Draft</span>
+            {% elif course.status == 'review' %}
+                <span class="status status-review">In Review</span>
+            {% elif course.status == 'published' %}
+                <span class="status status-published">Published</span>
+            {% elif course.status == 'archived' %}
+                <span class="status status-archived">Archived</span>
+            {% endif %}
+        </div>
+        <div class="info-row">
+            <span class="info-label">Objective:</span> {{ course.objective }}
+        </div>
+    </div>
+    
+    <!-- Summary Section -->
+    <div class="section">
+        <h2>Summary</h2>
+        <p>{{ course.summary|linebreaks }}</p>
+    </div>
+    
+    <!-- Introduction Section -->
+    <div class="section">
+        <h2>Introduction</h2>
+        <h3>Overview</h3>
+        <p>{{ course.introduction|linebreaks }}</p>
+        
+        <h3>Practical Applications</h3>
+        <p>{{ course.practical_applications|linebreaks }}</p>
+    </div>
+    
+    <!-- Fundamental Concepts Section -->
+    <div class="section">
+        <h2>Fundamental Concepts</h2>
+        {% if concepts %}
+            {% for concept in concepts %}
+                <div class="concept">
+                    <h4>{{ concept.name }}</h4>
+                    <div>
+                        <h5>Definition</h5>
+                        <p>{{ concept.definition }}</p>
+                    </div>
+                    <div>
+                        <h5>Detailed Explanation</h5>
+                        <p>{{ concept.detailed_explanation }}</p>
+                    </div>
+                    <div>
+                        <h5>Illustrative Example</h5>
+                        <p>{{ concept.illustrative_example }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No concepts have been added to this course.</p>
+        {% endif %}
+    </div>
+    
+    <!-- Advanced Topics Section -->
+    <div class="section">
+        <h2>Advanced Topics</h2>
+        {% if advanced_topics %}
+            {% for topic in advanced_topics %}
+                <div class="advanced-topic">
+                    <h4>{{ topic.name }}</h4>
+                    <div>
+                        <h5>Applications</h5>
+                        <p>{{ topic.applications }}</p>
+                    </div>
+                    <div>
+                        <h5>Risks/Challenges</h5>
+                        <p>{{ topic.challenges }}</p>
+                    </div>
+                    <div>
+                        <h5>Real-world Example</h5>
+                        <p>{{ topic.real_example }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No advanced topics have been added to this course.</p>
+        {% endif %}
+    </div>
+    
+    <!-- Practical Examples Section -->
+    <div class="section">
+        <h2>Practical Examples</h2>
+        {% if practical_examples %}
+            {% for example in practical_examples %}
+                <div class="example">
+                    <h4>{{ example.title }}</h4>
+                    {% if example.code %}
+                        <div>
+                            <h5>Code</h5>
+                            <div class="code-block">{{ example.code }}</div>
+                        </div>
+                    {% endif %}
+                    <div>
+                        <h5>Step-by-step Explanation</h5>
+                        <p>{{ example.step_by_step }}</p>
+                    </div>
+                    {% if example.real_application %}
+                        <div>
+                            <h5>Application in Real Project</h5>
+                            <p>{{ example.real_application }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No practical examples have been added to this course.</p>
+        {% endif %}
+    </div>
+    
+    <!-- Resources Section -->
+    <div class="section">
+        <h2>Recommended Resources</h2>
+        {% if course.recommended_resources %}
+            <p>{{ course.recommended_resources|linebreaks }}</p>
+        {% else %}
+            <p>No resources have been added to this course.</p>
+        {% endif %}
+    </div>
+    
+    <!-- Glossary Section -->
+    <div class="section">
+        <h2>Glossary</h2>
+        {% if glossary_terms %}
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 30%">Term</th>
+                        <th>Definition</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for term in glossary_terms %}
+                        <tr>
+                            <td><strong>{{ term.term }}</strong></td>
+                            <td>{{ term.definition }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No glossary terms have been added to this course.</p>
+        {% endif %}
+    </div>
+    
+    <!-- Attachments Section -->
+    <div class="section">
+        <h2>Attachments</h2>
+        {% if course.attachments %}
+            <p>{{ course.attachments|linebreaks }}</p>
+        {% else %}
+            <p>No attachments have been added to this course.</p>
+        {% endif %}
+    </div>
+    
+    <div class="footer">
+        <p>Generated from R1D3 Education Platform on {{ now|date:"F d, Y" }}</p>
+    </div>
+</body>
+</html>
