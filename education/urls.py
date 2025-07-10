@@ -1,8 +1,7 @@
 from django.urls import path
 from . import views
-from . import debug_views
-from . import knowledge_views
-from . import course_views
+from .knowledge import views as knowledge_views
+from .course import views as course_views
 
 app_name = 'education'
 
@@ -13,7 +12,6 @@ urlpatterns = [
     path('materials/', views.CourseMaterialsView.as_view(), name='materials'),
     path('schedule/', views.ScheduleView.as_view(), name='schedule'),
     path('tasks/', views.EducationTasksView.as_view(), name='tasks'),  # Using the education app's view
-    path('debug-tasks/', debug_views.DebugEducationTasksView.as_view(), name='debug_tasks'),
     path('tasks/newtask/', views.EducationTaskCreateView.as_view(), name='task_create'),
     path('tasks/<int:pk>/', views.EducationTaskDetailView.as_view(), name='task_detail'),
     path('tasks/<int:pk>/update/', views.EducationTaskUpdateView.as_view(), name='task_update'),

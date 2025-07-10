@@ -1,6 +1,6 @@
 from django import forms
 from django.utils.text import slugify
-from .knowledge_models import KnowledgeArticle, KnowledgeCategory, KnowledgeTag, MediaAttachment
+from .models import KnowledgeArticle, KnowledgeCategory, KnowledgeTag, MediaAttachment
 
 
 class KnowledgeArticleForm(forms.ModelForm):
