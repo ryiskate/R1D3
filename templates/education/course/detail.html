@@ -8,6 +8,9 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="mt-4">{{ course.title }}</h1>
         <div>
+            <a href="{% url 'education:course_pdf' course.pk %}" class="btn btn-danger" target="_blank">
+                <i class="fas fa-file-pdf"></i> Export PDF
+            </a>
             <a href="{% url 'education:course_update' course.pk %}" class="btn btn-primary">
                 <i class="fas fa-edit"></i> Edit
             </a>

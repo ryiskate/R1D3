@@ -30,6 +30,15 @@ class CourseForm(forms.ModelForm):
             'attachments': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'status': forms.Select(attrs={'class': 'form-select'}),
         }
+        labels = {
+            'title': 'Document Title *',
+            'central_theme': 'Central Theme *',
+            'objective': 'Document Objective *',
+            'summary': 'Theme Summary *',
+            'introduction': 'Introduction to Theme *',
+            'practical_applications': 'Practical Applications *',
+            'status': 'Status *'
+        }
 
 
 class ConceptSectionForm(forms.ModelForm):
@@ -45,6 +54,13 @@ class ConceptSectionForm(forms.ModelForm):
             'illustrative_example': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
             'order': forms.NumberInput(attrs={'class': 'form-control'}),
         }
+        labels = {
+            'name': 'Concept Name *',
+            'definition': 'Definition *',
+            'detailed_explanation': 'Detailed Explanation *',
+            'illustrative_example': 'Illustrative Example *',
+            'order': 'Order *'
+        }
 
 
 class AdvancedTopicSectionForm(forms.ModelForm):
@@ -59,6 +75,13 @@ class AdvancedTopicSectionForm(forms.ModelForm):
             'challenges': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'real_example': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
             'order': forms.NumberInput(attrs={'class': 'form-control'}),
+        }
+        labels = {
+            'name': 'Topic Name *',
+            'applications': 'Applications *',
+            'challenges': 'Risks/Challenges *',
+            'real_example': 'Real-world Example *',
+            'order': 'Order *'
         }
 
 
@@ -76,6 +99,12 @@ class PracticalExampleForm(forms.ModelForm):
             'real_application': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'order': forms.NumberInput(attrs={'class': 'form-control'}),
         }
+        labels = {
+            'title': 'Example Title *',
+            'step_by_step': 'Step-by-step Explanation *',
+            'order': 'Order *'
+            # code, image, and real_application are optional (blank=True)
+        }
 
 
 class GlossaryTermForm(forms.ModelForm):
@@ -87,6 +116,10 @@ class GlossaryTermForm(forms.ModelForm):
         widgets = {
             'term': forms.TextInput(attrs={'class': 'form-control'}),
             'definition': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+        }
+        labels = {
+            'term': 'Term *',
+            'definition': 'Definition *'
         }
 
 

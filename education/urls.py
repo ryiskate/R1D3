@@ -38,4 +38,5 @@ urlpatterns = [
     path('courses/<int:pk>/', course_views.CourseDetailView.as_view(), name='course_detail'),
     path('courses/<int:pk>/update/', course_views.CourseUpdateView.as_view(), name='course_update'),
     path('courses/<int:pk>/delete/', course_views.CourseDeleteView.as_view(), name='course_delete'),
+    path('courses/<int:pk>/pdf/', course_views.CoursePDFView.as_view(), name='course_pdf'),
 ]
