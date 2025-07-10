@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}
-    {% if is_update %}Edit{% else %}Create{% endif %} Course Documentation | R1D3 Education
+    {% if is_update %}Edit{% else %}Create{% endif %} Course | R1D3 Education
 {% endblock %}
 
 {% block extra_css %}
@@ -44,12 +44,12 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="mt-4">
             {% if is_update %}
-                Edit Documentation: {{ documentation.title }}
+                Edit Course: {{ course.title }}
             {% else %}
-                Create New Documentation
+                Create New Course
             {% endif %}
         </h1>
-        <a href="{% if is_update %}{% url 'education:documentation_detail' documentation.pk %}{% else %}{% url 'education:documentation_list' %}{% endif %}" class="btn btn-secondary">
+        <a href="{% if is_update %}{% url 'education:course_detail' course.pk %}{% else %}{% url 'education:course_list' %}{% endif %}" class="btn btn-secondary">
             <i class="fas fa-arrow-left"></i> Back
         </a>
     </div>
@@ -61,10 +61,10 @@
             <div class="card mb-4">
                 <div class="card-header">
                     <i class="fas fa-edit me-1"></i>
-                    Documentation Form
+                    Course Form
                 </div>
                 <div class="card-body">
-                    <form method="post" id="documentationForm">
+                    <form method="post" id="courseForm">
                         {% csrf_token %}
                         
                         <!-- Main form errors -->
@@ -76,13 +76,13 @@
                         
                         <!-- 1. Initial Information Section -->
                         <div class="section-title">
-                            <i class="fas fa-info-circle me-1"></i> 1. Informações Iniciais
+                            <i class="fas fa-info-circle me-1"></i> 1. Initial Information
                         </div>
                         
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="{{ form.title.id_for_label }}">Título do Documento</label>
+                                    <label for="{{ form.title.id_for_label }}">Course Title</label>
                                     {{ form.title }}
                                     {% if form.title.errors %}
                                         <div class="text-danger">{{ form.title.errors }}</div>
@@ -91,7 +91,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="{{ form.central_theme.id_for_label }}">Tema Central</label>
+                                    <label for="{{ form.central_theme.id_for_label }}">Central Theme</label>
                                     {{ form.central_theme }}
                                     {% if form.central_theme.errors %}
                                         <div class="text-danger">{{ form.central_theme.errors }}</div>
@@ -103,43 +103,41 @@
                         <div class="row mb-3">
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label for="{{ form.objective.id_for_label }}">Objetivo do Documento</label>
+                                    <label for="{{ form.objective.id_for_label }}">Course Objective</label>
                                     {{ form.objective }}
                                     {% if form.objective.errors %}
                                         <div class="text-danger">{{ form.objective.errors }}</div>
                                     {% endif %}
-                                    <small class="form-text text-muted">Exemplo: Reunir e explicar os conceitos fundamentais de Python para uso em projetos de automação.</small>
                                 </div>
                             </div>
                         </div>
                         
                         <!-- 2. Summary Section -->
                         <div class="section-title mt-4">
-                            <i class="fas fa-file-alt me-1"></i> 2. Resumo do Tema
+                            <i class="fas fa-file-alt me-1"></i> 2. Course Summary
                         </div>
                         
                         <div class="row mb-3">
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label for="{{ form.summary.id_for_label }}">Uma visão geral clara e concisa sobre o tema abordado</label>
+                                    <label for="{{ form.summary.id_for_label }}">Summary</label>
                                     {{ form.summary }}
                                     {% if form.summary.errors %}
                                         <div class="text-danger">{{ form.summary.errors }}</div>
                                     {% endif %}
-                                    <small class="form-text text-muted">Exemplo: Python é uma linguagem de programação de alto nível focada em legibilidade e produtividade...</small>
                                 </div>
                             </div>
                         </div>
                         
                         <!-- 3. Introduction Section -->
                         <div class="section-title mt-4">
-                            <i class="fas fa-book-open me-1"></i> 4. Introdução ao Tema
+                            <i class="fas fa-book-open me-1"></i> 3. Course Introduction
                         </div>
                         
                         <div class="row mb-3">
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label for="{{ form.introduction.id_for_label }}">Introdução ao Tema</label>
+                                    <label for="{{ form.introduction.id_for_label }}">Introduction</label>
                                     {{ form.introduction }}
                                     {% if form.introduction.errors %}
                                         <div class="text-danger">{{ form.introduction.errors }}</div>
@@ -151,7 +149,7 @@
                         <div class="row mb-3">
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label for="{{ form.practical_applications.id_for_label }}">Aplicações práticas</label>
+                                    <label for="{{ form.practical_applications.id_for_label }}">Practical Applications</label>
                                     {{ form.practical_applications }}
                                     {% if form.practical_applications.errors %}
                                         <div class="text-danger">{{ form.practical_applications.errors }}</div>
@@ -160,12 +158,12 @@
                             </div>
                         </div>
                         
-                        <!-- 5. Fundamental Concepts Section -->
+                        <!-- 4. Fundamental Concepts Section -->
                         <div class="section-title mt-4">
-                            <i class="fas fa-lightbulb me-1"></i> 5. Conceitos Fundamentais
+                            <i class="fas fa-lightbulb me-1"></i> 4. Fundamental Concepts
                         </div>
                         
-                        <p class="text-muted mb-3">Divida os principais conceitos em seções, com definições, explicações e exemplos.</p>
+                        <p class="text-muted mb-3">Break down the main concepts into sections, with definitions, explanations, and examples.</p>
                         
                         {{ concept_formset.management_form }}
                         <div id="concept-formset" class="formset-container">
@@ -177,8 +175,8 @@
                                     
                                     {% if concept_form.DELETE %}
                                         <div class="delete-row">
-                                            <label class="form-check-label">
-                                                {{ concept_form.DELETE }} Remover
+                                            <label class="form-check-label text-danger">
+                                                {{ concept_form.DELETE }} Delete
                                             </label>
                                         </div>
                                     {% endif %}
@@ -186,7 +184,7 @@
                                     <div class="row mb-3">
                                         <div class="col-md-8">
                                             <div class="form-group">
-                                                <label for="{{ concept_form.name.id_for_label }}">Nome do Conceito</label>
+                                                <label for="{{ concept_form.name.id_for_label }}">Concept Name</label>
                                                 {{ concept_form.name }}
                                                 {% if concept_form.name.errors %}
                                                     <div class="text-danger">{{ concept_form.name.errors }}</div>
@@ -195,7 +193,7 @@
                                         </div>
                                         <div class="col-md-4">
                                             <div class="form-group">
-                                                <label for="{{ concept_form.order.id_for_label }}">Ordem</label>
+                                                <label for="{{ concept_form.order.id_for_label }}">Display Order</label>
                                                 {{ concept_form.order }}
                                                 {% if concept_form.order.errors %}
                                                     <div class="text-danger">{{ concept_form.order.errors }}</div>
@@ -207,7 +205,7 @@
                                     <div class="row mb-3">
                                         <div class="col-md-12">
                                             <div class="form-group">
-                                                <label for="{{ concept_form.definition.id_for_label }}">Definição</label>
+                                                <label for="{{ concept_form.definition.id_for_label }}">Definition</label>
                                                 {{ concept_form.definition }}
                                                 {% if concept_form.definition.errors %}
                                                     <div class="text-danger">{{ concept_form.definition.errors }}</div>
@@ -219,7 +217,7 @@
                                     <div class="row mb-3">
                                         <div class="col-md-12">
                                             <div class="form-group">
-                                                <label for="{{ concept_form.detailed_explanation.id_for_label }}">Explicação detalhada</label>
+                                                <label for="{{ concept_form.detailed_explanation.id_for_label }}">Detailed Explanation</label>
                                                 {{ concept_form.detailed_explanation }}
                                                 {% if concept_form.detailed_explanation.errors %}
                                                     <div class="text-danger">{{ concept_form.detailed_explanation.errors }}</div>
@@ -228,10 +226,10 @@
                                         </div>
                                     </div>
                                     
-                                    <div class="row mb-3">
+                                    <div class="row">
                                         <div class="col-md-12">
                                             <div class="form-group">
-                                                <label for="{{ concept_form.illustrative_example.id_for_label }}">Exemplo ilustrativo</label>
+                                                <label for="{{ concept_form.illustrative_example.id_for_label }}">Illustrative Example</label>
                                                 {{ concept_form.illustrative_example }}
                                                 {% if concept_form.illustrative_example.errors %}
                                                     <div class="text-danger">{{ concept_form.illustrative_example.errors }}</div>
@@ -244,15 +242,15 @@
                         </div>
                         
                         <button type="button" id="add-concept" class="btn btn-outline-primary add-row">
-                            <i class="fas fa-plus"></i> Adicionar Conceito
+                            <i class="fas fa-plus"></i> Add Concept
                         </button>
                         
-                        <!-- 6. Advanced Topics Section -->
+                        <!-- 5. Advanced Topics Section -->
                         <div class="section-title mt-4">
-                            <i class="fas fa-brain me-1"></i> 6. Tópicos Avançados
+                            <i class="fas fa-brain me-1"></i> 5. Advanced Topics
                         </div>
                         
-                        <p class="text-muted mb-3">Aprofundamento em técnicas, teorias, ou ferramentas específicas.</p>
+                        <p class="text-muted mb-3">Include more complex topics with applications, challenges, and real examples.</p>
                         
                         {{ advanced_topic_formset.management_form }}
                         <div id="advanced-topic-formset" class="formset-container">
@@ -264,8 +262,8 @@
                                     
                                     {% if topic_form.DELETE %}
                                         <div class="delete-row">
-                                            <label class="form-check-label">
-                                                {{ topic_form.DELETE }} Remover
+                                            <label class="form-check-label text-danger">
+                                                {{ topic_form.DELETE }} Delete
                                             </label>
                                         </div>
                                     {% endif %}
@@ -273,7 +271,7 @@
                                     <div class="row mb-3">
                                         <div class="col-md-8">
                                             <div class="form-group">
-                                                <label for="{{ topic_form.name.id_for_label }}">Nome do Tópico</label>
+                                                <label for="{{ topic_form.name.id_for_label }}">Topic Name</label>
                                                 {{ topic_form.name }}
                                                 {% if topic_form.name.errors %}
                                                     <div class="text-danger">{{ topic_form.name.errors }}</div>
@@ -282,7 +280,7 @@
                                         </div>
                                         <div class="col-md-4">
                                             <div class="form-group">
-                                                <label for="{{ topic_form.order.id_for_label }}">Ordem</label>
+                                                <label for="{{ topic_form.order.id_for_label }}">Display Order</label>
                                                 {{ topic_form.order }}
                                                 {% if topic_form.order.errors %}
                                                     <div class="text-danger">{{ topic_form.order.errors }}</div>
@@ -294,7 +292,7 @@
                                     <div class="row mb-3">
                                         <div class="col-md-12">
                                             <div class="form-group">
-                                                <label for="{{ topic_form.applications.id_for_label }}">Aplicações</label>
+                                                <label for="{{ topic_form.applications.id_for_label }}">Applications</label>
                                                 {{ topic_form.applications }}
                                                 {% if topic_form.applications.errors %}
                                                     <div class="text-danger">{{ topic_form.applications.errors }}</div>
@@ -306,7 +304,7 @@
                                     <div class="row mb-3">
                                         <div class="col-md-12">
                                             <div class="form-group">
-                                                <label for="{{ topic_form.challenges.id_for_label }}">Riscos/desafios</label>
+                                                <label for="{{ topic_form.challenges.id_for_label }}">Challenges & Considerations</label>
                                                 {{ topic_form.challenges }}
                                                 {% if topic_form.challenges.errors %}
                                                     <div class="text-danger">{{ topic_form.challenges.errors }}</div>
@@ -315,10 +313,10 @@
                                         </div>
                                     </div>
                                     
-                                    <div class="row mb-3">
+                                    <div class="row">
                                         <div class="col-md-12">
                                             <div class="form-group">
-                                                <label for="{{ topic_form.real_example.id_for_label }}">Exemplo real</label>
+                                                <label for="{{ topic_form.real_example.id_for_label }}">Real-World Example</label>
                                                 {{ topic_form.real_example }}
                                                 {% if topic_form.real_example.errors %}
                                                     <div class="text-danger">{{ topic_form.real_example.errors }}</div>
@@ -331,19 +329,19 @@
                         </div>
                         
                         <button type="button" id="add-advanced-topic" class="btn btn-outline-primary add-row">
-                            <i class="fas fa-plus"></i> Adicionar Tópico Avançado
+                            <i class="fas fa-plus"></i> Add Advanced Topic
                         </button>
                         
-                        <!-- 7. Practical Examples Section -->
+                        <!-- 6. Practical Examples Section -->
                         <div class="section-title mt-4">
-                            <i class="fas fa-code me-1"></i> 7. Exemplos Práticos
+                            <i class="fas fa-code me-1"></i> 6. Practical Examples
                         </div>
                         
-                        <p class="text-muted mb-3">Exemplos práticos de aplicação do tema, com código, configurações ou procedimentos.</p>
+                        <p class="text-muted mb-3">Add code examples, step-by-step explanations, and real-world applications.</p>
                         
-                        {{ example_formset.management_form }}
+                        {{ practical_example_formset.management_form }}
                         <div id="example-formset" class="formset-container">
-                            {% for example_form in example_formset %}
+                            {% for example_form in practical_example_formset %}
                                 <div class="formset-item example-form">
                                     {% if example_form.instance.pk %}
                                         {{ example_form.id }}
@@ -351,8 +349,8 @@
                                     
                                     {% if example_form.DELETE %}
                                         <div class="delete-row">
-                                            <label class="form-check-label">
-                                                {{ example_form.DELETE }} Remover
+                                            <label class="form-check-label text-danger">
+                                                {{ example_form.DELETE }} Delete
                                             </label>
                                         </div>
                                     {% endif %}
@@ -360,7 +358,7 @@
                                     <div class="row mb-3">
                                         <div class="col-md-8">
                                             <div class="form-group">
-                                                <label for="{{ example_form.title.id_for_label }}">Título do Exemplo</label>
+                                                <label for="{{ example_form.title.id_for_label }}">Example Title</label>
                                                 {{ example_form.title }}
                                                 {% if example_form.title.errors %}
                                                     <div class="text-danger">{{ example_form.title.errors }}</div>
@@ -369,7 +367,7 @@
                                         </div>
                                         <div class="col-md-4">
                                             <div class="form-group">
-                                                <label for="{{ example_form.order.id_for_label }}">Ordem</label>
+                                                <label for="{{ example_form.order.id_for_label }}">Display Order</label>
                                                 {{ example_form.order }}
                                                 {% if example_form.order.errors %}
                                                     <div class="text-danger">{{ example_form.order.errors }}</div>
@@ -381,10 +379,10 @@
                                     <div class="row mb-3">
                                         <div class="col-md-12">
                                             <div class="form-group">
-                                                <label for="{{ example_form.description.id_for_label }}">Descrição</label>
-                                                {{ example_form.description }}
-                                                {% if example_form.description.errors %}
-                                                    <div class="text-danger">{{ example_form.description.errors }}</div>
+                                                <label for="{{ example_form.code.id_for_label }}">Code</label>
+                                                {{ example_form.code }}
+                                                {% if example_form.code.errors %}
+                                                    <div class="text-danger">{{ example_form.code.errors }}</div>
                                                 {% endif %}
                                             </div>
                                         </div>
@@ -393,12 +391,11 @@
                                     <div class="row mb-3">
                                         <div class="col-md-12">
                                             <div class="form-group">
-                                                <label for="{{ example_form.code_snippet.id_for_label }}">Trecho de código ou procedimento</label>
-                                                {{ example_form.code_snippet }}
-                                                {% if example_form.code_snippet.errors %}
-                                                    <div class="text-danger">{{ example_form.code_snippet.errors }}</div>
+                                                <label for="{{ example_form.image.id_for_label }}">Image URL (optional)</label>
+                                                {{ example_form.image }}
+                                                {% if example_form.image.errors %}
+                                                    <div class="text-danger">{{ example_form.image.errors }}</div>
                                                 {% endif %}
-                                                <small class="form-text text-muted">Use formatação markdown para código: ```python\ncódigo aqui\n```</small>
                                             </div>
                                         </div>
                                     </div>
@@ -406,10 +403,22 @@
                                     <div class="row mb-3">
                                         <div class="col-md-12">
                                             <div class="form-group">
-                                                <label for="{{ example_form.expected_result.id_for_label }}">Resultado esperado</label>
-                                                {{ example_form.expected_result }}
-                                                {% if example_form.expected_result.errors %}
-                                                    <div class="text-danger">{{ example_form.expected_result.errors }}</div>
+                                                <label for="{{ example_form.step_by_step.id_for_label }}">Step-by-step Explanation</label>
+                                                {{ example_form.step_by_step }}
+                                                {% if example_form.step_by_step.errors %}
+                                                    <div class="text-danger">{{ example_form.step_by_step.errors }}</div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="{{ example_form.real_application.id_for_label }}">Application in Real Project</label>
+                                                {{ example_form.real_application }}
+                                                {% if example_form.real_application.errors %}
+                                                    <div class="text-danger">{{ example_form.real_application.errors }}</div>
                                                 {% endif %}
                                             </div>
                                         </div>
@@ -419,66 +428,68 @@
                         </div>
                         
                         <button type="button" id="add-example" class="btn btn-outline-primary add-row">
-                            <i class="fas fa-plus"></i> Adicionar Exemplo Prático
+                            <i class="fas fa-plus"></i> Add Example
                         </button>
                         
-                        <!-- 8. Resources Section -->
+                        <!-- 7. Resources Section -->
                         <div class="section-title mt-4">
-                            <i class="fas fa-book me-1"></i> 8. Recursos e Referências
+                            <i class="fas fa-link me-1"></i> 7. Recommended Resources
                         </div>
                         
                         <div class="row mb-3">
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label for="{{ form.resources.id_for_label }}">Recursos e Referências</label>
-                                    {{ form.resources }}
-                                    {% if form.resources.errors %}
-                                        <div class="text-danger">{{ form.resources.errors }}</div>
+                                    <label for="{{ form.recommended_resources.id_for_label }}">Recommended Resources</label>
+                                    {{ form.recommended_resources }}
+                                    {% if form.recommended_resources.errors %}
+                                        <div class="text-danger">{{ form.recommended_resources.errors }}</div>
                                     {% endif %}
-                                    <small class="form-text text-muted">Liste livros, artigos, sites, vídeos e outros recursos relevantes. Use formatação markdown para links: [título](url)</small>
                                 </div>
                             </div>
                         </div>
                         
-                        <!-- 9. Glossary Section -->
+                        <!-- 8. Glossary Section -->
                         <div class="section-title mt-4">
-                            <i class="fas fa-book-reader me-1"></i> 9. Glossário
+                            <i class="fas fa-book me-1"></i> 8. Glossary
                         </div>
                         
-                        <p class="text-muted mb-3">Definições de termos técnicos ou específicos mencionados no documento.</p>
+                        <p class="text-muted mb-3">Add important terms and their definitions.</p>
                         
                         {{ glossary_formset.management_form }}
                         <div id="glossary-formset" class="formset-container">
-                            {% for term_form in glossary_formset %}
+                            {% for glossary_form in glossary_formset %}
                                 <div class="formset-item glossary-form">
-                                    {% if term_form.instance.pk %}
-                                        {{ term_form.id }}
+                                    {% if glossary_form.instance.pk %}
+                                        {{ glossary_form.id }}
                                     {% endif %}
                                     
-                                    {% if term_form.DELETE %}
+                                    {% if glossary_form.DELETE %}
                                         <div class="delete-row">
-                                            <label class="form-check-label">
-                                                {{ term_form.DELETE }} Remover
+                                            <label class="form-check-label text-danger">
+                                                {{ glossary_form.DELETE }} Delete
                                             </label>
                                         </div>
                                     {% endif %}
                                     
                                     <div class="row mb-3">
-                                        <div class="col-md-6">
+                                        <div class="col-md-12">
                                             <div class="form-group">
-                                                <label for="{{ term_form.term.id_for_label }}">Termo</label>
-                                                {{ term_form.term }}
-                                                {% if term_form.term.errors %}
-                                                    <div class="text-danger">{{ term_form.term.errors }}</div>
+                                                <label for="{{ glossary_form.term.id_for_label }}">Term</label>
+                                                {{ glossary_form.term }}
+                                                {% if glossary_form.term.errors %}
+                                                    <div class="text-danger">{{ glossary_form.term.errors }}</div>
                                                 {% endif %}
                                             </div>
                                         </div>
-                                        <div class="col-md-6">
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-12">
                                             <div class="form-group">
-                                                <label for="{{ term_form.definition.id_for_label }}">Definição</label>
-                                                {{ term_form.definition }}
-                                                {% if term_form.definition.errors %}
-                                                    <div class="text-danger">{{ term_form.definition.errors }}</div>
+                                                <label for="{{ glossary_form.definition.id_for_label }}">Definition</label>
+                                                {{ glossary_form.definition }}
+                                                {% if glossary_form.definition.errors %}
+                                                    <div class="text-danger">{{ glossary_form.definition.errors }}</div>
                                                 {% endif %}
                                             </div>
                                         </div>
@@ -488,30 +499,30 @@
                         </div>
                         
                         <button type="button" id="add-glossary" class="btn btn-outline-primary add-row">
-                            <i class="fas fa-plus"></i> Adicionar Termo ao Glossário
+                            <i class="fas fa-plus"></i> Add Term
                         </button>
                         
-                        <!-- 10. Attachments Section -->
+                        <!-- 9. Attachments Section -->
                         <div class="section-title mt-4">
-                            <i class="fas fa-paperclip me-1"></i> 10. Anexos
+                            <i class="fas fa-paperclip me-1"></i> 9. Attachments
                         </div>
                         
                         <div class="row mb-3">
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label for="{{ form.attachments.id_for_label }}">Anexos</label>
+                                    <label for="{{ form.attachments.id_for_label }}">Attachments</label>
                                     {{ form.attachments }}
+                                    <small class="form-text text-muted">Enter links to attachments, one per line.</small>
                                     {% if form.attachments.errors %}
                                         <div class="text-danger">{{ form.attachments.errors }}</div>
                                     {% endif %}
-                                    <small class="form-text text-muted">Liste links para arquivos anexos ou materiais complementares. Use formatação markdown para links: [nome do arquivo](url)</small>
                                 </div>
                             </div>
                         </div>
                         
-                        <!-- Status Section -->
+                        <!-- 10. Status Section -->
                         <div class="section-title mt-4">
-                            <i class="fas fa-tasks me-1"></i> Status do Documento
+                            <i class="fas fa-flag me-1"></i> 10. Status
                         </div>
                         
                         <div class="row mb-3">
@@ -524,24 +535,12 @@
                                     {% endif %}
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="{{ form.last_updated.id_for_label }}">Data da Última Atualização</label>
-                                    {{ form.last_updated }}
-                                    {% if form.last_updated.errors %}
-                                        <div class="text-danger">{{ form.last_updated.errors }}</div>
-                                    {% endif %}
-                                </div>
-                            </div>
                         </div>
                         
                         <!-- Submit Button -->
-                        <div class="mt-4 d-flex justify-content-between">
-                            <a href="{% url 'education:documentation_list' %}" class="btn btn-secondary">
-                                <i class="fas fa-times"></i> Cancelar
-                            </a>
+                        <div class="mt-4">
                             <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save"></i> {% if is_update %}Atualizar{% else %}Salvar{% endif %} Documentação
+                                <i class="fas fa-save"></i> {% if is_update %}Update{% else %}Create{% endif %} Course
                             </button>
                         </div>
                     </form>
@@ -550,25 +549,25 @@
         </div>
     </div>
 </div>
+{% endblock %}
 
 {% block extra_js %}
 <script>
     $(document).ready(function() {
-        // Initialize formsets
-        const conceptFormsetPrefix = "{{ concept_formset.prefix }}";
-        const advancedTopicFormsetPrefix = "{{ advanced_topic_formset.prefix }}";
-        const exampleFormsetPrefix = "{{ example_formset.prefix }}";
-        const glossaryFormsetPrefix = "{{ glossary_formset.prefix }}";
+        // Define formset prefixes
+        const conceptFormsetPrefix = 'conceptsection_set';
+        const advancedTopicFormsetPrefix = 'advancedtopicsection_set';
+        const exampleFormsetPrefix = 'practicalexample_set';
+        const glossaryFormsetPrefix = 'glossaryterm_set';
         
         // Function to update form indices
-        function updateFormIndices(formset, prefix) {
-            const forms = formset.find('.formset-item');
-            const totalForms = forms.length;
+        function updateFormIndices(container, prefix) {
+            const forms = container.find('.formset-item');
             
-            // Update the total forms count in the management form
-            $(`#id_${prefix}-TOTAL_FORMS`).val(totalForms);
+            // Update the TOTAL_FORMS in the management form
+            $(`#id_${prefix}-TOTAL_FORMS`).val(forms.length);
             
-            // Update each form's index
+            // Update the indices of each form
             forms.each(function(index) {
                 $(this).find(':input').each(function() {
                     if ($(this).attr('id')) {

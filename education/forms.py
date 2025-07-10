@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import inlineformset_factory
 from .models import (
-    CourseDocumentation, 
+    Course, 
     ConceptSection, 
     AdvancedTopicSection, 
     PracticalExample, 
@@ -9,11 +9,11 @@ from .models import (
 )
 
 
-class CourseDocumentationForm(forms.ModelForm):
-    """Form for creating and editing course documentation"""
+class CourseForm(forms.ModelForm):
+    """Form for creating and editing courses"""
     
     class Meta:
-        model = CourseDocumentation
+        model = Course
         fields = [
             'title', 'central_theme', 'objective', 'summary', 
             'introduction', 'practical_applications', 
@@ -92,7 +92,7 @@ class GlossaryTermForm(forms.ModelForm):
 
 # Create formsets for related models
 ConceptSectionFormSet = inlineformset_factory(
-    CourseDocumentation, 
+    Course, 
     ConceptSection, 
     form=ConceptSectionForm,
     extra=1, 
@@ -100,7 +100,7 @@ ConceptSectionFormSet = inlineformset_factory(
 )
 
 AdvancedTopicSectionFormSet = inlineformset_factory(
-    CourseDocumentation, 
+    Course, 
     AdvancedTopicSection, 
     form=AdvancedTopicSectionForm,
     extra=1, 
@@ -108,7 +108,7 @@ AdvancedTopicSectionFormSet = inlineformset_factory(
 )
 
 PracticalExampleFormSet = inlineformset_factory(
-    CourseDocumentation, 
+    Course, 
     PracticalExample, 
     form=PracticalExampleForm,
     extra=1, 
@@ -116,7 +116,7 @@ PracticalExampleFormSet = inlineformset_factory(
 )
 
 GlossaryTermFormSet = inlineformset_factory(
-    CourseDocumentation, 
+    Course, 
     GlossaryTerm, 
     form=GlossaryTermForm,
     extra=3, 
