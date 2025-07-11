@@ -73,9 +73,29 @@ class KnowledgeArticleDetailView(LoginRequiredMixin, BreadcrumbMixin, DetailView
     slug_url_kwarg = 'slug'
     
     def get_context_data(self, **kwargs):
+        import json
+        import logging
+        logger = logging.getLogger(__name__)
+        
         context = super().get_context_data(**kwargs)
         context['active_department'] = 'education'
         context['related_articles'] = self.object.get_related_articles()
+        
+        # Process content blocks if they exist
+        article = self.object
+        if article.content and article.content.startswith('Content blocks:'):
+            try:
+                # Try to find the content blocks in the POST data
+                content_blocks_data = self.request.session.get(f'article_{article.id}_content_blocks')
+                if content_blocks_data:
+                    content_blocks = json.loads(content_blocks_data)
+                    context['article'].content_blocks = content_blocks
+                    logger.info(f"Loaded content blocks from session for article {article.id}")
+            except Exception as e:
+                logger.error(f"Error processing content blocks for display: {str(e)}")
+                # If there's an error, we'll just display the regular content
+                pass
+        
         return context
     
     def get_breadcrumbs(self):
@@ -200,11 +220,35 @@ class KnowledgeArticleUpdateView(LoginRequiredMixin, BreadcrumbMixin, UpdateView
     slug_url_kwarg = 'slug'
     
     def get_context_data(self, **kwargs):
+        import json
+        import logging
+        logger = logging.getLogger(__name__)
+        
         context = super().get_context_data(**kwargs)
         context['active_department'] = 'education'
         context['is_create'] = False
         context['media_form'] = MediaAttachmentForm()
         context['media_attachments'] = self.object.attachments.all()
+        
+        # Process content blocks if they exist
+        article = self.object
+        if article.content and article.content.startswith('Content blocks:'):
+            try:
+                # Try to find the content blocks in the session
+                content_blocks_data = self.request.session.get(f'article_{article.id}_content_blocks')
+                if content_blocks_data:
+                    # Load content blocks from session
+                    content_blocks = json.loads(content_blocks_data)
+                    context['content_blocks_json'] = content_blocks_data
+                    logger.info(f"Loaded content blocks from session for article {article.id}")
+                else:
+                    # If not in session, try to parse from the article content
+                    logger.info(f"No content blocks found in session for article {article.id}")
+                    context['content_blocks_json'] = '[]'
+            except Exception as e:
+                logger.error(f"Error processing content blocks for edit form: {str(e)}")
+                context['content_blocks_json'] = '[]'
+        
         return context
     
     def get_breadcrumbs(self):
@@ -219,6 +263,7 @@ class KnowledgeArticleUpdateView(LoginRequiredMixin, BreadcrumbMixin, UpdateView
     
     def form_valid(self, form):
         import logging
+        import json
         logger = logging.getLogger(__name__)
         
         # Process content blocks data if provided
@@ -227,6 +272,15 @@ class KnowledgeArticleUpdateView(LoginRequiredMixin, BreadcrumbMixin, UpdateView
         
         if content_blocks:
             form.instance.content = f"Content blocks: {len(content_blocks)} characters"
+            
+            # Store the content blocks in the session for retrieval during edit and display
+            try:
+                # Validate JSON before storing
+                json_data = json.loads(content_blocks)
+                self.request.session[f'article_{form.instance.id}_content_blocks'] = content_blocks
+                logger.info(f"Stored content blocks in session for article {form.instance.id}")
+            except json.JSONDecodeError as e:
+                logger.error(f"Invalid JSON in content blocks: {str(e)}")
         
         # Ensure the slug is set if not provided
         from django.utils.text import slugify
@@ -238,6 +292,13 @@ class KnowledgeArticleUpdateView(LoginRequiredMixin, BreadcrumbMixin, UpdateView
         try:
             self.object = form.save()
             logger.info(f"Article updated with ID: {self.object.id}, slug: {self.object.slug}")
+            
+            # If we didn't have the ID before (new article), update the session key
+            if content_blocks and f'article_None_content_blocks' in self.request.session:
+                self.request.session[f'article_{self.object.id}_content_blocks'] = self.request.session[f'article_None_content_blocks']
+                del self.request.session[f'article_None_content_blocks']
+                self.request.session.modified = True
+                logger.info(f"Updated session key for new article {self.object.id}")
             
             # Add success message
             messages.success(self.request, f"Article '{self.object.title}' updated successfully.")

@@ -6,8 +6,15 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.db import transaction
 from django.contrib import messages
 from django.template.loader import render_to_string
-from weasyprint import HTML
-from weasyprint.text.fonts import FontConfiguration
+
+# Import WeasyPrint only when needed to avoid issues during migrations
+weasyprint_imported = False
+try:
+    from weasyprint import HTML
+    from weasyprint.text.fonts import FontConfiguration
+    weasyprint_imported = True
+except ImportError:
+    pass
 
 from core.mixins import BreadcrumbMixin
 from .models import Course, ConceptSection, AdvancedTopicSection, PracticalExample, GlossaryTerm
@@ -239,6 +246,11 @@ class CoursePDFView(LoginRequiredMixin, View):
     """View for exporting a course as PDF"""
     
     def get(self, request, *args, **kwargs):
+        # Check if WeasyPrint is available
+        if not weasyprint_imported:
+            messages.error(request, "PDF export is not available. WeasyPrint library is not installed.")
+            return redirect('education:course_detail', pk=self.kwargs['pk'])
+            
         # Get the course object
         course = get_object_or_404(Course, pk=self.kwargs['pk'])
         
@@ -260,13 +272,17 @@ class CoursePDFView(LoginRequiredMixin, View):
         # Render the template to a string
         html_string = render_to_string('education/course/pdf_template.html', context)
         
-        # Generate PDF
-        font_config = FontConfiguration()
-        html = HTML(string=html_string, base_url=request.build_absolute_uri('/'))
-        pdf = html.write_pdf(font_config=font_config)
-        
-        # Create HTTP response with PDF
-        response = HttpResponse(pdf, content_type='application/pdf')
-        response['Content-Disposition'] = f'attachment; filename="{course.title}.pdf"'
-        
-        return response
+        try:
+            # Generate PDF
+            font_config = FontConfiguration()
+            html = HTML(string=html_string, base_url=request.build_absolute_uri('/'))
+            pdf = html.write_pdf(font_config=font_config)
+            
+            # Create HTTP response with PDF
+            response = HttpResponse(pdf, content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment; filename="{course.title}.pdf"'
+            
+            return response
+        except Exception as e:
+            messages.error(request, f"Error generating PDF: {str(e)}")
+            return redirect('education:course_detail', pk=course.pk)

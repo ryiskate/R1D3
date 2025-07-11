@@ -141,7 +141,69 @@
             <div class="card shadow mb-4">
                 <div class="card-body">
                     <div class="article-content">
-                        {{ article.content|safe }}
+                        {% if article.content and 'Content blocks:' in article.content %}
+                            <!-- Render content blocks -->
+                            <div id="content-blocks-container">
+                                {% if article.content_blocks %}
+                                    {% for block in article.content_blocks %}
+                                        <div class="content-block card mb-4">
+                                            <div class="card-header d-flex justify-content-between align-items-center">
+                                                <h5 class="m-0 font-weight-bold">{{ block.title }}</h5>
+                                                <span class="badge badge-primary">
+                                                    {% if block.type == 'text' %}
+                                                        <i class="fas fa-align-left mr-1"></i> Text
+                                                    {% elif block.type == 'bullet' %}
+                                                        <i class="fas fa-list mr-1"></i> Bullet Points
+                                                    {% elif block.type == 'image' %}
+                                                        <i class="fas fa-image mr-1"></i> Image
+                                                    {% elif block.type == 'video' %}
+                                                        <i class="fas fa-video mr-1"></i> Video
+                                                    {% else %}
+                                                        <i class="fas fa-cube mr-1"></i> {{ block.type|title }}
+                                                    {% endif %}
+                                                </span>
+                                            </div>
+                                            <div class="card-body">
+                                                {% if block.description %}
+                                                    <p class="card-text">{{ block.description }}</p>
+                                                {% endif %}
+                                                
+                                                {% if block.type == 'text' %}
+                                                    <div class="block-content text-block">
+                                                        {{ block.content.text|safe }}
+                                                    </div>
+                                                {% elif block.type == 'bullet' %}
+                                                    <div class="block-content bullet-block">
+                                                        <ul>
+                                                            {% for point in block.content.bulletPoints %}
+                                                                <li>{{ point }}</li>
+                                                            {% endfor %}
+                                                        </ul>
+                                                    </div>
+                                                {% elif block.type == 'image' %}
+                                                    <div class="block-content image-block text-center">
+                                                        <img src="{{ block.content.imageUrl }}" alt="{{ block.content.imageAlt|default:block.title }}" class="img-fluid mb-2">
+                                                    </div>
+                                                {% elif block.type == 'video' %}
+                                                    <div class="block-content video-block">
+                                                        <div class="embed-responsive embed-responsive-16by9">
+                                                            <iframe class="embed-responsive-item" src="{{ block.content.videoUrl }}" allowfullscreen></iframe>
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="alert alert-info">
+                                        <p>This article has content blocks that cannot be displayed. Please edit the article to fix the content.</p>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <!-- Render regular content -->
+                            {{ article.content|safe }}
+                        {% endif %}
                     </div>
                 </div>
             </div>

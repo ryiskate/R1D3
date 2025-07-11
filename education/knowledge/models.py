@@ -64,12 +64,13 @@ class KnowledgeArticle(models.Model):
     """Main model for knowledge articles"""
     title = models.CharField(max_length=200)
     slug = models.SlugField(unique=True)
-    summary = models.TextField(help_text="Brief summary of the article")
+    summary = models.TextField(blank=True, help_text="Brief summary of the article")
     content = models.TextField(help_text="Main content in HTML format")
     category = models.ForeignKey(
         KnowledgeCategory, 
         on_delete=models.SET_NULL, 
         null=True, 
+        blank=True,
         related_name='articles'
     )
     tags = models.ManyToManyField(KnowledgeTag, blank=True, related_name='articles')
