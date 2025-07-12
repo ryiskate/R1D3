@@ -69,6 +69,26 @@
     .bg-purple {
         background-color: #6f42c1;
     }
+    
+    /* Company filter cards styling */
+    .company-filter-card {
+        min-width: 160px;
+        width: calc(100% / 7); /* Equal width for all 7 columns */
+        flex: 0 0 auto; /* Don't grow or shrink */
+        padding: 0 5px;
+    }
+    
+    /* Make the row of company filter cards scrollable on small screens */
+    @media (max-width: 992px) {
+        .row.flex-nowrap.overflow-auto {
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+            padding-bottom: 10px;
+        }
+        .company-filter-card {
+            min-width: 140px;
+        }
+    }
 </style>
 {% endblock %}
 
@@ -229,26 +249,34 @@
                     <h6 class="m-0 font-weight-bold text-primary">Company Filter</h6>
                 </div>
                 <div class="card-body">
-                    <div class="row">
+                    <div class="row flex-nowrap overflow-auto">
                         {% for section in section_stats %}
-                        <div class="col-md-2 mb-2">
+                        <div class="col company-filter-card">
                             <div class="card h-100">
                                 <div class="card-body p-2 text-center">
                                     <div class="d-flex align-items-center justify-content-center mb-1">
-                                        {% if section.section_name == 'game_development' %}
+                                        {% if section.section_name == 'game_development' or section.section_name == 'game_dev' %}
                                             <i class="fas fa-gamepad text-primary me-1"></i>
                                         {% elif section.section_name == 'education' %}
                                             <i class="fas fa-graduation-cap text-success me-1"></i>
                                         {% elif section.section_name == 'arcade' %}
-                                            <i class="fas fa-arcade text-danger me-1"></i>
+                                            <i class="fas fa-gamepad text-danger me-1"></i>
                                         {% elif section.section_name == 'marketing' %}
                                             <i class="fas fa-bullhorn text-info me-1"></i>
                                         {% elif section.section_name == 'research' %}
                                             <i class="fas fa-flask text-warning me-1"></i>
+                                        {% elif section.section_name == 'social_media' %}
+                                            <i class="fas fa-hashtag text-info me-1"></i>
+                                        {% elif section.section_name == 'theme_park' %}
+                                            <i class="fas fa-ticket-alt text-warning me-1"></i>
+                                        {% elif section.section_name == 'indie_news' %}
+                                            <i class="fas fa-newspaper text-success me-1"></i>
+                                        {% elif section.section_name == 'r1d3' %}
+                                            <i class="fas fa-code text-primary me-1"></i>
                                         {% else %}
                                             <i class="fas fa-cogs text-secondary me-1"></i>
                                         {% endif %}
-                                        <span class="fw-bold">{{ section.section_name|title }}</span>
+                                        <span class="fw-bold">{% if section.section_name == 'game_development' %}Game_Dev{% else %}{{ section.section_name|title }}{% endif %}</span>
                                     </div>
                                     <span class="badge bg-primary mb-1">{{ section.count }} Tasks</span>
                                     <div>
