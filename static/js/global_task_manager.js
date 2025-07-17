@@ -209,11 +209,28 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Custom date sorting registered');
         }
         
+        // Destroy existing DataTable if it exists
+        if ($.fn.dataTable.isDataTable('#taskTable')) {
+            $('#taskTable').DataTable().destroy();
+            console.log('Destroyed existing DataTable');
+        }
+        
         // Initialize DataTables with explicit configuration
         console.log('DataTable columns:', $('#taskTable th').length);
         $('#taskTable th').each(function(index) {
             console.log(`Column ${index}: ${$(this).text().trim()}`);
         });
+        
+        // Simple function to extract text from the first hidden span in a cell
+        function getHiddenSpanText(cellData) {
+            if (cellData && cellData.indexOf && cellData.indexOf('<span style="display:none;">') !== -1) {
+                const match = cellData.match(/<span style="display:none;">(.*?)<\/span>/);
+                if (match && match[1]) {
+                    return match[1].trim();
+                }
+            }
+            return cellData;
+        }
         
         const taskTable = $('#taskTable').DataTable({
             // Debug DataTables initialization
@@ -240,14 +257,32 @@ document.addEventListener('DOMContentLoaded', function() {
                     "targets": 1,
                     "title": "Task"
                 },
+                // Status column with custom sorting
+                {
+                    "orderable": true,
+                    "targets": 3,
+                    "type": 'string',
+                    "render": function(data, type, row) {
+                        if (type === 'sort') {
+                            return getHiddenSpanText(data);
+                        }
+                        return data;
+                    }
+                },
                 // Due date column with custom sorting
                 { 
                     "orderable": true, 
                     "targets": 6,
-                    "type": 'date-detect'
+                    "type": 'string',
+                    "render": function(data, type, row) {
+                        if (type === 'sort') {
+                            return getHiddenSpanText(data);
+                        }
+                        return data;
+                    }
                 },
                 // Make all other columns explicitly sortable
-                { "orderable": true, "targets": [2, 3, 4, 5] }
+                { "orderable": true, "targets": [2, 4, 5] }
             ],
             // Disable DataTables' auto-width calculation
             "autoWidth": false,
