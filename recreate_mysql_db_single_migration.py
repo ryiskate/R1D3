@@ -22,13 +22,19 @@ django.setup()
 def get_mysql_credentials():
     """Get MySQL credentials from Django settings."""
     db_settings = settings.DATABASES['default']
-    return {
+    credentials = {
         'host': db_settings.get('HOST', 'localhost'),
-        'port': db_settings.get('PORT', '3306'),
         'user': db_settings.get('USER', ''),
         'password': db_settings.get('PASSWORD', ''),
         'name': db_settings.get('NAME', ''),
     }
+    
+    # Only add port if it's not empty
+    port = db_settings.get('PORT')
+    if port:
+        credentials['port'] = port
+        
+    return credentials
 
 def backup_database(credentials):
     """Create a backup of the current database using mysqldump."""
@@ -39,9 +45,12 @@ def backup_database(credentials):
     cmd = [
         'mysqldump',
         f"--host={credentials['host']}",
-        f"--port={credentials['port']}",
         f"--user={credentials['user']}",
     ]
+    
+    # Add port only if specified
+    if 'port' in credentials and credentials['port']:
+        cmd.append(f"--port={credentials['port']}")
     
     if credentials['password']:
         cmd.append(f"--password={credentials['password']}")
@@ -67,9 +76,12 @@ def drop_and_recreate_database(credentials):
     mysql_cmd = [
         'mysql',
         f"--host={credentials['host']}",
-        f"--port={credentials['port']}",
         f"--user={credentials['user']}",
     ]
+    
+    # Add port only if specified
+    if 'port' in credentials and credentials['port']:
+        mysql_cmd.append(f"--port={credentials['port']}")
     
     if credentials['password']:
         mysql_cmd.append(f"--password={credentials['password']}")
