@@ -33,6 +33,15 @@ def get_mysql_credentials():
     port = db_settings.get('PORT')
     if port:
         credentials['port'] = port
+    
+    # For PythonAnywhere, we need to use the MySQL hostname
+    # which is typically username.mysql.pythonanywhere-services.com
+    if 'pythonanywhere' in credentials['host'] or credentials['host'] == 'localhost':
+        print(f"Using PythonAnywhere MySQL configuration with host: {credentials['host']}")
+    
+    # Check if we're on PythonAnywhere
+    if os.path.exists('/home/R1D3'):
+        print("Detected PythonAnywhere environment")
         
     return credentials
 
@@ -46,6 +55,7 @@ def backup_database(credentials):
         'mysqldump',
         f"--host={credentials['host']}",
         f"--user={credentials['user']}",
+        '--protocol=TCP',  # Force TCP protocol for PythonAnywhere
     ]
     
     # Add port only if specified
@@ -77,6 +87,7 @@ def drop_and_recreate_database(credentials):
         'mysql',
         f"--host={credentials['host']}",
         f"--user={credentials['user']}",
+        '--protocol=TCP',  # Force TCP protocol for PythonAnywhere
     ]
     
     # Add port only if specified
@@ -127,6 +138,13 @@ def recreate_database():
     # Get MySQL credentials
     credentials = get_mysql_credentials()
     
+    print(f"\nUsing MySQL credentials:")
+    print(f"  Host: {credentials['host']}")
+    print(f"  User: {credentials['user']}")
+    print(f"  Database: {credentials['name']}")
+    if 'port' in credentials:
+        print(f"  Port: {credentials['port']}")
+    
     # Backup the current database
     backup_path = backup_database(credentials)
     if not backup_path:
@@ -157,6 +175,25 @@ def main():
     print("This script will recreate your MySQL database with a single migration.")
     print("WARNING: This is a destructive operation. All data will be lost.")
     print("The script will create a backup automatically, but it's always good to have an extra one.")
+    
+    # Check if we're on PythonAnywhere
+    if os.path.exists('/home/R1D3'):
+        print("\nDetected PythonAnywhere environment")
+        print("Note: On PythonAnywhere, you might need to use the MySQL console instead.")
+        print("Visit: https://www.pythonanywhere.com/user/R1D3/databases/")
+        print("\nAlternatively, you can try running this script with the correct MySQL credentials.")
+        print("Make sure your settings.py has the correct MySQL host, usually in the format:")
+        print("username.mysql.pythonanywhere-services.com")
+    
+    # Check if mysqldump is available
+    try:
+        subprocess.run(['mysqldump', '--version'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        print("\nmysqldump is available on this system.")
+    except FileNotFoundError:
+        print("\nWARNING: mysqldump command not found. This script may not work correctly.")
+        print("On PythonAnywhere, you might need to use the MySQL console instead.")
+        print("Visit: https://www.pythonanywhere.com/user/R1D3/databases/")
+        return
     
     confirm = input("Do you want to continue? (y/n): ")
     if confirm.lower() != 'y':
