@@ -23,7 +23,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" rel="stylesheet">
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
-    
+
     <style>
         :root {
             --primary-color: #4e73df;
@@ -111,6 +111,13 @@
         .content-wrapper {
             min-height: calc(100vh - 4.375rem);
             padding-top: 4.375rem;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Company Phase Banner */
+        .company-phase-banner {
+            margin-top: -1px; /* Remove any gap between navbar and banner */
         }
         
         .sidebar-brand {
@@ -212,6 +219,42 @@
         
         .content-wrapper {
             min-height: calc(100vh - 4.375rem);
+        }
+        
+        /* Ensure no gap between navbar and company phase banner */
+        .topbar {
+            margin-bottom: 0 !important;
+            border-bottom: none !important;
+            padding: 0 !important;
+            min-height: 0 !important;
+            height: auto !important;
+        }
+        
+        .company-phase-banner {
+            margin-top: 0 !important;
+            border-top: none !important;
+            position: relative;
+            display: block;
+            width: 100%;
+            padding: 1rem 0;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+        }
+        
+        /* Remove any space between elements */
+        .navbar, .company-phase-banner {
+            line-height: 1;
+        }
+        
+        /* Force elements to connect with no gap */
+        .content-wrapper {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .content-wrapper > nav,
+        .content-wrapper > .company-phase-banner {
+            margin: 0 !important;
+            flex-shrink: 0;
         }
     </style>
     
@@ -322,8 +365,8 @@
                         {% elif request.resolver_match.namespace == 'education' %}
                             <!-- Education Department sidebar content -->
                             {% include 'education/sidebar.html' %}
-                        {% else %}
-                            <!-- Default sidebar content -->
+                        {% elif request.resolver_match.namespace == 'games' %}
+                            <!-- Game Development sidebar content -->
                             <div class="sidebar-heading">
                                 Game Development
                             </div>
@@ -346,6 +389,18 @@
                                 <a class="nav-link" href="{% url 'games:task_dashboard' %}">
                                     <i class="fas fa-fw fa-tasks"></i>
                                     <span>Game Tasks</span>
+                                </a>
+                            </li>
+                        {% else %}
+                            <!-- Default sidebar content for other namespaces -->
+                            <div class="sidebar-heading">
+                                Navigation
+                            </div>
+                            
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'core:dashboard' %}">
+                                    <i class="fas fa-fw fa-home"></i>
+                                    <span>Main Dashboard</span>
                                 </a>
                             </li>
                         {% endif %}
@@ -408,59 +463,48 @@
         <!-- Content Wrapper -->
         <div class="content-wrapper col-lg-10 col-md-9 col-12 ms-auto">
             <!-- Topbar -->
-            <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+            <nav class="navbar navbar-expand navbar-light bg-white topbar mb-0 p-0 static-top shadow">
                 <!-- Sidebar Toggle (Topbar) -->
                 <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
                     <i class="fa fa-bars"></i>
                 </button>
                 
-                <!-- Milestone Display (replaces search) -->
-                <div class="milestone-display ms-3 me-auto" id="milestone-display">
-                    <!-- Debug info -->
-                    <script>
-                        // Milestone debug logs removed for cleaner console
-                        // All milestone debug logs removed for cleaner console
-                    </script>
-                    
-                    <!-- Simple milestone display -->
-                    {% if strategy_in_progress_milestone and strategy_company_phase %}
-                    <div class="d-inline-block py-2 px-3 rounded" 
-                        {% if strategy_company_phase.phase_type == 'indie_dev' %}
-                        style="background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);"
-                        {% elif strategy_company_phase.phase_type == 'arcade' %}
-                        style="background: linear-gradient(135deg, #1cc88a 0%, #13855c 100%);"
-                        {% elif strategy_company_phase.phase_type == 'theme_park' %}
-                        style="background: linear-gradient(135deg, #f6c23e 0%, #dda20a 100%);"
-                        {% else %}
-                        style="background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);"
-                        {% endif %}
-                    >
-                        <span class="text-white">
-                            <i class="fas fa-flag me-1"></i>
-                            <span class="fw-bold">Company Phase {{ strategy_company_phase.order }}:</span>
-                            <span class="ms-1">"{{ strategy_company_phase.name }}" - "{{ strategy_in_progress_milestone.title }}"</span>
-                            <!-- Strategy milestone display -->
-                        </span>
-                    </div>
-                    {% else %}
-                    <div class="d-inline-block py-2 px-3 rounded" style="{{ background_style }}">
-                        <span class="text-white">
-                            <i class="fas fa-flag me-1"></i>
-                            <span class="fw-bold">Company Phase {{ phase_order }}:</span>
-                            <span class="ms-1">"{{ phase_name }}" - "{{ milestone_title }}"</span>
-                            <!-- Hidden timestamp for refresh: {{ timestamp }} {{ random_id }} -->
-                        </span>
-                    </div>
-                    {% endif %}
-                </div>
-                
-
+                <!-- Empty space for topbar balance -->
+                <div class="ms-3 me-auto"></div>
                 
                 <!-- Topbar Navbar -->
                 <ul class="navbar-nav ml-auto">
                     <!-- Empty navbar right side -->
                 </ul>
-            </nav>
+            </nav><!-- Company Phase Banner (Full Width) -->{% if strategy_in_progress_milestone and strategy_company_phase %}
+            <div class="company-phase-banner w-100 py-3 px-4 text-center shadow-sm"
+                {% if strategy_company_phase.phase_type == 'indie_dev' %}
+                    style="background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);"
+                {% elif strategy_company_phase.phase_type == 'arcade' %}
+                    style="background: linear-gradient(135deg, #1cc88a 0%, #13855c 100%);"
+                {% elif strategy_company_phase.phase_type == 'theme_park' %}
+                    style="background: linear-gradient(135deg, #f6c23e 0%, #dda20a 100%);"
+                {% else %}
+                    style="background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);"
+                {% endif %}
+            >
+                <span class="text-white fs-5">
+                    <i class="fas fa-flag me-2"></i>
+                    <span class="fw-bold">Company Phase {{ strategy_company_phase.order }}:</span>
+                    <span class="ms-1">"{{ strategy_company_phase.name }}" - "{{ strategy_in_progress_milestone.title }}"</span>
+                    <!-- Strategy milestone display -->
+                </span>
+            </div>
+            {% else %}
+            <div class="company-phase-banner w-100 py-3 px-4 text-center shadow-sm" style="{{ background_style|default:'background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);' }}">
+                <span class="text-white fs-5">
+                    <i class="fas fa-flag me-2"></i>
+                    <span class="fw-bold">Company Phase {{ phase_order }}:</span>
+                    <span class="ms-1">"{{ phase_name }}" - "{{ milestone_title }}"</span>
+                    <!-- Hidden timestamp for refresh: {{ timestamp }} {{ random_id }} -->
+                </span>
+            </div>
+            {% endif %}
             
             <!-- Breadcrumbs -->
             <div class="container-fluid mt-2 mb-3">
@@ -470,7 +514,7 @@
             </div>
             
             <!-- Main Content -->
-            <main>
+            <main class="flex-grow-1 d-flex flex-column">
                 {% if messages %}
                     <div class="container-fluid">
                         {% for message in messages %}
@@ -486,7 +530,7 @@
             </main>
             
             <!-- Footer -->
-            <footer class="sticky-footer bg-white">
+            <footer class="sticky-footer bg-white mt-auto">
                 <div class="container my-auto">
                     <div class="copyright text-center my-auto">
                         <span>Copyright &copy; R1D3 Game Development 2025</span>

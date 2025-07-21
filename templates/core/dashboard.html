@@ -87,15 +87,27 @@
                 <div class="card-header py-3 d-flex justify-content-between align-items-center">
                     <h5 class="mb-0 font-weight-bold text-primary">All Tasks ({{ all_tasks_count|default:"0" }} total)</h5>
                     <div>
-                        <small class="text-muted me-3">
-                            <span class="badge bg-success">Game Tasks: {{ game_tasks_count|default:"0" }}</span>
-                            <span class="badge bg-primary">R1D3 Tasks: {{ r1d3_tasks_count|default:"0" }}</span>
-                        </small>
                         <a href="/R1D3-tasks/" class="btn btn-sm btn-primary">View All Tasks</a>
                     </div>
                 </div>
 
                 <div class="card-body">
+                    <!-- Company Section Filter Buttons -->
+                    <div class="mb-4">
+                        <div class="d-flex flex-wrap gap-2">
+                            <a href="#" class="btn btn-sm btn-outline-primary filter-btn active" data-filter="all">All Sections</a>
+                            <a href="#" class="btn btn-sm btn-outline-primary filter-btn" data-filter="r1d3">R1D3</a>
+                            <a href="#" class="btn btn-sm btn-outline-success filter-btn" data-filter="game_development">Game Development</a>
+                            <a href="#" class="btn btn-sm btn-outline-info filter-btn" data-filter="education">Education</a>
+                            <a href="#" class="btn btn-sm btn-outline-danger filter-btn" data-filter="arcade">Arcade</a>
+                            <a href="#" class="btn btn-sm btn-outline-warning filter-btn" data-filter="marketing">Marketing</a>
+                            <a href="#" class="btn btn-sm btn-outline-secondary filter-btn" data-filter="finance">Finance</a>
+                            <a href="#" class="btn btn-sm btn-outline-secondary filter-btn" data-filter="hr">HR</a>
+                            <a href="#" class="btn btn-sm btn-outline-secondary filter-btn" data-filter="it">IT</a>
+                            <a href="#" class="btn btn-sm btn-outline-primary filter-btn" data-filter="research">Research</a>
+                            <a href="#" class="btn btn-sm btn-outline-secondary filter-btn" data-filter="other">Other</a>
+                        </div>
+                    </div>
                     <div class="table-responsive">
                         <table class="table table-hover" id="myTasksTable">
                             <thead>
@@ -224,7 +236,8 @@
 {% block extra_js %}
 <script>
     $(document).ready(function() {
-        $('#myTasksTable').DataTable({
+        // Initialize DataTable with search removed
+        var taskTable = $('#myTasksTable').DataTable({
             "order": [[3, "desc"], [4, "asc"]], // Sort by priority (desc) then due date (asc)
             "pageLength": 10,
             "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
@@ -236,7 +249,58 @@
             },
             "columnDefs": [
                 { "orderable": false, "targets": 5 } // Disable sorting on the Actions column
-            ]
+            ],
+            "searching": false // Remove search functionality
+        });
+        
+        // Add data-section attribute to each row for easier filtering
+        $('#myTasksTable tbody tr').each(function() {
+            var $row = $(this);
+            var $cell = $row.find('td:eq(1)'); // Company section cell (second column)
+            var section = '';
+            
+            if ($cell.find('.badge:contains("R1D3")').length > 0) {
+                section = 'r1d3';
+            } else if ($cell.find('.badge:contains("Game Development")').length > 0) {
+                section = 'game_development';
+            } else if ($cell.find('.badge:contains("Education")').length > 0) {
+                section = 'education';
+            } else if ($cell.find('.badge:contains("Arcade")').length > 0) {
+                section = 'arcade';
+            } else if ($cell.find('.badge:contains("Marketing")').length > 0) {
+                section = 'marketing';
+            } else if ($cell.find('.badge:contains("Finance")').length > 0) {
+                section = 'finance';
+            } else if ($cell.find('.badge:contains("HR")').length > 0) {
+                section = 'hr';
+            } else if ($cell.find('.badge:contains("IT")').length > 0) {
+                section = 'it';
+            } else if ($cell.find('.badge:contains("Research")').length > 0) {
+                section = 'research';
+            } else {
+                section = 'other';
+            }
+            
+            $row.attr('data-section', section);
+        });
+        
+        // Company section filter functionality
+        $('.filter-btn').on('click', function(e) {
+            e.preventDefault();
+            
+            // Update active button
+            $('.filter-btn').removeClass('active');
+            $(this).addClass('active');
+            
+            var filter = $(this).data('filter');
+            
+            // Apply filtering
+            if (filter === 'all') {
+                $('#myTasksTable tbody tr').show();
+            } else {
+                $('#myTasksTable tbody tr').hide();
+                $('#myTasksTable tbody tr[data-section="' + filter + '"]').show();
+            }
         });
     });
 </script>

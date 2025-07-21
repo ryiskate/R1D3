@@ -175,14 +175,8 @@
         <div class="col-md-4 text-end">
             {% block header_buttons %}
             <a href="{% block new_task_url %}#{% endblock %}" class="btn btn-primary">
-                <i class="fas fa-plus-circle me-1"></i> {% block new_task_text %}New Task{% endblock %}
+                <i class="fas fa-plus me-1"></i> {% block new_task_text %}New Task{% endblock %}
             </a>
-            <a href="#" class="btn btn-outline-secondary ms-2" data-bs-toggle="modal" data-bs-target="#filterModal">
-                <i class="fas fa-filter me-1"></i> Filters
-            </a>
-            <button type="button" class="btn btn-outline-primary ms-2" data-bs-toggle="modal" data-bs-target="#batchUpdateModal">
-                <i class="fas fa-pencil-alt me-1"></i> Batch Update
-            </button>
             {% endblock %}
         </div>
     </div>
@@ -308,12 +302,7 @@
                 <a href="{% block table_new_task_url %}{% url 'core:r1d3_task_create' %}{% endblock %}" class="btn btn-sm btn-primary">
                     <i class="fas fa-plus-circle me-1"></i> {% block table_new_task_text %}New Task{% endblock %}
                 </a>
-                <button type="button" class="btn btn-sm btn-outline-secondary ms-2" data-bs-toggle="modal" data-bs-target="#filterModal">
-                    <i class="fas fa-filter me-1"></i> Filter
-                </button>
-                <button type="button" class="btn btn-sm btn-outline-secondary ms-2" data-bs-toggle="modal" data-bs-target="#batchUpdateModal">
-                    <i class="fas fa-tasks me-1"></i> Batch Update
-                </button>
+                <!-- Filter and Batch Update buttons removed -->
                 {% if current_filters %}
                 <a href="{% block clear_filters_url %}#{% endblock %}" class="btn btn-sm btn-outline-secondary ms-2">
                     <i class="fas fa-times me-1"></i> Clear Filters
@@ -413,15 +402,10 @@
     </div>
     {% endblock task_table %}
     
-    <!-- Filter Modal -->
-    {% block filter_modal %}
-    {% include "core/filter_modal.html" %}
-    {% endblock %}
+    <!-- Filter and Batch Update modals removed -->
+    {% block filter_modal %}{% endblock %}
     
-    <!-- Batch Update Modal -->
-    {% block batch_update_modal %}
-    {% include "core/batch_update_modal.html" %}
-    {% endblock %}
+    {% block batch_update_modal %}{% endblock %}
     
     <!-- Toast Container -->
     {% block toast_container %}
