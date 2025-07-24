@@ -24,17 +24,39 @@ class Migration(migrations.Migration):
             sql="""
             SET FOREIGN_KEY_CHECKS = 0;
             
+            -- Check if tables exist before dropping them
+            -- This avoids errors when tables don't exist
+            
+            -- Function to safely drop tables if they exist
+            DROP PROCEDURE IF EXISTS drop_if_table_exists;
+            CREATE PROCEDURE drop_if_table_exists(IN table_name VARCHAR(255))
+            BEGIN
+                DECLARE table_count INT;
+                SELECT COUNT(*) INTO table_count FROM information_schema.tables 
+                WHERE table_schema = DATABASE() AND table_name = table_name;
+                
+                IF table_count > 0 THEN
+                    SET @sql = CONCAT('DROP TABLE `', table_name, '`;');
+                    PREPARE stmt FROM @sql;
+                    EXECUTE stmt;
+                    DEALLOCATE PREPARE stmt;
+                END IF;
+            END;
+            
             -- Drop tables that might have foreign key relationships first
-            DROP TABLE IF EXISTS auth_group_permissions;
-            DROP TABLE IF EXISTS auth_user_groups;
-            DROP TABLE IF EXISTS auth_user_user_permissions;
+            CALL drop_if_table_exists('auth_group_permissions');
+            CALL drop_if_table_exists('auth_user_groups');
+            CALL drop_if_table_exists('auth_user_user_permissions');
             
             -- Then drop the main tables
-            DROP TABLE IF EXISTS account_emailaddress;
-            DROP TABLE IF EXISTS account_emailconfirmation;
-            DROP TABLE IF EXISTS auth_group;
-            DROP TABLE IF EXISTS auth_permission;
-            DROP TABLE IF EXISTS core_profile;
+            CALL drop_if_table_exists('account_emailaddress');
+            CALL drop_if_table_exists('account_emailconfirmation');
+            CALL drop_if_table_exists('auth_group');
+            CALL drop_if_table_exists('auth_permission');
+            CALL drop_if_table_exists('core_profile');
+            
+            -- Clean up
+            DROP PROCEDURE IF EXISTS drop_if_table_exists;
             
             SET FOREIGN_KEY_CHECKS = 1;
             """,
