@@ -80,7 +80,7 @@ class GameDevelopmentSectionTaskForm(BaseTaskForm):
     """
     class Meta(BaseTaskForm.Meta):
         model = GameDevelopmentTask
-        fields = BaseTaskForm.Meta.fields + ['team', 'gdd_section', 'platform']
+        fields = BaseTaskForm.Meta.fields + ['gdd_section', 'platform']
         
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -88,12 +88,6 @@ class GameDevelopmentSectionTaskForm(BaseTaskForm):
         if self.instance:
             self.instance.game = None
             self.instance.milestone = None
-            
-        # Make sure team field is properly configured
-        if 'team' in self.fields:
-            from .models import Team
-            self.fields['team'].queryset = Team.objects.all().order_by('name')
-            self.fields['team'].empty_label = 'No team assigned'
 
 
 class EducationTaskForm(BaseTaskForm):

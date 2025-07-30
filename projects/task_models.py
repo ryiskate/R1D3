@@ -50,11 +50,6 @@ class BaseTask(models.Model):
         User, on_delete=models.SET_NULL, 
         null=True, blank=True, related_name='%(class)s_assigned'
     )
-    # Re-enabled team field
-    team = models.ForeignKey(
-        'projects.Team', on_delete=models.SET_NULL,
-        null=True, blank=True, related_name='%(class)s_tasks'
-    )
     
     # Time tracking
     estimated_hours = models.DecimalField(max_digits=5, decimal_places=1, default=0)
