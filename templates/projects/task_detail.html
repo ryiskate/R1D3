@@ -213,10 +213,8 @@
                                 <div class="list-group-item d-flex justify-content-between align-items-center">
                                     <div>
                                         {% if subtask.is_completed %}
-                                        <i class="fas fa-check-circle text-success me-2"></i>
                                         <span class="text-decoration-line-through">{{ subtask.title }}</span>
                                         {% else %}
-                                        <i class="far fa-circle text-secondary me-2"></i>
                                         <span>{{ subtask.title }}</span>
                                         {% endif %}
                                     </div>

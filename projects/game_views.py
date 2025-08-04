@@ -155,16 +155,30 @@ class GameProjectDetailView(LoginRequiredMixin, DetailView):
         # Get game milestones
         context['milestones'] = game.milestones.all().order_by('due_date')
         
-        # Get game tasks - using gametask_set since there's no explicit related_name
-        context['tasks'] = GameTask.objects.filter(game=game).order_by('-priority', 'due_date')
-        context['tasks_by_status'] = {
-            'backlog': GameTask.objects.filter(game=game, status='backlog').count(),
-            'to_do': GameTask.objects.filter(game=game, status='to_do').count(),
-            'in_progress': GameTask.objects.filter(game=game, status='in_progress').count(),
-            'in_review': GameTask.objects.filter(game=game, status='in_review').count(),
-            'done': GameTask.objects.filter(game=game, status='done').count(),
-            'blocked': GameTask.objects.filter(game=game, status='blocked').count(),
+        # Get game tasks - using GameDevelopmentTask instead of GameTask
+        from .task_models import GameDevelopmentTask
+        tasks = GameDevelopmentTask.objects.filter(game=game).order_by('-priority', 'due_date')
+        context['tasks'] = tasks
+        
+        # Count tasks by status
+        task_counts = {
+            'backlog': GameDevelopmentTask.objects.filter(game=game, status='backlog').count(),
+            'to_do': GameDevelopmentTask.objects.filter(game=game, status='to_do').count(),
+            'in_progress': GameDevelopmentTask.objects.filter(game=game, status='in_progress').count(),
+            'in_review': GameDevelopmentTask.objects.filter(game=game, status='in_review').count(),
+            'done': GameDevelopmentTask.objects.filter(game=game, status='done').count(),
+            'blocked': GameDevelopmentTask.objects.filter(game=game, status='blocked').count(),
         }
+        
+        # Calculate percentages for the progress bars
+        total_tasks = sum(task_counts.values())
+        if total_tasks > 0:
+            context['tasks_by_status'] = {
+                status: int((count / total_tasks) * 100) 
+                for status, count in task_counts.items()
+            }
+        else:
+            context['tasks_by_status'] = {status: 0 for status in task_counts}
         
         # Get game assets
         context['assets'] = game.assets.all()
@@ -905,20 +919,35 @@ class GameTaskDetailView(LoginRequiredMixin, DetailView):
         if hasattr(self.object, 'comments'):
             context['comments'] = self.object.comments.order_by('-created_at')
         
+        # Get subtasks for this task
+        if self.object.has_subtasks:
+            from django.contrib.contenttypes.models import ContentType
+            from projects.task_models import SubTask
+            
+            content_type = ContentType.objects.get_for_model(self.object)
+            subtasks = SubTask.objects.filter(
+                content_type=content_type,
+                object_id=self.object.id
+            )
+            context['subtasks'] = subtasks
+        
         return context
 
 
-class GameTaskUpdateView(LoginRequiredMixin, UpdateView):
+from .base_task_views import BaseTaskUpdateView
+
+class GameTaskUpdateView(BaseTaskUpdateView):
     """
     Update an existing game development task
     """
     model = GameDevelopmentTask
     form_class = GameDevelopmentTaskForm
     template_name = 'projects/game_task_form.html'
+    section_name = "Game Development Task"
     
     def get_success_url(self):
-        messages.success(self.request, f"Task '{self.object.title}' updated successfully!")
-        return reverse_lazy('games:task_detail', kwargs={'pk': self.object.id})
+        messages.success(self.request, f"{self.section_name} '{self.object.title}' updated successfully!")
+        return reverse_lazy('games:task_detail', kwargs={'pk': self.object.pk})
     
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -937,9 +966,20 @@ class GameTaskUpdateView(LoginRequiredMixin, UpdateView):
             context['game'] = self.object.game
         else:
             context['game'] = None
-        context['today'] = date.today()
-        context['is_update'] = True
         context['teams'] = Team.objects.all().order_by('name')
+        
+        # Add subtasks to the context
+        if self.object.has_subtasks:
+            from django.contrib.contenttypes.models import ContentType
+            from projects.task_models import SubTask
+            
+            content_type = ContentType.objects.get_for_model(self.object)
+            subtasks = SubTask.objects.filter(
+                content_type=content_type,
+                object_id=self.object.id
+            )
+            context['subtasks'] = subtasks
+            
         return context
 
 

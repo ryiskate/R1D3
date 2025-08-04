@@ -137,18 +137,27 @@ class BaseTaskUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     def form_valid(self, form):
         response = super().form_valid(form)
         
+        # Debug print to see what's happening
+        print(f"\n\n==== FORM VALID IN {self.__class__.__name__} =====")
+        print(f"Task ID: {self.object.id}, Title: {self.object.title}")
+        print(f"has_subtasks: {form.instance.has_subtasks}")
+        print(f"POST data keys: {self.request.POST.keys()}")
+        
         # Get the content type for the task model
         content_type = ContentType.objects.get_for_model(self.object)
+        print(f"Content type: {content_type}")
         
         # Delete existing subtasks if the checkbox is unchecked
         if not form.instance.has_subtasks:
+            print("has_subtasks is False, deleting all subtasks")
             SubTask.objects.filter(
                 content_type=content_type,
                 object_id=self.object.id
             ).delete()
         # Update existing subtasks
         elif 'subtasks' in self.request.POST:
-            # First delete all existing subtasks
+            print("has_subtasks is True and 'subtasks' in POST data")
+            # First delete all existing subtasks to handle title changes and completion status correctly
             SubTask.objects.filter(
                 content_type=content_type,
                 object_id=self.object.id
@@ -156,31 +165,31 @@ class BaseTaskUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
             
             # Then create new ones from the form data
             subtasks_data = self.request.POST.getlist('subtasks')
+            print(f"Number of subtasks in POST data: {len(subtasks_data)}")
             
-            # Debug print
-            print("Raw subtasks data from form:")
-            for subtask_json in subtasks_data:
-                print(subtask_json)
+            for i, subtask_json in enumerate(subtasks_data):
+                print(f"Processing subtask {i+1}: {subtask_json}")
                 try:
                     subtask_data = json.loads(subtask_json)
                     print(f"Parsed JSON: {subtask_data}")
-                    print(f"is_completed value: {subtask_data.get('is_completed', 'NOT FOUND')}")
-                except json.JSONDecodeError:
-                    print(f"Invalid JSON: {subtask_json}")
-            
-            for subtask_json in subtasks_data:
-                try:
-                    subtask_data = json.loads(subtask_json)
                     if subtask_data.get('title'):
-                        SubTask.objects.create(
+                        subtask = SubTask.objects.create(
                             content_type=content_type,
                             object_id=self.object.id,
                             title=subtask_data.get('title'),
                             is_completed=subtask_data.get('is_completed', False)
                         )
-                except json.JSONDecodeError:
-                    pass  # Skip invalid JSON data
-        
+                        print(f"Created subtask: {subtask.id} - {subtask.title} (completed: {subtask.is_completed})")
+                    else:
+                        print(f"Skipping subtask with empty title")
+                except json.JSONDecodeError as e:
+                    print(f"JSON decode error: {e} for data: {subtask_json}")
+                except Exception as e:
+                    print(f"Error creating subtask: {e}")
+        else:
+            print("has_subtasks is True but no 'subtasks' in POST data")
+            
+        print("==== END OF FORM VALID ====\n\n")
         return response
     
     def get_context_data(self, **kwargs):

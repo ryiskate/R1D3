@@ -80,26 +80,16 @@ class GDDUploadView(LoginRequiredMixin, UserPassesTestMixin, View):
             with transaction.atomic():
                 sections, features = create_sections_and_features(gdd, html_content)
                 
-                # Create tasks for features if requested
+                # Auto-task creation functionality has been removed as requested
                 if auto_create_tasks:
-                    tasks_created = 0
-                    existing_tasks = 0
+                    messages.info(request, "The automatic task creation feature has been disabled.")
                     
-                    # Get all existing task titles for this game
-                    existing_task_titles = set(GameTask.objects.filter(game=game).values_list('title', flat=True))
+                    # Log that someone tried to use this feature
+                    import logging
+                    logger = logging.getLogger(__name__)
+                    logger.info(f"User {request.user.username} attempted to use disabled auto-task-creation feature for game {game.id}")
                     
-                    for feature in features:
-                        # Only create a task if a task with the same name doesn't exist
-                        if feature.feature_name not in existing_task_titles:
-                            convert_feature_to_task(feature, game)
-                            tasks_created += 1
-                        else:
-                            existing_tasks += 1
-                    
-                    if tasks_created > 0:
-                        messages.success(request, f"Created {tasks_created} new tasks from GDD features.")
-                    if existing_tasks > 0:
-                        messages.info(request, f"Skipped {existing_tasks} features that already have matching tasks.")
+                    # Note: We're keeping the checkbox in the form but disabling the functionality
             
             return redirect('games:gdd_detail', pk=game.id)
         
