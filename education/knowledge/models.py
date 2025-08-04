@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils.text import slugify
 from django.urls import reverse
+from django.db.models import JSONField
 
 
 class KnowledgeCategory(models.Model):
@@ -66,6 +67,7 @@ class KnowledgeArticle(models.Model):
     slug = models.SlugField(unique=True)
     summary = models.TextField(blank=True, help_text="Brief summary of the article")
     content = models.TextField(help_text="Main content in HTML format")
+    content_blocks = JSONField(null=True, blank=True, help_text="JSON content blocks data")
     category = models.ForeignKey(
         KnowledgeCategory, 
         on_delete=models.SET_NULL, 

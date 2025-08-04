@@ -73,8 +73,8 @@ class KnowledgeArticleDetailView(LoginRequiredMixin, BreadcrumbMixin, DetailView
     slug_url_kwarg = 'slug'
     
     def get_context_data(self, **kwargs):
-        import json
         import logging
+        import json
         logger = logging.getLogger(__name__)
         
         context = super().get_context_data(**kwargs)
@@ -84,17 +84,21 @@ class KnowledgeArticleDetailView(LoginRequiredMixin, BreadcrumbMixin, DetailView
         # Process content blocks if they exist
         article = self.object
         if article.content and article.content.startswith('Content blocks:'):
-            try:
-                # Try to find the content blocks in the POST data
-                content_blocks_data = self.request.session.get(f'article_{article.id}_content_blocks')
-                if content_blocks_data:
-                    content_blocks = json.loads(content_blocks_data)
-                    context['article'].content_blocks = content_blocks
-                    logger.info(f"Loaded content blocks from session for article {article.id}")
-            except Exception as e:
-                logger.error(f"Error processing content blocks for display: {str(e)}")
-                # If there's an error, we'll just display the regular content
-                pass
+            # Content blocks should be stored directly in the database model
+            if article.content_blocks:
+                # Content blocks are already in the model, no need to parse JSON
+                logger.info(f"Using content blocks from database for article {article.id}: {len(article.content_blocks)} blocks")
+                # The template already has access to article.content_blocks
+                
+                # Log the content blocks for debugging
+                try:
+                    logger.info(f"Content blocks data: {json.dumps(article.content_blocks)[:200]}...")
+                except Exception as e:
+                    logger.error(f"Error serializing content blocks for logging: {str(e)}")
+            else:
+                # No content blocks found in the database
+                logger.warning(f"No content blocks found in database for article {article.id}")
+                context['content_blocks_missing'] = True
         
         return context
     
@@ -147,6 +151,7 @@ class KnowledgeArticleCreateView(LoginRequiredMixin, BreadcrumbMixin, CreateView
     
     def form_valid(self, form):
         import logging
+        import json
         logger = logging.getLogger(__name__)
         
         # Set the author to the current user
@@ -156,8 +161,21 @@ class KnowledgeArticleCreateView(LoginRequiredMixin, BreadcrumbMixin, CreateView
         content_blocks = self.request.POST.get('content_blocks')
         logger.info(f"Content blocks data received: {content_blocks[:100] if content_blocks else 'None'}...")
         
+        # Store content blocks directly in the database model
         if content_blocks:
-            form.instance.content = f"Content blocks: {len(content_blocks)} characters"
+            try:
+                # Parse the JSON content blocks
+                content_blocks_json = json.loads(content_blocks)
+                # Store the parsed JSON in the content_blocks field
+                form.instance.content_blocks = content_blocks_json
+                # Store a marker in the content field that this article uses content blocks
+                form.instance.content = f"Content blocks: {len(content_blocks_json)} blocks"
+                logger.info(f"Parsed content blocks: {len(content_blocks_json)} blocks")
+            except json.JSONDecodeError as e:
+                logger.error(f"Error parsing content blocks JSON: {str(e)}")
+                # If JSON parsing fails, store the content as is
+                form.instance.content = content_blocks if content_blocks else ""
+                form.instance.content_blocks = None
         
         # Ensure the slug is set if not provided
         from django.utils.text import slugify
@@ -169,6 +187,7 @@ class KnowledgeArticleCreateView(LoginRequiredMixin, BreadcrumbMixin, CreateView
         try:
             self.object = form.save()
             logger.info(f"Article saved with ID: {self.object.id}, slug: {self.object.slug}")
+            logger.info(f"Content blocks saved to database: {bool(form.instance.content_blocks)}")
             
             # Add success message
             messages.success(self.request, f"Article '{self.object.title}' created successfully.")
@@ -219,6 +238,17 @@ class KnowledgeArticleUpdateView(LoginRequiredMixin, BreadcrumbMixin, UpdateView
         return self.object.get_absolute_url()
     slug_url_kwarg = 'slug'
     
+    def get_form(self, form_class=None):
+        """Return an instance of the form to be used in this view."""
+        import logging
+        logger = logging.getLogger(__name__)
+        
+        form = super().get_form(form_class)
+        logger.info(f"Form instance data: {form.instance.id}, {form.instance.title if form.instance else 'None'}")
+        return form
+    
+    # Note: The form_valid method is defined below to avoid duplication
+    
     def get_context_data(self, **kwargs):
         import json
         import logging
@@ -227,6 +257,9 @@ class KnowledgeArticleUpdateView(LoginRequiredMixin, BreadcrumbMixin, UpdateView
         context = super().get_context_data(**kwargs)
         context['active_department'] = 'education'
         context['is_create'] = False
+        context['article'] = self.object  # Ensure article is explicitly set in context
+        logger.info(f"Update view context: is_create={context['is_create']}, article.slug={self.object.slug if self.object else 'None'}")
+        
         context['media_form'] = MediaAttachmentForm()
         context['media_attachments'] = self.object.attachments.all()
         
@@ -234,16 +267,15 @@ class KnowledgeArticleUpdateView(LoginRequiredMixin, BreadcrumbMixin, UpdateView
         article = self.object
         if article.content and article.content.startswith('Content blocks:'):
             try:
-                # Try to find the content blocks in the session
-                content_blocks_data = self.request.session.get(f'article_{article.id}_content_blocks')
-                if content_blocks_data:
-                    # Load content blocks from session
-                    content_blocks = json.loads(content_blocks_data)
-                    context['content_blocks_json'] = content_blocks_data
-                    logger.info(f"Loaded content blocks from session for article {article.id}")
+                # Get content blocks from the database JSONField
+                if article.content_blocks:
+                    # Convert content blocks from database to JSON string for the template
+                    content_blocks_json = json.dumps(article.content_blocks)
+                    context['content_blocks_json'] = content_blocks_json
+                    logger.info(f"Loaded content blocks from database for article {article.id}: {len(article.content_blocks)} blocks")
                 else:
-                    # If not in session, try to parse from the article content
-                    logger.info(f"No content blocks found in session for article {article.id}")
+                    # No content blocks found in database
+                    logger.warning(f"No content blocks found in database for article {article.id}")
                     context['content_blocks_json'] = '[]'
             except Exception as e:
                 logger.error(f"Error processing content blocks for edit form: {str(e)}")
@@ -273,14 +305,19 @@ class KnowledgeArticleUpdateView(LoginRequiredMixin, BreadcrumbMixin, UpdateView
         if content_blocks:
             form.instance.content = f"Content blocks: {len(content_blocks)} characters"
             
-            # Store the content blocks in the session for retrieval during edit and display
+            # Store the content blocks directly in the database JSONField
             try:
                 # Validate JSON before storing
                 json_data = json.loads(content_blocks)
-                self.request.session[f'article_{form.instance.id}_content_blocks'] = content_blocks
-                logger.info(f"Stored content blocks in session for article {form.instance.id}")
+                form.instance.content_blocks = json_data
+                logger.info(f"Storing content blocks in database JSONField for article {form.instance.id or 'new'}, blocks: {len(json_data)}")
             except json.JSONDecodeError as e:
                 logger.error(f"Invalid JSON in content blocks: {str(e)}")
+        else:
+            # If no content blocks provided but we're editing an existing article with content blocks
+            if hasattr(form.instance, 'id') and form.instance.id and form.instance.content_blocks:
+                logger.warning(f"No content blocks provided in form, but article {form.instance.id} has existing blocks. Preserving existing blocks.")
+                # Keep existing content blocks
         
         # Ensure the slug is set if not provided
         from django.utils.text import slugify

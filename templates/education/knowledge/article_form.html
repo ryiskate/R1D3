@@ -107,9 +107,8 @@
                     {% endif %}
                 </div>
                 <div class="card-body">
-                    <form method="post" enctype="multipart/form-data" id="article-form" action="{% if is_create or not article.slug %}{% url 'education:knowledge_article_create' %}{% else %}{% url 'education:knowledge_article_update' article.slug %}{% endif %}" onsubmit="return handleFormSubmission(event);">
+                    <form method="post" enctype="multipart/form-data" id="article-form" action="{% if is_create %}{% url 'education:knowledge_article_create' %}{% else %}{% url 'education:knowledge_article_update' article.slug %}{% endif %}" onsubmit="return handleFormSubmission(event);">
                         {% csrf_token %}
-                        <input type="hidden" name="content_blocks" id="content-blocks-data" value="">
                         
                         <div class="row mb-3">
                             <div class="col-md-8">
@@ -132,10 +131,10 @@
                         {{ form.summary|as_crispy_field }}
                         
                         <!-- Hidden input to store JSON data of all blocks -->
-                        <input type="hidden" name="content_blocks" id="content-blocks-data" value="[]">
+                        <input type="hidden" name="content_blocks" id="content-blocks-data" value="{% if article.content_blocks %}{{ article.content_blocks|safe|stringformat:'json' }}{% else %}[]{% endif %}">
                         
                         <!-- Hidden content field for compatibility -->
-                        <input type="hidden" name="content" id="{{ form.content.id_for_label }}" value="">
+                        <input type="hidden" name="content" id="{{ form.content.id_for_label }}" value="{{ form.content.value|default:'' }}">
                         
                         <div class="form-group">
                             <div class="custom-control custom-checkbox">
@@ -390,6 +389,33 @@
     // Initialize content blocks array as a global variable
     let contentBlocks = [];
     
+    // Check if we have content blocks from the server
+    {% if content_blocks_json %}
+    try {
+        const existingContentBlocksJson = {{ content_blocks_json|safe }};
+        if (existingContentBlocksJson && Array.isArray(existingContentBlocksJson) && existingContentBlocksJson.length > 0) {
+            console.log('Loading existing content blocks from server:', existingContentBlocksJson);
+            contentBlocks = existingContentBlocksJson;
+        }
+    } catch (e) {
+        console.error('Error parsing content blocks JSON:', e);
+    }
+    {% endif %}
+    
+    // Also check if we have content blocks in the hidden input field
+    const contentBlocksInput = document.getElementById('content-blocks-data');
+    if (contentBlocksInput && contentBlocksInput.value && contentBlocksInput.value !== '[]') {
+        try {
+            const inputContentBlocks = JSON.parse(contentBlocksInput.value);
+            if (inputContentBlocks && Array.isArray(inputContentBlocks) && inputContentBlocks.length > 0) {
+                console.log('Loading content blocks from input field:', inputContentBlocks);
+                contentBlocks = inputContentBlocks;
+            }
+        } catch (e) {
+            console.error('Error parsing content blocks from input field:', e);
+        }
+    }
+    
     // Function to show the block form based on selected type
     function showBlockForm() {
         const blockType = $('#block-type-select').val();
@@ -488,7 +514,7 @@
                 
             case 'image':
                 const imageUrl = $('#image-url').val().trim();
-                const imageAlt = $('#image-alt').val().trim();
+                const imageAlt = $('#image-description').val().trim();
                 
                 if (!imageUrl) {
                     alert('Please enter an image URL');
@@ -507,7 +533,32 @@
                     return false;
                 }
                 
-                blockData.content.videoUrl = videoUrl;
+                // Convert YouTube URLs to embed format
+                let embedUrl = videoUrl;
+                
+                // Handle YouTube URLs
+                const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]+)(?:\S+)?/;
+                const youtubeMatch = videoUrl.match(youtubeRegex);
+                
+                if (youtubeMatch && youtubeMatch[1]) {
+                    // Add required parameters for better compatibility
+                    const videoId = youtubeMatch[1];
+                    console.log('YouTube video ID detected:', videoId);
+                    embedUrl = `https://www.youtube.com/embed/${videoId}`;
+                    
+                    // Store the original URL as well for fallback
+                    blockData.originalVideoUrl = videoUrl;
+                }
+                
+                // Handle Vimeo URLs
+                const vimeoRegex = /(?:https?:\/\/)?(?:www\.)?(?:vimeo\.com\/)([0-9]+)(?:\S+)?/;
+                const vimeoMatch = videoUrl.match(vimeoRegex);
+                
+                if (vimeoMatch && vimeoMatch[1]) {
+                    embedUrl = 'https://player.vimeo.com/video/' + vimeoMatch[1];
+                }
+                
+                blockData.content.videoUrl = embedUrl;
                 break;
         }
         
@@ -602,7 +653,9 @@
         switch(blockData.type) {
             case 'bullet':
                 let bulletList = '<ul>';
-                blockData.content.bulletPoints.forEach(point => {
+                // Handle both data structures: content.bulletPoints and points
+                const bulletPoints = blockData.points || (blockData.content && blockData.content.bulletPoints) || [];
+                bulletPoints.forEach(point => {
                     bulletList += `<li>${point}</li>`;
                 });
                 bulletList += '</ul>';
@@ -610,18 +663,22 @@
                 break;
                 
             case 'image':
+                // Handle both data structures: content.imageUrl and imageUrl
+                const imageUrl = blockData.imageUrl || (blockData.content && blockData.content.imageUrl) || '';
+                const imageAlt = blockData.imageAlt || (blockData.content && blockData.content.imageAlt) || blockData.title || '';
                 blockContent = `
                     <div class="text-center">
-                        <img src="${blockData.content.imageUrl}" alt="${blockData.content.imageAlt}" class="img-fluid mb-2" style="max-height: 200px;">
+                        <img src="${imageUrl}" alt="${imageAlt}" class="img-fluid mb-2" style="max-height: 200px;">
                     </div>
                 `;
                 break;
                 
             case 'video':
-                // Simple embed - in a real app, you'd want to process the URL to create a proper embed
+                // Handle both data structures: content.videoUrl and videoUrl
+                const videoUrl = blockData.videoUrl || (blockData.content && blockData.content.videoUrl) || '';
                 blockContent = `
                     <div class="embed-responsive embed-responsive-16by9">
-                        <iframe class="embed-responsive-item" src="${blockData.content.videoUrl}" allowfullscreen></iframe>
+                        <iframe class="embed-responsive-item" src="${videoUrl}" allowfullscreen></iframe>
                     </div>
                 `;
                 break;
@@ -716,6 +773,43 @@
         return true; // Allow form submission to proceed
     }
     
+    // Function to extract content from a block element
+    function getBlockContent(blockElement) {
+        const blockType = blockElement.data('block-type');
+        const blockId = blockElement.data('block-id');
+        console.log(`Getting content for block ${blockId} of type ${blockType}`);
+        
+        // Find the matching block in our contentBlocks array
+        const blockData = contentBlocks.find(block => block.id === blockId);
+        
+        if (!blockData) {
+            console.error(`Block data not found for ID: ${blockId}`);
+            return {};
+        }
+        
+        // Return the content based on block type
+        switch(blockType) {
+            case 'bullet':
+                return {
+                    bulletPoints: blockData.content ? blockData.content.bulletPoints : (blockData.points || [])
+                };
+                
+            case 'image':
+                return {
+                    imageUrl: blockData.content ? blockData.content.imageUrl : (blockData.imageUrl || ''),
+                    imageAlt: blockData.content ? blockData.content.imageAlt : (blockData.imageAlt || '')
+                };
+                
+            case 'video':
+                return {
+                    videoUrl: blockData.content ? blockData.content.videoUrl : (blockData.videoUrl || '')
+                };
+                
+            default:
+                return blockData.content || {};
+        }
+    }
+    
     // Function to prepare content blocks for form submission
     function prepareContentBlocksForSubmission() {
         console.log('Preparing content blocks for submission');
@@ -725,11 +819,15 @@
         $('.content-block').each(function() {
             const blockId = $(this).data('block-id');
             const blockType = $(this).data('block-type');
+            const blockTitle = contentBlocks.find(block => block.id === blockId)?.title || '';
+            const blockDescription = contentBlocks.find(block => block.id === blockId)?.description || '';
             const blockContent = getBlockContent($(this));
             
             contentBlocks.push({
                 id: blockId,
                 type: blockType,
+                title: blockTitle,
+                description: blockDescription,
                 content: blockContent
             });
         });
@@ -753,129 +851,104 @@
     
     // Function to handle form submission with explicit redirection
     function handleFormSubmission(event) {
-        event.preventDefault(); // Prevent default form submission
+        // Don't prevent default form submission initially
         console.log('Form submission handler called');
         
-        // Prepare content blocks data
-        prepareContentBlocksForSubmission();
-        
-        // Get form data
-        const form = document.getElementById('article-form');
-        const formData = new FormData(form);
-        
-        // Log form data for debugging
-        console.log('Form title:', formData.get('title'));
-        console.log('Form slug:', formData.get('slug'));
-        
-        // Get CSRF token
-        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-        
-        console.log('Submitting form to:', form.action);
-        
-        // Show loading indicator
-        const submitBtn = document.querySelector('button[type="submit"]');
-        const originalBtnText = submitBtn ? submitBtn.innerHTML : 'Save';
-        if (submitBtn) {
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        try {
+            // Serialize content blocks to JSON and store in hidden input
+            $('#content-blocks-data').val(JSON.stringify(contentBlocks));
+            console.log('Content blocks serialized:', contentBlocks.length, 'blocks');
+            
+            // Get form data
+            const form = document.getElementById('article-form');
+            const formData = new FormData(form);
+            
+            // Log form data for debugging
+            console.log('Form title:', formData.get('title'));
+            console.log('Form slug:', formData.get('slug'));
+            console.log('Form action URL:', form.action);
+            console.log('Content blocks data length:', formData.get('content_blocks') ? formData.get('content_blocks').length : 0);
+            
+            // Verify if this is an update (edit) or create operation
+            const isUpdate = form.action.includes('/update/');
+            console.log('Is update operation:', isUpdate, 'Form action:', form.action);
+            
+            // Ensure content field has a value if we have content blocks
+            if (contentBlocks.length > 0) {
+                $('#id_content').val('Content blocks: ' + contentBlocks.length + ' blocks');
+            }
+            
+            // Get CSRF token
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            
+            // Show loading indicator
+            const submitBtn = document.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn ? submitBtn.innerHTML : 'Save';
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            }
+            
+            // Try AJAX submission first
+            event.preventDefault(); // Now prevent default form submission for AJAX attempt
+            
+            // Submit the form using fetch API
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                credentials: 'same-origin'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Form submission successful:', data);
+                
+                if (data.redirect_url) {
+                    // Redirect to the provided URL
+                    window.location.href = data.redirect_url;
+                } else if (data.slug) {
+                    // If we have a slug but no redirect URL, construct the URL
+                    console.log('Using server-provided slug:', data.slug);
+                    const baseUrl = window.location.origin;
+                    const detailUrl = `${baseUrl}/education/knowledge/article/${data.slug}/`;
+                    console.log('Redirecting to:', detailUrl);
+                    window.location.href = detailUrl;
+                } else {
+                    // Fallback: reload the page
+                    window.location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error submitting form:', error);
+                
+                // Reset submit button on error
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnText;
+                }
+                
+                // Fall back to standard form submission
+                console.log('Falling back to standard form submission after error');
+                form.submit();
+            });
+            
+            return false; // Prevent default form submission since we're handling it
+        } catch (error) {
+            console.error('Error in form submission handler:', error);
+            // If anything goes wrong in our handler, let the form submit normally
+            return true;
         }
-        
-        // Submit the form using fetch API
-        fetch(form.action, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRFToken': csrftoken,
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            credentials: 'same-origin'
-        })
-        .then(response => {
-            console.log('Response status:', response.status);
-            console.log('Response headers:', response.headers);
-            
-            // Reset submit button
-            if (submitBtn) {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalBtnText;
-            }
-            
-            if (response.ok) {
-                // Try to parse the response as JSON
-                return response.json().then(data => {
-                    console.log('Response data:', data);
-                    
-                    // If we have a redirect_url from the server response, use it (primary method)
-                    if (data.redirect_url) {
-                        console.log('Redirecting to server-provided URL:', data.redirect_url);
-                        // Use a small timeout to ensure the browser processes the redirect
-                        setTimeout(() => {
-                            window.location.href = data.redirect_url;
-                        }, 100);
-                        return;
-                    }
-                    
-                    // If we have a slug from the server response, use it as backup
-                    if (data.slug) {
-                        console.log('Using server-provided slug:', data.slug);
-                        const baseUrl = window.location.origin;
-                        const detailUrl = `${baseUrl}/education/knowledge/article/${data.slug}/`;
-                        console.log('Redirecting to:', detailUrl);
-                        setTimeout(() => {
-                            window.location.href = detailUrl;
-                        }, 100);
-                        return;
-                    }
-                    
-                    // Fallback: try to get the slug from the form
-                    const slugInput = document.getElementById('id_slug');
-                    const titleInput = document.getElementById('id_title');
-                    let slug = slugInput.value;
-                    
-                    if (!slug && titleInput.value) {
-                        // Generate a slug from the title if slug field is empty
-                        slug = titleInput.value.toLowerCase().replace(/[^\w]+/g, '-');
-                    }
-                    
-                    if (slug) {
-                        // Construct the URL for the article detail page
-                        const baseUrl = window.location.origin;
-                        const detailUrl = `${baseUrl}/education/knowledge/article/${slug}/`;
-                        
-                        console.log('Redirecting to article detail page:', detailUrl);
-                        setTimeout(() => {
-                            window.location.href = detailUrl;
-                        }, 100);
-                    } else {
-                        // If we couldn't determine the slug, just reload the page
-                        window.location.reload();
-                    }
-                });
-            } else {
-                // For error responses, try to get error details
-                return response.text().then(text => {
-                    console.error('Form submission failed with status:', response.status);
-                    console.error('Error details:', text);
-                    alert('There was an error creating the article. Please check the form for errors and try again.');
-                });
-            }
-        })
-        .catch(error => {
-            console.error('Error submitting form:', error);
-            
-            // Reset submit button on error
-            if (submitBtn) {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalBtnText;
-            }
-            
-            alert('There was an error submitting the form. Please try again.');
-        });
-        
-        return false; // Prevent default form submission
     }
     
-    // Initialize event handlers when document is ready
+    // Initialize document ready function
     $(document).ready(function() {
         // Initialize Select2
         $('.select2, select[name="category"], select[name="tags"]').select2({
@@ -885,29 +958,42 @@
         
         // Add hidden input for content blocks data if it doesn't exist
         if (!$('#content-blocks-data').length) {
-            $('#article-form').append('<input type="hidden" id="content-blocks-data" name="content_blocks" value="[]">');        
+            $('#article-form').append('<input type="hidden" id="content-blocks-data" name="content_blocks" value="[]">');
         }
+        
+        // Ensure the content field is properly populated
+        if ($('#id_content').length && $('#id_content').val() === '') {
+            $('#id_content').val('Content managed by blocks system');
+        }
+        
+        // Debug form field values
+        console.log('Form field values:');
+        console.log('Title:', $('#id_title').val());
+        console.log('Slug:', $('#id_slug').val());
+        console.log('Summary:', $('#id_summary').val());
+        console.log('Content:', $('#id_content').val());
+        console.log('Content Blocks:', $('#content-blocks-data').val());
+        console.log('Is Published:', $('#id_is_published').prop('checked'));
+        console.log('Category:', $('#id_category').val());
+        console.log('Tags:', $('#id_tags').val());
         
         // Remove ALL form submission handlers to avoid conflicts
         $('#article-form').off('submit');
         $('#submit-article-btn').off('click');
         
-        // Load existing content blocks if any
-        const existingBlocks = $('#content-blocks-data').val();
-        if (existingBlocks && existingBlocks !== '[]') {
-            try {
-                contentBlocks = JSON.parse(existingBlocks);
-                // Render each block
-                contentBlocks.forEach(function(block) {
-                    renderContentBlock(block);
-                });
-                // Hide the no blocks message
-                if (contentBlocks.length > 0) {
-                    $('#no-blocks-message').hide();
-                }
-            } catch (e) {
-                console.error('Error parsing content blocks:', e);
-            }
+        // Render any existing content blocks from the server-provided data
+        if (contentBlocks && contentBlocks.length > 0) {
+            console.log('Rendering existing content blocks:', contentBlocks);
+            // Render each block
+            contentBlocks.forEach(function(block) {
+                renderContentBlock(block);
+            });
+            // Hide the no blocks message
+            $('#no-blocks-message').hide();
+            // Update the hidden input with the content blocks data
+            $('#content-blocks-data').val(JSON.stringify(contentBlocks));
+        } else {
+            console.log('No existing content blocks found');
         }
         
         // Log form details for debugging

@@ -25,36 +25,6 @@ class EducationDashboardView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         context['active_department'] = 'education'
         
-        # Import needed models
-        from education.course.models import Course
-        from django.db.models import Count, Q
-        
-        # 1. Active Classes - Count published courses
-        active_courses = Course.objects.filter(status='published').count()
-        context['active_classes_count'] = active_courses
-        
-        # 2. Students Enrolled - Count all users (simplified approach)
-        students_count = User.objects.count()
-        context['students_enrolled_count'] = students_count
-        
-        # 3. Course Completion - Calculate average completion percentage
-        all_tasks = EducationTask.objects.all()
-        completed_tasks = all_tasks.filter(status='done').count()
-        total_tasks = all_tasks.count()
-        
-        if total_tasks > 0:
-            completion_percentage = int((completed_tasks / total_tasks) * 100)
-        else:
-            completion_percentage = 0
-            
-        context['course_completion_percentage'] = completion_percentage
-        
-        # 4. Pending Tasks - Count tasks that are not done
-        pending_tasks = EducationTask.objects.filter(
-            ~Q(status='done')
-        ).count()
-        context['pending_tasks_count'] = pending_tasks
-        
         # Fetch only the current user's education tasks
         user_tasks = EducationTask.objects.filter(assigned_to=self.request.user).order_by('-due_date')
         context['user_education_tasks'] = user_tasks
@@ -136,17 +106,15 @@ class EducationTasksView(BreadcrumbMixin, LoginRequiredMixin, TemplateView):
         context['users'] = User.objects.all()
         
         # Task statistics for status cards
-        total_tasks = tasks.count()
         task_stats = {
             'to_do': tasks.filter(status='to_do').count(),
             'in_progress': tasks.filter(status='in_progress').count(),
             'in_review': tasks.filter(status='in_review').count(),
             'done': tasks.filter(status='done').count(),
-            'blocked': tasks.filter(status='backlog').count(),  # Renamed to match template
-            'total': total_tasks,  # Add total to task_stats for percentage calculation
+            'backlog': tasks.filter(status='backlog').count(),
         }
         context['task_stats'] = task_stats
-        context['total_tasks'] = total_tasks
+        context['total_tasks'] = tasks.count()
         
         return context
 
@@ -236,9 +204,8 @@ class EducationTaskCreateView(BreadcrumbMixin, LoginRequiredMixin, TemplateView)
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['active_department'] = 'education'
-        context['is_update'] = False
-        context['subtasks'] = []  # Empty list for new tasks
         context['form'] = self.get_form()
+        context['is_update'] = False
         return context
         
     def get_form(self):
@@ -248,17 +215,12 @@ class EducationTaskCreateView(BreadcrumbMixin, LoginRequiredMixin, TemplateView)
     def post(self, request, *args, **kwargs):
         from django.shortcuts import redirect
         from projects.task_forms import EducationTaskForm
-        from core.subtask_handler import handle_subtasks
         
         form = EducationTaskForm(request.POST)
         if form.is_valid():
             task = form.save(commit=False)
             task.created_by = request.user
             task.save()
-            
-            # Handle subtasks
-            handle_subtasks(request, task)
-            
             return redirect('education:task_detail', pk=task.pk)
         
         context = self.get_context_data()
@@ -285,18 +247,11 @@ class EducationTaskDetailView(BreadcrumbMixin, LoginRequiredMixin, TemplateView)
         context = super().get_context_data(**kwargs)
         pk = self.kwargs.get('pk')
         
-        from projects.task_models import EducationTask, SubTask
+        from projects.task_models import EducationTask
         from django.shortcuts import get_object_or_404
-        from django.contrib.contenttypes.models import ContentType
         
         task = get_object_or_404(EducationTask, pk=pk)
-        
-        # Get subtasks for this task
-        content_type = ContentType.objects.get_for_model(EducationTask)
-        subtasks = SubTask.objects.filter(content_type=content_type, object_id=pk)
-        
         context['task'] = task
-        context['subtasks'] = subtasks
         context['active_department'] = 'education'
         
         return context
@@ -322,23 +277,17 @@ class EducationTaskUpdateView(BreadcrumbMixin, LoginRequiredMixin, TemplateView)
         context = super().get_context_data(**kwargs)
         pk = self.kwargs.get('pk')
         
-        from projects.task_models import EducationTask, SubTask
+        from projects.task_models import EducationTask
         from django.shortcuts import get_object_or_404
         from projects.task_forms import EducationTaskForm
-        from django.contrib.contenttypes.models import ContentType
         
         task = get_object_or_404(EducationTask, pk=pk)
         form = EducationTaskForm(instance=task)
-        
-        # Get existing subtasks for this task
-        content_type = ContentType.objects.get_for_model(EducationTask)
-        subtasks = SubTask.objects.filter(content_type=content_type, object_id=pk)
         
         context['task'] = task
         context['form'] = form
         context['active_department'] = 'education'
         context['is_update'] = True
-        context['subtasks'] = subtasks
         
         return context
         
@@ -346,17 +295,12 @@ class EducationTaskUpdateView(BreadcrumbMixin, LoginRequiredMixin, TemplateView)
         from django.shortcuts import redirect, get_object_or_404
         from projects.task_models import EducationTask
         from projects.task_forms import EducationTaskForm
-        from core.subtask_handler import handle_subtasks
         
         task = get_object_or_404(EducationTask, pk=pk)
         form = EducationTaskForm(request.POST, instance=task)
         
         if form.is_valid():
-            task = form.save()
-            
-            # Handle subtasks
-            handle_subtasks(request, task)
-            
+            form.save()
             return redirect('education:task_detail', pk=task.pk)
         
         context = self.get_context_data()

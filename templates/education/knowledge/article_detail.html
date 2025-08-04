@@ -104,8 +104,8 @@
             <div class="row">
                 <div class="col-lg-8 mx-auto text-center">
                     {% if article.category %}
-                    <a href="{% url 'education:knowledge_category' article.category.slug %}" class="category-badge badge mb-3" style="background-color: {{ article.category.color }}; color: white;">
-                        <i class="fas {{ article.category.icon }} mr-1"></i> {{ article.category.name }}
+                    <a href="{% url 'education:knowledge_category' article.category.slug %}" class="category-badge badge mb-3" style="background-color: {{ article.category.color|default:'#4e73df' }}; color: white;">
+                        <i class="fas {{ article.category.icon|default:'fa-book' }} mr-1"></i> {{ article.category.name }}
                     </a>
                     {% endif %}
                     <h1 class="h2 text-gray-800 mb-3">{{ article.title }}</h1>
@@ -170,25 +170,48 @@
                                                 
                                                 {% if block.type == 'text' %}
                                                     <div class="block-content text-block">
-                                                        {{ block.content.text|safe }}
+                                                        {{ block.text|safe }}
                                                     </div>
                                                 {% elif block.type == 'bullet' %}
                                                     <div class="block-content bullet-block">
                                                         <ul>
-                                                            {% for point in block.content.bulletPoints %}
-                                                                <li>{{ point }}</li>
-                                                            {% endfor %}
+                                                            {% if block.points %}
+                                                                {% for point in block.points %}
+                                                                    <li>{{ point }}</li>
+                                                                {% endfor %}
+                                                            {% elif block.content.bulletPoints %}
+                                                                {% for point in block.content.bulletPoints %}
+                                                                    <li>{{ point }}</li>
+                                                                {% endfor %}
+                                                            {% endif %}
                                                         </ul>
                                                     </div>
                                                 {% elif block.type == 'image' %}
                                                     <div class="block-content image-block text-center">
-                                                        <img src="{{ block.content.imageUrl }}" alt="{{ block.content.imageAlt|default:block.title }}" class="img-fluid mb-2">
+                                                        {% if block.imageUrl %}
+                                                            <img src="{{ block.imageUrl }}" alt="{{ block.imageAlt|default:block.title }}" class="img-fluid mb-2">
+                                                        {% elif block.content.imageUrl %}
+                                                            <img src="{{ block.content.imageUrl }}" alt="{{ block.content.imageAlt|default:block.title }}" class="img-fluid mb-2">
+                                                        {% endif %}
                                                     </div>
                                                 {% elif block.type == 'video' %}
                                                     <div class="block-content video-block">
-                                                        <div class="embed-responsive embed-responsive-16by9">
-                                                            <iframe class="embed-responsive-item" src="{{ block.content.videoUrl }}" allowfullscreen></iframe>
-                                                        </div>
+                                                        {% if block.videoUrl or block.content.videoUrl %}
+                                                            {% with video_url=block.videoUrl|default:block.content.videoUrl %}
+                                                                {% if 'youtube.com/embed/' in video_url or 'youtu.be' in video_url or 'youtube.com/watch' in video_url %}
+                                                                    <div class="embed-responsive embed-responsive-16by9">
+                                                                        <iframe class="embed-responsive-item" src="{{ video_url }}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                                                    </div>
+                                                                    <div class="mt-2">
+                                                                        <a href="{{ video_url|default:'#' }}" target="_blank" class="btn btn-sm btn-outline-primary">Open video in new tab</a>
+                                                                    </div>
+                                                                {% else %}
+                                                                    <div class="embed-responsive embed-responsive-16by9">
+                                                                        <iframe class="embed-responsive-item" src="{{ video_url }}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                                                    </div>
+                                                                {% endif %}
+                                                            {% endwith %}
+                                                        {% endif %}
                                                     </div>
                                                 {% endif %}
                                             </div>
@@ -196,7 +219,10 @@
                                     {% endfor %}
                                 {% else %}
                                     <div class="alert alert-info">
-                                        <p>This article has content blocks that cannot be displayed. Please edit the article to fix the content.</p>
+                                        <p><i class="fas fa-info-circle mr-2"></i> This article has content blocks that cannot be displayed. Please edit the article to fix the content.</p>
+                                        {% if content_blocks_missing %}
+                                            <p class="mt-2 mb-0"><small>Content blocks data is missing from the database. Try editing and saving the article again.</small></p>
+                                        {% endif %}
                                     </div>
                                 {% endif %}
                             </div>

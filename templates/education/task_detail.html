@@ -52,7 +52,7 @@
         <!-- Task Details -->
         <div class="col-md-8">
             <div class="card mb-4">
-                <div class="card-header bg-info text-dark">
+                <div class="card-header">
                     <h5 class="card-title mb-0">Task Details</h5>
                 </div>
                 <div class="card-body">
@@ -67,20 +67,38 @@
                         </div>
                     </div>
 
-                    <div class="row mb-4">
+                    <div class="row">
                         <div class="col-md-6">
                             <h6 class="fw-bold">Status</h6>
-                            <span class="badge bg-{{ task.status|status_color }} rounded-pill px-3 py-2">
-                                <i class="fas fa-{{ task.status|status_icon }} me-1"></i>
-                                {{ task.get_status_display }}
-                            </span>
+                            <div class="mb-3">
+                                {% if task.status == 'backlog' %}
+                                <span class="badge bg-secondary">Backlog</span>
+                                {% elif task.status == 'to_do' %}
+                                <span class="badge bg-primary">To Do</span>
+                                {% elif task.status == 'in_progress' %}
+                                <span class="badge bg-warning">In Progress</span>
+                                {% elif task.status == 'in_review' %}
+                                <span class="badge bg-info">In Review</span>
+                                {% elif task.status == 'done' %}
+                                <span class="badge bg-success">Done</span>
+                                {% elif task.status == 'blocked' %}
+                                <span class="badge bg-danger">Blocked</span>
+                                {% endif %}
+                            </div>
                         </div>
                         <div class="col-md-6">
                             <h6 class="fw-bold">Priority</h6>
-                            <span class="badge bg-{{ task.priority|priority_color }} rounded-pill px-3 py-2">
-                                <i class="fas fa-{{ task.priority|priority_icon }} me-1"></i>
-                                {{ task.get_priority_display }}
-                            </span>
+                            <div class="mb-3">
+                                {% if task.priority == 'low' %}
+                                <span class="badge bg-success">Low</span>
+                                {% elif task.priority == 'medium' %}
+                                <span class="badge bg-warning">Medium</span>
+                                {% elif task.priority == 'high' %}
+                                <span class="badge bg-danger">High</span>
+                                {% elif task.priority == 'critical' %}
+                                <span class="badge bg-dark">Critical</span>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
 
@@ -145,7 +163,7 @@
 
             <!-- Task Hours -->
             <div class="card mb-4">
-                <div class="card-header bg-info text-dark">
+                <div class="card-header">
                     <h5 class="card-title mb-0">Time Tracking</h5>
                 </div>
                 <div class="card-body">
@@ -178,7 +196,7 @@
         <!-- Sidebar -->
         <div class="col-md-4">
             <div class="card mb-4">
-                <div class="card-header bg-info text-dark">
+                <div class="card-header">
                     <h5 class="card-title mb-0">Task Information</h5>
                 </div>
                 <div class="card-body">
@@ -205,7 +223,7 @@
             
             <!-- Quick Actions -->
             <div class="card mb-4">
-                <div class="card-header bg-info text-dark">
+                <div class="card-header">
                     <h5 class="card-title mb-0">Quick Actions</h5>
                 </div>
                 <div class="card-body">
@@ -236,6 +254,36 @@
             </div>
         </div>
     </div>
+    
+    {% if subtasks %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Subtasks</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for subtask in subtasks %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                {% if subtask.is_completed %}
+                                <span class="text-decoration-line-through">{{ subtask.title }}</span>
+                                {% else %}
+                                <span>{{ subtask.title }}</span>
+                                {% endif %}
+                            </div>
+                            <span class="badge bg-light text-dark">{{ subtask.created_at|date:"M d, Y" }}</span>
+                        </div>
+                        {% empty %}
+                        <div class="list-group-item">No subtasks defined</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}
 
