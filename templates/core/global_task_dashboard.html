@@ -424,7 +424,7 @@
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="7" class="text-center py-4">
+                            <td colspan="8" class="text-center py-4">
                                 <div class="text-muted">
                                     <i class="fas fa-search fa-2x mb-3"></i>
                                     <p>No tasks found matching your criteria.</p>
@@ -459,6 +459,37 @@
 {% endblock %}
 
 {% block task_dashboard_js %}
+<script>
+// Debug script to check column counts
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Debugging table structure...');
+    const table = document.getElementById('taskTable');
+    if (table) {
+        const headerRow = table.querySelector('thead tr');
+        const headerCells = headerRow ? headerRow.querySelectorAll('th') : [];
+        console.log('Header cells count:', headerCells.length);
+        
+        const tbody = table.querySelector('tbody');
+        const rows = tbody ? tbody.querySelectorAll('tr') : [];
+        console.log('Total rows:', rows.length);
+        
+        if (rows.length > 0) {
+            rows.forEach((row, index) => {
+                const cells = row.querySelectorAll('td');
+                console.log(`Row ${index} cells count:`, cells.length);
+            });
+        } else {
+            const emptyRow = tbody.querySelector('tr');
+            if (emptyRow) {
+                const emptyCells = emptyRow.querySelectorAll('td');
+                console.log('Empty state row cells count:', emptyCells.length);
+                const colspan = emptyRow.querySelector('td').getAttribute('colspan');
+                console.log('Empty state colspan:', colspan);
+            }
+        }
+    }
+});
+</script>
 <script src="{% static 'js/global_task_manager.js' %}"></script>
 <script src="{% static 'js/task_table_sorting.js' %}"></script>
 {% endblock %}

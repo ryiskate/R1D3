@@ -5,7 +5,7 @@ from projects.task_models import SubTask
 def handle_subtasks(request, task_instance):
     """
     Process subtasks from form submission and save them to the database.
-    Adds new subtasks from the form without replacing existing ones.
+    Updates existing subtasks and adds new ones from the form.
     
     Args:
         request: The HTTP request containing form data
@@ -28,8 +28,9 @@ def handle_subtasks(request, task_instance):
     # Get subtask data from the form
     subtask_data_list = request.POST.getlist('subtasks')
     
-    # Get existing subtask titles for comparison
-    existing_titles = set(existing_subtasks.values_list('title', flat=True))
+    # First, let's delete all existing subtasks and recreate them
+    # This is the simplest way to handle title changes
+    existing_subtasks.delete()
     
     # Process each subtask from the form
     for subtask_json in subtask_data_list:
@@ -39,24 +40,21 @@ def handle_subtasks(request, task_instance):
         try:
             subtask_data = json.loads(subtask_json)
             title = subtask_data.get('title', '').strip()
-            completed = subtask_data.get('completed', False)
+            completed = subtask_data.get('is_completed', subtask_data.get('completed', False))
             
             # Skip empty subtasks
             if not title:
                 continue
                 
-            # Only create new subtasks that don't already exist
-            if title not in existing_titles:
-                # Create a new subtask
-                SubTask.objects.create(
-                    content_type=content_type,
-                    object_id=task_instance.id,
-                    title=title,
-                    is_completed=completed
-                )
+            # Create the subtask
+            SubTask.objects.create(
+                content_type=content_type,
+                object_id=task_instance.id,
+                title=title,
+                is_completed=completed
+            )
+            print(f"Created/updated subtask: {title}, is_completed: {completed}")
             
         except json.JSONDecodeError:
             # Skip invalid JSON
             continue
-    
-    # We don't delete any existing subtasks that weren't in the form

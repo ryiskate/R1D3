@@ -435,12 +435,15 @@
             var completed = row.find('.subtask-completed').is(':checked');
             var rowId = row.attr('id');
             
+            console.log('Updating subtask data:', rowId, title, 'Completed:', completed);
+            
             var data = JSON.stringify({
                 title: title,
-                completed: completed
+                is_completed: completed
             });
             
             row.find('.subtask-data').val(data);
+            console.log('Subtask data set to:', data);
         }
         
         // Initialize existing subtasks data

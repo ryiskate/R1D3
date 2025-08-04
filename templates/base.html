@@ -366,31 +366,46 @@
                             <!-- Education Department sidebar content -->
                             {% include 'education/sidebar.html' %}
                         {% elif request.resolver_match.namespace == 'games' %}
-                            <!-- Game Development sidebar content -->
-                            <div class="sidebar-heading">
-                                Game Development
-                            </div>
-                            
-                            <li class="nav-item">
-                                <a class="nav-link {% if request.resolver_match.namespace == 'games' and request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'games:dashboard' %}">
-                                    <i class="fas fa-fw fa-gamepad"></i>
-                                    <span>Game Dashboard</span>
-                                </a>
-                            </li>
-                            
-                            <li class="nav-item">
-                                <a class="nav-link {% if request.resolver_match.namespace == 'games' and request.resolver_match.url_name == 'game_list' %}active{% endif %}" href="{% url 'games:game_list' %}">
-                                    <i class="fas fa-fw fa-list"></i>
-                                    <span>Game Projects</span>
-                                </a>
-                            </li>
-                            
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'games:task_dashboard' %}">
-                                    <i class="fas fa-fw fa-tasks"></i>
-                                    <span>Game Tasks</span>
-                                </a>
-                            </li>
+                            <!-- Only show Game Development sidebar when not on dashboard, root, or projects pages -->
+                            {% if request.path != '/' and request.path != '/dashboard/' and request.path != '/projects/' and request.path != '/dashboard/projects/' %}
+                                <!-- Game Development sidebar content -->
+                                <div class="sidebar-heading">
+                                    Game Development
+                                </div>
+                                
+                                <li class="nav-item">
+                                    <a class="nav-link {% if request.resolver_match.namespace == 'games' and request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'games:dashboard' %}">
+                                        <i class="fas fa-fw fa-gamepad"></i>
+                                        <span>Game Dashboard</span>
+                                    </a>
+                                </li>
+                                
+                                <li class="nav-item">
+                                    <a class="nav-link {% if request.resolver_match.namespace == 'games' and request.resolver_match.url_name == 'game_list' %}active{% endif %}" href="{% url 'games:game_list' %}">
+                                        <i class="fas fa-fw fa-list"></i>
+                                        <span>Game Projects</span>
+                                    </a>
+                                </li>
+                                
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'games:task_dashboard' %}">
+                                        <i class="fas fa-fw fa-tasks"></i>
+                                        <span>Game Tasks</span>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <!-- Default sidebar content for dashboard and projects pages -->
+                                <div class="sidebar-heading">
+                                    Navigation
+                                </div>
+                                
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'core:dashboard' %}">
+                                        <i class="fas fa-fw fa-home"></i>
+                                        <span>Home</span>
+                                    </a>
+                                </li>
+                            {% endif %}
                         {% else %}
                             <!-- Default sidebar content for other namespaces -->
                             <div class="sidebar-heading">
@@ -543,6 +558,23 @@
     <!-- jQuery first, then Bootstrap JS Bundle with Popper -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Script to hide Game Development section on dashboard and root URLs -->
+    <script>
+        $(document).ready(function() {
+            // Get the current path
+            var currentPath = window.location.pathname;
+            
+            // Check if the current path is dashboard or root
+            if (currentPath === '/' || currentPath === '/dashboard/') {
+                // Hide the Game Development section
+                $('.sidebar-heading:contains("Game Development")').hide();
+                $('.sidebar-heading:contains("Game Development")').next('li').hide();
+                $('.sidebar-heading:contains("Game Development")').next('li').next('li').hide();
+                $('.sidebar-heading:contains("Game Development")').next('li').next('li').next('li').hide();
+            }
+        });
+    </script>
     
     <!-- Milestone Display -->
     <script>

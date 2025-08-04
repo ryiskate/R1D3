@@ -105,21 +105,6 @@
                                 <em>Unassigned</em>
                                 {% endif %}
                             </div>
-
-                            <h6 class="fw-bold">Team</h6>
-                            <div class="mb-3">
-                                {% if task.team %}
-                                <div class="d-flex align-items-center">
-                                    <div class="avatar-circle avatar-sm bg-info me-2">
-                                        {{ task.team.name|first|upper }}
-                                    </div>
-                                    <span>{{ task.team.name }}</span>
-                                </div>
-                                {% else %}
-                                <em>No team assigned</em>
-                                {% endif %}
-                            </div>
-
                             <h6 class="fw-bold">Due Date</h6>
                             <div class="mb-3">
                                 {% if task.due_date %}

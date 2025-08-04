@@ -103,7 +103,7 @@ class BaseTaskCreateView(LoginRequiredMixin, CreateView):
                             content_type=content_type,
                             object_id=self.object.id,
                             title=subtask_data.get('title'),
-                            is_completed=subtask_data.get('completed', False)
+                            is_completed=subtask_data.get('is_completed', False)
                         )
                 except json.JSONDecodeError:
                     pass  # Skip invalid JSON data
@@ -156,6 +156,18 @@ class BaseTaskUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
             
             # Then create new ones from the form data
             subtasks_data = self.request.POST.getlist('subtasks')
+            
+            # Debug print
+            print("Raw subtasks data from form:")
+            for subtask_json in subtasks_data:
+                print(subtask_json)
+                try:
+                    subtask_data = json.loads(subtask_json)
+                    print(f"Parsed JSON: {subtask_data}")
+                    print(f"is_completed value: {subtask_data.get('is_completed', 'NOT FOUND')}")
+                except json.JSONDecodeError:
+                    print(f"Invalid JSON: {subtask_json}")
+            
             for subtask_json in subtasks_data:
                 try:
                     subtask_data = json.loads(subtask_json)
@@ -164,7 +176,7 @@ class BaseTaskUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
                             content_type=content_type,
                             object_id=self.object.id,
                             title=subtask_data.get('title'),
-                            is_completed=subtask_data.get('completed', False)
+                            is_completed=subtask_data.get('is_completed', False)
                         )
                 except json.JSONDecodeError:
                     pass  # Skip invalid JSON data
