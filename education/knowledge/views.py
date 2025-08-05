@@ -379,6 +379,7 @@ class KnowledgeArticleDeleteView(LoginRequiredMixin, BreadcrumbMixin, DeleteView
     """View for deleting a knowledge article"""
     model = KnowledgeArticle
     template_name = 'education/knowledge/article_confirm_delete.html'
+    context_object_name = 'article'
     success_url = reverse_lazy('education:knowledge_base')
     slug_url_kwarg = 'slug'
     
