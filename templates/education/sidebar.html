@@ -26,12 +26,7 @@
     </a>
 </li>
 
-<li class="nav-item">
-    <a class="nav-link {% if request.resolver_match.namespace == 'education' and request.resolver_match.url_name == 'schedule' %}active{% endif %}" href="{% url 'education:schedule' %}">
-        <i class="fas fa-fw fa-calendar-alt"></i>
-        <span>Schedule</span>
-    </a>
-</li>
+<!-- Schedule link temporarily disabled -->
 
 <li class="nav-item">
     <a class="nav-link {% if request.resolver_match.namespace == 'education' and request.resolver_match.url_name == 'tasks' %}active{% endif %}" href="{% url 'education:tasks' %}">
