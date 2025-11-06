@@ -67,9 +67,9 @@ def check_required_packages():
         package_name = package.replace('-', '_')
         try:
             importlib.import_module(package_name)
-            print(f"✓ {package} is installed")
+            print(f"[OK] {package} is installed")
         except ImportError:
-            print(f"✗ {package} is NOT installed")
+            print(f"[MISSING] {package} is NOT installed")
             missing_packages.append(package)
     
     if missing_packages:
