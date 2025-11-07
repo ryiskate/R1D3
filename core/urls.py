@@ -7,6 +7,7 @@ from .quick_link_views import (
 from .debug_views import debug_milestones
 from .views_milestone import get_milestone_display, test_milestone_update
 from .profile_views import select_profile, clear_profile
+from .sync_views import sync_database, sync_status, pull_database
 
 app_name = 'core'
 
@@ -47,4 +48,9 @@ urlpatterns = [
     
     # Debug endpoints (only accessible to staff)
     path('api/debug/milestones/', debug_milestones, name='debug_milestones'),
+    
+    # Database Sync URLs
+    path('api/sync/database/', sync_database, name='sync_database'),
+    path('api/sync/status/', sync_status, name='sync_status'),
+    path('api/sync/pull/', pull_database, name='pull_database'),
 ]

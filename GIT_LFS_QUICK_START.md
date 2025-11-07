@@ -58,21 +58,38 @@ git push
 
 Since `db.sqlite3` is tracked by LFS, both people will sync the same database automatically!
 
-### Before Making Database Changes:
+### **Easy Way: Use the Sync Script**
+
+Just run this script before and after working:
+
+```bash
+# Windows
+sync_database.bat
+
+# It will:
+# - Pull latest database changes
+# - Commit and push your changes (if any)
+# - Warn you if database was updated
+```
+
+### **Manual Way:**
+
+**Before Making Database Changes:**
 ```bash
 # Always pull first to get latest database
 git pull
 ```
 
-### After Making Database Changes:
+**After Making Database Changes:**
 ```bash
 # Commit and push the database
 git add db.sqlite3
-git commit -m "Updated database: [describe changes]"
+git commit -m "Database: Added 3 tasks for Ricardo, updated Epic status"
 git push
 ```
 
-### Handling Database Conflicts:
+### **Handling Database Conflicts:**
+
 If both people modify the database at the same time:
 
 **Option 1: Keep your version**
@@ -89,10 +106,11 @@ git add db.sqlite3
 git commit -m "Resolved database conflict - kept remote changes"
 ```
 
-**Option 3: Manual merge** (recommended)
-1. Export your changes to a migration or SQL file
-2. Pull their version
-3. Apply your changes on top
+**Option 3: Manual merge** (recommended if both changes are important)
+1. Backup your database: `copy db.sqlite3 db_backup.sqlite3`
+2. Export your changes: `python manage.py dumpdata projects.R1D3Task > my_tasks.json`
+3. Pull their version: `git pull`
+4. Re-apply your changes manually or: `python manage.py loaddata my_tasks.json`
 
 ---
 

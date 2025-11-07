@@ -7,10 +7,14 @@ from django.contrib import messages
 from django.http import Http404, JsonResponse, HttpResponse
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
 from datetime import date, timedelta, datetime
 import json
 from django.template.loader import render_to_string
 from django.core.cache import cache
+
+# Import Git sync manager
+from .git_sync import GitSyncManager
 
 # Import legacy views for backward compatibility
 from .legacy_views import R1D3TaskDetailLegacyView, R1D3TaskUpdateLegacyView, R1D3TaskDeleteLegacyView

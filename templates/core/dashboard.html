@@ -6,7 +6,14 @@
 
 {% block content %}
 <div class="container-fluid py-4">
-    <h1 class="mb-4">{{ request.session.current_user_name|default:request.user.username }}'s Dashboard</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0">{{ request.session.current_user_name|default:request.user.username }}'s Dashboard</h1>
+        
+        <!-- Database Sync Button -->
+        <button type="button" class="btn btn-primary" id="syncDatabaseBtn">
+            <i class="fas fa-sync-alt me-2"></i>Sync Database
+        </button>
+    </div>
 
     <!-- Dashboard content starts here -->
     
@@ -239,6 +246,93 @@
 
 {% block extra_js %}
 <script>
+    // Database Sync Functionality
+    document.getElementById('syncDatabaseBtn').addEventListener('click', function() {
+        const btn = this;
+        const originalHTML = btn.innerHTML;
+        
+        // Disable button and show loading
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Syncing...';
+        
+        // Check sync status first
+        fetch('{% url "core:sync_status" %}')
+            .then(response => response.json())
+            .then(status => {
+                if (status.has_uncommitted_changes) {
+                    // Ask for commit message
+                    const message = prompt('You have uncommitted database changes.\nEnter a commit message (or cancel to just pull):');
+                    
+                    if (message === null) {
+                        // User canceled, just pull
+                        performSync(null);
+                    } else {
+                        // Commit and push with message
+                        performSync(message || 'Updated database');
+                    }
+                } else {
+                    // No local changes, just pull
+                    performSync(null);
+                }
+            })
+            .catch(error => {
+                console.error('Error checking sync status:', error);
+                btn.disabled = false;
+                btn.innerHTML = originalHTML;
+                alert('Error checking sync status. See console for details.');
+            });
+        
+        function performSync(commitMessage) {
+            const formData = new FormData();
+            if (commitMessage) {
+                formData.append('commit_message', commitMessage);
+            }
+            
+            fetch('{% url "core:sync_database" %}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(result => {
+                btn.disabled = false;
+                btn.innerHTML = originalHTML;
+                
+                if (result.success) {
+                    // Show success message
+                    let message = result.message;
+                    if (result.details && result.details.length > 0) {
+                        message += '\n\n' + result.details.join('\n');
+                    }
+                    
+                    if (result.needs_restart) {
+                        if (confirm(message + '\n\nRestart server now?')) {
+                            // Optionally trigger server restart
+                            alert('Please manually restart the server to load new database.');
+                        }
+                    } else {
+                        alert(message);
+                    }
+                    
+                    // Reload page if database was updated
+                    if (result.database_updated) {
+                        setTimeout(() => location.reload(), 2000);
+                    }
+                } else {
+                    alert('Sync failed: ' + result.message + '\n\n' + (result.details ? result.details.join('\n') : ''));
+                }
+            })
+            .catch(error => {
+                console.error('Error syncing database:', error);
+                btn.disabled = false;
+                btn.innerHTML = originalHTML;
+                alert('Error syncing database. See console for details.');
+            });
+        }
+    });
+    
     $(document).ready(function() {
         // Initialize DataTable with search removed
         var taskTable = $('#myTasksTable').DataTable({
