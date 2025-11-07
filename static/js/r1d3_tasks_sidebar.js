@@ -10,9 +10,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('R1D3 Tasks sidebar script running, current path:', currentPath);
     
-    // Only modify sidebar if we're on an R1D3 Tasks page
+    // Only modify sidebar if we're on an R1D3 Tasks page or Epics page
     if (currentPath === '/R1D3-tasks/' || 
         currentPath.startsWith('/R1D3-tasks/') || 
+        currentPath.startsWith('/projects/epics/') ||
         currentPath === '/' || 
         currentPath === '/dashboard/') {
         
@@ -23,6 +24,13 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="sidebar-heading">
                 R1D3 Tasks
             </div>
+            
+            <li class="nav-item">
+                <a class="nav-link ${currentPath.startsWith('/projects/epics/') ? 'active' : ''}" href="/projects/epics/">
+                    <i class="fas fa-fw fa-layer-group"></i>
+                    <span>Epics</span>
+                </a>
+            </li>
             
             <li class="nav-item">
                 <a class="nav-link ${currentPath === '/R1D3-tasks/' ? 'active' : ''}" href="/R1D3-tasks/">

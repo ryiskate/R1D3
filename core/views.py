@@ -124,9 +124,17 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                 
             # Get GameDevelopmentTask objects assigned to the current user
             try:
-                game_dev_tasks = list(GameDevelopmentTask.objects.filter(
-                    assigned_to=user
-                ).order_by('-priority', 'due_date'))
+                # Get current profile name from session
+                current_user_name = self.request.session.get('current_user_name', '')
+                
+                if current_user_name:
+                    game_dev_tasks = list(GameDevelopmentTask.objects.filter(
+                        Q(assigned_to_name=current_user_name) | Q(created_by_name=current_user_name)
+                    ).order_by('-priority', 'due_date'))
+                else:
+                    game_dev_tasks = list(GameDevelopmentTask.objects.filter(
+                        assigned_to=user
+                    ).order_by('-priority', 'due_date'))
                 
                 # Add task type information to each Game Development task
                 for task in game_dev_tasks:
@@ -146,9 +154,18 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             ).count()
             
             # Get R1D3Task objects assigned to the current user
-            r1d3_tasks = list(R1D3Task.objects.filter(
-                assigned_to=user
-            ).order_by('-priority', 'due_date'))
+            # Get current profile name from session
+            current_user_name = self.request.session.get('current_user_name', '')
+            
+            # Filter by assigned_to_name if profile is selected, otherwise by assigned_to
+            if current_user_name:
+                r1d3_tasks = list(R1D3Task.objects.filter(
+                    Q(assigned_to_name=current_user_name) | Q(created_by_name=current_user_name)
+                ).order_by('-priority', 'due_date'))
+            else:
+                r1d3_tasks = list(R1D3Task.objects.filter(
+                    assigned_to=user
+                ).order_by('-priority', 'due_date'))
             
             # Print debug info for R1D3 tasks
             print(f"R1D3 tasks for user {user.username}: {len(r1d3_tasks)}")
@@ -162,9 +179,14 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             # Get EducationTask objects assigned to the current user
             try:
                 from projects.task_models import EducationTask
-                education_tasks = list(EducationTask.objects.filter(
-                    assigned_to=user
-                ).order_by('-priority', 'due_date'))
+                if current_user_name:
+                    education_tasks = list(EducationTask.objects.filter(
+                        Q(assigned_to_name=current_user_name) | Q(created_by_name=current_user_name)
+                    ).order_by('-priority', 'due_date'))
+                else:
+                    education_tasks = list(EducationTask.objects.filter(
+                        assigned_to=user
+                    ).order_by('-priority', 'due_date'))
                 
                 # Add task type information to each Education task
                 for task in education_tasks:
@@ -175,9 +197,14 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             # Get SocialMediaTask objects assigned to the current user
             try:
                 from projects.task_models import SocialMediaTask
-                social_media_tasks = list(SocialMediaTask.objects.filter(
-                    assigned_to=user
-                ).order_by('-priority', 'due_date'))
+                if current_user_name:
+                    social_media_tasks = list(SocialMediaTask.objects.filter(
+                        Q(assigned_to_name=current_user_name) | Q(created_by_name=current_user_name)
+                    ).order_by('-priority', 'due_date'))
+                else:
+                    social_media_tasks = list(SocialMediaTask.objects.filter(
+                        assigned_to=user
+                    ).order_by('-priority', 'due_date'))
                 
                 # Add task type information to each Social Media task
                 for task in social_media_tasks:
@@ -188,9 +215,14 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             # Get ArcadeTask objects assigned to the current user
             try:
                 from projects.task_models import ArcadeTask
-                arcade_tasks = list(ArcadeTask.objects.filter(
-                    assigned_to=user
-                ).order_by('-priority', 'due_date'))
+                if current_user_name:
+                    arcade_tasks = list(ArcadeTask.objects.filter(
+                        Q(assigned_to_name=current_user_name) | Q(created_by_name=current_user_name)
+                    ).order_by('-priority', 'due_date'))
+                else:
+                    arcade_tasks = list(ArcadeTask.objects.filter(
+                        assigned_to=user
+                    ).order_by('-priority', 'due_date'))
                 
                 # Add task type information to each Arcade task
                 for task in arcade_tasks:
@@ -201,9 +233,14 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             # Get ThemeParkTask objects assigned to the current user
             try:
                 from projects.task_models import ThemeParkTask
-                theme_park_tasks = list(ThemeParkTask.objects.filter(
-                    assigned_to=user
-                ).order_by('-priority', 'due_date'))
+                if current_user_name:
+                    theme_park_tasks = list(ThemeParkTask.objects.filter(
+                        Q(assigned_to_name=current_user_name) | Q(created_by_name=current_user_name)
+                    ).order_by('-priority', 'due_date'))
+                else:
+                    theme_park_tasks = list(ThemeParkTask.objects.filter(
+                        assigned_to=user
+                    ).order_by('-priority', 'due_date'))
                 
                 # Add task type information to each Theme Park task
                 for task in theme_park_tasks:
@@ -214,9 +251,14 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         # Get IndieNewsTask objects assigned to the current user if available
         if INDIE_NEWS_AVAILABLE:
             try:
-                indie_news_tasks = list(IndieNewsTask.objects.filter(
-                    assigned_to=user
-                ).order_by('-priority', 'due_date'))
+                if current_user_name:
+                    indie_news_tasks = list(IndieNewsTask.objects.filter(
+                        Q(assigned_to_name=current_user_name) | Q(created_by_name=current_user_name)
+                    ).order_by('-priority', 'due_date'))
+                else:
+                    indie_news_tasks = list(IndieNewsTask.objects.filter(
+                        assigned_to=user
+                    ).order_by('-priority', 'due_date'))
                 
                 # Print debug info for indie news tasks
                 print(f"Indie News tasks for user {user.username}: {len(indie_news_tasks)}")
@@ -345,7 +387,7 @@ class GlobalTaskDashboardView(LoginRequiredMixin, View):
             print(f"IndieNewsTask model not available: {e}")
             pass
         
-        # Get tasks from each model
+        # Get tasks from each model - GlobalTaskDashboard shows ALL tasks
         r1d3_tasks = list(R1D3Task.objects.all())
         game_dev_tasks = list(GameDevelopmentTask.objects.all())
         education_tasks = list(EducationTask.objects.all())

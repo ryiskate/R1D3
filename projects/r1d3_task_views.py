@@ -32,6 +32,15 @@ class R1D3TaskDashboardView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         queryset = super().get_queryset()
         
+        # Filter by current user's profile name from session by default
+        current_user_name = self.request.session.get('current_user_name', '')
+        if current_user_name and not self.request.GET.get('show_all'):
+            # Show tasks assigned to current profile OR created by current profile
+            queryset = queryset.filter(
+                Q(assigned_to_name=current_user_name) | 
+                Q(created_by_name=current_user_name)
+            )
+        
         # Apply filters from GET parameters
         status_filter = self.request.GET.get('status')
         priority_filter = self.request.GET.get('priority')
@@ -43,7 +52,8 @@ class R1D3TaskDashboardView(LoginRequiredMixin, ListView):
         if priority_filter:
             queryset = queryset.filter(priority=priority_filter)
         if assigned_filter:
-            queryset = queryset.filter(assigned_to=assigned_filter)
+            # Filter by assigned_to_name instead of assigned_to
+            queryset = queryset.filter(assigned_to_name=assigned_filter)
         if department_filter:
             queryset = queryset.filter(department=department_filter)
             

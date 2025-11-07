@@ -65,6 +65,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',  # Required by django-allauth
     'core.middleware.BreadcrumbsMiddleware',  # Breadcrumbs support
+    'core.middleware.ProfileSelectionMiddleware',  # Profile selection for team members
 ]
 
 ROOT_URLCONF = 'company_system.urls'
@@ -197,9 +198,25 @@ if not DEBUG:
     SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = 'DENY'
 
-# Import Backblaze B2 storage settings
-try:
-    from .backblaze_settings import *
-except ImportError:
-    # If Backblaze settings are not available, use default file storage
-    pass
+# Import Backblaze B2 storage settings (only in production)
+if not DEBUG:
+    try:
+        from .backblaze_settings import *
+    except ImportError:
+        # If Backblaze settings are not available, use default file storage
+        pass
+else:
+    # Use local file storage for development
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = BASE_DIR / 'media'
+
+# R1D3 Team Members Configuration
+# Add team member names here for task assignment
+TEAM_MEMBERS = [
+    ('', '-- Unassigned --'),
+    ('Ricardo', 'Ricardo'),
+    ('Kazumi', 'Kazumi'),
+]
+
+# Team member names only (for validation)
+TEAM_MEMBER_NAMES = [name for value, name in TEAM_MEMBERS if value]

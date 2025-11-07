@@ -6,12 +6,18 @@ from .quick_link_views import (
 )
 from .debug_views import debug_milestones
 from .views_milestone import get_milestone_display, test_milestone_update
+from .profile_views import select_profile, clear_profile
 
 app_name = 'core'
 
 urlpatterns = [
     path('', views.HomeView.as_view(), name='home'),
     path('dashboard/', views.DashboardView.as_view(), name='dashboard'),
+    
+    # Profile Selection URLs
+    path('profile/select/', select_profile, name='select_profile'),
+    path('profile/clear/', clear_profile, name='clear_profile'),
+    
     # R1D3 Tasks URLs
     path('R1D3-tasks/', views.GlobalTaskDashboardView.as_view(), name='global_task_dashboard'),
     path('R1D3-tasks/newtask/', views.R1D3TaskCreateView.as_view(), name='r1d3_task_create'),

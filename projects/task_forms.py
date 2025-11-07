@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.forms import inlineformset_factory, formset_factory
+from django.conf import settings
 from .task_models import (
     BaseTask, R1D3Task, GameDevelopmentTask, EducationTask,
     SocialMediaTask, ArcadeTask, ThemeParkTask, SubTask
@@ -24,12 +25,29 @@ class SubTaskForm(forms.ModelForm):
 class BaseTaskForm(forms.ModelForm):
     """
     Base form for all task types with common fields
+    Uses text-based assignment for Git sync workflow
     """
+    # Override assigned_to with a ChoiceField for team members
+    assigned_to_name = forms.ChoiceField(
+        required=False,
+        label='Assigned to',
+        help_text='Select team member to assign this task to'
+    )
+    
+    # Add epic field (will be filtered by company section)
+    epic = forms.ModelChoiceField(
+        queryset=None,
+        required=False,
+        label='Epic',
+        help_text='Assign this task to an epic (optional)',
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    
     class Meta:
         model = BaseTask
         fields = [
             'title', 'description', 'task_type', 'status', 'priority',
-            'assigned_to', 'due_date', 'has_additional_note', 'additional_note_text',
+            'assigned_to_name', 'due_date', 'epic', 'has_additional_note', 'additional_note_text',
             'has_subtasks', 'output'
         ]
         widgets = {
@@ -40,7 +58,39 @@ class BaseTaskForm(forms.ModelForm):
         }
         
     def __init__(self, *args, **kwargs):
+        # Extract company_section if provided
+        company_section = kwargs.pop('company_section', None)
         super().__init__(*args, **kwargs)
+        
+        # Import Epic here to avoid circular imports
+        from .task_models import Epic
+        
+        # Set team member choices from settings
+        self.fields['assigned_to_name'].choices = settings.TEAM_MEMBERS
+        
+        # Set epic queryset - filter by company section if provided
+        if company_section:
+            epic_queryset = Epic.objects.filter(
+                company_section=company_section,
+                status__in=['planning', 'in_progress']
+            ).order_by('-priority', 'title')
+            
+            # If no epics found for this section, show all active epics
+            if not epic_queryset.exists():
+                epic_queryset = Epic.objects.filter(
+                    status__in=['planning', 'in_progress']
+                ).order_by('company_section', '-priority', 'title')
+            
+            self.fields['epic'].queryset = epic_queryset
+        else:
+            # Show all active epics if no section specified
+            self.fields['epic'].queryset = Epic.objects.filter(
+                status__in=['planning', 'in_progress']
+            ).order_by('company_section', '-priority', 'title')
+        
+        # Add empty label
+        self.fields['epic'].empty_label = "-- No Epic (Standalone Task) --"
+        
         # Check if this is a ThemeParkTaskForm and remove estimated_hours if it exists
         if self.__class__.__name__ == 'ThemeParkTaskForm' and 'estimated_hours' in self.fields:
             del self.fields['estimated_hours']
@@ -53,6 +103,11 @@ class R1D3TaskForm(BaseTaskForm):
     class Meta(BaseTaskForm.Meta):
         model = R1D3Task
         fields = BaseTaskForm.Meta.fields + ['department', 'impact_level', 'strategic_goal']
+    
+    def __init__(self, *args, **kwargs):
+        # R1D3 tasks use 'r1d3' company section for epic filtering
+        kwargs['company_section'] = 'r1d3'
+        super().__init__(*args, **kwargs)
 
 
 class GameDevelopmentTaskForm(BaseTaskForm):
@@ -65,6 +120,8 @@ class GameDevelopmentTaskForm(BaseTaskForm):
         
     def __init__(self, *args, **kwargs):
         game_id = kwargs.pop('game_id', None)
+        # Game development tasks use 'games' company section for epic filtering
+        kwargs['company_section'] = 'games'
         super().__init__(*args, **kwargs)
         
         # Filter milestones by game if game_id is provided

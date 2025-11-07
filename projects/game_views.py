@@ -45,15 +45,32 @@ class GameDashboardView(LoginRequiredMixin, ListView):
         ).count()
         # Use GameDevelopmentTask model instead of GameTask for user's tasks
         from .task_models import GameDevelopmentTask
-        context['my_tasks'] = GameDevelopmentTask.objects.filter(
-            assigned_to=self.request.user,
-            status__in=['backlog', 'to_do', 'in_progress', 'in_review', 'blocked']
-        ).order_by('due_date', '-priority')[:10]  # Limit to 10 most relevant tasks
+        
+        # Get current profile name from session
+        current_user_name = self.request.session.get('current_user_name', '')
+        
+        if current_user_name:
+            context['my_tasks'] = GameDevelopmentTask.objects.filter(
+                Q(assigned_to_name=current_user_name) | Q(created_by_name=current_user_name),
+                status__in=['backlog', 'to_do', 'in_progress', 'in_review', 'blocked']
+            ).order_by('due_date', '-priority')[:10]  # Limit to 10 most relevant tasks
+        else:
+            context['my_tasks'] = GameDevelopmentTask.objects.filter(
+                assigned_to=self.request.user,
+                status__in=['backlog', 'to_do', 'in_progress', 'in_review', 'blocked']
+            ).order_by('due_date', '-priority')[:10]  # Limit to 10 most relevant tasks
         # Use GameDevelopmentTask model for overdue tasks as well
-        context['overdue_tasks'] = GameDevelopmentTask.objects.filter(
-            due_date__lt=timezone.now().date(),
-            status__in=['to_do', 'in_progress', 'in_review', 'blocked']
-        ).order_by('due_date')
+        if current_user_name:
+            context['overdue_tasks'] = GameDevelopmentTask.objects.filter(
+                Q(assigned_to_name=current_user_name) | Q(created_by_name=current_user_name),
+                due_date__lt=timezone.now().date(),
+                status__in=['to_do', 'in_progress', 'in_review', 'blocked']
+            ).order_by('due_date')
+        else:
+            context['overdue_tasks'] = GameDevelopmentTask.objects.filter(
+                due_date__lt=timezone.now().date(),
+                status__in=['to_do', 'in_progress', 'in_review', 'blocked']
+            ).order_by('due_date')
         context['recent_builds'] = GameBuild.objects.order_by('-build_date')[:5]
         return context
 

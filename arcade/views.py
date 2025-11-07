@@ -23,11 +23,6 @@ class ArcadeDashboardView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['active_department'] = 'arcade'
-        
-        # Fetch only the current user's arcade tasks
-        user_tasks = ArcadeTask.objects.filter(assigned_to=self.request.user).order_by('-due_date')
-        context['user_arcade_tasks'] = user_tasks
-        
         return context
 
 

@@ -6,7 +6,7 @@
 
 {% block content %}
 <div class="container-fluid py-4">
-    <h1 class="mb-4">{{ request.user.username }}'s Dashboard</h1>
+    <h1 class="mb-4">{{ request.session.current_user_name|default:request.user.username }}'s Dashboard</h1>
 
     <!-- Dashboard content starts here -->
     
@@ -189,7 +189,11 @@
                                             </span>
                                         </td>
                                         <td>
-                                            {% if task.assigned_to %}
+                                            {% if task.assigned_to_name %}
+                                                <span class="badge {% if task.assigned_to_name == request.session.current_user_name %}bg-success{% else %}bg-secondary{% endif %}">
+                                                    {{ task.assigned_to_name }}
+                                                </span>
+                                            {% elif task.assigned_to %}
                                                 <span class="badge {% if task.assigned_to.username == request.user.username %}bg-success{% else %}bg-secondary{% endif %}">
                                                     {{ task.assigned_to.username }}
                                                 </span>

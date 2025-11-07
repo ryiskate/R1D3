@@ -62,10 +62,15 @@ class GameProject(TimeStampedModel):
     actual_release_date = models.DateField(null=True, blank=True)
     budget = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
     
-    # Team
-    lead_developer = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='led_games')
-    lead_designer = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='designed_games')
-    lead_artist = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='art_directed_games')
+    # Team (text-based for Git sync compatibility)
+    lead_developer_name = models.CharField(max_length=100, blank=True, help_text="Lead developer name")
+    lead_designer_name = models.CharField(max_length=100, blank=True, help_text="Lead designer name")
+    lead_artist_name = models.CharField(max_length=100, blank=True, help_text="Lead artist name")
+    
+    # Legacy fields (kept for backward compatibility, will be deprecated)
+    lead_developer = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='led_games')
+    lead_designer = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='designed_games')
+    lead_artist = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='art_directed_games')
     team_members = models.ManyToManyField(User, related_name='game_projects', blank=True)
     
     # GitHub Integration
@@ -351,6 +356,8 @@ class GameTask(TimeStampedModel):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='backlog')
     priority = models.CharField(max_length=20, choices=PRIORITY_CHOICES, default='medium')
     assigned_to = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='game_tasks')
+    assigned_to_name = models.CharField(max_length=100, blank=True, default='', help_text="Team member name for Git sync workflow")
+    created_by_name = models.CharField(max_length=100, blank=True, default='', help_text="Creator name for Git sync workflow")
     due_date = models.DateField(null=True, blank=True)
     estimated_hours = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
     actual_hours = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)

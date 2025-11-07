@@ -126,7 +126,7 @@
                         </div>
                         <div class="row">
                             <div class="col-md-6">
-                                {{ form.assigned_to|as_crispy_field }}
+                                {{ form.assigned_to_name|as_crispy_field }}
                             </div>
                             {% block team_field %}
                             <div class="col-md-6">
@@ -140,6 +140,13 @@
                             <div class="col-md-6">
                                 {{ form.due_date|as_crispy_field }}
                             </div>
+                            <div class="col-md-6">
+                                {% if 'epic' in form.fields %}
+                                    {{ form.epic|as_crispy_field }}
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="row">
                             <div class="col-md-6">
                                 {{ form.has_additional_note|as_crispy_field }}
                             </div>
@@ -353,8 +360,8 @@
 <script>
     $(document).ready(function() {
         // Initialize select2 for dropdowns
-        $('#id_assigned_to').select2({
-            placeholder: "Select user(s)",
+        $('#id_assigned_to_name').select2({
+            placeholder: "Select team member",
             allowClear: true,
             width: '100%'
         });

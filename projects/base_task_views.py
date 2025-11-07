@@ -86,8 +86,14 @@ class BaseTaskCreateView(LoginRequiredMixin, CreateView):
     template_name = 'projects/unified_task_form.html'
     
     def form_valid(self, form):
-        # Set the created_by field to the current user
+        # Set the created_by field to the current user (for backward compatibility)
         form.instance.created_by = self.request.user
+        
+        # Set created_by_name from session (for Git sync workflow)
+        current_user_name = self.request.session.get('current_user_name', '')
+        if current_user_name:
+            form.instance.created_by_name = current_user_name
+        
         response = super().form_valid(form)
         
         # Process subtasks if they exist

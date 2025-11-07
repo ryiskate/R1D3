@@ -23,9 +23,6 @@
     .border-left-secondary {
         border-left: 0.25rem solid #858796 !important;
     }
-    .border-left-danger {
-        border-left: 0.25rem solid #e74a3b !important;
-    }
     
     /* Badge Styling */
     .badge {
@@ -33,176 +30,110 @@
         font-weight: 600;
     }
     
-    /* Progress Bar Styling */
-    .progress {
-        height: 0.5rem;
-        margin-bottom: 0.5rem;
-    }
-    
-    /* Card Styling */
-    .status-card {
-        transition: all 0.3s ease;
-    }
-    .status-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    /* Company Cards */
+    .company-card {
+        text-align: center;
+        margin-bottom: 1rem;
+        border-radius: 0.5rem;
     }
     
     /* Table Styling */
     .table-hover tbody tr:hover {
         background-color: rgba(0, 0, 0, 0.075);
     }
-    
-    .task-title {
-        font-weight: 600;
-        color: #4e73df;
-    }
-    
-    .task-id {
-        font-size: 0.8rem;
-        color: #858796;
-    }
 </style>
 {% endblock %}
 
-{% load education_extras %}
 {% block content %}
 <div class="container-fluid py-4">
     <!-- Header -->
     <div class="row mb-4">
         <div class="col-md-8">
-            <h1 class="h3 mb-0 text-gray-800">Education Tasks</h1>
+            <h1>Education Tasks</h1>
         </div>
         <div class="col-md-4 text-end">
-            <a href="{% url 'education:task_create' %}" class="btn btn-primary">
-                <i class="fas fa-plus mr-2"></i> New Education Task
+            <a href="{% url 'education:task_create' %}" class="btn btn-primary btn-icon-split">
+                <span class="icon text-white-50">
+                    <i class="fas fa-plus"></i>
+                </span>
+                <span class="text">New Education Task</span>
             </a>
+            <button type="button" class="btn btn-outline-secondary" id="filtersBtn">
+                <i class="fas fa-filter"></i> Filters
+            </button>
+            <button type="button" class="btn btn-outline-primary" id="batchUpdateBtn">
+                <i class="fas fa-tasks"></i> Batch Update
+            </button>
         </div>
     </div>
     
     <!-- Status Cards -->
     <div class="row mb-4">
         <!-- To Do -->
-        <div class="col-xl-2 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2 status-card">
+        <div class="col">
+            <div class="card border-left-primary shadow h-100 py-2">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">TO DO</div>
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">To Do</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ task_stats.to_do|default:0 }}</div>
                         </div>
-                    </div>
-                    <div class="progress mt-2">
-                        <div class="progress-bar bg-primary" role="progressbar" 
-                             style="width: {{ task_stats.to_do|default:0|percentage:task_stats.total }}%" 
-                             aria-valuenow="{{ task_stats.to_do|default:0|percentage:task_stats.total }}" 
-                             aria-valuemin="0" 
-                             aria-valuemax="100"></div>
                     </div>
                 </div>
             </div>
         </div>
         
         <!-- In Progress -->
-        <div class="col-xl-2 col-md-6 mb-4">
-            <div class="card border-left-warning shadow h-100 py-2 status-card">
+        <div class="col">
+            <div class="card border-left-warning shadow h-100 py-2">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">IN PROGRESS</div>
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">In Progress</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ task_stats.in_progress|default:0 }}</div>
                         </div>
-                    </div>
-                    <div class="progress mt-2">
-                        <div class="progress-bar bg-warning" role="progressbar" 
-                             style="width: {{ task_stats.in_progress|default:0|percentage:task_stats.total }}%" 
-                             aria-valuenow="{{ task_stats.in_progress|default:0|percentage:task_stats.total }}" 
-                             aria-valuemin="0" 
-                             aria-valuemax="100"></div>
                     </div>
                 </div>
             </div>
         </div>
         
         <!-- In Review -->
-        <div class="col-xl-2 col-md-6 mb-4">
-            <div class="card border-left-info shadow h-100 py-2 status-card">
+        <div class="col">
+            <div class="card border-left-info shadow h-100 py-2">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">IN REVIEW</div>
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">In Review</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ task_stats.in_review|default:0 }}</div>
                         </div>
-                    </div>
-                    <div class="progress mt-2">
-                        <div class="progress-bar bg-info" role="progressbar" 
-                             style="width: {{ task_stats.in_review|default:0|percentage:task_stats.total }}%" 
-                             aria-valuenow="{{ task_stats.in_review|default:0|percentage:task_stats.total }}" 
-                             aria-valuemin="0" 
-                             aria-valuemax="100"></div>
                     </div>
                 </div>
             </div>
         </div>
         
         <!-- Done -->
-        <div class="col-xl-2 col-md-6 mb-4">
-            <div class="card border-left-success shadow h-100 py-2 status-card">
+        <div class="col">
+            <div class="card border-left-success shadow h-100 py-2">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">DONE</div>
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Done</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ task_stats.done|default:0 }}</div>
                         </div>
                     </div>
-                    <div class="progress mt-2">
-                        <div class="progress-bar bg-success" role="progressbar" 
-                             style="width: {{ task_stats.done|default:0|percentage:task_stats.total }}%" 
-                             aria-valuenow="{{ task_stats.done|default:0|percentage:task_stats.total }}" 
-                             aria-valuemin="0" 
-                             aria-valuemax="100"></div>
-                    </div>
                 </div>
             </div>
         </div>
         
-        <!-- Blocked -->
-        <div class="col-xl-2 col-md-6 mb-4">
-            <div class="card border-left-danger shadow h-100 py-2 status-card">
+        <!-- Backlog -->
+        <div class="col">
+            <div class="card border-left-secondary shadow h-100 py-2">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">BLOCKED</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ task_stats.blocked|default:0 }}</div>
+                            <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">Backlog</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ task_stats.backlog|default:0 }}</div>
                         </div>
-                    </div>
-                    <div class="progress mt-2">
-                        <div class="progress-bar bg-danger" role="progressbar" 
-                             style="width: {{ task_stats.blocked|default:0|percentage:task_stats.total }}%" 
-                             aria-valuenow="{{ task_stats.blocked|default:0|percentage:task_stats.total }}" 
-                             aria-valuemin="0" 
-                             aria-valuemax="100"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Total -->
-        <div class="col-xl-2 col-md-6 mb-4">
-            <div class="card border-left-info shadow h-100 py-2 status-card">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">TOTAL</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ task_stats.total|default:0 }}</div>
-                        </div>
-                    </div>
-                    <div class="progress mt-2">
-                        <div class="progress-bar bg-info" role="progressbar" 
-                             style="width: 100%" 
-                             aria-valuenow="100" 
-                             aria-valuemin="0" 
-                             aria-valuemax="100"></div>
                     </div>
                 </div>
             </div>
@@ -212,15 +143,10 @@
     <!-- Task Table -->
     <div class="row">
         <div class="col-12">
+            <h5 class="mb-3">Education Tasks</h5>
+        </div>
+        <div class="col-12">
             <div class="card shadow mb-4">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Education Tasks</h6>
-                    <div>
-                        <button type="button" class="btn btn-sm btn-outline-primary" id="batchUpdateBtn">
-                            <i class="fas fa-tasks"></i> Batch Update
-                        </button>
-                    </div>
-                </div>
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-hover" id="taskTable">
@@ -229,7 +155,7 @@
                                     <th width="30">
                                         <input type="checkbox" class="form-check-input" id="selectAllTasks">
                                     </th>
-                                    <th>Task</th>
+                                    <th>Title</th>
                                     <th>Company Section</th>
                                     <th>Status</th>
                                     <th>Priority</th>
@@ -245,23 +171,20 @@
                                         <input type="checkbox" class="form-check-input task-checkbox" value="{{ task.id }}">
                                     </td>
                                     <td>
-                                        <a href="{% url 'education:task_detail' task.id %}" class="task-title">{{ task.title }}</a>
-                                        <div class="task-id">ID: {{ task.id }}</div>
+                                        <a href="{% url 'education:task_detail' task.id %}">{{ task.title }}</a>
+                                        <div class="small text-muted">ID: {{ task.id }}</div>
                                     </td>
                                     <td>
-                                        <span class="badge bg-info text-white">
-                                            <i class="fas fa-graduation-cap me-1"></i>
-                                            Education
-                                        </span>
+                                        <span class="badge bg-info rounded-pill">Education</span>
                                     </td>
                                     <td>
-                                        <span class="badge bg-{{ task.status|task_status_color }}">
+                                        <span class="badge bg-{{ task.status|task_status_color }} rounded-pill">
                                             <i class="fas fa-clipboard-list me-1"></i>
                                             {{ task.get_status_display }}
                                         </span>
                                     </td>
                                     <td>
-                                        <span class="badge bg-{% if task.priority == 'high' %}danger{% elif task.priority == 'medium' %}warning{% else %}success{% endif %}">
+                                        <span class="badge bg-{% if task.priority == 'high' %}danger{% elif task.priority == 'medium' %}warning{% else %}success{% endif %} rounded-pill">
                                             <i class="fas fa-{% if task.priority == 'high' %}arrow-up{% elif task.priority == 'medium' %}minus{% else %}arrow-down{% endif %} me-1"></i>
                                             {{ task.get_priority_display }}
                                         </span>
@@ -287,7 +210,7 @@
                                         <a href="{% url 'education:task_update' task.id %}" class="btn btn-sm btn-outline-primary">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <a href="{% url 'education:task_delete' task.id %}" class="btn btn-sm btn-outline-danger delete-task-btn" data-task-id="{{ task.id }}">
+                                        <a href="{% url 'education:task_delete' task.id %}" class="btn btn-sm btn-outline-danger">
                                             <i class="fas fa-trash"></i>
                                         </a>
                                     </td>

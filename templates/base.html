@@ -343,11 +343,18 @@
                 <!-- Dynamic Department Sidebar Content -->
                 <div id="sidebar-content">
                     {% block sidebar_content %}
-                        {% if '/R1D3-tasks/' in request.path %}
+                        {% if '/R1D3-tasks/' in request.path or '/projects/epics/' in request.path %}
                             <!-- R1D3 Tasks sidebar content -->
                             <div class="sidebar-heading">
                                 R1D3 Tasks
                             </div>
+                            
+                            <li class="nav-item">
+                                <a class="nav-link {% if '/projects/epics/' in request.path %}active{% endif %}" href="{% url 'projects:epic_list' %}">
+                                    <i class="fas fa-fw fa-layer-group"></i>
+                                    <span>Epics</span>
+                                </a>
+                            </li>
                             
                             <li class="nav-item">
                                 <a class="nav-link {% if request.path == '/R1D3-tasks/' %}active{% endif %}" href="/R1D3-tasks/">
@@ -633,9 +640,9 @@
     <!-- The education sidebar is now included via the sidebar.html template -->
     {% elif request.resolver_match.namespace != 'indie_news' %}
     <script src="/static/js/department_sidebar_v2.js"></script>
-    {% if '/R1D3-tasks/' in request.path %}
+    {% if '/R1D3-tasks/' in request.path or '/projects/epics/' in request.path %}
     <!-- R1D3 Tasks Sidebar Script (takes precedence over department sidebar) -->
-    <script src="/static/js/r1d3_tasks_sidebar.js"></script>
+    <script src="/static/js/r1d3_tasks_sidebar.js?v=2"></script>
     {% endif %}
     {% endif %}
     

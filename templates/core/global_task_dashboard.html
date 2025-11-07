@@ -396,7 +396,9 @@
                                 </span>
                             </td>
                             <td>
-                                {% if task.assigned_to %}
+                                {% if task.assigned_to_name %}
+                                <span class="badge bg-success">{{ task.assigned_to_name }}</span>
+                                {% elif task.assigned_to %}
                                 <a href="?assigned_to={{ task.assigned_to.id }}">{{ task.assigned_to.username }}</a>
                                 {% else %}
                                 <span class="text-muted">Unassigned</span>

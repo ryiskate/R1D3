@@ -100,84 +100,85 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table" id="socialMediaTasksTable" width="100%" cellspacing="0">
+                <table class="table table-bordered" id="socialMediaTasksTable" width="100%" cellspacing="0">
                     <thead>
                         <tr>
-                            <th style="width: 30px;">
-                                <input type="checkbox" class="form-check-input" id="selectAllTasks">
-                            </th>
-                            <th>Task</th>
-                            <th>Company Section</th>
-                            <th>Status</th>
+                            <th>Task ID</th>
+                            <th>Task Name</th>
+                            <th>Description</th>
                             <th>Priority</th>
+                            <th>Status</th>
                             <th>Assigned To</th>
                             <th>Due Date</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% if user_social_media_tasks %}
-                            {% for task in user_social_media_tasks %}
-                                <tr>
-                                    <td>
-                                        <input type="checkbox" class="form-check-input task-checkbox" value="{{ task.id }}">
-                                    </td>
-                                    <td>
-                                        <a href="{% url 'social_media:task_detail' task.id %}" class="text-primary fw-bold">{{ task.title }}</a>
-                                        <div class="small text-muted">ID: {{ task.id }}</div>
-                                    </td>
-                                    <td>
-                                        <span class="badge text-white" style="background-color: #e83e8c;">Social Media</span>
-                                    </td>
-                                    <td>
-                                        {% if task.status == 'To Do' %}
-                                            <span class="badge bg-primary">To Do</span>
-                                        {% elif task.status == 'In Progress' %}
-                                            <span class="badge bg-primary">In Progress</span>
-                                        {% elif task.status == 'Review' %}
-                                            <span class="badge bg-primary">Review</span>
-                                        {% elif task.status == 'Done' %}
-                                            <span class="badge bg-primary">Done</span>
-                                        {% else %}
-                                            <span class="badge bg-primary">Blocked</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if task.priority == 'Critical' %}
-                                            <span class="badge bg-danger">High</span>
-                                        {% elif task.priority == 'High' %}
-                                            <span class="badge bg-danger">High</span>
-                                        {% elif task.priority == 'Medium' %}
-                                            <span class="badge bg-warning text-dark">Medium</span>
-                                        {% else %}
-                                            <span class="badge bg-info">Low</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if task.assigned_to %}
-                                            {{ task.assigned_to.username }}
-                                        {% else %}
-                                            Unassigned
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if task.due_date %}
-                                            <a href="#" class="text-primary">{{ task.due_date|date:"M d, Y" }}</a>
-                                        {% else %}
-                                            No due date
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        <a href="{% url 'social_media:task_update' task.id %}" class="btn btn-sm btn-outline-primary"><i class="fas fa-edit"></i></a>
-                                        <a href="#" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></a>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        {% else %}
-                            <tr>
-                                <td colspan="8" class="text-center">You don't have any social media tasks assigned to you.</td>
-                            </tr>
-                        {% endif %}
+                        <tr>
+                            <td>SM-001</td>
+                            <td>Create Game Launch Campaign</td>
+                            <td>Develop social media campaign for upcoming game launch</td>
+                            <td><span class="badge bg-danger">Critical</span></td>
+                            <td><span class="badge bg-warning">In Progress</span></td>
+                            <td>Emily Parker</td>
+                            <td>2025-06-25</td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>SM-002</td>
+                            <td>Influencer Outreach</td>
+                            <td>Contact gaming influencers for promotional partnerships</td>
+                            <td><span class="badge bg-primary">High</span></td>
+                            <td><span class="badge bg-secondary">To Do</span></td>
+                            <td>David Wilson</td>
+                            <td>2025-07-10</td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>SM-003</td>
+                            <td>Community Event Planning</td>
+                            <td>Plan online community event for game anniversary</td>
+                            <td><span class="badge bg-info">Medium</span></td>
+                            <td><span class="badge bg-success">Done</span></td>
+                            <td>Sophia Martinez</td>
+                            <td>2025-06-05</td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>SM-004</td>
+                            <td>Content Calendar Creation</td>
+                            <td>Develop Q3 content calendar for all social platforms</td>
+                            <td><span class="badge bg-primary">High</span></td>
+                            <td><span class="badge bg-warning">In Progress</span></td>
+                            <td>Alex Thompson</td>
+                            <td>2025-06-30</td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>SM-005</td>
+                            <td>Analytics Report</td>
+                            <td>Prepare monthly social media performance report</td>
+                            <td><span class="badge bg-info">Medium</span></td>
+                            <td><span class="badge bg-secondary">To Do</span></td>
+                            <td>Jessica Lee</td>
+                            <td>2025-07-05</td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>

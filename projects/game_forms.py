@@ -1,4 +1,5 @@
 from django import forms
+from django.conf import settings
 from .game_models import (
     GameProject, GameDesignDocument, GameAsset, GameMilestone, 
     GameTask, GameBuild, PlaytestSession, PlaytestFeedback, GameBug
@@ -6,12 +7,29 @@ from .game_models import (
 
 
 class GameProjectForm(forms.ModelForm):
+    # Text-based lead fields with dropdown from TEAM_MEMBERS
+    lead_developer_name = forms.ChoiceField(
+        required=False,
+        label='Lead Developer',
+        help_text='Select the lead developer for this project'
+    )
+    lead_designer_name = forms.ChoiceField(
+        required=False,
+        label='Lead Designer',
+        help_text='Select the lead designer for this project'
+    )
+    lead_artist_name = forms.ChoiceField(
+        required=False,
+        label='Lead Artist',
+        help_text='Select the lead artist for this project'
+    )
+    
     class Meta:
         model = GameProject
         fields = [
             'title', 'tagline', 'description', 'status', 'genre', 'platforms',
             'target_audience', 'start_date', 'target_release_date', 'budget',
-            'lead_developer', 'lead_designer', 'lead_artist', 'team_members',
+            'lead_developer_name', 'lead_designer_name', 'lead_artist_name',
             # GitHub integration fields
             'github_repository', 'github_username', 'github_token', 'github_webhook_secret',
             'github_branch', 'auto_sync',
@@ -24,7 +42,6 @@ class GameProjectForm(forms.ModelForm):
             'target_audience': forms.TextInput(attrs={'placeholder': 'e.g., Casual gamers, 18-35 years old'}),
             'start_date': forms.DateInput(attrs={'type': 'date'}),
             'target_release_date': forms.DateInput(attrs={'type': 'date'}),
-            'team_members': forms.SelectMultiple(attrs={'class': 'select2'}),
             # GitHub integration widgets
             'github_repository': forms.URLInput(attrs={'placeholder': 'https://github.com/username/repo'}),
             'github_username': forms.TextInput(attrs={'placeholder': 'username or organization'}),
@@ -38,6 +55,12 @@ class GameProjectForm(forms.ModelForm):
         
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        
+        # Set choices for lead fields from TEAM_MEMBERS
+        self.fields['lead_developer_name'].choices = settings.TEAM_MEMBERS
+        self.fields['lead_designer_name'].choices = settings.TEAM_MEMBERS
+        self.fields['lead_artist_name'].choices = settings.TEAM_MEMBERS
+        
         self.fields['github_token'].required = False
         self.fields['github_webhook_secret'].required = False
 

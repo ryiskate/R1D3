@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('strategy', '0003_create_strategymilestone_sqlite'),
+        ('strategy', '0002_remove_is_completed_add_status'),
     ]
 
     operations = [

@@ -7,10 +7,20 @@ from . import unified_task_views
 from . import unified_task_forms
 # Import the all tasks views
 from . import all_tasks_views
+# Import epic views
+from . import epic_views
 
 app_name = 'projects'
 
 urlpatterns = [
+    # Epic URLs
+    path('epics/', epic_views.EpicListView.as_view(), name='epic_list'),
+    path('epics/create/', epic_views.EpicCreateView.as_view(), name='epic_create'),
+    path('epics/<int:pk>/', epic_views.EpicDetailView.as_view(), name='epic_detail'),
+    path('epics/<int:pk>/update/', epic_views.EpicUpdateView.as_view(), name='epic_update'),
+    path('epics/<int:pk>/delete/', epic_views.EpicDeleteView.as_view(), name='epic_delete'),
+    
+    # Project URLs
     path('', views.ProjectDashboardView.as_view(), name='dashboard'),
     path('list/', views.ProjectListView.as_view(), name='project_list'),
     path('<int:pk>/', views.ProjectDetailView.as_view(), name='project_detail'),
