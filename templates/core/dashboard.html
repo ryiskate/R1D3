@@ -251,6 +251,11 @@
         const btn = this;
         const originalHTML = btn.innerHTML;
         
+        // Warn user about stopping server
+        if (!confirm('⚠️ IMPORTANT: You must STOP the Django server before syncing!\n\n1. Stop server (Ctrl+C in terminal)\n2. Click OK to sync\n3. Restart server after sync\n\nHave you stopped the server?')) {
+            return;
+        }
+        
         // Disable button and show loading
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Syncing...';

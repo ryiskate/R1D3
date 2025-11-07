@@ -27,6 +27,11 @@
         const btn = this;
         const originalHTML = btn.innerHTML;
         
+        // Warn user about stopping server
+        if (!confirm('⚠️ IMPORTANT: You must STOP the Django server before syncing!\n\n1. Stop server (Ctrl+C in terminal)\n2. Click OK to sync\n3. Restart server after sync\n\nHave you stopped the server?')) {
+            return;
+        }
+        
         // Disable button and show loading
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Syncing...';
@@ -55,7 +60,7 @@
                 console.error('Error checking sync status:', error);
                 btn.disabled = false;
                 btn.innerHTML = originalHTML;
-                alert('Error checking sync status. See console for details.');
+                alert('Error checking sync status: ' + error.message + '\n\nThis might mean:\n1. Git is not installed\n2. Not in a Git repository\n3. Server needs restart\n\nTry manual sync instead:\n1. Stop server (Ctrl+C)\n2. Run: git pull\n3. Restart server');
             });
         
         function performSync(commitMessage) {

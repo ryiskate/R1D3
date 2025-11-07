@@ -28,10 +28,16 @@ def sync_database(request):
 @require_http_methods(["GET"])
 def sync_status(request):
     """Get current sync status"""
-    sync_manager = GitSyncManager()
-    status = sync_manager.get_sync_status()
-    
-    return JsonResponse(status)
+    try:
+        sync_manager = GitSyncManager()
+        status = sync_manager.get_sync_status()
+        return JsonResponse(status)
+    except Exception as e:
+        return JsonResponse({
+            'error': True,
+            'message': str(e),
+            'has_uncommitted_changes': False
+        }, status=500)
 
 
 @login_required

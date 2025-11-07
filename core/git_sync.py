@@ -139,18 +139,32 @@ class GitSyncManager:
     
     def get_sync_status(self):
         """Get current sync status information"""
-        # Check for uncommitted changes
-        db_changes = self.check_database_changes()
-        
-        # Get last commit info
-        last_commit = self.run_git_command('git log -1 --pretty=format:"%h - %s (%cr)" db.sqlite3')
-        
-        # Check if we're behind remote
-        self.run_git_command('git fetch')
-        behind = self.run_git_command('git rev-list HEAD..origin/master --count')
-        
-        return {
-            'has_uncommitted_changes': db_changes['has_changes'],
-            'last_database_commit': last_commit['output'] if last_commit['success'] else 'Unknown',
-            'commits_behind': int(behind['output'].strip()) if behind['success'] and behind['output'].strip().isdigit() else 0
-        }
+        try:
+            # Check for uncommitted changes
+            db_changes = self.check_database_changes()
+            
+            # Get last commit info
+            last_commit = self.run_git_command('git log -1 --pretty=format:"%h - %s (%cr)" db.sqlite3')
+            
+            # Check if we're behind remote (skip fetch if it fails)
+            fetch_result = self.run_git_command('git fetch')
+            commits_behind = 0
+            
+            if fetch_result['success']:
+                behind = self.run_git_command('git rev-list HEAD..origin/master --count')
+                if behind['success'] and behind['output'].strip().isdigit():
+                    commits_behind = int(behind['output'].strip())
+            
+            return {
+                'has_uncommitted_changes': db_changes['has_changes'],
+                'last_database_commit': last_commit['output'] if last_commit['success'] else 'Unknown',
+                'commits_behind': commits_behind
+            }
+        except Exception as e:
+            # Return minimal status if there's an error
+            return {
+                'has_uncommitted_changes': False,
+                'last_database_commit': 'Error: ' + str(e),
+                'commits_behind': 0,
+                'error': str(e)
+            }
