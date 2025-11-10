@@ -265,10 +265,16 @@
                 <div class="card-body">
                     <div class="list-group">
                         {% for subtask in subtasks %}
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>
+                        <div class="list-group-item d-flex align-items-center" data-subtask-id="{{ subtask.id }}">
+                            <div class="form-check me-3">
+                                <input class="form-check-input subtask-checkbox" type="checkbox" 
+                                       id="subtask-{{ subtask.id }}" 
+                                       {% if subtask.is_completed %}checked{% endif %}
+                                       data-subtask-id="{{ subtask.id }}">
+                            </div>
+                            <div class="flex-grow-1">
                                 {% if subtask.is_completed %}
-                                <span class="text-decoration-line-through">{{ subtask.title }}</span>
+                                <span class="text-decoration-line-through text-muted">{{ subtask.title }}</span>
                                 {% else %}
                                 <span>{{ subtask.title }}</span>
                                 {% endif %}
@@ -290,8 +296,48 @@
 {% block extra_js %}
 <script>
     $(document).ready(function() {
-        // Add any task-specific JavaScript here
-        console.log("Education task detail page loaded");
+        // Handle subtask checkbox changes
+        $('.subtask-checkbox').change(function() {
+            const checkbox = $(this);
+            const subtaskId = checkbox.data('subtask-id');
+            const isCompleted = checkbox.is(':checked');
+            const listItem = checkbox.closest('.list-group-item');
+            const titleSpan = listItem.find('.flex-grow-1 span');
+            
+            // Update UI immediately
+            if (isCompleted) {
+                titleSpan.addClass('text-decoration-line-through text-muted');
+                titleSpan.removeClass('');
+            } else {
+                titleSpan.removeClass('text-decoration-line-through text-muted');
+            }
+            
+            // Send AJAX request to update subtask
+            $.ajax({
+                url: `/api/subtasks/${subtaskId}/toggle/`,
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                data: {
+                    is_completed: isCompleted
+                },
+                success: function(response) {
+                    console.log('Subtask updated successfully');
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error updating subtask:', error);
+                    // Revert checkbox on error
+                    checkbox.prop('checked', !isCompleted);
+                    if (!isCompleted) {
+                        titleSpan.addClass('text-decoration-line-through text-muted');
+                    } else {
+                        titleSpan.removeClass('text-decoration-line-through text-muted');
+                    }
+                    alert('Failed to update subtask. Please try again.');
+                }
+            });
+        });
     });
 </script>
 {% endblock %}

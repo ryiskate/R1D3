@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Delete Game - {{ game.title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card shadow">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Confirm Delete Game Project
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-danger" role="alert">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <strong>Warning!</strong> This action cannot be undone. All data associated with this game will be permanently deleted.
+                    </div>
+                    
+                    <h4 class="mb-3">Are you sure you want to delete this game project?</h4>
+                    
+                    <div class="card bg-light mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ game.title }}</h5>
+                            {% if game.tagline %}
+                            <p class="text-muted fst-italic">{{ game.tagline }}</p>
+                            {% endif %}
+                            <p class="card-text">{{ game.description|truncatewords:30 }}</p>
+                            
+                            <div class="row mt-3">
+                                <div class="col-6">
+                                    <small class="text-muted">
+                                        <i class="fas fa-gamepad me-1"></i>
+                                        <strong>{{ game.get_genre_display }}</strong>
+                                    </small>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted">
+                                        <i class="fas fa-desktop me-1"></i>
+                                        <strong>{{ game.get_platforms_display }}</strong>
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-6">
+                                    <small class="text-muted">
+                                        <i class="fas fa-signal me-1"></i>
+                                        <strong>{{ game.get_status_display }}</strong>
+                                    </small>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted">
+                                        <i class="fas fa-calendar me-1"></i>
+                                        <strong>{{ game.start_date|date:"M d, Y" }}</strong>
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if task_count > 0 %}
+                    <div class="alert alert-warning" role="alert">
+                        <i class="fas fa-tasks me-2"></i>
+                        <strong>Note:</strong> This game has <strong>{{ task_count }}</strong> associated task(s). 
+                        All tasks will also be deleted.
+                    </div>
+                    {% endif %}
+                    
+                    <div class="alert alert-info" role="alert">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Alternative:</strong> Consider archiving this game instead of deleting it. 
+                        Archived games are hidden from the main list but can be restored later.
+                    </div>
+                    
+                    <form method="post" class="mt-4">
+                        {% csrf_token %}
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'games:game_detail' game.pk %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                            <div>
+                                <a href="{% url 'games:game_detail' game.pk %}" class="btn btn-warning me-2">
+                                    <i class="fas fa-archive me-2"></i>Archive Instead
+                                </a>
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fas fa-trash-alt me-2"></i>Yes, Delete Permanently
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

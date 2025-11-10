@@ -210,10 +210,16 @@
                             <h6 class="fw-bold">Subtasks</h6>
                             <div class="list-group">
                                 {% for subtask in subtasks %}
-                                <div class="list-group-item d-flex justify-content-between align-items-center">
-                                    <div>
+                                <div class="list-group-item d-flex align-items-center" data-subtask-id="{{ subtask.id }}">
+                                    <div class="form-check me-3">
+                                        <input class="form-check-input subtask-checkbox" type="checkbox" 
+                                               id="subtask-{{ subtask.id }}" 
+                                               {% if subtask.is_completed %}checked{% endif %}
+                                               data-subtask-id="{{ subtask.id }}">
+                                    </div>
+                                    <div class="flex-grow-1">
                                         {% if subtask.is_completed %}
-                                        <span class="text-decoration-line-through">{{ subtask.title }}</span>
+                                        <span class="text-decoration-line-through text-muted">{{ subtask.title }}</span>
                                         {% else %}
                                         <span>{{ subtask.title }}</span>
                                         {% endif %}
@@ -312,11 +318,62 @@
 
 {% block extra_js %}
 <script>
-    // Set the width of progress bars after page load to avoid CSS lint errors
     document.addEventListener('DOMContentLoaded', function() {
+        // Set the width of progress bars after page load to avoid CSS lint errors
         const progressBars = document.querySelectorAll('.progress-bar[data-percentage]');
         progressBars.forEach(bar => {
             bar.style.width = bar.dataset.percentage + '%';
+        });
+        
+        // Handle subtask checkbox changes
+        document.querySelectorAll('.subtask-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const subtaskId = this.dataset.subtaskId;
+                const isCompleted = this.checked;
+                const listItem = this.closest('.list-group-item');
+                const titleSpan = listItem.querySelector('.flex-grow-1 span');
+                
+                // Update UI immediately
+                if (isCompleted) {
+                    titleSpan.classList.add('text-decoration-line-through', 'text-muted');
+                } else {
+                    titleSpan.classList.remove('text-decoration-line-through', 'text-muted');
+                }
+                
+                // Send AJAX request to update subtask
+                fetch(`/api/subtasks/${subtaskId}/toggle/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `is_completed=${isCompleted}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.success) {
+                        // Revert on error
+                        checkbox.checked = !isCompleted;
+                        if (!isCompleted) {
+                            titleSpan.classList.add('text-decoration-line-through', 'text-muted');
+                        } else {
+                            titleSpan.classList.remove('text-decoration-line-through', 'text-muted');
+                        }
+                        alert('Failed to update subtask. Please try again.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // Revert on error
+                    checkbox.checked = !isCompleted;
+                    if (!isCompleted) {
+                        titleSpan.classList.add('text-decoration-line-through', 'text-muted');
+                    } else {
+                        titleSpan.classList.remove('text-decoration-line-through', 'text-muted');
+                    }
+                    alert('Failed to update subtask. Please try again.');
+                });
+            });
         });
     });
 </script>

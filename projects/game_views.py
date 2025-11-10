@@ -31,8 +31,15 @@ class GameDashboardView(LoginRequiredMixin, ListView):
     context_object_name = 'games'
     
     def get_queryset(self):
-        # Show active game projects by default
-        return GameProject.objects.filter(status__in=['pre_production', 'production', 'alpha', 'beta'])
+        # Show active game projects by default (exclude archived)
+        queryset = GameProject.objects.filter(status__in=['pre_production', 'production', 'alpha', 'beta'])
+        
+        # Check if user wants to see archived games
+        show_archived = self.request.GET.get('show_archived', 'false') == 'true'
+        if not show_archived:
+            queryset = queryset.filter(is_archived=False)
+        
+        return queryset
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -99,6 +106,11 @@ class GameProjectListView(LoginRequiredMixin, ListView):
     
     def get_queryset(self):
         queryset = GameProject.objects.all()
+        
+        # Check if user wants to see archived games
+        show_archived = self.request.GET.get('show_archived', 'false') == 'true'
+        if not show_archived:
+            queryset = queryset.filter(is_archived=False)
         
         # Filter by status if provided
         status = self.request.GET.get('status')
@@ -1002,3 +1014,43 @@ class GameTaskUpdateView(BaseTaskUpdateView):
 
 # GameTaskListView has been removed as it's been replaced by GameTaskDashboardView
 # This reduces potential security vulnerabilities from unused views
+
+
+class GameProjectDeleteView(LoginRequiredMixin, DeleteView):
+    """
+    Delete a game project
+    """
+    model = GameProject
+    template_name = 'projects/game_confirm_delete.html'
+    context_object_name = 'game'
+    success_url = reverse_lazy('games:dashboard')
+    
+    def delete(self, request, *args, **kwargs):
+        game = self.get_object()
+        messages.success(request, f"Game project '{game.title}' deleted successfully!")
+        return super().delete(request, *args, **kwargs)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Get task count for warning
+        context['task_count'] = GameDevelopmentTask.objects.filter(game=self.object).count()
+        return context
+
+
+class GameProjectArchiveView(LoginRequiredMixin, View):
+    """
+    Archive/Unarchive a game project
+    """
+    def post(self, request, pk):
+        game = get_object_or_404(GameProject, pk=pk)
+        
+        # Toggle archive status
+        game.is_archived = not game.is_archived
+        game.save()
+        
+        if game.is_archived:
+            messages.success(request, f"Game project '{game.title}' archived successfully!")
+        else:
+            messages.success(request, f"Game project '{game.title}' unarchived successfully!")
+        
+        return redirect('games:game_detail', pk=game.pk)

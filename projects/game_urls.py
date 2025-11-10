@@ -24,6 +24,8 @@ urlpatterns = [
     path('create/', game_views.GameProjectCreateView.as_view(), name='game_create'),
     path('<int:pk>/update/', game_views.GameProjectUpdateView.as_view(), name='game_update'),
     path('<int:pk>/update-status/', GameStatusUpdateView.as_view(), name='game_update_status'),
+    path('<int:pk>/delete/', game_views.GameProjectDeleteView.as_view(), name='game_delete'),
+    path('<int:pk>/archive/', game_views.GameProjectArchiveView.as_view(), name='game_archive'),
     
     # Game Design Document URLs
     path('<int:pk>/gdd/', game_views.GameDesignDocumentView.as_view(), name='gdd_detail'),

@@ -13,7 +13,12 @@
     <!-- Game Header -->
     <div class="row mb-4">
         <div class="col-md-8">
-            <h1>{{ game.title }} <span class="badge bg-success">✓ VERIFIED</span></h1>
+            <h1>{{ game.title }} 
+                <span class="badge bg-success">✓ VERIFIED</span>
+                {% if game.is_archived %}
+                <span class="badge bg-warning text-dark"><i class="fas fa-archive me-1"></i>ARCHIVED</span>
+                {% endif %}
+            </h1>
             {% if game.tagline %}<p class="lead">{{ game.tagline }}</p>{% endif %}
             <div class="mb-3 d-flex align-items-center">
                 <!-- Status Badge -->
@@ -86,7 +91,20 @@
                     </a></li>
                     <li><a class="dropdown-item" href="{% url 'games:task_kanban' game.id %}">Kanban Board</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-danger" href="#">Archive Game</a></li>
+                    <li>
+                        <form method="post" action="{% url 'games:game_archive' game.id %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="dropdown-item text-warning">
+                                <i class="fas fa-archive me-2"></i>
+                                {% if game.is_archived %}Unarchive Game{% else %}Archive Game{% endif %}
+                            </button>
+                        </form>
+                    </li>
+                    <li>
+                        <a class="dropdown-item text-danger" href="{% url 'games:game_delete' game.id %}">
+                            <i class="fas fa-trash-alt me-2"></i>Delete Game
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>

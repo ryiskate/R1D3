@@ -8,6 +8,7 @@ from .debug_views import debug_milestones
 from .views_milestone import get_milestone_display, test_milestone_update
 from .profile_views import select_profile, clear_profile
 from .sync_views import sync_database, sync_status, pull_database
+from .subtask_views import toggle_subtask
 
 app_name = 'core'
 
@@ -53,4 +54,7 @@ urlpatterns = [
     path('api/sync/database/', sync_database, name='sync_database'),
     path('api/sync/status/', sync_status, name='sync_status'),
     path('api/sync/pull/', pull_database, name='pull_database'),
+    
+    # Subtask API
+    path('api/subtasks/<int:subtask_id>/toggle/', toggle_subtask, name='toggle_subtask'),
 ]

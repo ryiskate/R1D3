@@ -93,6 +93,9 @@ class GameProject(TimeStampedModel):
     related_goals = models.ManyToManyField(Goal, related_name='game_projects', blank=True)
     related_objectives = models.ManyToManyField(Objective, related_name='game_projects', blank=True)
     
+    # Archive status
+    is_archived = models.BooleanField(default=False, help_text="Archive this game project")
+    
     def __str__(self):
         return self.title
     
