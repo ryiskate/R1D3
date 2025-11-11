@@ -944,6 +944,8 @@ class R1D3TaskDeleteView(LoginRequiredMixin, DeleteView):
             self._set_task_specifics(model.__name__)
             return task
         except model.DoesNotExist:
+            # Task doesn't exist - show friendly error
+            messages.error(self.request, f"Task with ID {task_id} not found. It may have already been deleted.")
             raise Http404(f"No {task_type} task found with ID {task_id}")
     
     def _set_task_specifics(self, model_name):

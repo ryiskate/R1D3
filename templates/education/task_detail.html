@@ -323,10 +323,20 @@
                     is_completed: isCompleted
                 },
                 success: function(response) {
-                    console.log('Subtask updated successfully');
+                    console.log('Subtask updated successfully', response);
+                    if (!response.success) {
+                        // Revert on error
+                        checkbox.prop('checked', !isCompleted);
+                        if (!isCompleted) {
+                            titleSpan.addClass('text-decoration-line-through text-muted');
+                        } else {
+                            titleSpan.removeClass('text-decoration-line-through text-muted');
+                        }
+                        alert('Failed to update subtask: ' + (response.error || 'Unknown error'));
+                    }
                 },
                 error: function(xhr, status, error) {
-                    console.error('Error updating subtask:', error);
+                    console.error('Error updating subtask:', error, xhr.responseText);
                     // Revert checkbox on error
                     checkbox.prop('checked', !isCompleted);
                     if (!isCompleted) {
@@ -334,7 +344,7 @@
                     } else {
                         titleSpan.removeClass('text-decoration-line-through text-muted');
                     }
-                    alert('Failed to update subtask. Please try again.');
+                    alert('Failed to update subtask. Error: ' + (xhr.responseText || error));
                 }
             });
         });
