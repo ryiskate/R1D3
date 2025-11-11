@@ -471,6 +471,23 @@
             });
         });
         
+        // Update all subtask data before form submission
+        $('form').on('submit', function(e) {
+            console.log('Form submitting, updating all subtask data...');
+            
+            // Update all subtask rows
+            $('.subtask-row').each(function() {
+                updateSubtaskData($(this));
+            });
+            
+            // Log all subtask data being sent
+            var subtaskInputs = $('input[name="subtasks"]');
+            console.log('Number of subtask inputs:', subtaskInputs.length);
+            subtaskInputs.each(function(index) {
+                console.log('Subtask ' + (index + 1) + ':', $(this).val());
+            });
+        });
+        
         // Native HTML5 date input is used instead of Bootstrap datepicker
         // This prevents the double calendar issue
     });
