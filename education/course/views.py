@@ -7,14 +7,7 @@ from django.db import transaction
 from django.contrib import messages
 from django.template.loader import render_to_string
 
-# Import WeasyPrint only when needed to avoid issues during migrations
-weasyprint_imported = False
-try:
-    from weasyprint import HTML
-    from weasyprint.text.fonts import FontConfiguration
-    weasyprint_imported = True
-except ImportError:
-    pass
+# WeasyPrint will be imported lazily when needed to avoid system dependency issues
 
 from core.mixins import BreadcrumbMixin
 from .models import Course, ConceptSection, AdvancedTopicSection, PracticalExample, GlossaryTerm
@@ -246,9 +239,12 @@ class CoursePDFView(LoginRequiredMixin, View):
     """View for exporting a course as PDF"""
     
     def get(self, request, *args, **kwargs):
-        # Check if WeasyPrint is available
-        if not weasyprint_imported:
-            messages.error(request, "PDF export is not available. WeasyPrint library is not installed.")
+        # Try to import WeasyPrint lazily
+        try:
+            from weasyprint import HTML
+            from weasyprint.text.fonts import FontConfiguration
+        except (ImportError, OSError) as e:
+            messages.error(request, f"PDF export is not available. WeasyPrint dependencies are missing: {str(e)}")
             return redirect('education:course_detail', pk=self.kwargs['pk'])
             
         # Get the course object
